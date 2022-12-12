@@ -59,3 +59,12 @@ void CLIENT::set_state_unlock()
 {
 	_state_lock.unlock();
 }
+
+void CLIENT::set_recv_over(EXP_OVER& recv_over, SOCKET c_socket)
+{
+	_recv_over.m_comp_op = recv_over.m_comp_op;
+	_recv_over.m_wsa_buf.buf = recv_over.m_wsa_buf.buf;
+	_recv_over.m_wsa_buf.len = recv_over.m_wsa_buf.len;
+	ZeroMemory(&_recv_over.m_wsa_over, sizeof(recv_over.m_wsa_over));
+	_socket = c_socket;
+}

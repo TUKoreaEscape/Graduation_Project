@@ -1,7 +1,7 @@
 #pragma once
 #include "Voice_chat.h"
 
-void CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2) {
+void CALLBACK Voice_Chat::waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2) {
     switch (uMsg)
     {
         // 데이터가 호출되면 메시지가 WIM_DATA로 호출된다.
