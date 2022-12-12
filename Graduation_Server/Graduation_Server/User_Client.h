@@ -12,10 +12,12 @@ private:
 	int			_prev_size;
 	int			_id;
 
-	SOCKET		_socket;
-	EXP_OVER	_recv_over;
+
+
 
 public:
+	SOCKET		_socket;
+	EXP_OVER	_recv_over;
 	CLIENT() : _state(ST_FREE), _prev_size(0)
 	{
 

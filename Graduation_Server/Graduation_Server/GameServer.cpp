@@ -159,15 +159,37 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 		break;
 
-	case CS_PACKET::CS_CHAT:
+	case CS_PACKET::CS_PACKET_CHAT:
+		cs_packet_chat* packet = reinterpret_cast<cs_packet_chat*>(p);
+		char mess[256];
 
+		strcpy_s(mess, packet->message);
+
+		// 같은 방에 있는 유저한테만 메세지 보낼 예정
 		break;
 	}
 }
 
 void cGameServer::Disconnect(const unsigned int _user_id)
 {
-	;
+	CLIENT& cl = m_clients[_user_id];
+	
+	// 여기서 초기화
+	
+	m_clients[_user_id].set_state_lock();
+	closesocket(m_clients[_user_id]._socket);
+	m_clients[_user_id].set_state(ST_FREE);
+	m_clients[_user_id].set_state_unlock();
+}
+
+void cGameServer::send_chat_packet(int user_id, int my_id, char* mess)
+{
+	sc_packet_chat packet;
+	packet.id = my_id;
+	packet.type = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_CHAT;
+	strcpy_s(packet.message, mess);
+	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 
 int cGameServer::get_new_id()
@@ -189,3 +211,4 @@ int cGameServer::get_new_id()
 	std::cout << "Maximum Number of Clients Overflow! \n";
 	return -1;
 }
+
