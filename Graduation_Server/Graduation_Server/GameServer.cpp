@@ -105,6 +105,14 @@ void cGameServer::Accept(EXP_OVER* exp_over)
 		cout << "Accept Client! \n";
 		CLIENT& cl = m_clients[new_id];
 		cl.set_prev_size(0);
+		cl._recv_over.m_comp_op = OP_RECV;
+		cl._recv_over.m_wsa_buf.buf = reinterpret_cast<char*>(cl._recv_over.m_buf);
+		cl._recv_over.m_wsa_buf.len = sizeof(cl._recv_over.m_buf);
+		ZeroMemory(&cl._recv_over.m_wsa_over, sizeof(cl._recv_over.m_wsa_over));
+		cl._socket = c_socket;
+
+		CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), m_h_iocp, new_id, 0);
+		cl.do_recv();
 	}
 }
 

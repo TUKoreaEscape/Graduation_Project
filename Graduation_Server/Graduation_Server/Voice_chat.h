@@ -31,6 +31,6 @@ public:
 	void Init();
 	void Receive();
 	void Listen(int);
-
+	void CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
 	void Connect(const char*, int);
 };
