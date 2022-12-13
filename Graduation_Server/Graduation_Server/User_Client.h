@@ -38,6 +38,8 @@ public:
 	void	set_state_lock();
 	void	set_state_unlock();
 
+	void	error_display(int error_number);
+
 	void	set_prev_size(int _size);
 	void	do_recv();
 	void	do_send(int num_byte, void* mess);

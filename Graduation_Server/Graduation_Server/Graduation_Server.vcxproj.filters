@@ -16,14 +16,14 @@
     <Filter Include="소스 파일\00 Main">
       <UniqueIdentifier>{6a2d2806-5189-4170-a5c1-efd9e781ab5c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\01 IOCP">
-      <UniqueIdentifier>{7fd71ec1-24c9-4db1-b25a-0826c73cd903}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\12 Protocol">
       <UniqueIdentifier>{3a7b5064-3fba-4874-8709-7b3751389f4c}</UniqueIdentifier>
     </Filter>
     <Filter Include="소스 파일\09 Voice">
       <UniqueIdentifier>{e909f882-5f06-4e95-935d-aa026dee75b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\01 IOCP">
+      <UniqueIdentifier>{7fd71ec1-24c9-4db1-b25a-0826c73cd903}</UniqueIdentifier>
     </Filter>
     <Filter Include="소스 파일\03 Client">
       <UniqueIdentifier>{7106c36e-d583-4c5e-92bc-559698fe6d73}</UniqueIdentifier>

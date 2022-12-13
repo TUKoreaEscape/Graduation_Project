@@ -23,7 +23,7 @@ void CLIENT::do_recv()
 	{
 		int error_num = WSAGetLastError();
 		if (ERROR_IO_PENDING != error_num)
-			; // 에러디스플레이 만들거임
+			error_display(error_num);
 	}
 }
 
@@ -36,7 +36,7 @@ void CLIENT::do_send(int num_byte, void* mess)
 	{
 		int error_num = WSAGetLastError();
 		if (ERROR_IO_PENDING != error_num)
-			; // 에러디스플레이 만들거임
+			error_display(error_num);
 	}
 }
 
@@ -67,4 +67,15 @@ void CLIENT::set_recv_over(EXP_OVER& recv_over, SOCKET c_socket)
 	_recv_over.m_wsa_buf.len = recv_over.m_wsa_buf.len;
 	ZeroMemory(&_recv_over.m_wsa_over, sizeof(recv_over.m_wsa_over));
 	_socket = c_socket;
+}
+
+void CLIENT::error_display(int error_number)
+{
+	WCHAR* lpMsgBuf;
+
+	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL, error_number, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, 0);
+
+	std::wcout << lpMsgBuf << std::endl;
+	LocalFree(lpMsgBuf);
 }
