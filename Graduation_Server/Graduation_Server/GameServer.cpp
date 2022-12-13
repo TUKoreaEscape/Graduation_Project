@@ -15,8 +15,8 @@ cGameServer::~cGameServer()
 void cGameServer::init()
 {
 	// 서버 시작시 기본 초기화는 여기서 해줄 예정!
-	//m_voice_chat = new Voice_Chat;
-	//m_voice_chat->Init();
+	m_voice_chat = new Voice_Chat;
+	m_voice_chat->Init();
 
 }
 

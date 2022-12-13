@@ -7,6 +7,7 @@
 
 class EXP_OVER;
 class CLIENT;
+class Voice_Chat;
 
 class cGameServer : public C_IOCP
 {
@@ -32,6 +33,6 @@ private:
 	std::thread						m_timer_thread;
 
 	std::array<CLIENT, MAX_USER>	m_clients;
-	//static Voice_Chat					*m_voice_chat;
+	Voice_Chat						*m_voice_chat;
 	
 };

@@ -4,8 +4,9 @@
 #include <iostream>
 #include <fstream>
 #include <winsock2.h>
+#include <mmsystem.h>
 
-//#pragma comment(lib, "winnm.lib")
+#pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "ws2_32")
 
 class Voice_Chat {
@@ -30,7 +31,4 @@ public:
 
 	void Init();
 	void Receive();
-	void Listen(int);
-	void CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
-	void Connect(const char*, int);
 };
