@@ -28,6 +28,9 @@
     <Filter Include="소스 파일\03 Client">
       <UniqueIdentifier>{7106c36e-d583-4c5e-92bc-559698fe6d73}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\04 RoomManager">
+      <UniqueIdentifier>{a6c856b2-87f0-4405-a69d-a85b523fcc09}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IOCP.h">
@@ -51,6 +54,9 @@
     <ClInclude Include="stdafx.h">
       <Filter>소스 파일\12 Protocol</Filter>
     </ClInclude>
+    <ClInclude Include="Room_Manager.h">
+      <Filter>소스 파일\04 RoomManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -70,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="User_Client.cpp">
       <Filter>소스 파일\03 Client</Filter>
+    </ClCompile>
+    <ClCompile Include="Room_Manager.cpp">
+      <Filter>소스 파일\04 RoomManager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -132,6 +132,7 @@
     <ClCompile Include="GameServer.cpp" />
     <ClCompile Include="IOCP.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Room_Manager.cpp" />
     <ClCompile Include="User_Client.cpp" />
     <ClCompile Include="Voice_chat.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -142,6 +143,7 @@
     <ClInclude Include="GameServer.h" />
     <ClInclude Include="IOCP.h" />
     <ClInclude Include="protocol.h" />
+    <ClInclude Include="Room_Manager.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="User_Client.h" />
     <ClInclude Include="Voice_chat.h">
