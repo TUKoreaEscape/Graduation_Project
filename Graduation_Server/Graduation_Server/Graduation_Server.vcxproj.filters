@@ -28,7 +28,7 @@
     <Filter Include="소스 파일\03 Client">
       <UniqueIdentifier>{7106c36e-d583-4c5e-92bc-559698fe6d73}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\04 RoomManager">
+    <Filter Include="소스 파일\04 Room">
       <UniqueIdentifier>{a6c856b2-87f0-4405-a69d-a85b523fcc09}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -55,7 +55,10 @@
       <Filter>소스 파일\12 Protocol</Filter>
     </ClInclude>
     <ClInclude Include="Room_Manager.h">
-      <Filter>소스 파일\04 RoomManager</Filter>
+      <Filter>소스 파일\04 Room</Filter>
+    </ClInclude>
+    <ClInclude Include="Room.h">
+      <Filter>소스 파일\04 Room</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -78,7 +81,10 @@
       <Filter>소스 파일\03 Client</Filter>
     </ClCompile>
     <ClCompile Include="Room_Manager.cpp">
-      <Filter>소스 파일\04 RoomManager</Filter>
+      <Filter>소스 파일\04 Room</Filter>
+    </ClCompile>
+    <ClCompile Include="Room.cpp">
+      <Filter>소스 파일\04 Room</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
