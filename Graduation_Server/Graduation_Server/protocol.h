@@ -68,7 +68,10 @@ struct sc_packet_login_fail {
 };
 
 struct sc_packet_move {
+	unsigned char	size;
+	unsigned char	type;
 
+	char			input_key;
 };
 
 struct sc_packet_create_room {
