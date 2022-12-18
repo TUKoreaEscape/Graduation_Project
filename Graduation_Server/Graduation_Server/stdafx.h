@@ -12,6 +12,7 @@
 #include <queue>
 #include <concurrent_priority_queue.h>
 #include <unordered_map>
+#include <unordered_set>
 #include <mutex>
 #include "EXPOver.h"
 

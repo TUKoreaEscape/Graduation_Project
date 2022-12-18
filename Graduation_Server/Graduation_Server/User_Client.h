@@ -8,6 +8,9 @@ private:
 	char		_name[MAX_NAME_SIZE];
 	STATE		_state;
 	mutex		_state_lock;
+
+
+
 	
 	int			_prev_size;
 	int			_id;
@@ -16,6 +19,8 @@ private:
 
 
 public:
+	unordered_set <int> room_list;
+	unordered_set <int> view_list;
 	SOCKET		_socket;
 	EXP_OVER	_recv_over;
 	CLIENT() : _state(ST_FREE), _prev_size(0)

@@ -166,6 +166,8 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		strcpy_s(mess, packet->message);
 
 		// 같은 방에 있는 유저한테만 메세지 보낼 예정
+		for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
+			; // 이쪽 send_chat_packet!
 		break;
 	}
 }
