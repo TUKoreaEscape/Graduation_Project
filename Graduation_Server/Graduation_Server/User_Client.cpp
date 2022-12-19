@@ -50,15 +50,6 @@ STATE CLIENT::get_state()
 	return _state;
 }
 
-void CLIENT::set_state_lock()
-{
-	_state_lock.lock();
-}
-
-void CLIENT::set_state_unlock()
-{
-	_state_lock.unlock();
-}
 
 void CLIENT::set_recv_over(EXP_OVER& recv_over, SOCKET c_socket)
 {

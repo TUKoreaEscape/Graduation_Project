@@ -7,6 +7,7 @@
 #include <mutex>
 #include <array>
 #include <map>
+#include <vector>
 #include <algorithm>
 #include <thread>
 #include <queue>

@@ -4,10 +4,12 @@
 #include "EXPOver.h"
 #include "Voice_chat.h"
 #include "User_Client.h"
+#include "Room_Manager.h"
 
 class EXP_OVER;
 class CLIENT;
 class Voice_Chat;
+class RoomManager;
 
 class cGameServer : public C_IOCP
 {
@@ -34,5 +36,6 @@ private:
 
 	std::array<CLIENT, MAX_USER>	m_clients;
 	Voice_Chat						*m_voice_chat;
+	RoomManager*					m_room_manager = nullptr;
 	
 };

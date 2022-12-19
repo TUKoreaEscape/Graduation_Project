@@ -9,6 +9,17 @@ const int	MAX_CHAT_SIZE = 100;
 const int  MAX_NAME_SIZE = 30;
 // ----- 클라이언트가 서버에게 보낼때 ------
 enum COMP_OP { OP_RECV, OP_SEND, OP_ACCEPT, OP_NPC_MOVE, OP_PLAYER_MOVE };
+
+namespace GAME_ROOM_STATE
+{
+	enum TYPE
+	{
+		NONE = 0,
+		READY,
+		PLAYING
+	};
+}
+
 namespace CS_PACKET
 {
 	enum TYPE

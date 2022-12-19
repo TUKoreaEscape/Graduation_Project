@@ -54,7 +54,7 @@ void C_IOCP::Bind_Socket(short port_num)
 	ZeroMemory(&m_exp_over.m_wsa_over, sizeof(m_exp_over.m_wsa_over));
 	m_exp_over.m_comp_op = COMP_OP(OP_ACCEPT);
 
-	AcceptEx(m_listen_socket, m_client_socket, buf_accept, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &m_exp_over.m_wsa_over);
+	bool ret = AcceptEx(m_listen_socket, m_client_socket, buf_accept, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &m_exp_over.m_wsa_over);
 
 	std::cout << "Server Start!!! \n";
 }

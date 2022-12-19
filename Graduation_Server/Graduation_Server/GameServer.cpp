@@ -18,6 +18,9 @@ void cGameServer::init()
 	m_voice_chat = new Voice_Chat;
 	m_voice_chat->Init();
 
+	m_room_manager = new RoomManager;
+	m_room_manager->init();
+
 }
 
 void cGameServer::StartServer()
@@ -167,7 +170,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 		// 같은 방에 있는 유저한테만 메세지 보낼 예정
 		for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
-			; // 이쪽 send_chat_packet!
+			;
 		break;
 	}
 }
@@ -178,10 +181,10 @@ void cGameServer::Disconnect(const unsigned int _user_id)
 	
 	// 여기서 초기화
 	
-	m_clients[_user_id].set_state_lock();
+	m_clients[_user_id]._state_lock.lock();
 	closesocket(m_clients[_user_id]._socket);
 	m_clients[_user_id].set_state(ST_FREE);
-	m_clients[_user_id].set_state_unlock();
+	m_clients[_user_id]._state_lock.unlock();
 }
 
 void cGameServer::send_chat_packet(int user_id, int my_id, char* mess)
@@ -200,14 +203,14 @@ int cGameServer::get_new_id()
 
 	for (int i = 0; i < MAX_USER; ++i)
 	{
-		m_clients[i].set_state_lock();
+		m_clients[i]._state_lock.lock();
 		if (ST_FREE == m_clients[i].get_state())
 		{
 			m_clients[i].set_state(ST_ACCEPT);
-			m_clients[i].set_state_unlock();
+			m_clients[i]._state_lock.unlock();
 			return i;
 		}
-		m_clients[i].set_state_unlock();
+		m_clients[i]._state_lock.unlock();
 	}
 
 	std::cout << "Maximum Number of Clients Overflow! \n";
