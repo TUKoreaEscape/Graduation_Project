@@ -9,7 +9,8 @@ cGameServer::cGameServer()
 
 cGameServer::~cGameServer()
 {
-
+	delete m_voice_chat;
+	delete m_room_manager;
 }
 
 void cGameServer::init()
@@ -169,10 +170,17 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		strcpy_s(mess, packet->message);
 
 		// 같은 방에 있는 유저한테만 메세지 보낼 예정
+		m_clients[user_id]._room_list_lock.lock();
 		for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
-			;
+			send_chat_packet(*ptr, user_id, mess);
+		m_clients[user_id]._room_list_lock.unlock();
 		break;
 	}
+}
+
+void cGameServer::Send(EXP_OVER* exp_over)
+{
+	
 }
 
 void cGameServer::Disconnect(const unsigned int _user_id)

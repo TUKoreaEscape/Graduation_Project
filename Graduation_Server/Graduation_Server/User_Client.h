@@ -14,10 +14,12 @@ private:
 public:
 	unordered_set <int> room_list;
 	unordered_set <int> view_list;
+
+	mutex		_room_list_lock;
 	mutex		_state_lock;
+
 	SOCKET		_socket;
 	EXP_OVER	_recv_over;
-
 
 public:
 	CLIENT() : _id(-1), _state(ST_FREE), _prev_size(0)

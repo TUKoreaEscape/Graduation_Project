@@ -36,6 +36,5 @@ private:
 
 	std::array<CLIENT, MAX_USER>	m_clients;
 	Voice_Chat						*m_voice_chat;
-	RoomManager*					m_room_manager = nullptr;
-	
+	RoomManager						*m_room_manager = nullptr;
 };

@@ -12,4 +12,6 @@ int main()
 	g_server = new cGameServer;
 	g_server->init();
 	g_server->StartServer();
+
+	delete g_server;
 }
