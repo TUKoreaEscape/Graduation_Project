@@ -27,7 +27,8 @@ namespace CS_PACKET
 		NONE = 0,
 		CS_LOGIN,
 		CS_MOVE,
-		CS_PACKET_CHAT
+		CS_PACKET_CHAT,
+		CS_PACKET_CREATE_ROOM
 	};
 }
 
