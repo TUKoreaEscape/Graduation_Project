@@ -26,7 +26,10 @@ public:
 	void	Send(EXP_OVER* exp_over);
 	void	Recv(EXP_OVER* exp_over, const unsigned int user_id, const DWORD num_byte);
 	void	Disconnect(const unsigned int _user_id);
+
 	void	send_chat_packet(int user_id, int my_id, char* mess);
+	void	create_room(const unsigned int _user_id);
+
 
 	int		get_new_id();
 

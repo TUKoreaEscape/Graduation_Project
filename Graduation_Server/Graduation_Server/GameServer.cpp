@@ -156,14 +156,18 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	switch (p_type) // 패킷 타입별로 처리할 공간
 	{
 	case CS_PACKET::CS_LOGIN:
+	{
 		// 로그인 처리
 		break;
+	}
 
 	case CS_PACKET::CS_MOVE:
-
+	{
 		break;
+	}
 
 	case CS_PACKET::CS_PACKET_CHAT:
+	{
 		cs_packet_chat* packet = reinterpret_cast<cs_packet_chat*>(p);
 		char mess[256];
 
@@ -175,6 +179,13 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 			send_chat_packet(*ptr, user_id, mess);
 		m_clients[user_id]._room_list_lock.unlock();
 		break;
+	}
+	case CS_PACKET::CS_PACKET_CREATE_ROOM:
+	{
+		create_room(user_id);
+		break;
+	}
+
 	}
 }
 
@@ -203,6 +214,11 @@ void cGameServer::send_chat_packet(int user_id, int my_id, char* mess)
 	packet.type = SC_PACKET::SC_PACKET_CHAT;
 	strcpy_s(packet.message, mess);
 	m_clients[user_id].do_send(sizeof(packet), &packet);
+}
+
+void cGameServer::create_room(const unsigned int _user_id)
+{
+	m_room_manager->Create_room();
 }
 
 int cGameServer::get_new_id()
