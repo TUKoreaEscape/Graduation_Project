@@ -218,7 +218,7 @@ void cGameServer::send_chat_packet(int user_id, int my_id, char* mess)
 
 void cGameServer::create_room(const unsigned int _user_id)
 {
-	m_room_manager->Create_room();
+	m_room_manager->Create_room(_user_id);
 }
 
 int cGameServer::get_new_id()

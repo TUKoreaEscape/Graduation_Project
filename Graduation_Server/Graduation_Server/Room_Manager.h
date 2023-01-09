@@ -13,5 +13,5 @@ public:
 	~RoomManager();
 
 	void init();
-	void Create_room();
+	void Create_room(int user_id);
 };
