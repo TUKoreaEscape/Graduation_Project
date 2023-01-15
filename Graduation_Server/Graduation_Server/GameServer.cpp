@@ -28,6 +28,7 @@ void cGameServer::StartServer()
 {
 	C_IOCP::Start_server();
 
+	// 이쪽은 이제 맵 로드할 부분
 	for (int i = 0; i < 8; ++i)
 		m_worker_threads.emplace_back(std::thread(&cGameServer::WorkerThread, this));
 	m_timer_thread = std::thread{ &cGameServer::m_timer_thread, this };

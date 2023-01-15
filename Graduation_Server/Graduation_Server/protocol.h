@@ -33,24 +33,32 @@ namespace CS_PACKET
 }
 
 
-struct cs_packet_login {
-	unsigned char size;
-	unsigned char type;
+struct cs_packet_login { // 로그인 시도
+	unsigned char	size;
+	unsigned char	type;
+
+	char			id[20];
+	char			pass_word[20];
 };
 
-struct cs_packet_move {
-	unsigned char size;
-	unsigned char type;
+struct cs_packet_move { // 이동관련 데이터
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned char	input_key;
+	// 벡터를 보낼지도 고민중
 };
 
 struct cs_packet_voice {
 	unsigned char size;
 	unsigned char type;
 
+	// vivox사용 예정
 };
 
 struct cs_packet_chat {
 	unsigned char	size;
+	int				room_number;
 	char			type;
 	char			message[MAX_CHAT_SIZE];
 };
@@ -69,14 +77,15 @@ namespace SC_PACKET
 	};
 }
 
-struct sc_packet_login_ok {
+struct sc_packet_login_ok { // 로그인 성공을 클라에게 전송
 	unsigned char	size;
 	unsigned char	type;
 	unsigned int	id;
 };
 
-struct sc_packet_login_fail {
-
+struct sc_packet_login_fail { // 로그인 실패를 클라에게 전송
+	unsigned char	size;
+	unsigned char	type;
 };
 
 struct sc_packet_move {
@@ -87,20 +96,22 @@ struct sc_packet_move {
 };
 
 struct sc_packet_create_room {
-	unsigned char size;
-	unsigned char type;
+	unsigned char	size;
+	unsigned char	type;
 
+	unsigned int	room_number;
 	// 방 생성 내용
 };
 
 struct sc_packet_user_join_room {
-	unsigned char size;
-	unsigned char type;
+	unsigned char	size;
+	unsigned char	type;
 
+	unsigned int	room_number;
 	// 유저 방 입장시 room manager에 데이터 이동
 };
 
-struct sc_packet_chat {
+struct sc_packet_chat { // 유저간 채팅
 	unsigned char	size;
 	char			type;
 	int				id;

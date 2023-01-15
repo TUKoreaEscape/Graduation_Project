@@ -14,4 +14,8 @@ public:
 
 	void init();
 	void Create_room(int user_id);
+
+	bool collision_wall_player(int user_id);
+	bool collision_player_player(int user_id);
+
 };
