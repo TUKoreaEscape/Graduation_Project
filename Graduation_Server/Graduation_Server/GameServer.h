@@ -1,10 +1,12 @@
 #pragma once
+#include <codecvt>
 #include "stdafx.h"
 #include "IOCP.h"
 #include "EXPOver.h"
 #include "Voice_chat.h"
 #include "User_Client.h"
 #include "Room_Manager.h"
+#include "DataBase.h"
 
 class EXP_OVER;
 class CLIENT;
@@ -30,8 +32,12 @@ public:
 	void	send_chat_packet(int user_id, int my_id, char* mess);
 	void	create_room(const unsigned int _user_id);
 
+	void	User_Login(void* buff);
+
 
 	int		get_new_id();
+
+	wstring stringToWstring(const std::string& t_str);
 
 private:
 	std::vector<std::thread>		m_worker_threads;
@@ -40,4 +46,5 @@ private:
 	std::array<CLIENT, MAX_USER>	m_clients;
 	Voice_Chat						*m_voice_chat;
 	RoomManager						*m_room_manager = nullptr;
+	DataBase						*m_database = nullptr;
 };

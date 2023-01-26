@@ -16,6 +16,9 @@ cGameServer::~cGameServer()
 void cGameServer::init()
 {
 	// 서버 시작시 기본 초기화는 여기서 해줄 예정!
+	m_database = new DataBase;
+	// 초기화함수 곧 만들거임! 아마도 ㅎ
+
 	m_voice_chat = new Voice_Chat;
 	m_voice_chat->Init();
 
@@ -190,6 +193,15 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	}
 }
 
+wstring cGameServer::stringToWstring(const std::string& t_str)
+{
+	typedef codecvt_utf8<wchar_t>  convert_type;
+	wstring_convert<convert_type, wchar_t> converter;
+
+	return converter.from_bytes(t_str);
+
+}
+
 void cGameServer::Send(EXP_OVER* exp_over)
 {
 	
@@ -205,6 +217,29 @@ void cGameServer::Disconnect(const unsigned int _user_id)
 	closesocket(m_clients[_user_id]._socket);
 	m_clients[_user_id].set_state(ST_FREE);
 	m_clients[_user_id]._state_lock.unlock();
+}
+
+void cGameServer::User_Login(void* buff)
+{
+	cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(buff);
+	string stringID{};
+	string stringPW{};
+
+	stringID = packet->id;
+	stringPW = packet->pass_word;
+
+	UserData_ID_PW data;
+
+	data.user_id = stringToWstring(stringID);
+	data.user_pw = stringToWstring(stringPW);
+	
+	if (m_database->check_login(data.user_id, data.user_pw))
+	{
+		cout << "로그인 성공" << endl;
+	}
+	else
+		cout << "로그인 실패" << endl;
+	// 여기에 db에 요청하여 체크
 }
 
 void cGameServer::send_chat_packet(int user_id, int my_id, char* mess)

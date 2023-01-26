@@ -24,6 +24,50 @@ DataBase::~DataBase()
 	SQLFreeHandle(SQL_HANDLE_ENV, henv); 
 }
 
+bool DataBase::check_login(std::wstring user_id, std::wstring user_pw)
+{
+	std::wstring wp{};
+
+	wp += L"EXEC GetID ";
+	wp += user_id;
+	UserData_ID_PW *check_data = new UserData_ID_PW;
+
+	retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)wp.c_str(), SQL_NTS);
+	std::wcout << wp << std::endl;
+	
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+	{
+		; // 이쪽에서 db바인딩 정할거임!
+
+		retcode = SQLBindCol(hstmt, 1, SQL_C_CHAR, &check_data->user_id, NAMELEN, &cbID);
+		retcode = SQLBindCol(hstmt, 2, SQL_C_CHAR, &check_data->user_pw, NAMELEN + 10, &cbPW);
+
+		retcode = SQLFetch(hstmt);
+
+		if (retcode == SQL_ERROR)
+			show_error();
+
+		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+		{
+			if (user_pw == check_data->user_pw)
+			{
+				SQLCancel(hstmt);
+				wprintf(L"Login Success \n");
+				delete check_data;
+				return true;
+			}
+			SQLCancel(hstmt);
+			wprintf(L"Login Fail \n");
+			delete check_data;
+			return false;
+		}
+	}   
+	delete check_data;
+	return false;
+}
+
 void DataBase::show_error()
 {
 	std::cout << "Error!!! \n";
