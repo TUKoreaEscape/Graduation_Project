@@ -31,6 +31,9 @@
     <Filter Include="소스 파일\04 Room">
       <UniqueIdentifier>{a6c856b2-87f0-4405-a69d-a85b523fcc09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\02 DataBase">
+      <UniqueIdentifier>{888e1868-1bce-414e-99a0-09516a91821b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IOCP.h">
@@ -60,6 +63,9 @@
     <ClInclude Include="Room.h">
       <Filter>소스 파일\04 Room</Filter>
     </ClInclude>
+    <ClInclude Include="DataBase.h">
+      <Filter>소스 파일\02 DataBase</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -85,6 +91,9 @@
     </ClCompile>
     <ClCompile Include="Room.cpp">
       <Filter>소스 파일\04 Room</Filter>
+    </ClCompile>
+    <ClCompile Include="DataBase.cpp">
+      <Filter>소스 파일\02 DataBase</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
