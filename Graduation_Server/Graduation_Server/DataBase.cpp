@@ -39,8 +39,7 @@ bool DataBase::check_login(std::wstring user_id, std::wstring user_pw)
 	
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 	{
-		; // 이쪽에서 db바인딩 정할거임!
-
+		// ID에 따른 저장된 PW를 불러옴
 		retcode = SQLBindCol(hstmt, 1, SQL_C_CHAR, &check_data->user_id, NAMELEN, &cbID);
 		retcode = SQLBindCol(hstmt, 2, SQL_C_CHAR, &check_data->user_pw, NAMELEN + 10, &cbPW);
 
@@ -51,6 +50,7 @@ bool DataBase::check_login(std::wstring user_id, std::wstring user_pw)
 
 		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 		{
+			// PW비교후 아닌경우 FAIL 패킷 보내야함
 			if (user_pw == check_data->user_pw)
 			{
 				SQLCancel(hstmt);

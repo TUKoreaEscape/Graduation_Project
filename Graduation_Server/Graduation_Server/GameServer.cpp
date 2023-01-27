@@ -24,7 +24,6 @@ void cGameServer::init()
 
 	m_room_manager = new RoomManager;
 	m_room_manager->init();
-
 }
 
 void cGameServer::StartServer()
@@ -103,14 +102,19 @@ void cGameServer::WorkerThread()
 
 void cGameServer::Accept(EXP_OVER* exp_over)
 {
-	std::cout << "Accept Completed \n";
+	if(DEBUG)
+		std::cout << "Accept Completed \n";
 	SOCKET c_socket = *(reinterpret_cast<SOCKET*>(exp_over->m_buf));
 	unsigned int new_id = get_new_id();
 	if (-1 == new_id)
-		std::cout << "Maxumum user overflow. Accept aborted \n";
+	{
+		if(DEBUG)
+			std::cout << "Maxumum user overflow. Accept aborted \n";
+	}
 	else
 	{
-		cout << "Accept Client! \n";
+		if(DEBUG)
+			cout << "Accept Client! \n";
 		CLIENT& cl = m_clients[new_id];
 		cl.set_prev_size(0);
 		cl._recv_over.m_comp_op = OP_RECV;
@@ -162,6 +166,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	case CS_PACKET::CS_LOGIN:
 	{
 		// 로그인 처리
+		User_Login(user_id, p);
 		break;
 	}
 
@@ -219,7 +224,7 @@ void cGameServer::Disconnect(const unsigned int _user_id)
 	m_clients[_user_id]._state_lock.unlock();
 }
 
-void cGameServer::User_Login(void* buff)
+void cGameServer::User_Login(int c_id, void* buff)
 {
 	cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(buff);
 	string stringID{};
@@ -235,10 +240,16 @@ void cGameServer::User_Login(void* buff)
 	
 	if (m_database->check_login(data.user_id, data.user_pw))
 	{
-		cout << "로그인 성공" << endl;
+		if(DEBUG)
+			cout << "로그인 성공" << endl;
+		send_login_ok_packet(c_id);
 	}
 	else
-		cout << "로그인 실패" << endl;
+	{
+		if(DEBUG)
+			cout << "로그인 실패" << endl;
+		send_login_fail_packet(c_id);
+	}
 	// 여기에 db에 요청하여 체크
 }
 
@@ -249,6 +260,25 @@ void cGameServer::send_chat_packet(int user_id, int my_id, char* mess)
 	packet.type = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_CHAT;
 	strcpy_s(packet.message, mess);
+	m_clients[user_id].do_send(sizeof(packet), &packet);
+}
+
+void cGameServer::send_login_fail_packet(int user_id)
+{
+	sc_packet_login_fail packet;
+	packet.type = SC_PACKET::SC_LOGINFAIL;
+	packet.size = sizeof(sc_packet_login_fail);
+
+	m_clients[user_id].do_send(sizeof(packet), &packet);
+}
+
+void cGameServer::send_login_ok_packet(int user_id)
+{
+	sc_packet_login_ok packet;
+	packet.id = user_id;
+	packet.size = sizeof(sc_packet_login_ok);
+	packet.type = SC_PACKET::SC_LOGINOK;
+
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 

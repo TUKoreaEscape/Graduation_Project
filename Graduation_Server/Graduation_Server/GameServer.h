@@ -30,9 +30,11 @@ public:
 	void	Disconnect(const unsigned int _user_id);
 
 	void	send_chat_packet(int user_id, int my_id, char* mess);
+	void	send_login_fail_packet(int user_id);
+	void	send_login_ok_packet(int user_id);
 	void	create_room(const unsigned int _user_id);
 
-	void	User_Login(void* buff);
+	void	User_Login(int c_id, void* buff);
 
 
 	int		get_new_id();
