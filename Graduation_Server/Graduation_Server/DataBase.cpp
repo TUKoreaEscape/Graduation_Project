@@ -40,28 +40,24 @@ bool DataBase::check_login(std::wstring user_id, std::wstring user_pw)
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 	{
 		// ID에 따른 저장된 PW를 불러옴
-		retcode = SQLBindCol(hstmt, 1, SQL_C_WCHAR , &check_data->user_pw, NAMELEN + 10, &cbPW);
+		retcode = SQLBindCol(hstmt, 1, SQL_C_WCHAR , &check_data->user_pw, NAMELEN, &cbPW);
 
 		retcode = SQLFetch(hstmt);
 
 		if (retcode == SQL_ERROR)
 			show_error();
 
-		std::wcout << "Load id : " << user_id << std::endl;
-		std::wcout << "Load pw : " << check_data->user_pw << std::endl;
+		std::wstring temp_pw(check_data->user_pw);
+		temp_pw.erase(remove(temp_pw.begin(), temp_pw.end(), ' '), temp_pw.end());
 
-		std::cout << sizeof(check_data->user_pw) << std::endl;
-		std::cout << user_pw.size() << std::endl;
-	
-
-	
 		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 		{
 			// PW비교후 아닌경우 FAIL 패킷 보내야함
-			if (user_pw == check_data->user_pw)
+			if (user_pw.compare(temp_pw) == 0)
 			{
+				std::cout << user_pw.compare(temp_pw) << std::endl;
 				SQLCancel(hstmt);
-				wprintf(L"Login Success \n");
+				std::wcout << "Login Success!! ID : " << user_id << "\n";
 				delete check_data;
 				return true;
 			}

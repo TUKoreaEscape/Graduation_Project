@@ -25,13 +25,6 @@ void cGameServer::init()
 
 	m_room_manager = new RoomManager;
 	m_room_manager->init();
-
-	wstring id = L"kwb010712";
-	wstring pw = L"q1w2e3r4t5";
-
-	wcout << "id : " << id << endl;
-	wcout << "pw : " << pw << endl;
-	m_database->check_login(id, pw);
 }
 
 void cGameServer::StartServer()

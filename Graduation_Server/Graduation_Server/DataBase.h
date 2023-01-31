@@ -5,7 +5,7 @@
 
 #include <sqlext.h>
 
-constexpr auto NAMELEN = 20;
+constexpr auto NAMELEN = 40;
 
 struct UserData_ID_PW {
 	SQLWCHAR user_id[NAMELEN];
