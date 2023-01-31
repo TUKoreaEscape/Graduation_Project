@@ -9,7 +9,7 @@ DataBase::DataBase()
 
 	SQLSetConnectAttr(hdbc, SQL_LOGIN_TIMEOUT, (SQLPOINTER)5, 0);
 
-	retcode = SQLConnect(hdbc, (SQLWCHAR*)L"TaggerDB", SQL_NTS, (SQLWCHAR*)NULL, SQL_NTS, NULL, SQL_NTS);
+	retcode = SQLConnect(hdbc, (SQLWCHAR*)L"Graduation_ODBC", SQL_NTS, (SQLWCHAR*)NULL, SQL_NTS, NULL, SQL_NTS);
 
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 		std::cout << "DB Connect!" << std::endl;
@@ -28,26 +28,33 @@ bool DataBase::check_login(std::wstring user_id, std::wstring user_pw)
 {
 	std::wstring wp{};
 
-	wp += L"EXEC GetID ";
+	wp += L"EXEC Get_PW ";
 	wp += user_id;
 	UserData_ID_PW *check_data = new UserData_ID_PW;
 
 	retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 
 	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)wp.c_str(), SQL_NTS);
-	std::wcout << wp << std::endl;
+
 	
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 	{
 		// ID에 따른 저장된 PW를 불러옴
-		retcode = SQLBindCol(hstmt, 1, SQL_C_CHAR, &check_data->user_id, NAMELEN, &cbID);
-		retcode = SQLBindCol(hstmt, 2, SQL_C_CHAR, &check_data->user_pw, NAMELEN + 10, &cbPW);
+		retcode = SQLBindCol(hstmt, 1, SQL_C_WCHAR , &check_data->user_pw, NAMELEN + 10, &cbPW);
 
 		retcode = SQLFetch(hstmt);
 
 		if (retcode == SQL_ERROR)
 			show_error();
 
+		std::wcout << "Load id : " << user_id << std::endl;
+		std::wcout << "Load pw : " << check_data->user_pw << std::endl;
+
+		std::cout << sizeof(check_data->user_pw) << std::endl;
+		std::cout << user_pw.size() << std::endl;
+	
+
+	
 		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 		{
 			// PW비교후 아닌경우 FAIL 패킷 보내야함

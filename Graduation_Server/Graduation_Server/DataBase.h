@@ -5,11 +5,13 @@
 
 #include <sqlext.h>
 
-constexpr auto NAMELEN = 11;
+constexpr auto NAMELEN = 20;
 
 struct UserData_ID_PW {
-	std::wstring user_id;
-	std::wstring user_pw;
+	SQLWCHAR user_id[NAMELEN];
+	SQLWCHAR user_pw[NAMELEN];
+	//std::wstring user_id;
+	//std::wstring user_pw;
 };
 
 class DataBase
@@ -31,8 +33,8 @@ private:
 	SQLRETURN retcode;
 
 	SQLWCHAR szID[NAMELEN];
-	SQLWCHAR szPW[NAMELEN + 10];
-
+	SQLWCHAR szPW[NAMELEN];
+	
 	SQLLEN cbID = 0;
 	SQLLEN cbPW = 0;
 };

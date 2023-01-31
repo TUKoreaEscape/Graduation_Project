@@ -17,6 +17,7 @@ void cGameServer::init()
 {
 	// 서버 시작시 기본 초기화는 여기서 해줄 예정!
 	m_database = new DataBase;
+	
 	// 초기화함수 곧 만들거임! 아마도 ㅎ
 
 	m_voice_chat = new Voice_Chat;
@@ -24,6 +25,13 @@ void cGameServer::init()
 
 	m_room_manager = new RoomManager;
 	m_room_manager->init();
+
+	wstring id = L"kwb010712";
+	wstring pw = L"q1w2e3r4t5";
+
+	wcout << "id : " << id << endl;
+	wcout << "pw : " << pw << endl;
+	m_database->check_login(id, pw);
 }
 
 void cGameServer::StartServer()
@@ -232,13 +240,8 @@ void cGameServer::User_Login(int c_id, void* buff)
 
 	stringID = packet->id;
 	stringPW = packet->pass_word;
-
-	UserData_ID_PW data;
-
-	data.user_id = stringToWstring(stringID);
-	data.user_pw = stringToWstring(stringPW);
 	
-	if (m_database->check_login(data.user_id, data.user_pw))
+	if (m_database->check_login(stringToWstring(stringID), stringToWstring(stringPW)))
 	{
 		if(DEBUG)
 			cout << "로그인 성공" << endl;
