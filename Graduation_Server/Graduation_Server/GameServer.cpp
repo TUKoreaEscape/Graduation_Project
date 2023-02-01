@@ -235,17 +235,9 @@ void cGameServer::User_Login(int c_id, void* buff)
 	stringPW = packet->pass_word;
 	
 	if (m_database->check_login(stringToWstring(stringID), stringToWstring(stringPW)))
-	{
-		if(DEBUG)
-			cout << "로그인 성공" << endl;
 		send_login_ok_packet(c_id);
-	}
 	else
-	{
-		if(DEBUG)
-			cout << "로그인 실패" << endl;
 		send_login_fail_packet(c_id);
-	}
 	// 여기에 db에 요청하여 체크
 }
 

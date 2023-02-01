@@ -43,7 +43,8 @@ int main()
 	server_addr.sin_port = htons(SERVER_PORT);
 
 	inet_pton(AF_INET, SERVER_ADDR, &server_addr.sin_addr);
-	connect(g_s_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
+	while (connect(g_s_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)))
+		;
 
 	cout << "서버에 연결완료" << endl;
 	while (true)

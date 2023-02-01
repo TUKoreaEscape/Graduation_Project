@@ -55,17 +55,22 @@ bool DataBase::check_login(std::wstring user_id, std::wstring user_pw)
 			// PW비교후 아닌경우 FAIL 패킷 보내야함
 			if (user_pw.compare(temp_pw) == 0)
 			{
-				std::cout << user_pw.compare(temp_pw) << std::endl;
+				std::string debug_id;
+				debug_id.assign(user_id.begin(), user_id.end());
+				std::cout << "Login Success!! ID : " << debug_id << "\n";
 				SQLCancel(hstmt);
-				std::wcout << "Login Success!! ID : " << user_id << "\n";
 				delete check_data;
 				return true;
 			}
+
+			std::string debug_id;
+			debug_id.assign(user_id.begin(), user_id.end());
+			std::cout << "Login Fail!! ID : " << debug_id << "\n";
 			SQLCancel(hstmt);
-			wprintf(L"Login Fail \n");
 			delete check_data;
 			return false;
 		}
+		std::cout << "ID doesn't exist. \n";
 	}   
 	delete check_data;
 	return false;
