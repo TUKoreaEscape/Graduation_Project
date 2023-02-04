@@ -84,6 +84,7 @@ void cGameServer::WorkerThread()
 			if (num_byte == 0)
 				Disconnect(client_id);
 			Recv(exp_over, client_id, num_byte);
+			cout << client_id << "_send \n";
 			break;
 
 		case OP_SEND:
@@ -115,7 +116,7 @@ void cGameServer::Accept(EXP_OVER* exp_over)
 	else
 	{
 		if(DEBUG)
-			cout << "Accept Client! \n";
+			cout << "Accept Client! new_id : " << new_id << endl;
 		CLIENT& cl = m_clients[new_id];
 		cl.set_prev_size(0);
 		cl._recv_over.m_comp_op = OP_RECV;
@@ -125,6 +126,11 @@ void cGameServer::Accept(EXP_OVER* exp_over)
 		cl._socket = c_socket;
 
 		CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), m_h_iocp, new_id, 0);
+
+		ZeroMemory(&exp_over->m_wsa_over, sizeof(exp_over->m_wsa_over));
+		c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
+		*(reinterpret_cast<SOCKET*>(exp_over->m_buf)) = c_socket;
+		AcceptEx(C_IOCP::m_listen_socket, c_socket, exp_over->m_buf + 8, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &exp_over->m_wsa_over);
 		cl.do_recv();
 	}
 }
@@ -277,8 +283,6 @@ void cGameServer::create_room(const unsigned int _user_id)
 
 int cGameServer::get_new_id()
 {
-	static int g_id = 0;
-
 	for (int i = 0; i < MAX_USER; ++i)
 	{
 		m_clients[i]._state_lock.lock();
@@ -286,6 +290,7 @@ int cGameServer::get_new_id()
 		{
 			m_clients[i].set_state(ST_ACCEPT);
 			m_clients[i]._state_lock.unlock();
+			cout << "gen_id : " << i << endl;
 			return i;
 		}
 		m_clients[i]._state_lock.unlock();
