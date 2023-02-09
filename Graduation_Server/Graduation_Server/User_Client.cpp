@@ -13,6 +13,7 @@ int CLIENT::return_prev_size()
 void CLIENT::do_recv()
 {
 	DWORD recv_flag = 0;
+
 	ZeroMemory(&_recv_over.m_wsa_over, sizeof(_recv_over.m_wsa_over));
 	_recv_over.m_wsa_buf.buf = reinterpret_cast<char*>(_recv_over.m_buf + _prev_size);
 	_recv_over.m_wsa_buf.len = sizeof(_recv_over.m_buf) - _prev_size;
@@ -22,8 +23,10 @@ void CLIENT::do_recv()
 	if (SOCKET_ERROR == ret)
 	{
 		int error_num = WSAGetLastError();
-		if (ERROR_IO_PENDING != error_num)
+		if (ERROR_IO_PENDING != error_num) {
 			error_display(error_num);
+			cout << "recv error" << endl;
+		}
 	}
 }
 
@@ -35,9 +38,13 @@ void CLIENT::do_send(int num_byte, void* mess)
 	if (SOCKET_ERROR == ret)
 	{
 		int error_num = WSAGetLastError();
-		if (ERROR_IO_PENDING != error_num)
+		if (ERROR_IO_PENDING != error_num) {
 			error_display(error_num);
+			cout << "전송실패" << endl;
+		}
 	}
+	delete ex_over;
+	cout << "전송완료" << endl;
 }
 
 void CLIENT::set_state(STATE state)

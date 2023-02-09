@@ -8,8 +8,8 @@ private:
 	char		_name[MAX_NAME_SIZE];
 	STATE		_state;
 
-	int			_prev_size;
-	int			_id;
+	unsigned short	_prev_size;
+	int				_id;
 
 public:
 	unordered_set <int> room_list;

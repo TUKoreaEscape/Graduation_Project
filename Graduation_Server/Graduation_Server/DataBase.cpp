@@ -24,7 +24,7 @@ DataBase::~DataBase()
 	SQLFreeHandle(SQL_HANDLE_ENV, henv); 
 }
 
-bool DataBase::check_login(std::wstring user_id, std::wstring user_pw)
+int DataBase::check_login(std::wstring user_id, std::wstring user_pw)
 {
 	std::wstring wp{};
 
@@ -60,7 +60,7 @@ bool DataBase::check_login(std::wstring user_id, std::wstring user_pw)
 				std::cout << "Login Success!! ID : " << debug_id << "\n";
 				SQLCancel(hstmt);
 				delete check_data;
-				return true;
+				return 1;
 			}
 
 			std::string debug_id;
@@ -68,12 +68,12 @@ bool DataBase::check_login(std::wstring user_id, std::wstring user_pw)
 			std::cout << "Login Fail!! ID : " << debug_id << "\n";
 			SQLCancel(hstmt);
 			delete check_data;
-			return false;
+			return 2;
 		}
 		std::cout << "ID doesn't exist. \n";
 	}   
 	delete check_data;
-	return false;
+	return 0;
 }
 
 void DataBase::show_error()

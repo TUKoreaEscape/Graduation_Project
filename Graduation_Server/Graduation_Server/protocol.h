@@ -8,7 +8,7 @@ const int	MAX_CHAT_SIZE = 100;
 
 const int  MAX_NAME_SIZE = 30;
 // ----- 클라이언트가 서버에게 보낼때 ------
-enum COMP_OP { OP_RECV, OP_SEND, OP_ACCEPT, OP_NPC_MOVE, OP_PLAYER_MOVE };
+
 
 namespace GAME_ROOM_STATE
 {
@@ -28,7 +28,8 @@ namespace CS_PACKET
 		CS_LOGIN,
 		CS_MOVE,
 		CS_PACKET_CHAT,
-		CS_PACKET_CREATE_ROOM
+		CS_PACKET_CREATE_ROOM,
+		CS_PACKET_JOIN_ROOM
 	};
 }
 
@@ -86,6 +87,7 @@ struct sc_packet_login_ok { // 로그인 성공을 클라에게 전송
 struct sc_packet_login_fail { // 로그인 실패를 클라에게 전송
 	unsigned char	size;
 	unsigned char	type;
+	unsigned char   reason;
 };
 
 struct sc_packet_move {

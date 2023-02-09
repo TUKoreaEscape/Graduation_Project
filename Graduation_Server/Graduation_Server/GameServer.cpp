@@ -34,11 +34,9 @@ void cGameServer::StartServer()
 	// 이쪽은 이제 맵 로드할 부분
 	for (int i = 0; i < 8; ++i)
 		m_worker_threads.emplace_back(std::thread(&cGameServer::WorkerThread, this));
-	m_timer_thread = std::thread{ &cGameServer::m_timer_thread, this };
 
 	for (auto& worker : m_worker_threads)
 		worker.join();
-	m_timer_thread.join();
 }
 
 void cGameServer::WorkerThread()
@@ -81,8 +79,8 @@ void cGameServer::WorkerThread()
 
 		switch (exp_over->m_comp_op) {
 		case OP_RECV:
-			if (num_byte == 0)
-				Disconnect(client_id);
+			//if (num_byte == 0)
+			//	//Disconnect(client_id);
 			Recv(exp_over, client_id, num_byte);
 			cout << client_id << "_send \n";
 			break;
@@ -90,7 +88,7 @@ void cGameServer::WorkerThread()
 		case OP_SEND:
 			if (num_byte != exp_over->m_wsa_buf.len) {
 				std::cout << "send_error" << std::endl;
-				Disconnect(client_id);
+				//Disconnect(client_id);
 			}
 			delete exp_over;
 			break;
@@ -106,32 +104,23 @@ void cGameServer::Accept(EXP_OVER* exp_over)
 {
 	if(DEBUG)
 		std::cout << "Accept Completed \n";
-	SOCKET c_socket = *(reinterpret_cast<SOCKET*>(exp_over->m_buf));
+
 	unsigned int new_id = get_new_id();
-	if (-1 == new_id)
-	{
-		if(DEBUG)
-			std::cout << "Maxumum user overflow. Accept aborted \n";
-	}
+	if (-1 == new_id) {}
 	else
 	{
 		if(DEBUG)
 			cout << "Accept Client! new_id : " << new_id << endl;
-		CLIENT& cl = m_clients[new_id];
-		cl.set_prev_size(0);
-		cl._recv_over.m_comp_op = OP_RECV;
-		cl._recv_over.m_wsa_buf.buf = reinterpret_cast<char*>(cl._recv_over.m_buf);
-		cl._recv_over.m_wsa_buf.len = sizeof(cl._recv_over.m_buf);
-		ZeroMemory(&cl._recv_over.m_wsa_over, sizeof(cl._recv_over.m_wsa_over));
-		cl._socket = c_socket;
+		SOCKET c_socket = *(reinterpret_cast<SOCKET*>(exp_over->m_buf));
+		m_clients[new_id]._socket = c_socket;
 
 		CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), m_h_iocp, new_id, 0);
+		m_clients[new_id].do_recv();
 
 		ZeroMemory(&exp_over->m_wsa_over, sizeof(exp_over->m_wsa_over));
 		c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 		*(reinterpret_cast<SOCKET*>(exp_over->m_buf)) = c_socket;
 		AcceptEx(C_IOCP::m_listen_socket, c_socket, exp_over->m_buf + 8, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &exp_over->m_wsa_over);
-		cl.do_recv();
 	}
 }
 
@@ -202,6 +191,12 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		break;
 	}
 
+	case CS_PACKET::CS_PACKET_JOIN_ROOM:
+	{
+
+		break;
+	}
+
 	}
 }
 
@@ -233,17 +228,21 @@ void cGameServer::Disconnect(const unsigned int _user_id)
 
 void cGameServer::User_Login(int c_id, void* buff)
 {
+	int reason = 0;
+
 	cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(buff);
 	string stringID{};
 	string stringPW{};
 
 	stringID = packet->id;
 	stringPW = packet->pass_word;
-	
-	if (m_database->check_login(stringToWstring(stringID), stringToWstring(stringPW)))
+	reason = m_database->check_login(stringToWstring(stringID), stringToWstring(stringPW));
+	if (reason == 1)
 		send_login_ok_packet(c_id);
+	else if(reason == 2)
+		send_login_fail_packet(c_id, reason);
 	else
-		send_login_fail_packet(c_id);
+		send_login_fail_packet(c_id, reason);
 	// 여기에 db에 요청하여 체크
 }
 
@@ -257,12 +256,12 @@ void cGameServer::send_chat_packet(int user_id, int my_id, char* mess)
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 
-void cGameServer::send_login_fail_packet(int user_id)
+void cGameServer::send_login_fail_packet(int user_id, char reason)
 {
 	sc_packet_login_fail packet;
 	packet.type = SC_PACKET::SC_LOGINFAIL;
 	packet.size = sizeof(sc_packet_login_fail);
-
+	packet.reason = reason;
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 

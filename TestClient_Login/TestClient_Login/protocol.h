@@ -85,6 +85,7 @@ struct sc_packet_login_ok { // 로그인 성공을 클라에게 전송
 struct sc_packet_login_fail { // 로그인 실패를 클라에게 전송
 	unsigned char	size;
 	unsigned char	type;
+	unsigned char   reason;
 };
 
 struct sc_packet_move {

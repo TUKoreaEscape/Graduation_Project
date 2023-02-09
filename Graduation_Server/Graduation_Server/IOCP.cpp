@@ -18,13 +18,8 @@ C_IOCP::~C_IOCP()
 void C_IOCP::Start_server()
 {
 	WSADATA wsa;
-	int let;
-	let = WSAStartup(MAKEWORD(2, 2), &wsa);
-
-	if (let != -1)
-		this->Bind_Socket(SERVER_PORT);
-	else
-		this->~C_IOCP();
+	WSAStartup(MAKEWORD(2, 2), &wsa);
+	this->Bind_Socket(SERVER_PORT);
 }
 
 void C_IOCP::Close_server()
@@ -52,7 +47,7 @@ void C_IOCP::Bind_Socket(short port_num)
 	char buf_accept[sizeof(SOCKADDR_IN) * 2 + 32 + 100];
 	*(reinterpret_cast<SOCKET*>(&m_exp_over.m_buf)) = m_client_socket;
 	ZeroMemory(&m_exp_over.m_wsa_over, sizeof(m_exp_over.m_wsa_over));
-	m_exp_over.m_comp_op = COMP_OP(OP_ACCEPT);
+	m_exp_over.m_comp_op = OP_TYPE(OP_ACCEPT);
 
 	bool ret = AcceptEx(m_listen_socket, m_client_socket, buf_accept, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &m_exp_over.m_wsa_over);
 
