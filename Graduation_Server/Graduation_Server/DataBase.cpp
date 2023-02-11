@@ -76,6 +76,55 @@ int DataBase::check_login(std::wstring user_id, std::wstring user_pw)
 	return 0;
 }
 
+int DataBase::create_id(std::wstring user_id, std::wstring user_pw)
+{
+
+	std::wstring wp{};
+
+	wp += L"EXEC Get_PW ";
+	wp += user_id;
+	UserData_ID_PW* check_data = new UserData_ID_PW;
+
+	retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)wp.c_str(), SQL_NTS);
+
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) // 여기를 통과한 경우 id가 DB에는 없는 경우임!
+	{
+		// ID에 따른 저장된 PW를 불러옴
+		retcode = SQLBindCol(hstmt, 1, SQL_C_WCHAR, &check_data->user_pw, NAMELEN, &cbPW);
+		retcode = SQLFetch(hstmt);
+
+		if (retcode == SQL_ERROR)
+			show_error();
+
+		std::wstring temp_pw(check_data->user_pw);
+		temp_pw.erase(remove(temp_pw.begin(), temp_pw.end(), ' '), temp_pw.end());
+
+		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+		{
+			SQLCancel(hstmt);
+			return 0; // ID가 중복임
+		}
+		SQLCancel(hstmt);
+	}
+
+
+	std::wstring insert_query{};
+	insert_query += L"EXEC Insert_id ";
+	insert_query += user_id;
+	insert_query += L", ";
+	insert_query += user_pw;
+
+	retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)insert_query.c_str(), SQL_NTS);
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) // 여기를 통과한 경우 id가 DB에는 없는 경우임!
+	{
+		return 1; // 생성완료
+	}
+
+	return 2; // 그냥 에러임
+}
+
 void DataBase::show_error()
 {
 	std::cout << "Error!!! \n";

@@ -166,6 +166,12 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		break;
 	}
 
+	case CS_PACKET::CS_CREATE_ID:
+	{	
+		create_id(user_id, p);
+		break;
+	}
+
 	case CS_PACKET::CS_MOVE:
 	{
 		break;
@@ -239,13 +245,33 @@ void cGameServer::User_Login(int c_id, void* buff)
 	reason = m_database->check_login(stringToWstring(stringID), stringToWstring(stringPW));
 	if (reason == 1)
 		send_login_ok_packet(c_id);
-	else if(reason == 2)
-		send_login_fail_packet(c_id, reason);
 	else
 		send_login_fail_packet(c_id, reason);
 	// 여기에 db에 요청하여 체크
 }
 
+void cGameServer::create_id(int c_id, void* buff)
+{
+	int reason = 0;
+
+	cs_packet_create_id* packet = reinterpret_cast<cs_packet_create_id*>(buff);
+
+	string stringID{};
+	string stringPW{};
+
+	stringID = packet->id;
+	stringPW = packet->pass_word;
+	reason = m_database->create_id(stringToWstring(stringID), stringToWstring(stringPW));
+
+	cout << "reason : " << reason << endl;
+	if (reason == 1) // id 생성 성공
+		send_create_id_ok_packet(c_id);
+	else // id 생성 실패
+		send_create_id_fail_packet(c_id, reason);
+}
+
+//============================================================================
+// 서버에서 보내는 패킷 함수들 
 void cGameServer::send_chat_packet(int user_id, int my_id, char* mess)
 {
 	sc_packet_chat packet;
@@ -274,6 +300,26 @@ void cGameServer::send_login_ok_packet(int user_id)
 
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
+
+void cGameServer::send_create_id_ok_packet(int user_id)
+{
+	sc_packet_create_id_ok packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_CREATE_ID_OK;
+
+	m_clients[user_id].do_send(sizeof(packet), &packet);
+}
+
+void cGameServer::send_create_id_fail_packet(int user_id, char reason)
+{
+	sc_packet_create_id_fail packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_CREATE_ID_FAIL;
+	packet.reason = reason;
+
+	m_clients[user_id].do_send(sizeof(packet), &packet);
+}
+//============================================================================
 
 void cGameServer::create_room(const unsigned int _user_id)
 {

@@ -1,5 +1,6 @@
 #pragma once
 
+
 // 클라이언트와 서버간 통신에 사용할 구조체를 정의합니다.
 const short SERVER_PORT = 4000;
 const int	BUFSIZE = 256;
@@ -7,7 +8,7 @@ const int	MAX_CHAT_SIZE = 100;
 
 const int  MAX_NAME_SIZE = 30;
 // ----- 클라이언트가 서버에게 보낼때 ------
-enum COMP_OP { OP_RECV, OP_SEND, OP_ACCEPT, OP_NPC_MOVE, OP_PLAYER_MOVE };
+
 
 namespace GAME_ROOM_STATE
 {
@@ -24,13 +25,22 @@ namespace CS_PACKET
 	enum TYPE
 	{
 		NONE = 0,
+		CS_CREATE_ID,
 		CS_LOGIN,
 		CS_MOVE,
 		CS_PACKET_CHAT,
-		CS_PACKET_CREATE_ROOM
+		CS_PACKET_CREATE_ROOM,
+		CS_PACKET_JOIN_ROOM
 	};
 }
 
+struct cs_packet_create_id {
+	unsigned char	size;
+	unsigned char	type;
+
+	char			id[20];
+	char			pass_word[20];
+};
 
 struct cs_packet_login { // 로그인 시도
 	unsigned char	size;
@@ -71,6 +81,8 @@ namespace SC_PACKET
 		NONE = 0,
 		SC_LOGINOK,
 		SC_LOGINFAIL,
+		SC_CREATE_ID_OK,
+		SC_CREATE_ID_FAIL,
 		SC_MOVING,
 		SC_PACKET_CHAT
 	};
@@ -86,6 +98,17 @@ struct sc_packet_login_fail { // 로그인 실패를 클라에게 전송
 	unsigned char	size;
 	unsigned char	type;
 	unsigned char   reason;
+};
+
+struct sc_packet_create_id_ok {
+	unsigned char	size;
+	unsigned char	type;
+};
+
+struct sc_packet_create_id_fail {
+	unsigned char	size;
+	unsigned char	type;
+	unsigned char	reason;
 };
 
 struct sc_packet_move {

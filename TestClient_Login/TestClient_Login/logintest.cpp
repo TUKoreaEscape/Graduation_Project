@@ -37,13 +37,28 @@ void ProcessPacket(char* ptr)
 	{
 	case SC_PACKET::SC_LOGINOK:
 		cout << "로그인에 성공하였습니다!" << endl;
+		cout << "===============================================" << endl;
 		break;
 
 	case SC_PACKET::SC_LOGINFAIL:
-		if (ptr[2] == '0')
-			cout << "로그인에 실패하였습니다. (사유 : 존재하지 않는 ID 입니다." << endl;
-		else if (ptr[2] == '2')
-			cout << "로그인에 실패하였습니다. (사유 : PW가 틀립니다." << endl;
+		if (ptr[2] == 0)
+			cout << "로그인에 실패하였습니다. (사유 : 존재하지 않는 ID 입니다.)" << endl;
+		else if (ptr[2] == 2)
+			cout << "로그인에 실패하였습니다. (사유 : PW가 틀립니다.)" << endl;
+		cout << "===============================================" << endl;
+		break;
+
+	case SC_PACKET::SC_CREATE_ID_OK:
+		cout << "ID 생성에 성공하였습니다!" << endl;
+		cout << "===============================================" << endl;
+		break;
+
+	case SC_PACKET::SC_CREATE_ID_FAIL:
+		if (ptr[2] == 0)
+			cout << "ID 생성에 실패하였습니다. (사유 : 이미 같은 ID가 존재합니다.)" << endl;
+		else if (ptr[2] == 2)
+			cout << "ID 생성에 실패하였습니다. (사유 : DB 연결 에러입니다.)" << endl;
+		cout << "===============================================" << endl;
 		break;
 	}
 }
@@ -64,7 +79,7 @@ void PacketReassembly(char* net_buf, size_t io_byte)
 			ZeroMemory(packet_buffer, BUF_SIZE);
 			ptr += make_packet_size - saved_packet_size;
 			io_byte -= make_packet_size - saved_packet_size;
-			cout << "io byte - " << io_byte << endl;
+			//cout << "io byte - " << io_byte << endl;
 			make_packet_size = 0;
 			saved_packet_size = 0;
 		}
@@ -88,26 +103,61 @@ void RecvPacket()
 			;
 
 		if (recv_byte > 0) {
-			cout << "recv_byte : " << recv_byte << endl;
+			//cout << "recv_byte : " << recv_byte << endl;
 			PacketReassembly(wsabuf.buf, recv_byte);
 		}
 	}
+}
+
+void Login_Test()
+{
+	cs_packet_login packet;
+	cout << "===============================================" << endl;
+	cout << "ID 입력 : ";
+	cin >> packet.id;
+
+	cout << "PW 입력 : ";
+	cin >> packet.pass_word;
+	packet.type = CS_PACKET::CS_LOGIN;
+	packet.size = sizeof(packet);
+
+	SendPacket(0, &packet);
+}
+
+void CreateID_Test()
+{
+	cs_packet_create_id packet;
+	cout << "===============================================" << endl;
+	cout << "새로운 ID 입력 : ";
+	cin >> packet.id;
+
+	cout << "새로운 PW 입력 : ";
+	cin >> packet.pass_word;
+
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_CREATE_ID;
+
+	SendPacket(0, &packet);
 }
 
 void Send_Packet()
 {
 	while (true)
 	{
-		cs_packet_login packet;
-		cout << "ID 입력 : ";
-		cin >> packet.id;
+		int test_code = 0;
+		cout << "원하는 테스트를 선택하세요." << endl;
+		cout << "1. ID 로그인 테스트" << endl;
+		cout << "2. ID 생성 테스트" << endl;
+		cout << "입력 : ";
+		cin >> test_code;
 
-		cout << "PW 입력 : ";
-		cin >> packet.pass_word;
-		packet.type = CS_PACKET::CS_LOGIN;
-		packet.size = sizeof(cs_packet_login);
+		system("cls");
+		if (test_code == 1)
+			Login_Test();
+		else if (test_code == 2)
+			CreateID_Test();
 
-		SendPacket(0, &packet);
+		this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }
 

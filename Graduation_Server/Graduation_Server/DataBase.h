@@ -23,6 +23,7 @@ public:
 	void HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE retcode);
 
 	int check_login(std::wstring user_id, std::wstring user_pw);
+	int create_id(std::wstring user_id, std::wstring user_pw);
 
 	void show_error();
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "EXP_OVER.h"
 
-EXP_OVER::EXP_OVER(COMP_OP comp_op, char _size, void* message) : m_comp_op(comp_op)
+EXP_OVER::EXP_OVER(OP_TYPE comp_op, char _size, void* message) : m_comp_op(comp_op)
 {
 	ZeroMemory(&m_wsa_buf, sizeof(m_wsa_over));
 	m_wsa_buf.buf = reinterpret_cast<char*>(m_buf);
@@ -9,7 +9,7 @@ EXP_OVER::EXP_OVER(COMP_OP comp_op, char _size, void* message) : m_comp_op(comp_
 	memcpy(m_buf, message, _size);
 }
 
-EXP_OVER::EXP_OVER(COMP_OP comp_op) : m_comp_op(comp_op)
+EXP_OVER::EXP_OVER(OP_TYPE comp_op) : m_comp_op(comp_op)
 {
 
 }
