@@ -232,24 +232,6 @@ void cGameServer::Disconnect(const unsigned int _user_id)
 	m_clients[_user_id]._state_lock.unlock();
 }
 
-void cGameServer::User_Login(int c_id, void* buff)
-{
-	int reason = 0;
-
-	cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(buff);
-	string stringID{};
-	string stringPW{};
-
-	stringID = packet->id;
-	stringPW = packet->pass_word;
-	reason = m_database->check_login(stringToWstring(stringID), stringToWstring(stringPW));
-	if (reason == 1)
-		send_login_ok_packet(c_id);
-	else
-		send_login_fail_packet(c_id, reason);
-	// 여기에 db에 요청하여 체크
-}
-
 void cGameServer::create_id(int c_id, void* buff)
 {
 	int reason = 0;
@@ -320,10 +302,27 @@ void cGameServer::send_create_id_fail_packet(int user_id, char reason)
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 //============================================================================
-
-void cGameServer::create_room(const unsigned int _user_id)
+// Client가 서버에 요청시 동작하는 함수
+void cGameServer::create_room(const unsigned int _user_id) // 새로운 방 생성
 {
 	m_room_manager->Create_room(_user_id);
+}
+
+void cGameServer::User_Login(int c_id, void* buff) // 로그인 요청
+{
+	int reason = 0;
+
+	cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(buff);
+	string stringID{};
+	string stringPW{};
+
+	stringID = packet->id;
+	stringPW = packet->pass_word;
+	reason = m_database->check_login(stringToWstring(stringID), stringToWstring(stringPW));
+	if (reason == 1) // reason 0 : id가 존재하지 않음 / reason 1 : 성공 / reason 2 : pw가 틀림
+		send_login_ok_packet(c_id);
+	else
+		send_login_fail_packet(c_id, reason);
 }
 
 int cGameServer::get_new_id()

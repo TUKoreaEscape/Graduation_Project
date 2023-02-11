@@ -157,7 +157,8 @@ void Send_Packet()
 		else if (test_code == 2)
 			CreateID_Test();
 
-		this_thread::sleep_for(std::chrono::seconds(1));
+		this_thread::sleep_for(std::chrono::seconds(3));
+		system("cls");
 	}
 }
 
