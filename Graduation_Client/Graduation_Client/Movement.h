@@ -4,28 +4,27 @@
 class CommonMovement : public Component
 {
 public:
-	//void update();
-	//void move();
+	void start();
+	void update();
 };
 
 class TaggerMovement : public Component
 {
 public:
-	//void update();
-	//void move();
-	//void attack();
+	void start() {};
+	void update() {};
 };
 
 class SurvivorMovement : public Component
 {
 public:
-	//void update();
-	//void move();
+	void start() {};
+	void update() {};
 };
 
 class DeadMovement : public Component
 {
 public:
-	//void update();
-	//void move();
+	void start() {};
+	void update() {};
 };

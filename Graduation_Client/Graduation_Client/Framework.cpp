@@ -258,24 +258,25 @@ void Framework::CreateDepthStencilView()
 
 void Framework::BuildObjects()
 {
+	input = Input::GetInstance();
+	scene = new GameScene();
 }
 
 void Framework::ReleaseObjects()
 {
 }
 
-void Framework::ProcessInput()
+void Framework::UpdateObjects()
 {
-}
-
-void Framework::AnimateObjects()
-{
+	scene->update();
 }
 
 void Framework::FrameAdvance()
 {
-	ProcessInput();
-	AnimateObjects();
+	input->Update(m_hWnd);
+
+	UpdateObjects();
+
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL); //명령 할당자와 명령 리스트를 리셋한다.
 
@@ -283,8 +284,7 @@ void Framework::FrameAdvance()
 	::ZeroMemory(&d3dResourceBarrier, sizeof(D3D12_RESOURCE_BARRIER));
 	d3dResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	d3dResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	d3dResourceBarrier.Transition.pResource =
-		m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex];
+	d3dResourceBarrier.Transition.pResource = m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex];
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	d3dResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -305,6 +305,9 @@ void Framework::FrameAdvance()
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle); //렌더 타겟 뷰(서술자)와 깊이-스텐실 뷰(서술자)를 출력-병합 단계(OM)에 연결한다.
 	
 	//렌더링 코드는 여기에 추가될 것이다.
+
+	scene->render();
+
 
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
@@ -339,68 +342,4 @@ void Framework::WaitForGpuComplete()
 		hResult = m_pd3dFence->SetEventOnCompletion(nFence, m_hFenceEvent);
 		::WaitForSingleObject(m_hFenceEvent, INFINITE);
 	}
-}
-
-void Framework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
-{
-	switch (nMessageID) {
-	case WM_LBUTTONDOWN:
-	case WM_RBUTTONDOWN:
-		break;
-	case WM_LBUTTONUP:
-	case WM_RBUTTONUP:
-		break;
-	case WM_MOUSEMOVE:
-		break;
-	default:
-		break;
-	}
-}
-
-void Framework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
-{
-	switch (nMessageID) {
-	case WM_KEYUP:
-		switch (wParam) {
-		case VK_ESCAPE:
-			::PostQuitMessage(0);
-			break;
-		case VK_RETURN:
-			break;
-		case VK_F8:
-			break;
-		case VK_F9:
-			break;
-		default:
-			break;
-		}
-		break;
-
-	default:
-		break;
-	}
-}
-
-LRESULT CALLBACK Framework::OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
-{
-	switch (nMessageID) {
-	case WM_SIZE:
-	{
-		m_nWndClientWidth = LOWORD(lParam);
-		m_nWndClientHeight = HIWORD(lParam);
-		break;
-	}
-	case WM_LBUTTONDOWN:
-	case WM_RBUTTONDOWN:
-	case WM_LBUTTONUP:
-	case WM_RBUTTONUP:
-	case WM_MOUSEMOVE:
-		OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
-		break;
-	case WM_KEYDOWN:
-	case WM_KEYUP:
-		OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
-		break;
-	}
-	return(0);
 }

@@ -66,6 +66,15 @@
     <ClInclude Include="Movement.h">
       <Filter>Client\Component</Filter>
     </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Engine\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Engine\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.h">
+      <Filter>Client\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -94,6 +103,15 @@
     </ClCompile>
     <ClCompile Include="Movement.cpp">
       <Filter>Client\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Engine\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Engine\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="GameScene.cpp">
+      <Filter>Client\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

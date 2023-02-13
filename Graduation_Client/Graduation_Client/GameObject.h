@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "Component.h"
 
+
 class GameObject
 {
 	std::list<Component*> components;
@@ -19,7 +20,8 @@ public:
 		for (auto component : components)
 			component->update();
 	}
-	virtual void print() {}
+
+	virtual void render() {}
 
 	template<typename T>
 	T* AddComponent();
