@@ -301,6 +301,18 @@ void cGameServer::send_create_id_fail_packet(int user_id, char reason)
 
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
+
+void cGameServer::send_move_packet(int user_id)
+{
+	sc_packet_move packet;
+
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_MOVING;
+	
+	m_clients[user_id].do_send(sizeof(packet), &packet);
+
+}
+
 //============================================================================
 // Client가 서버에 요청시 동작하는 함수
 void cGameServer::create_room(const unsigned int _user_id) // 새로운 방 생성

@@ -34,6 +34,7 @@ public:
 	void	send_login_ok_packet(int user_id);
 	void	send_create_id_ok_packet(int user_id);
 	void	send_create_id_fail_packet(int user_id, char reason);
+	void	send_move_packet(int user_id);
 
 	void	create_room(const unsigned int _user_id);
 
