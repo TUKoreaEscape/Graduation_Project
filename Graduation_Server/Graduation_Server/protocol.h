@@ -19,6 +19,15 @@ namespace GAME_ROOM_STATE
 	};
 }
 
+namespace LOGIN_FAIL_REASON
+{
+	enum TYPE
+	{
+		INVALID_ID,
+		WRONG_PW
+	};
+}
+
 namespace CS_PACKET
 {
 	enum TYPE

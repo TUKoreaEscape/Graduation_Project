@@ -32,7 +32,7 @@ public:
 	void	Disconnect(const unsigned int _user_id);
 
 	void	send_chat_packet(int user_id, int my_id, char* mess);
-	void	send_login_fail_packet(int user_id, char reason);
+	void	send_login_fail_packet(int user_id, LOGIN_FAIL_REASON::TYPE reason);
 	void	send_login_ok_packet(int user_id);
 	void	send_create_id_ok_packet(int user_id);
 	void	send_create_id_fail_packet(int user_id, char reason);

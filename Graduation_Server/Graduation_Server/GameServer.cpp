@@ -265,7 +265,7 @@ void cGameServer::send_chat_packet(int user_id, int my_id, char* mess)
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 
-void cGameServer::send_login_fail_packet(int user_id, char reason)
+void cGameServer::send_login_fail_packet(int user_id, LOGIN_FAIL_REASON::TYPE reason)
 {
 	sc_packet_login_fail packet;
 	packet.type = SC_PACKET::SC_LOGINFAIL;
@@ -334,8 +334,12 @@ void cGameServer::User_Login(int c_id, void* buff) // 로그인 요청
 	reason = m_database->check_login(stringToWstring(stringID), stringToWstring(stringPW));
 	if (reason == 1) // reason 0 : id가 존재하지 않음 / reason 1 : 성공 / reason 2 : pw가 틀림
 		send_login_ok_packet(c_id);
-	else
-		send_login_fail_packet(c_id, reason);
+	else {
+		if (reason == 0)
+			send_login_fail_packet(c_id, LOGIN_FAIL_REASON::INVALID_ID);
+		else
+			send_login_fail_packet(c_id, LOGIN_FAIL_REASON::WRONG_PW);
+	}
 }
 
 void cGameServer::Process_Move(const unsigned int user_id, void* buff)
