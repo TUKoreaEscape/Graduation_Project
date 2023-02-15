@@ -174,6 +174,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_MOVE:
 	{
+		Process_Move(user_id, p);
 		break;
 	}
 
@@ -336,6 +337,14 @@ void cGameServer::User_Login(int c_id, void* buff) // 로그인 요청
 	else
 		send_login_fail_packet(c_id, reason);
 }
+
+void cGameServer::Process_Move(const unsigned int user_id, void* buff)
+{
+	cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(buff);
+	
+	// 이쪽에서 벡터값을 받아오고! 각방에 이동정보 전송
+}
+
 
 int cGameServer::get_new_id()
 {
