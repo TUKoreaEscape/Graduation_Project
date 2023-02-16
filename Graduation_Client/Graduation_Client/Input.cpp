@@ -1,5 +1,7 @@
 #pragma once
 #include "Input.h"
+#include "Framework.h"
+#include "Graduation_Client.h"
 
 Input* Input::InputInstance = nullptr;
 UCHAR Input::keyBuffer[256];
@@ -48,6 +50,8 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			break;
 		case VK_RETURN:
 			break;
+		case VK_F9:
+			g_Framework.ChangeSwapChainState();
 		default:
 			break;
 		}

@@ -68,5 +68,7 @@ public:
 	//프레임워크의 핵심(애니메이션, 렌더링)을 구성하는 함수이다. 
 
 	void WaitForGpuComplete(); //CPU와 GPU를 동기화하는 함수이다.
+
+	void ChangeSwapChainState();
 };
 
