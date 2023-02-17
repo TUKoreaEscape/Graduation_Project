@@ -6,7 +6,7 @@ void CommonMovement::start()
 {
 }
 
-void CommonMovement::update()
+void CommonMovement::update(float elapsedTime)
 {
 	UCHAR keyBuffer[256];
 	memcpy(keyBuffer,Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));

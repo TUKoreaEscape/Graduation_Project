@@ -12,7 +12,7 @@ GameObject* Scene::CreateEmpty()
 	return new GameObject();
 }
 
-void Scene::update()
+void Scene::update(float elapsedTime)
 {
 	while (!creationQueue.empty())
 	{
@@ -23,7 +23,7 @@ void Scene::update()
 	}
 
 	for (auto gameObject : gameObjects)
-		gameObject->update();
+		gameObject->update(elapsedTime);
 
 	auto t = deletionQueue;
 	while (!deletionQueue.empty())
@@ -36,8 +36,9 @@ void Scene::update()
 	}
 }
 
-void Scene::render()
+void Scene::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	for (auto object : Scene::scene->gameObjects)
-		object->render();
+	pd3dCommandList->DrawInstanced(3, 1, 0, 0);
+	/*for (auto object : Scene::scene->gameObjects)
+		object->render();*/
 }

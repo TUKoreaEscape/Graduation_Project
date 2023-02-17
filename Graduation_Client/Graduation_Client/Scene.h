@@ -27,8 +27,8 @@ public:
 			delete object;
 		gameObjects.clear();
 	}
-	virtual void update();
-	virtual void render();
+	virtual void update(float elapsedTime);
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void PushDelete(GameObject* gameObject)
 	{

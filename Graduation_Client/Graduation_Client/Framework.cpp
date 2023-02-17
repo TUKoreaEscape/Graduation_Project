@@ -27,9 +27,15 @@ Framework::Framework()
 
 	m_hFenceEvent = NULL;
 	m_pd3dFence = NULL;
-	m_nFenceValue = 0;
+	for (int i = 0; i < m_nSwapChainBuffers; i++) m_nFenceValues[i] = 0;
+
 	m_nWndClientWidth = FRAME_BUFFER_WIDTH;
 	m_nWndClientHeight = FRAME_BUFFER_HEIGHT;
+
+	m_d3dViewport = { 0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f };
+	m_d3dScissorRect = { 0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT };
+
+	scene = NULL;
 }
 
 Framework::~Framework()
@@ -177,7 +183,6 @@ void Framework::CreateDirect3DDevice()
 	m_nMsaa4xQualityLevels = d3dMsaaQualityLevels.NumQualityLevels; //디바이스가 지원하는 다중 샘플의 품질 수준을 확인한다.
 	m_bMsaa4xEnable = (m_nMsaa4xQualityLevels > 1) ? true : false; //다중 샘플의 품질 수준이 1보다 크면 다중 샘플링을 활성화한다.
 	hResult = m_pd3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void**)&m_pd3dFence);
-	m_nFenceValue = 0; //펜스를 생성하고 펜스 값을 0으로 설정한다.
 	m_hFenceEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	/*펜스와 동기화를 위한 이벤트 객체를 생성한다(이벤트 객체의 초기값을 FALSE이다).
 	이벤트가 실행되면(Signal) 이벤트의 값을 자동적으로 FALSE가 되도록 생성한다.*/
@@ -258,19 +263,24 @@ void Framework::BuildObjects()
 {
 	input = Input::GetInstance();
 	scene = new GameScene();
+	scene->BuildObjects(m_pd3dDevice);
+	time.Reset();
 }
 
 void Framework::ReleaseObjects()
 {
+	if (scene) scene->ReleaseObjects();
+	if (scene) delete scene;
 }
 
 void Framework::UpdateObjects()
 {
-	scene->update();
+	scene->update(time.GetTimeElapsed());
 }
 
 void Framework::FrameAdvance()
 {
+	time.Tick(0.0);
 	input->Update(m_hWnd);
 
 	UpdateObjects();
@@ -304,7 +314,7 @@ void Framework::FrameAdvance()
 	
 	//렌더링 코드는 여기에 추가될 것이다.
 
-	scene->render();
+	if(scene) scene->render(m_pd3dCommandList);
 
 
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -316,32 +326,24 @@ void Framework::FrameAdvance()
 
 	hResult = m_pd3dCommandList->Close(); //명령 리스트를 닫힌 상태로 만든다.
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
-	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists); //명령 리스트를 명령 큐에 추가하여 실행한다.
+	m_pd3dCommandQueue->ExecuteCommandLists(_countof(ppd3dCommandLists), ppd3dCommandLists); //명령 리스트를 명령 큐에 추가하여 실행한다.
 	WaitForGpuComplete(); //GPU가 모든 명령 리스트를 실행할 때 까지 기다린다.
 
-	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;
-	dxgiPresentParameters.DirtyRectsCount = 0;
-	dxgiPresentParameters.pDirtyRects = NULL;
-	dxgiPresentParameters.pScrollRect = NULL;
-	dxgiPresentParameters.pScrollOffset = NULL;
-	m_pdxgiSwapChain->Present1(1, 0, &dxgiPresentParameters);
+	m_pdxgiSwapChain->Present(0, 0);
 	/*스왑체인을 프리젠트한다. 프리젠트를 하면 현재 렌더 타겟(후면버퍼)의 내용이 전면버퍼로 옮겨지고 렌더 타겟 인덱스가 바뀔 것이다.*/
-	m_nSwapChainBufferIndex = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
+	MoveToNextFrame();
 }
 
 void Framework::WaitForGpuComplete()
 {
-	m_nFenceValue++; //CPU 펜스의 값을 증가한다.
-	const UINT64 nFence = m_nFenceValue;
-	HRESULT hResult = m_pd3dCommandQueue->Signal(m_pd3dFence, nFence); //GPU가 펜스의 값을 설정하는 명령을 명령 큐에 추가한다.
-
-	if (m_pd3dFence->GetCompletedValue() < nFence) //펜스의 현재 값이 설정한 값보다 작으면 펜스의 현재 값이 설정한 값이 될 때까지 기다린다.
+	UINT64 nFenceValue = ++m_nFenceValues[m_nSwapChainBufferIndex];
+	HRESULT hResult = m_pd3dCommandQueue->Signal(m_pd3dFence, nFenceValue); //GPU가 펜스의 값을 설정하는 명령을 명령 큐에 추가한다.
+	if (m_pd3dFence->GetCompletedValue() < nFenceValue) //펜스의 현재 값이 설정한 값보다 작으면 펜스의 현재 값이 설정한 값이 될 때까지 기다린다.
 	{
-		hResult = m_pd3dFence->SetEventOnCompletion(nFence, m_hFenceEvent);
+		hResult = m_pd3dFence->SetEventOnCompletion(nFenceValue, m_hFenceEvent);
 		::WaitForSingleObject(m_hFenceEvent, INFINITE);
 	}
 }
-
 
 void Framework::ChangeSwapChainState()
 {
@@ -368,4 +370,16 @@ void Framework::ChangeSwapChainState()
 		m_nWndClientHeight, dxgiSwapChainDesc.BufferDesc.Format, dxgiSwapChainDesc.Flags);
 	m_nSwapChainBufferIndex = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
 	CreateRenderTargetViews();
+}
+
+void Framework::MoveToNextFrame()
+{
+	m_nSwapChainBufferIndex = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
+	UINT64 nFenceValue = ++m_nFenceValues[m_nSwapChainBufferIndex];
+	HRESULT hResult = m_pd3dCommandQueue->Signal(m_pd3dFence, nFenceValue);
+	if (m_pd3dFence->GetCompletedValue() < nFenceValue)
+	{
+		hResult = m_pd3dFence->SetEventOnCompletion(nFenceValue, m_hFenceEvent);
+		::WaitForSingleObject(m_hFenceEvent, INFINITE);
+	}
 }

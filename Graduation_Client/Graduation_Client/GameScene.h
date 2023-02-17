@@ -12,9 +12,19 @@ class GameScene : public Scene
 {
 public:
 	class Player* player;
+	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL; //루트 시그너쳐를 나타내는 인터페이스 포인터이다.
+	ID3D12PipelineState *m_pd3dPipelineState = NULL; //파이프라인 상태를 나타내는 인터페이스 포인터이다.
 public:
 	GameScene();
 	~GameScene() {}
 
-	virtual void render();
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
+
+
+	void BuildObjects(ID3D12Device* pd3dDevice);
+
+	void ReleaseObjects();
+
+	void CreateGraphicsRootSignature(ID3D12Device* pd3dDevice); //루트 시그너쳐를 생성한다.
+	void CreateGraphicsPipelineState(ID3D12Device* pd3dDevice); //정점 셰이더와 픽셀 셰이더를 생성한다
 };

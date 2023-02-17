@@ -15,10 +15,10 @@ public:
 			component->start();
 	}
 
-	virtual void update()
+	virtual void update(float elapsedTime)
 	{
 		for (auto component : components)
-			component->update();
+			component->update(elapsedTime);
 	}
 
 	virtual void render() {}
