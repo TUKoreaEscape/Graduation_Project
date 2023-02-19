@@ -155,9 +155,9 @@ void cGameServer::Recv(EXP_OVER* exp_over, const unsigned int user_id, const DWO
 
 void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) // 패킷구분 후 처리
 {
-	unsigned char p_type = p[1];
+	unsigned char packet_type = p[1];
 
-	switch (p_type) // 패킷 타입별로 처리할 공간
+	switch (packet_type) // 패킷 타입별로 처리할 공간
 	{
 	case CS_PACKET::CS_LOGIN:
 	{
