@@ -38,3 +38,7 @@ using Microsoft::WRL::ComPtr;
 #define FRAME_BUFFER_HEIGHT 900
 
 #include <list>
+#include <queue>
+#include <deque>
+#include <algorithm>
+#include <iostream>

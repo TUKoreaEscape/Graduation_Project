@@ -1,5 +1,10 @@
 #pragma once
 #include "stdafx.h"
+#include "Input.h"
+#include "Player.h"
+#include "Scene.h"
+#include "GameScene.h"
+#include "Time.h"
 
 class Framework
 {
@@ -33,11 +38,15 @@ private:
 	ID3D12PipelineState *m_pd3dPipelineState; //그래픽스 파이프라인 상태 객체에 대한 인터페이스 포인터이다.
 
 	ID3D12Fence *m_pd3dFence;
-	UINT64 m_nFenceValue;
+	UINT64 m_nFenceValues[m_nSwapChainBuffers];
 	HANDLE m_hFenceEvent; //펜스 인터페이스 포인터, 펜스의 값, 이벤트 핸들이다.
 
 	D3D12_VIEWPORT m_d3dViewport{};
 	D3D12_RECT m_d3dScissorRect{}; //뷰포트와 씨저 사각형이다.
+
+	Input*			input;
+	GameScene*		scene;
+	Time			time;
 
 public:
 	Framework();
@@ -56,15 +65,14 @@ public:
 	void BuildObjects();
 	void ReleaseObjects(); //렌더링할 메쉬와 게임 객체를 생성하고 소멸하는 함수이다.
 
-	void ProcessInput();
-	void AnimateObjects();
+	void UpdateObjects(); //AnimateObjects
 	void FrameAdvance();
-	//프레임워크의 핵심(사용자 입력, 애니메이션, 렌더링)을 구성하는 함수이다. 
+	//프레임워크의 핵심(애니메이션, 렌더링)을 구성하는 함수이다. 
 
 	void WaitForGpuComplete(); //CPU와 GPU를 동기화하는 함수이다.
 
-	void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
-	void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
-	LRESULT CALLBACK OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam); //윈도우의 메시지(키보드, 마우스 입력)를 처리하는 함수이다.
+	void ChangeSwapChainState();
+
+	void MoveToNextFrame();
 };
 

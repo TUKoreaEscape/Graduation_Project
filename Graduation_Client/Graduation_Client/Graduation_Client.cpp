@@ -1,9 +1,12 @@
 ﻿// Graduation_Client.cpp : 애플리케이션에 대한 진입점을 정의합니다.
 //
-
+#pragma once
 #include "stdafx.h"
 #include "Framework.h"
 #include "Graduation_Client.h"
+#include "Input.h"
+
+#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
 
 #define MAX_LOADSTRING 100
 
@@ -12,6 +15,7 @@ HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 Framework g_Framework;
+Input* input=Input::GetInstance();
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -123,6 +127,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
+#ifdef _WITH_SWAPCHAIN_FULLSCREEN_STATE
+   gGameFramework.ChangeSwapChainState();
+#endif
+
    return TRUE;
 }
 
@@ -147,7 +155,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_MOUSEMOVE:
     case WM_KEYDOWN:
     case WM_KEYUP:
-        g_Framework.OnProcessingWindowMessage(hWnd, message, wParam, lParam);
+        input->ProcessingWindowMessage(hWnd, message, wParam, lParam);
         break;
     case WM_DESTROY:
         PostQuitMessage(0);

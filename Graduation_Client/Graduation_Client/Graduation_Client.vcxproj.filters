@@ -31,6 +31,9 @@
     <Filter Include="Engine\stdafx">
       <UniqueIdentifier>{4ace4f42-6d47-41cc-b2e3-88127886ea77}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Shader">
+      <UniqueIdentifier>{2e496cfb-0032-4d37-9c04-227629dff23f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -66,6 +69,15 @@
     <ClInclude Include="Movement.h">
       <Filter>Client\Component</Filter>
     </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Engine\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Engine\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.h">
+      <Filter>Client\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -95,6 +107,15 @@
     <ClCompile Include="Movement.cpp">
       <Filter>Client\Component</Filter>
     </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Engine\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Engine\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="GameScene.cpp">
+      <Filter>Client\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Graduation_Client.rc">
@@ -108,5 +129,10 @@
     <Image Include="Graduation_Client.ico">
       <Filter>리소스 파일</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders.hlsl">
+      <Filter>Engine\Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

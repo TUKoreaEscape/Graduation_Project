@@ -1,6 +1,5 @@
 #include "Player.h"
 
-Player::Player()
+void Player::render()
 {
-	//AddComponent<CommonMovement>();
 }

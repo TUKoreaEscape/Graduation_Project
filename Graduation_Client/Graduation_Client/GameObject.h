@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "Component.h"
 
+
 class GameObject
 {
 	std::list<Component*> components;
@@ -14,12 +15,13 @@ public:
 			component->start();
 	}
 
-	virtual void update()
+	virtual void update(float elapsedTime)
 	{
 		for (auto component : components)
-			component->update();
+			component->update(elapsedTime);
 	}
-	virtual void print() {}
+
+	virtual void render() {}
 
 	template<typename T>
 	T* AddComponent();

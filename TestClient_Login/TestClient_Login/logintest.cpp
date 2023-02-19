@@ -41,9 +41,9 @@ void ProcessPacket(char* ptr)
 		break;
 
 	case SC_PACKET::SC_LOGINFAIL:
-		if (ptr[2] == 0)
+		if (ptr[2] == LOGIN_FAIL_REASON::INVALID_ID)
 			cout << "로그인에 실패하였습니다. (사유 : 존재하지 않는 ID 입니다.)" << endl;
-		else if (ptr[2] == 2)
+		else if (ptr[2] == LOGIN_FAIL_REASON::WRONG_PW)
 			cout << "로그인에 실패하였습니다. (사유 : PW가 틀립니다.)" << endl;
 		cout << "===============================================" << endl;
 		break;

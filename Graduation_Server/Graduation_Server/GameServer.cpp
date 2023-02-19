@@ -174,6 +174,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_MOVE:
 	{
+		Process_Move(user_id, p);
 		break;
 	}
 
@@ -264,7 +265,7 @@ void cGameServer::send_chat_packet(int user_id, int my_id, char* mess)
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 
-void cGameServer::send_login_fail_packet(int user_id, char reason)
+void cGameServer::send_login_fail_packet(int user_id, LOGIN_FAIL_REASON::TYPE reason)
 {
 	sc_packet_login_fail packet;
 	packet.type = SC_PACKET::SC_LOGINFAIL;
@@ -301,6 +302,18 @@ void cGameServer::send_create_id_fail_packet(int user_id, char reason)
 
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
+
+void cGameServer::send_move_packet(int user_id)
+{
+	sc_packet_move packet;
+
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_MOVING;
+	
+	m_clients[user_id].do_send(sizeof(packet), &packet);
+
+}
+
 //============================================================================
 // Client가 서버에 요청시 동작하는 함수
 void cGameServer::create_room(const unsigned int _user_id) // 새로운 방 생성
@@ -321,9 +334,21 @@ void cGameServer::User_Login(int c_id, void* buff) // 로그인 요청
 	reason = m_database->check_login(stringToWstring(stringID), stringToWstring(stringPW));
 	if (reason == 1) // reason 0 : id가 존재하지 않음 / reason 1 : 성공 / reason 2 : pw가 틀림
 		send_login_ok_packet(c_id);
-	else
-		send_login_fail_packet(c_id, reason);
+	else {
+		if (reason == 0)
+			send_login_fail_packet(c_id, LOGIN_FAIL_REASON::INVALID_ID);
+		else
+			send_login_fail_packet(c_id, LOGIN_FAIL_REASON::WRONG_PW);
+	}
 }
+
+void cGameServer::Process_Move(const unsigned int user_id, void* buff)
+{
+	cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(buff);
+	
+	// 이쪽에서 벡터값을 받아오고! 각방에 이동정보 전송
+}
+
 
 int cGameServer::get_new_id()
 {

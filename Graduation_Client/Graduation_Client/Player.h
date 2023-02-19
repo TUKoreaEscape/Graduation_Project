@@ -5,5 +5,9 @@
 class Player : public GameObject
 {
 public:
-	Player();
+	Player() : GameObject()
+	{
+		AddComponent<CommonMovement>();
+	}
+	void render();
 };

@@ -1,6 +1,5 @@
 #pragma once
 
-
 // 클라이언트와 서버간 통신에 사용할 구조체를 정의합니다.
 const short SERVER_PORT = 4000;
 const int	BUFSIZE = 256;
@@ -17,6 +16,15 @@ namespace GAME_ROOM_STATE
 		NONE = 0,
 		READY,
 		PLAYING
+	};
+}
+
+namespace LOGIN_FAIL_REASON
+{
+	enum TYPE
+	{
+		INVALID_ID,
+		WRONG_PW
 	};
 }
 
@@ -55,6 +63,10 @@ struct cs_packet_move { // 이동관련 데이터
 	unsigned char	type;
 
 	unsigned char	input_key;
+	unsigned char	state;
+
+	unsigned short	look;
+
 	// 벡터를 보낼지도 고민중
 };
 
@@ -115,7 +127,10 @@ struct sc_packet_move {
 	unsigned char	size;
 	unsigned char	type;
 
-	char			input_key;
+	unsigned char	input_key;
+	unsigned char	state;
+	
+	unsigned short	look;
 };
 
 struct sc_packet_create_room {
@@ -136,7 +151,9 @@ struct sc_packet_user_join_room {
 
 struct sc_packet_chat { // 유저간 채팅
 	unsigned char	size;
-	char			type;
+	unsigned char	type;
+	
 	int				id;
+	
 	char			message[MAX_CHAT_SIZE];
 };
