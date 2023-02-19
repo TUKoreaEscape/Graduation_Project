@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
-enum STATE {ST_FREE, ST_ACCEPT, ST_INGAME};
+enum STATE {ST_FREE, ST_ACCEPT, ST_LOBBY, ST_GAMEROOM, ST_INGAME};
 
 class CLIENT {
 private:
@@ -10,6 +10,7 @@ private:
 
 	unsigned short	_prev_size;
 	int				_id;
+	int				_join_room_number;
 
 public:
 	unordered_set <int> room_list;
@@ -34,11 +35,13 @@ public:
 
 	int		return_prev_size();
 	int		get_id() { return _id; }
+	int		get_join_room_number() { return _join_room_number; }
 
 	STATE	get_state();
 	void	set_state(STATE state);
 	void	set_id(int id) { _id = id; }
 	void	set_recv_over(EXP_OVER& exp_over, SOCKET c_socket);
+	void	set_join_room_number(int room_number);
 
 	void	error_display(int error_number);
 

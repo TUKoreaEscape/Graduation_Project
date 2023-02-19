@@ -67,6 +67,11 @@ void CLIENT::set_recv_over(EXP_OVER& recv_over, SOCKET c_socket)
 	_socket = c_socket;
 }
 
+void CLIENT::set_join_room_number(int room_number)
+{
+	_join_room_number = room_number;
+}
+
 void CLIENT::error_display(int error_number)
 {
 	WCHAR* lpMsgBuf;
