@@ -52,9 +52,19 @@ void CLIENT::set_state(STATE state)
 	_state = state;
 }
 
+void CLIENT::set_login_state(LOGIN_STATE _state)
+{
+	_login_state = _state;
+}
+
 STATE CLIENT::get_state()
 {
 	return _state;
+}
+
+LOGIN_STATE CLIENT::get_login_state()
+{
+	return _login_state;
 }
 
 

@@ -5,7 +5,7 @@
 class RoomManager
 {
 private:
-	//array<Room, 5000> in_game_room;
+	array<Room, 5000> a_in_game_room;
 	vector<Room> in_game_room;
 
 public:

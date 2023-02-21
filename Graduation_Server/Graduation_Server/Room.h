@@ -15,7 +15,17 @@ public:
 	GAME_ROOM_STATE::TYPE _room_state;
 
 public:
+	Room()
+	{
+	}
 	Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE _room_state)
+	{
+		in_player[Number_of_users] = make_player_id;
+		Number_of_users++;
+		remain_user = 6 - Number_of_users;
+	}
+
+	void Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE _room_state)
 	{
 		in_player[Number_of_users] = make_player_id;
 		Number_of_users++;

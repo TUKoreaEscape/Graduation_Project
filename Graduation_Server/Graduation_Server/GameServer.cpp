@@ -11,6 +11,7 @@ cGameServer::~cGameServer()
 {
 	delete m_voice_chat;
 	delete m_room_manager;
+	delete m_database;
 }
 
 void cGameServer::init()
@@ -174,27 +175,20 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_MOVE:
 	{
-		Process_Move(user_id, p);
+		if(Y_LOGIN == m_clients[user_id].get_login_state())
+			Process_Move(user_id, p);
 		break;
 	}
 
 	case CS_PACKET::CS_PACKET_CHAT:
 	{
-		cs_packet_chat* packet = reinterpret_cast<cs_packet_chat*>(p);
-		char mess[256];
-
-		strcpy_s(mess, packet->message);
-
-		// 같은 방에 있는 유저한테만 메세지 보낼 예정
-		m_clients[user_id]._room_list_lock.lock();
-		for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
-			send_chat_packet(*ptr, user_id, mess);
-		m_clients[user_id]._room_list_lock.unlock();
+		Process_Chat(user_id, p);
 		break;
 	}
 	case CS_PACKET::CS_PACKET_CREATE_ROOM:
 	{
-		create_room(user_id);
+		if (Y_LOGIN == m_clients[user_id].get_login_state())
+			create_room(user_id);
 		break;
 	}
 
@@ -230,6 +224,7 @@ void cGameServer::Disconnect(const unsigned int _user_id)
 	m_clients[_user_id]._state_lock.lock();
 	closesocket(m_clients[_user_id]._socket);
 	m_clients[_user_id].set_state(ST_FREE);
+	m_clients[_user_id].set_login_state(N_LOGIN);
 	m_clients[_user_id]._state_lock.unlock();
 }
 
@@ -251,6 +246,25 @@ void cGameServer::create_id(int c_id, void* buff)
 		send_create_id_ok_packet(c_id);
 	else // id 생성 실패
 		send_create_id_fail_packet(c_id, reason);
+}
+
+void cGameServer::Process_Move(const int user_id, void* buff)
+{
+	cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(buff);
+}
+
+void cGameServer::Process_Chat(const int user_id, void* buff)
+{
+	cs_packet_chat* packet = reinterpret_cast<cs_packet_chat*>(buff);
+	char mess[256];
+
+	strcpy_s(mess, packet->message);
+
+	// 같은 방에 있는 유저한테만 메세지 보낼 예정
+	m_clients[user_id]._room_list_lock.lock();
+	for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
+		send_chat_packet(*ptr, user_id, mess);
+	m_clients[user_id]._room_list_lock.unlock();
 }
 
 //============================================================================
@@ -333,22 +347,18 @@ void cGameServer::User_Login(int c_id, void* buff) // 로그인 요청
 	stringPW = packet->pass_word;
 	reason = m_database->check_login(stringToWstring(stringID), stringToWstring(stringPW));
 	if (reason == 1) // reason 0 : id가 존재하지 않음 / reason 1 : 성공 / reason 2 : pw가 틀림
+	{
 		send_login_ok_packet(c_id);
-	else {
+		m_clients[c_id].set_login_state(Y_LOGIN);
+	}
+	else 
+	{
 		if (reason == 0)
 			send_login_fail_packet(c_id, LOGIN_FAIL_REASON::INVALID_ID);
 		else
 			send_login_fail_packet(c_id, LOGIN_FAIL_REASON::WRONG_PW);
 	}
 }
-
-void cGameServer::Process_Move(const unsigned int user_id, void* buff)
-{
-	cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(buff);
-	
-	// 이쪽에서 벡터값을 받아오고! 각방에 이동정보 전송
-}
-
 
 int cGameServer::get_new_id()
 {

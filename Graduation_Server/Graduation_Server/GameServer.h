@@ -42,7 +42,8 @@ public:
 
 	void	User_Login(int c_id, void* buff);
 	void	create_id(int c_id, void* buff);
-	void	Process_Move(const unsigned user_id, void* buff);
+	void	Process_Move(const int user_id, void* buff);
+	void	Process_Chat(const int user_id, void* buff);
 
 	int		get_new_id();
 
