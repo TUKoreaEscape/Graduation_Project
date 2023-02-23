@@ -154,6 +154,37 @@ void cGameServer::Recv(EXP_OVER* exp_over, const unsigned int user_id, const DWO
 	// and send clients sending
 }
 
+wstring cGameServer::stringToWstring(const std::string& t_str) // string -> wstring 변환
+{
+	typedef codecvt_utf8<wchar_t>  convert_type;
+	wstring_convert<convert_type, wchar_t> converter;
+
+	return converter.from_bytes(t_str);
+
+}
+
+void cGameServer::Send(EXP_OVER* exp_over)
+{
+
+}
+
+void cGameServer::Disconnect(const unsigned int _user_id) // 클라이언트 연결을 풀어줌(비정상 접속해제 or 정상종료시 사용)
+{
+	CLIENT& cl = m_clients[_user_id];
+
+	// 여기서 초기화
+
+	m_clients[_user_id]._state_lock.lock();
+	closesocket(m_clients[_user_id]._socket);
+	m_clients[_user_id].set_state(ST_FREE);
+	m_clients[_user_id].set_login_state(N_LOGIN);
+	m_clients[_user_id]._state_lock.unlock();
+}
+
+
+//============================================================================
+// 패킷 구분후 처리해주는 공간
+//============================================================================
 void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) // 패킷구분 후 처리
 {
 	unsigned char packet_type = p[1];
@@ -163,13 +194,13 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	case CS_PACKET::CS_LOGIN:
 	{
 		// 로그인 처리
-		User_Login(user_id, p);
+		Process_User_Login(user_id, p);
 		break;
 	}
 
 	case CS_PACKET::CS_CREATE_ID:
 	{	
-		create_id(user_id, p);
+		Process_Create_ID(user_id, p);
 		break;
 	}
 
@@ -188,7 +219,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	case CS_PACKET::CS_PACKET_CREATE_ROOM:
 	{
 		if (Y_LOGIN == m_clients[user_id].get_login_state())
-			create_room(user_id);
+			Process_Create_Room(user_id);
 		break;
 	}
 
@@ -200,35 +231,10 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	}
 }
-
-wstring cGameServer::stringToWstring(const std::string& t_str)
-{
-	typedef codecvt_utf8<wchar_t>  convert_type;
-	wstring_convert<convert_type, wchar_t> converter;
-
-	return converter.from_bytes(t_str);
-
-}
-
-void cGameServer::Send(EXP_OVER* exp_over)
-{
-	
-}
-
-void cGameServer::Disconnect(const unsigned int _user_id)
-{
-	CLIENT& cl = m_clients[_user_id];
-	
-	// 여기서 초기화
-	
-	m_clients[_user_id]._state_lock.lock();
-	closesocket(m_clients[_user_id]._socket);
-	m_clients[_user_id].set_state(ST_FREE);
-	m_clients[_user_id].set_login_state(N_LOGIN);
-	m_clients[_user_id]._state_lock.unlock();
-}
-
-void cGameServer::create_id(int c_id, void* buff)
+//============================================================================
+// 구분한 패킷 처리하는 공간
+//============================================================================
+void cGameServer::Process_Create_ID(int c_id, void* buff) // 요청받은 ID생성패킷 처리
 {
 	int reason = 0;
 
@@ -248,9 +254,12 @@ void cGameServer::create_id(int c_id, void* buff)
 		send_create_id_fail_packet(c_id, reason);
 }
 
-void cGameServer::Process_Move(const int user_id, void* buff)
+void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터 이동을 처리
 {
 	cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(buff);
+
+	for (auto ptr = m_clients[user_id].view_list.begin(); ptr != m_clients[user_id].view_list.end(); ++ptr)
+		send_move_packet(*ptr, packet->pos);
 }
 
 void cGameServer::Process_Chat(const int user_id, void* buff)
@@ -267,8 +276,38 @@ void cGameServer::Process_Chat(const int user_id, void* buff)
 	m_clients[user_id]._room_list_lock.unlock();
 }
 
+void cGameServer::Process_Create_Room(const unsigned int _user_id) // 요청받은 새로운 방 생성
+{
+	m_room_manager->Create_room(_user_id);
+}
+
+void cGameServer::Process_User_Login(int c_id, void* buff) // 로그인 요청
+{
+	int reason = 0;
+
+	cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(buff);
+	string stringID{};
+	string stringPW{};
+
+	stringID = packet->id;
+	stringPW = packet->pass_word;
+	reason = m_database->check_login(stringToWstring(stringID), stringToWstring(stringPW));
+	if (reason == 1) // reason 0 : id가 존재하지 않음 / reason 1 : 성공 / reason 2 : pw가 틀림
+	{
+		send_login_ok_packet(c_id);
+		m_clients[c_id].set_login_state(Y_LOGIN);
+	}
+	else
+	{
+		if (reason == 0)
+			send_login_fail_packet(c_id, LOGIN_FAIL_REASON::INVALID_ID);
+		else
+			send_login_fail_packet(c_id, LOGIN_FAIL_REASON::WRONG_PW);
+	}
+}
 //============================================================================
 // 서버에서 보내는 패킷 함수들 
+//============================================================================
 void cGameServer::send_chat_packet(int user_id, int my_id, char* mess)
 {
 	sc_packet_chat packet;
@@ -317,7 +356,7 @@ void cGameServer::send_create_id_fail_packet(int user_id, char reason)
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 
-void cGameServer::send_move_packet(int user_id)
+void cGameServer::send_move_packet(int user_id, Position pos)
 {
 	sc_packet_move packet;
 
@@ -328,37 +367,6 @@ void cGameServer::send_move_packet(int user_id)
 
 }
 
-//============================================================================
-// Client가 서버에 요청시 동작하는 함수
-void cGameServer::create_room(const unsigned int _user_id) // 새로운 방 생성
-{
-	m_room_manager->Create_room(_user_id);
-}
-
-void cGameServer::User_Login(int c_id, void* buff) // 로그인 요청
-{
-	int reason = 0;
-
-	cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(buff);
-	string stringID{};
-	string stringPW{};
-
-	stringID = packet->id;
-	stringPW = packet->pass_word;
-	reason = m_database->check_login(stringToWstring(stringID), stringToWstring(stringPW));
-	if (reason == 1) // reason 0 : id가 존재하지 않음 / reason 1 : 성공 / reason 2 : pw가 틀림
-	{
-		send_login_ok_packet(c_id);
-		m_clients[c_id].set_login_state(Y_LOGIN);
-	}
-	else 
-	{
-		if (reason == 0)
-			send_login_fail_packet(c_id, LOGIN_FAIL_REASON::INVALID_ID);
-		else
-			send_login_fail_packet(c_id, LOGIN_FAIL_REASON::WRONG_PW);
-	}
-}
 
 int cGameServer::get_new_id()
 {
@@ -378,4 +386,4 @@ int cGameServer::get_new_id()
 	std::cout << "Maximum Number of Clients Overflow! \n";
 	return -1;
 }
-
+//============================================================================

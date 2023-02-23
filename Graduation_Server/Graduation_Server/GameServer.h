@@ -22,7 +22,7 @@ public:
 	void	init();
 	void	StartServer();
 	void	WorkerThread();
-	void	ProcessPacket(const unsigned int user_id, unsigned char* p);
+	
 
 
 
@@ -36,12 +36,14 @@ public:
 	void	send_login_ok_packet(int user_id);
 	void	send_create_id_ok_packet(int user_id);
 	void	send_create_id_fail_packet(int user_id, char reason);
-	void	send_move_packet(int user_id);
+	void	send_move_packet(int user_id, Position pos);
 
-	void	create_room(const unsigned int _user_id);
 
-	void	User_Login(int c_id, void* buff);
-	void	create_id(int c_id, void* buff);
+
+	void	ProcessPacket(const unsigned int user_id, unsigned char* p); // 패킷을 구분후 처리함
+	void	Process_User_Login(int c_id, void* buff);
+	void	Process_Create_ID(int c_id, void* buff);
+	void	Process_Create_Room(const unsigned int _user_id);
 	void	Process_Move(const int user_id, void* buff);
 	void	Process_Chat(const int user_id, void* buff);
 
@@ -54,7 +56,7 @@ private:
 	std::thread						m_timer_thread;
 
 	std::array<CLIENT, MAX_USER>	m_clients;
-	Voice_Chat						*m_voice_chat;
+	Voice_Chat						*m_voice_chat = nullptr;
 	RoomManager						*m_room_manager = nullptr;
 	DataBase						*m_database = nullptr;
 };

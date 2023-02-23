@@ -8,6 +8,13 @@ const int	MAX_CHAT_SIZE = 100;
 const int  MAX_NAME_SIZE = 30;
 // ----- 클라이언트가 서버에게 보낼때 ------
 
+struct Position{
+	float x;
+	float y;
+	float z;
+	float look;
+	float at;
+};
 
 namespace GAME_ROOM_STATE
 {
@@ -65,9 +72,7 @@ struct cs_packet_move { // 이동관련 데이터
 	unsigned char	input_key;
 	unsigned char	state;
 
-	unsigned short	look;
-
-	// 벡터를 보낼지도 고민중
+	Position		pos;
 };
 
 struct cs_packet_voice {
@@ -130,7 +135,7 @@ struct sc_packet_move {
 	unsigned char	input_key;
 	unsigned char	state;
 	
-	unsigned short	look;
+	Position		pos;
 };
 
 struct sc_packet_create_room {

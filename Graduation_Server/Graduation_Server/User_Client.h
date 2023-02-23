@@ -24,7 +24,7 @@ public:
 	EXP_OVER	_recv_over;
 
 public:
-	CLIENT() : _id(-1), _state(ST_FREE), _prev_size(0), _login_state(N_LOGIN)
+	CLIENT() : _id(-1), _state(ST_FREE), _prev_size(0), _login_state(N_LOGIN), _join_room_number(-1)
 	{
 
 	}
