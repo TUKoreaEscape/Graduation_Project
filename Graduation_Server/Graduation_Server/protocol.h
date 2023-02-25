@@ -21,6 +21,7 @@ namespace GAME_ROOM_STATE
 	enum TYPE
 	{
 		NONE = 0,
+		FREE,
 		READY,
 		PLAYING
 	};
@@ -84,9 +85,15 @@ struct cs_packet_voice {
 
 struct cs_packet_chat {
 	unsigned char	size;
+	unsigned char	type;
+
 	int				room_number;
-	char			type;
 	char			message[MAX_CHAT_SIZE];
+};
+
+struct cs_packet_request_all_room_info {
+	unsigned char	size;
+	unsigned char	type;
 };
 
 // ----- 서버가 클라이언트에게 보낼때 -----

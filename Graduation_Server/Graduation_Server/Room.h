@@ -1,13 +1,13 @@
 #pragma once
 #include "stdafx.h"
 
-
+enum Room_State{ROOM_FREE, ROOM_READY, ROOM_GAMING};
 
 class Room {
 private:
-	int		room_number = -1;
-	int		Number_of_users = 0;
-	int		remain_user = 6;
+	int			room_number = -1;
+	int			Number_of_users = 0;
+	int			remain_user = 6;
 
 	array<int, 6> in_player{ -1 }; // 방에 들어온 플레이어 id
 
@@ -17,6 +17,7 @@ public:
 public:
 	Room()
 	{
+
 	}
 	Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE _room_state)
 	{
