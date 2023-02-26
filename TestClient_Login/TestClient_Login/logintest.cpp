@@ -74,7 +74,8 @@ void ProcessPacket(char* ptr)
 		
 		for (int i = 0; i < 10; ++i)
 		{
-			cout << packet->room_info[i].room_number << "번방 || [" << packet->room_info[i].join_member << "/6]" << endl;
+			if(packet->room_info[i].state != GAME_ROOM_STATE::FREE)
+				cout << packet->room_info[i].room_number << "번방 || [" << packet->room_info[i].join_member << "/6]" << endl;
 		}
 		break;
 	}
@@ -171,7 +172,7 @@ void Create_Room_Test()
 void Request_Room_Info_Test()
 {
 	cs_packet_request_all_room_info packet;
-	packet.request_page = 1;
+	packet.request_page = 0;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET::CS_PACKET_REQUEST_ROOM_INFO;
 
@@ -201,7 +202,7 @@ void Send_Packet()
 		else if (test_code == 4)
 			Request_Room_Info_Test();
 
-		this_thread::sleep_for(std::chrono::seconds(3));
+		this_thread::sleep_for(std::chrono::seconds(1));
 		system("cls");
 	}
 }

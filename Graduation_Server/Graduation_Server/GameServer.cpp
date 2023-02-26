@@ -218,7 +218,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	}
 	case CS_PACKET::CS_PACKET_CREATE_ROOM:
 	{
-		if (Y_LOGIN == m_clients[user_id].get_login_state())
+		//if (Y_LOGIN == m_clients[user_id].get_login_state())
 			Process_Create_Room(user_id);
 		break;
 	}
@@ -305,16 +305,16 @@ void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
 	int room_number;
 	for (int i = 0; i < 10; ++i) // 1페이지당 10개의 방이 보인다고 가정, 룸정보를 전송할 준비함
 	{
+		room_number = i + (packet->request_page * 10);
 
-			room_number = i + (packet->request_page * 10);
-			get_room_info = m_room_manager->Get_Room_Info(room_number);
-			send_packet.room_info[room_number].state = get_room_info._room_state;
-			//get_room_info.Get_Room_Name(send_packet.room_info[room_number].room_name, MAX_NAME_SIZE);
-			send_packet.room_info[room_number].room_number = room_number;
-			send_packet.room_info[room_number].join_member = get_room_info.Get_Number_of_users();
+		send_packet.room_info[i].room_number = room_number;
+		send_packet.room_info[i].join_member = m_room_manager->Get_Room_Info(room_number).Get_Number_of_users();
+		send_packet.room_info[i].state = m_room_manager->Get_Room_Info(room_number)._room_state;
+
+		cout << send_packet.room_info[i].room_number << "번방 || [" << send_packet.room_info[i].join_member << "/6]" << endl;
 	}
 
-	m_clients[user_id].do_send(sizeof(send_packet), &send_packet);
+	m_clients[user_id].do_send(sizeof(sc_packet_request_room_info), &send_packet);
 }
 
 void cGameServer::Process_User_Login(int c_id, void* buff) // 로그인 요청

@@ -171,6 +171,7 @@ struct sc_packet_request_room_info {
 	unsigned char	size;
 	unsigned char	type;
 
+	unsigned int	room_count;
 	Roominfo_by10	room_info[10];
 };
 

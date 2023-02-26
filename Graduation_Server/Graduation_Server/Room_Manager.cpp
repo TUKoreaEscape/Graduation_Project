@@ -20,14 +20,16 @@ void RoomManager::init()
 int RoomManager::Create_room(int user_id)
 {
 	//in_game_room.emplace_back(Room(user_id, in_game_room.size(), GAME_ROOM_STATE::READY)); // 방을 생성한 사람 id, 게임룸이 몆번방, 게임방 상태
-	int return_create_room_number;
+	int return_create_room_number = -1;
 	for (int i = 0; i < a_in_game_room.size(); ++i)
 	{
+
 		if (a_in_game_room[i]._room_state == GAME_ROOM_STATE::FREE)
 		{
+			cout << "게임룸 사이즈 " << a_in_game_room.size() << endl;
 			a_in_game_room[i].Create_Room(user_id, i, GAME_ROOM_STATE::READY);
 			return_create_room_number = i;
-			break;
+			return return_create_room_number;
 		}
 	}
 	return return_create_room_number;
