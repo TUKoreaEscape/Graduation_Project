@@ -5,8 +5,10 @@ const short SERVER_PORT = 4000;
 const int	BUFSIZE = 256;
 const int	MAX_CHAT_SIZE = 100;
 
-const int  MAX_NAME_SIZE = 30;
+const int  MAX_NAME_SIZE = 20;
+const int  MAX_ROOM = 5000;
 // ----- 클라이언트가 서버에게 보낼때 ------
+
 
 
 namespace GAME_ROOM_STATE
@@ -14,6 +16,7 @@ namespace GAME_ROOM_STATE
 	enum TYPE
 	{
 		NONE = 0,
+		FREE,
 		READY,
 		PLAYING
 	};
@@ -38,24 +41,42 @@ namespace CS_PACKET
 		CS_MOVE,
 		CS_PACKET_CHAT,
 		CS_PACKET_CREATE_ROOM,
-		CS_PACKET_JOIN_ROOM
+		CS_PACKET_JOIN_ROOM,
+		CS_PACKET_REQUEST_ROOM_INFO
 	};
 }
+
+struct Position {
+	float x;
+	float y;
+	float z;
+	float look;
+	float at;
+};
+
+struct Roominfo_by10 {
+	int						room_number;
+	char					room_name[MAX_NAME_SIZE];
+
+	GAME_ROOM_STATE::TYPE	state;
+	int						join_member;
+};
+
 
 struct cs_packet_create_id {
 	unsigned char	size;
 	unsigned char	type;
 
-	char			id[20];
-	char			pass_word[20];
+	char			id[MAX_NAME_SIZE];
+	char			pass_word[MAX_NAME_SIZE];
 };
 
 struct cs_packet_login { // 로그인 시도
 	unsigned char	size;
 	unsigned char	type;
 
-	char			id[20];
-	char			pass_word[20];
+	char			id[MAX_NAME_SIZE];
+	char			pass_word[MAX_NAME_SIZE];
 };
 
 struct cs_packet_move { // 이동관련 데이터
@@ -65,9 +86,7 @@ struct cs_packet_move { // 이동관련 데이터
 	unsigned char	input_key;
 	unsigned char	state;
 
-	unsigned short	look;
-
-	// 벡터를 보낼지도 고민중
+	Position		pos;
 };
 
 struct cs_packet_voice {
@@ -79,9 +98,22 @@ struct cs_packet_voice {
 
 struct cs_packet_chat {
 	unsigned char	size;
+	unsigned char	type;
+
 	int				room_number;
-	char			type;
 	char			message[MAX_CHAT_SIZE];
+};
+
+struct cs_packet_create_room {
+	unsigned char	size;
+	unsigned char	type;
+};
+
+struct cs_packet_request_all_room_info {
+	unsigned char	size;
+	unsigned char	type;
+
+	int				request_page;
 };
 
 // ----- 서버가 클라이언트에게 보낼때 -----
@@ -95,8 +127,10 @@ namespace SC_PACKET
 		SC_LOGINFAIL,
 		SC_CREATE_ID_OK,
 		SC_CREATE_ID_FAIL,
+		SC_CREATE_ROOM_OK,
 		SC_MOVING,
-		SC_PACKET_CHAT
+		SC_PACKET_CHAT,
+		SC_PACKET_ROOM_INFO
 	};
 }
 
@@ -130,7 +164,14 @@ struct sc_packet_move {
 	unsigned char	input_key;
 	unsigned char	state;
 
-	unsigned short	look;
+	Position		pos;
+};
+
+struct sc_packet_request_room_info {
+	unsigned char	size;
+	unsigned char	type;
+
+	Roominfo_by10	room_info[10];
 };
 
 struct sc_packet_create_room {

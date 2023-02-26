@@ -104,6 +104,11 @@ struct cs_packet_chat {
 	char			message[MAX_CHAT_SIZE];
 };
 
+struct cs_packet_create_room {
+	unsigned char	size;
+	unsigned char	type;
+};
+
 struct cs_packet_request_all_room_info {
 	unsigned char	size;
 	unsigned char	type;
@@ -122,6 +127,7 @@ namespace SC_PACKET
 		SC_LOGINFAIL,
 		SC_CREATE_ID_OK,
 		SC_CREATE_ID_FAIL,
+		SC_CREATE_ROOM_OK,
 		SC_MOVING,
 		SC_PACKET_CHAT,
 		SC_PACKET_ROOM_INFO

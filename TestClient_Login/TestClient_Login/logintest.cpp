@@ -33,6 +33,7 @@ void SendPacket(int cl, void* packet)
 
 void ProcessPacket(char* ptr)
 {
+//	cout << "받음" << endl;
 	switch (ptr[1])
 	{
 	case SC_PACKET::SC_LOGINOK:
@@ -60,6 +61,24 @@ void ProcessPacket(char* ptr)
 			cout << "ID 생성에 실패하였습니다. (사유 : DB 연결 에러입니다.)" << endl;
 		cout << "===============================================" << endl;
 		break;
+
+	case SC_PACKET::SC_CREATE_ROOM_OK:
+	{
+		sc_packet_create_room* packet = reinterpret_cast<sc_packet_create_room*>(ptr);
+		cout << packet->room_number << "번방을 생성하였습니다. " << endl;
+		break;
+	}
+	case SC_PACKET::SC_PACKET_ROOM_INFO:
+	{
+		sc_packet_request_room_info* packet = reinterpret_cast<sc_packet_request_room_info*>(ptr);
+		
+		for (int i = 0; i < 10; ++i)
+		{
+			cout << packet->room_info[i].room_number << "번방 || [" << packet->room_info[i].join_member << "/6]" << endl;
+		}
+		break;
+	}
+
 	}
 }
 
@@ -140,6 +159,25 @@ void CreateID_Test()
 	SendPacket(0, &packet);
 }
 
+void Create_Room_Test()
+{
+	cs_packet_create_room packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_CREATE_ROOM;
+
+	SendPacket(0, &packet);
+}
+
+void Request_Room_Info_Test()
+{
+	cs_packet_request_all_room_info packet;
+	packet.request_page = 1;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_REQUEST_ROOM_INFO;
+
+	SendPacket(0, &packet);
+}
+
 void Send_Packet()
 {
 	while (true)
@@ -148,6 +186,8 @@ void Send_Packet()
 		cout << "원하는 테스트를 선택하세요." << endl;
 		cout << "1. ID 로그인 테스트" << endl;
 		cout << "2. ID 생성 테스트" << endl;
+		cout << "3. (로그인 후) 방 생성" << endl;
+		cout << "4. 생성된 방 모든 정보 요청" << endl;
 		cout << "입력 : ";
 		cin >> test_code;
 
@@ -156,6 +196,10 @@ void Send_Packet()
 			Login_Test();
 		else if (test_code == 2)
 			CreateID_Test();
+		else if (test_code == 3)
+			Create_Room_Test();
+		else if (test_code == 4)
+			Request_Room_Info_Test();
 
 		this_thread::sleep_for(std::chrono::seconds(3));
 		system("cls");
