@@ -47,3 +47,8 @@ bool RoomManager::collision_wall_player(int user_id)
 {
 	return true;
 }
+
+Room RoomManager::Get_Room_Info(int room_number)
+{
+	return a_in_game_room[room_number];
+}

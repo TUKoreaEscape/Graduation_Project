@@ -8,6 +8,7 @@ private:
 	int			room_number = -1;
 	int			Number_of_users = 0;
 	int			remain_user = 6;
+	char		m_room_name[MAX_NAME_SIZE];
 
 	array<int, 6> in_player{ -1 }; // 방에 들어온 플레이어 id
 
@@ -39,4 +40,7 @@ public:
 	}
 
 	void Join_Player(int user_id);
+
+	int Get_Number_of_users();
+	char* Get_Room_Name(char room_name[], int size);
 };

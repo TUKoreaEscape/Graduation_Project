@@ -46,6 +46,7 @@ public:
 	void	Process_Create_Room(const unsigned int _user_id);
 	void	Process_Move(const int user_id, void* buff);
 	void	Process_Chat(const int user_id, void* buff);
+	void	Process_Request_Room_Info(const int user_id, void* buff);
 
 	int		get_new_id();
 

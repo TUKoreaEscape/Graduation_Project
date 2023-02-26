@@ -5,7 +5,7 @@
 class RoomManager
 {
 private:
-	array<Room, 5000> a_in_game_room;
+	array<Room, MAX_ROOM> a_in_game_room;
 	vector<Room> in_game_room;
 
 public:
@@ -15,6 +15,8 @@ public:
 	void	init();
 	int		Create_room(int user_id);
 	void	Join_room(int user_id, int select_room_number);
+
+	Room	Get_Room_Info(int room_number);
 
 	bool	collision_wall_player(int user_id);
 	bool	collision_player_player(int user_id);
