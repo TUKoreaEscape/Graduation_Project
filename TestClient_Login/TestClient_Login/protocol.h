@@ -2,7 +2,7 @@
 
 // 클라이언트와 서버간 통신에 사용할 구조체를 정의합니다.
 const short SERVER_PORT = 4000;
-const int	BUFSIZE = 256;
+const int	BUFSIZE = 512;
 const int	MAX_CHAT_SIZE = 100;
 
 const int  MAX_NAME_SIZE = 20;
@@ -56,12 +56,9 @@ struct Position {
 
 struct Roominfo_by10 {
 	int						room_number;
-	char					room_name[MAX_NAME_SIZE];
-
-	GAME_ROOM_STATE::TYPE	state;
 	int						join_member;
+	GAME_ROOM_STATE::TYPE	state;
 };
-
 
 struct cs_packet_create_id {
 	unsigned char	size;
@@ -171,7 +168,6 @@ struct sc_packet_request_room_info {
 	unsigned char	size;
 	unsigned char	type;
 
-	unsigned int	room_count;
 	Roominfo_by10	room_info[10];
 };
 

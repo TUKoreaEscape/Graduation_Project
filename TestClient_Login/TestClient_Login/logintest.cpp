@@ -71,12 +71,12 @@ void ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_ROOM_INFO:
 	{
 		sc_packet_request_room_info* packet = reinterpret_cast<sc_packet_request_room_info*>(ptr);
-		
+
+		cout << "send_packet size : " << sizeof(ptr) << endl;
 		for (int i = 0; i < 10; ++i)
-		{
-			if(packet->room_info[i].state != GAME_ROOM_STATE::FREE)
-				cout << packet->room_info[i].room_number << "번방 || [" << packet->room_info[i].join_member << "/6]" << endl;
-		}
+			cout << packet->room_info[i].room_number << "번방 || [" << packet->room_info[i].join_member << "/6]" << endl;
+
+		
 		break;
 	}
 
