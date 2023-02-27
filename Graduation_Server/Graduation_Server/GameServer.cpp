@@ -218,14 +218,15 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	}
 	case CS_PACKET::CS_PACKET_CREATE_ROOM:
 	{
-		//if (Y_LOGIN == m_clients[user_id].get_login_state())
+		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == ST_LOBBY) // 로그인하고 로비에 있을때만 방 생성 가능
 			Process_Create_Room(user_id);
 		break;
 	}
 
 	case CS_PACKET::CS_PACKET_JOIN_ROOM:
 	{
-
+		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == ST_LOBBY)
+			Process_Join_Room(user_id, p);
 		break;
 	}
 
@@ -288,8 +289,19 @@ void cGameServer::Process_Create_Room(const unsigned int _user_id) // 요청받은 �
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_CREATE_ROOM_OK;
 	packet.room_number = m_room_manager->Create_room(_user_id);
-
+	m_clients[_user_id].set_state(ST_GAMEROOM);
 	m_clients[_user_id].do_send(sizeof(packet), &packet);
+	
+}
+
+void cGameServer::Process_Join_Room(const int user_id, void* buff)
+{
+	cs_packet_join_room* packet = reinterpret_cast<cs_packet_join_room*>(buff);
+	
+	m_clients[user_id].set_join_room_number(packet->room_number);
+	m_clients[user_id].set_state(ST_GAMEROOM);
+
+	// 여기서 방 입장 성공,실패 유무를 판단후 클라에게 재전송
 }
 
 void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
@@ -330,6 +342,7 @@ void cGameServer::Process_User_Login(int c_id, void* buff) // 로그인 요청
 	{
 		send_login_ok_packet(c_id);
 		m_clients[c_id].set_login_state(Y_LOGIN);
+		m_clients[c_id].set_state(ST_LOBBY);
 	}
 	else
 	{

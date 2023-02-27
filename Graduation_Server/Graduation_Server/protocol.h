@@ -106,6 +106,13 @@ struct cs_packet_create_room {
 	unsigned char	type;
 };
 
+struct cs_packet_join_room {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned int	room_number;
+};
+
 struct cs_packet_request_all_room_info {
 	unsigned char	size;
 	unsigned char	type;
