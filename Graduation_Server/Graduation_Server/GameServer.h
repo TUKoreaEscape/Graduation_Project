@@ -48,6 +48,7 @@ public:
 	void	Process_Chat(const int user_id, void* buff);
 	void	Process_Request_Room_Info(const int user_id, void* buff);
 	void	Process_Join_Room(const int user_id, void* buff);
+	void	Process_Exit_Room(const int user_id, void* buff);
 
 	int		get_new_id();
 

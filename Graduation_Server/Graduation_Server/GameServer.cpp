@@ -229,6 +229,13 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 			Process_Join_Room(user_id, p);
 		break;
 	}
+	
+	case CS_PACKET::CS_PACKET_EXIT_ROOM:
+	{
+		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == ST_LOBBY)
+			Process_Exit_Room(user_id, p);
+		break;
+	}
 
 	case CS_PACKET::CS_PACKET_REQUEST_ROOM_INFO:
 	{
@@ -302,6 +309,29 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 	m_clients[user_id].set_state(ST_GAMEROOM);
 
 	// 여기서 방 입장 성공,실패 유무를 판단후 클라에게 재전송
+}
+
+void cGameServer::Process_Exit_Room(const int user_id, void* buff)
+{
+	cs_packet_request_exit_room* packet = reinterpret_cast<cs_packet_request_exit_room*>(buff);
+	m_clients[user_id].set_state(ST_LOBBY);
+
+	// 방을 나가면 로비이므로 방 정보들을 다시 보내줘야함!
+	sc_packet_request_room_info send_packet;
+
+	Room get_room_info;
+	int room_number;
+	for (int i = 0; i < 10; ++i)
+	{
+		room_number = i + (packet->request_page * 10);
+
+		send_packet.room_info[i].room_number = room_number;
+		send_packet.room_info[i].join_member = m_room_manager->Get_Room_Info(room_number).Get_Number_of_users();
+		send_packet.room_info[i].state = m_room_manager->Get_Room_Info(room_number)._room_state;
+	}
+	send_packet.size = sizeof(sc_packet_request_room_info);
+	send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
+	m_clients[user_id].do_send(sizeof(send_packet), &send_packet);
 }
 
 void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
