@@ -60,9 +60,6 @@
     <ClInclude Include="Player.h">
       <Filter>Client\GameObjects</Filter>
     </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>Client\Component</Filter>
-    </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>Engine\Framework</Filter>
     </ClInclude>
@@ -77,6 +74,24 @@
     </ClInclude>
     <ClInclude Include="GameScene.h">
       <Filter>Client\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="DDSTextureLoader12.h">
+      <Filter>Engine\System</Filter>
+    </ClInclude>
+    <ClInclude Include="WICTextureLoader12.h">
+      <Filter>Engine\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Client\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Client\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Engine\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Engine\Framework</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -98,9 +113,6 @@
     <ClCompile Include="Player.cpp">
       <Filter>Client\GameObjects</Filter>
     </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>Client\Component</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Engine\Framework</Filter>
     </ClCompile>
@@ -115,6 +127,24 @@
     </ClCompile>
     <ClCompile Include="GameScene.cpp">
       <Filter>Client\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="DDSTextureLoader12.cpp">
+      <Filter>Engine\System</Filter>
+    </ClCompile>
+    <ClCompile Include="WICTextureLoader12.cpp">
+      <Filter>Engine\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Client\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Client\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Engine\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Engine\Framework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -132,6 +162,9 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders.hlsl">
+      <Filter>Engine\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Light.hlsl">
       <Filter>Engine\Shader</Filter>
     </FxCompile>
   </ItemGroup>
