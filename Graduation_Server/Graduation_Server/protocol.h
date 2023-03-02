@@ -56,8 +56,8 @@ struct Position {
 };
 
 struct Roominfo_by10 {
-	int						room_number;
-	int						join_member;
+	short						room_number;
+	short						join_member;
 	GAME_ROOM_STATE::TYPE	state;
 };
 

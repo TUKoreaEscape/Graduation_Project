@@ -72,7 +72,7 @@ void cGameServer::WorkerThread()
 
 			LocalFree(lpMsgBuf);
 			Disconnect(client_id);
-			
+			cout << "disconnect ID : " << client_id << endl;
 			if (exp_over->m_comp_op == OP_SEND)
 				delete exp_over;
 			continue;
@@ -80,8 +80,8 @@ void cGameServer::WorkerThread()
 
 		switch (exp_over->m_comp_op) {
 		case OP_RECV:
-			//if (num_byte == 0)
-			//	//Disconnect(client_id);
+			if (num_byte == 0)
+				Disconnect(client_id);
 			Recv(exp_over, client_id, num_byte);
 			cout << client_id << "_send \n";
 			break;
@@ -89,7 +89,7 @@ void cGameServer::WorkerThread()
 		case OP_SEND:
 			if (num_byte != exp_over->m_wsa_buf.len) {
 				std::cout << "send_error" << std::endl;
-				//Disconnect(client_id);
+				Disconnect(client_id);
 			}
 			delete exp_over;
 			break;
@@ -171,14 +171,20 @@ void cGameServer::Send(EXP_OVER* exp_over)
 void cGameServer::Disconnect(const unsigned int _user_id) // 클라이언트 연결을 풀어줌(비정상 접속해제 or 정상종료시 사용)
 {
 	CLIENT& cl = m_clients[_user_id];
-
+	
+	Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
 	// 여기서 초기화
-
-	m_clients[_user_id]._state_lock.lock();
-	closesocket(m_clients[_user_id]._socket);
-	m_clients[_user_id].set_state(ST_FREE);
-	m_clients[_user_id].set_login_state(N_LOGIN);
-	m_clients[_user_id]._state_lock.unlock();
+	if (cl.get_join_room_number() != -1) {
+		cout << "있던방을 나감" << endl;
+		rl.Exit_Player(_user_id);
+		cout << "m_room_manager->Get_Room_Info(cl.get_join_room_number())의 실행값 : " << rl.Get_Number_of_users() << endl;
+	}
+	cl._state_lock.lock();
+	cl.set_state(ST_FREE);
+	cl.set_login_state(N_LOGIN);
+	cl.set_id(-1);
+	cl._state_lock.unlock();
+	closesocket(cl._socket);
 }
 
 
@@ -293,12 +299,15 @@ void cGameServer::Process_Chat(const int user_id, void* buff)
 void cGameServer::Process_Create_Room(const unsigned int _user_id) // 요청받은 새로운 방 생성
 {
 	sc_packet_create_room packet;
+
+	m_clients[_user_id].set_join_room_number(m_room_manager->Create_room(_user_id));
+	m_clients[_user_id].set_state(ST_GAMEROOM);
+
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_CREATE_ROOM_OK;
-	packet.room_number = m_room_manager->Create_room(_user_id);
-	m_clients[_user_id].set_state(ST_GAMEROOM);
+	packet.room_number = m_clients[_user_id].get_join_room_number();
+
 	m_clients[_user_id].do_send(sizeof(packet), &packet);
-	
 }
 
 void cGameServer::Process_Join_Room(const int user_id, void* buff)
@@ -308,6 +317,7 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 	m_clients[user_id].set_join_room_number(packet->room_number);
 	m_clients[user_id].set_state(ST_GAMEROOM);
 
+	m_room_manager->Join_room(user_id, packet->room_number);
 	// 여기서 방 입장 성공,실패 유무를 판단후 클라에게 재전송
 }
 
@@ -319,15 +329,15 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 	// 방을 나가면 로비이므로 방 정보들을 다시 보내줘야함!
 	sc_packet_request_room_info send_packet;
 
-	Room get_room_info;
+
 	int room_number;
 	for (int i = 0; i < 10; ++i)
 	{
 		room_number = i + (packet->request_page * 10);
-
+		Room &get_room_info = *m_room_manager->Get_Room_Info(room_number);
 		send_packet.room_info[i].room_number = room_number;
-		send_packet.room_info[i].join_member = m_room_manager->Get_Room_Info(room_number).Get_Number_of_users();
-		send_packet.room_info[i].state = m_room_manager->Get_Room_Info(room_number)._room_state;
+		send_packet.room_info[i].join_member = get_room_info.Get_Number_of_users();
+		send_packet.room_info[i].state = get_room_info._room_state;
 	}
 	send_packet.size = sizeof(sc_packet_request_room_info);
 	send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
@@ -341,15 +351,16 @@ void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
 	sc_packet_request_room_info send_packet;
 
 
-	Room get_room_info;
+	
 	int room_number;
 	for (int i = 0; i < 10; ++i) // 1페이지당 10개의 방이 보인다고 가정, 룸정보를 전송할 준비함
 	{
 		room_number = i + (packet->request_page * 10);
-
+		Room& get_room_info = *m_room_manager->Get_Room_Info(room_number);
+		cout << room_number << " : [" << get_room_info.Get_Number_of_users() << "/6]" << endl;
 		send_packet.room_info[i].room_number = room_number;
-		send_packet.room_info[i].join_member = m_room_manager->Get_Room_Info(room_number).Get_Number_of_users();
-		send_packet.room_info[i].state = m_room_manager->Get_Room_Info(room_number)._room_state;
+		send_packet.room_info[i].join_member = get_room_info.Get_Number_of_users();
+		send_packet.room_info[i].state = get_room_info._room_state;
 	}
 	send_packet.size = sizeof(sc_packet_request_room_info);
 	send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;

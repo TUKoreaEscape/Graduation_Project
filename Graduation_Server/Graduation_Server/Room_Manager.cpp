@@ -26,13 +26,20 @@ int RoomManager::Create_room(int user_id)
 
 		if (a_in_game_room[i]._room_state == GAME_ROOM_STATE::FREE)
 		{
-			cout << "게임룸 사이즈 " << a_in_game_room.size() << endl;
 			a_in_game_room[i].Create_Room(user_id, i, GAME_ROOM_STATE::READY);
 			return_create_room_number = i;
+			cout << "생성된 방번호 : " << return_create_room_number << endl;
 			return return_create_room_number;
 		}
 	}
+
 	return return_create_room_number;
+}
+
+void RoomManager::Clean_room(int room_number)
+{
+	a_in_game_room[room_number]._room_state = GAME_ROOM_STATE::FREE;
+	a_in_game_room[room_number].Reset_Room();
 }
 
 void RoomManager::Join_room(int user_id, int select_room_number)
@@ -50,7 +57,7 @@ bool RoomManager::collision_wall_player(int user_id)
 	return true;
 }
 
-Room RoomManager::Get_Room_Info(int room_number)
+Room* RoomManager::Get_Room_Info(int room_number)
 {
-	return a_in_game_room[room_number];
+	return &a_in_game_room[room_number];
 }

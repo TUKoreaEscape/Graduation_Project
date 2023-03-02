@@ -40,11 +40,9 @@ void CLIENT::do_send(int num_byte, void* mess)
 		int error_num = WSAGetLastError();
 		if (ERROR_IO_PENDING != error_num) {
 			error_display(error_num);
-			cout << "전송실패" << endl;
 		}
 	}
 	delete ex_over;
-	cout << "전송완료" << endl;
 }
 
 void CLIENT::set_state(STATE state)

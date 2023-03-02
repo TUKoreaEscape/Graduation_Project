@@ -42,6 +42,7 @@ namespace CS_PACKET
 		CS_PACKET_CHAT,
 		CS_PACKET_CREATE_ROOM,
 		CS_PACKET_JOIN_ROOM,
+		CS_PACKET_EXIT_ROOM,
 		CS_PACKET_REQUEST_ROOM_INFO
 	};
 }
@@ -55,8 +56,8 @@ struct Position {
 };
 
 struct Roominfo_by10 {
-	int						room_number;
-	int						join_member;
+	short						room_number;
+	short						join_member;
 	GAME_ROOM_STATE::TYPE	state;
 };
 
@@ -106,11 +107,25 @@ struct cs_packet_create_room {
 	unsigned char	type;
 };
 
+struct cs_packet_join_room {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned int	room_number;
+};
+
+struct cs_packet_request_exit_room {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned char	request_page;
+};
+
 struct cs_packet_request_all_room_info {
 	unsigned char	size;
 	unsigned char	type;
 
-	int				request_page;
+	unsigned char   request_page;
 };
 
 // ----- 서버가 클라이언트에게 보낼때 -----
