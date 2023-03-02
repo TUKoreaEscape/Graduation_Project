@@ -175,9 +175,7 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ğÆ® ¿¬°áÀ» Ç
 	Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
 	// ¿©±â¼­ ÃÊ±âÈ­
 	if (cl.get_join_room_number() != -1) {
-		cout << "ÀÖ´ø¹æÀ» ³ª°¨" << endl;
-		rl.Exit_Player(_user_id);
-		cout << "m_room_manager->Get_Room_Info(cl.get_join_room_number())ÀÇ ½ÇÇà°ª : " << rl.Get_Number_of_users() << endl;
+		rl.Exit_Player(_user_id);	
 	}
 	cl._state_lock.lock();
 	cl.set_state(ST_FREE);
@@ -238,7 +236,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	
 	case CS_PACKET::CS_PACKET_EXIT_ROOM:
 	{
-		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == ST_LOBBY)
+		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == ST_GAMEROOM)
 			Process_Exit_Room(user_id, p);
 		break;
 	}
@@ -314,34 +312,44 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 {
 	cs_packet_join_room* packet = reinterpret_cast<cs_packet_join_room*>(buff);
 	
-	m_clients[user_id].set_join_room_number(packet->room_number);
-	m_clients[user_id].set_state(ST_GAMEROOM);
+	if (m_room_manager->Join_room(user_id, packet->room_number))
+	{
+		m_clients[user_id].set_join_room_number(packet->room_number);
+		m_clients[user_id].set_state(ST_GAMEROOM);
+		send_join_room_success_packet(user_id);
+	}
 
-	m_room_manager->Join_room(user_id, packet->room_number);
-	// ¿©±â¼­ ¹æ ÀÔÀå ¼º°ø,½ÇÆĞ À¯¹«¸¦ ÆÇ´ÜÈÄ Å¬¶ó¿¡°Ô ÀçÀü¼Û
+	else
+		send_join_room_fail_packet(user_id);
 }
 
 void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 {
+	cout << "¹æ ³ª°¡±â ÇÏ·¯ ¿È" << endl;
 	cs_packet_request_exit_room* packet = reinterpret_cast<cs_packet_request_exit_room*>(buff);
-	m_clients[user_id].set_state(ST_LOBBY);
+	
+	if (m_clients[user_id].get_join_room_number() != -1) {
+		Room& cl_room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+		cl_room.Exit_Player(user_id);
+		m_clients[user_id].set_join_room_number(-1);
+		m_clients[user_id].set_state(ST_LOBBY);
 
-	// ¹æÀ» ³ª°¡¸é ·ÎºñÀÌ¹Ç·Î ¹æ Á¤º¸µéÀ» ´Ù½Ã º¸³»Áà¾ßÇÔ!
-	sc_packet_request_room_info send_packet;
-
-
-	int room_number;
-	for (int i = 0; i < 10; ++i)
-	{
-		room_number = i + (packet->request_page * 10);
-		Room &get_room_info = *m_room_manager->Get_Room_Info(room_number);
-		send_packet.room_info[i].room_number = room_number;
-		send_packet.room_info[i].join_member = get_room_info.Get_Number_of_users();
-		send_packet.room_info[i].state = get_room_info._room_state;
+		// ¹æÀ» ³ª°¡¸é ·ÎºñÀÌ¹Ç·Î ¹æ Á¤º¸µéÀ» ´Ù½Ã º¸³»Áà¾ßÇÔ!
+		sc_packet_request_room_info send_packet;
+		int room_number;
+		for (int i = 0; i < 10; ++i) // 1ÆäÀÌÁö´ç 10°³ÀÇ ¹æÀÌ º¸ÀÎ´Ù°í °¡Á¤, ·ëÁ¤º¸¸¦ Àü¼ÛÇÒ ÁØºñÇÔ
+		{
+			room_number = i + (packet->request_page * 10);
+			Room& get_room_info = *m_room_manager->Get_Room_Info(room_number);
+			cout << room_number << " : [" << get_room_info.Get_Number_of_users() << "/6]" << endl;
+			send_packet.room_info[i].room_number = room_number;
+			send_packet.room_info[i].join_member = get_room_info.Get_Number_of_users();
+			send_packet.room_info[i].state = get_room_info._room_state;
+		}
+		send_packet.size = sizeof(sc_packet_request_room_info);
+		send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
+		m_clients[user_id].do_send(sizeof(send_packet), &send_packet);
 	}
-	send_packet.size = sizeof(sc_packet_request_room_info);
-	send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
-	m_clients[user_id].do_send(sizeof(send_packet), &send_packet);
 }
 
 void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
@@ -396,7 +404,7 @@ void cGameServer::Process_User_Login(int c_id, void* buff) // ·Î±×ÀÎ ¿äÃ»
 //============================================================================
 // ¼­¹ö¿¡¼­ º¸³»´Â ÆĞÅ¶ ÇÔ¼öµé 
 //============================================================================
-void cGameServer::send_chat_packet(int user_id, int my_id, char* mess)
+void cGameServer::send_chat_packet(const unsigned int user_id, const unsigned int my_id, char* mess)
 {
 	sc_packet_chat packet;
 	packet.id = my_id;
@@ -406,7 +414,7 @@ void cGameServer::send_chat_packet(int user_id, int my_id, char* mess)
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 
-void cGameServer::send_login_fail_packet(int user_id, LOGIN_FAIL_REASON::TYPE reason)
+void cGameServer::send_login_fail_packet(const unsigned int user_id, LOGIN_FAIL_REASON::TYPE reason)
 {
 	sc_packet_login_fail packet;
 	packet.type = SC_PACKET::SC_LOGINFAIL;
@@ -415,7 +423,7 @@ void cGameServer::send_login_fail_packet(int user_id, LOGIN_FAIL_REASON::TYPE re
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 
-void cGameServer::send_login_ok_packet(int user_id)
+void cGameServer::send_login_ok_packet(const unsigned int user_id)
 {
 	sc_packet_login_ok packet;
 	packet.id = user_id;
@@ -425,7 +433,7 @@ void cGameServer::send_login_ok_packet(int user_id)
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 
-void cGameServer::send_create_id_ok_packet(int user_id)
+void cGameServer::send_create_id_ok_packet(const unsigned int user_id)
 {
 	sc_packet_create_id_ok packet;
 	packet.size = sizeof(packet);
@@ -434,7 +442,7 @@ void cGameServer::send_create_id_ok_packet(int user_id)
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 
-void cGameServer::send_create_id_fail_packet(int user_id, char reason)
+void cGameServer::send_create_id_fail_packet(const unsigned int user_id, char reason)
 {
 	sc_packet_create_id_fail packet;
 	packet.size = sizeof(packet);
@@ -444,7 +452,27 @@ void cGameServer::send_create_id_fail_packet(int user_id, char reason)
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 
-void cGameServer::send_move_packet(int user_id, Position pos)
+void cGameServer::send_join_room_success_packet(const unsigned int user_id)
+{
+	sc_packet_join_room_success packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_JOIN_ROOM_SUCCESS;
+
+	packet.room_number = m_clients[user_id].get_join_room_number();
+
+	m_clients[user_id].do_send(sizeof(packet), &packet);
+}
+
+void cGameServer::send_join_room_fail_packet(const unsigned int user_id)
+{
+	sc_packet_join_room_fail packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_JOIN_ROOM_FAIL;
+
+	m_clients[user_id].do_send(sizeof(packet), &packet);
+}
+
+void cGameServer::send_move_packet(const unsigned int user_id, Position pos)
 {
 	sc_packet_move packet;
 

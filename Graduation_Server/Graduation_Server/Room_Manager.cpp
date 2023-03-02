@@ -13,8 +13,10 @@ RoomManager::~RoomManager()
 void RoomManager::init()
 {
 	// 서버 시작시 게임룸 초기화 장소
-	for (int i = 0; i < a_in_game_room.size(); ++i)
+	for (int i = 0; i < a_in_game_room.size(); ++i) {
 		a_in_game_room[i]._room_state = GAME_ROOM_STATE::FREE;
+		a_in_game_room[i].init_room_number(i);
+	}
 }
 
 int RoomManager::Create_room(int user_id)
@@ -42,9 +44,14 @@ void RoomManager::Clean_room(int room_number)
 	a_in_game_room[room_number].Reset_Room();
 }
 
-void RoomManager::Join_room(int user_id, int select_room_number)
+bool RoomManager::Join_room(int user_id, int select_room_number)
 {
-	a_in_game_room[select_room_number].Join_Player(user_id);	
+	cout << "room_manager join room" << endl;
+	if (a_in_game_room[select_room_number].Join_Player(user_id))
+	{
+		return true;
+	}
+	return false;
 }
 
 bool RoomManager::collision_player_player(int user_id)

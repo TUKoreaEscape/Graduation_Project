@@ -79,6 +79,20 @@ void ProcessPacket(char* ptr)
 		
 		break;
 	}
+	
+	case SC_PACKET::SC_PACKET_JOIN_ROOM_FAIL:
+	{
+		sc_packet_join_room_fail* packet = reinterpret_cast<sc_packet_join_room_fail*>(ptr);
+		cout << "방 접속에 실패하였습니다!" << endl;
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_JOIN_ROOM_SUCCESS:
+	{
+		sc_packet_join_room_success* packet = reinterpret_cast<sc_packet_join_room_success*>(ptr);
+		cout << packet->room_number << "번 방에 접속 하였습니다." << endl;
+		break;
+	}
 
 	}
 }
@@ -179,6 +193,30 @@ void Request_Room_Info_Test()
 	SendPacket(0, &packet);
 }
 
+void Join_Room_Test()
+{
+	int room_number;
+	cout << "접속할 방 번호를 입력 해 주세요 : ";
+	cin >> room_number;
+
+	cs_packet_join_room packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_JOIN_ROOM;
+	packet.room_number = room_number;
+
+	SendPacket(0, &packet);
+}
+
+void Exit_Room_Test()
+{
+	cs_packet_request_exit_room packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_EXIT_ROOM;
+	packet.request_page = 0;
+
+	SendPacket(0, &packet);
+}
+
 void Send_Packet()
 {
 	while (true)
@@ -189,6 +227,8 @@ void Send_Packet()
 		cout << "2. ID 생성 테스트" << endl;
 		cout << "3. (로그인 후) 방 생성" << endl;
 		cout << "4. 생성된 방 모든 정보 요청" << endl;
+		cout << "5. 방 접속 테스트" << endl;
+		cout << "6. 방 나가기 테스트" << endl;
 		cout << "입력 : ";
 		cin >> test_code;
 
@@ -201,6 +241,10 @@ void Send_Packet()
 			Create_Room_Test();
 		else if (test_code == 4)
 			Request_Room_Info_Test();
+		else if (test_code == 5)
+			Join_Room_Test();
+		else if (test_code == 6)
+			Exit_Room_Test();
 
 		this_thread::sleep_for(std::chrono::seconds(1));
 		system("cls");

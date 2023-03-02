@@ -31,12 +31,14 @@ public:
 	void	Recv(EXP_OVER* exp_over, const unsigned int user_id, const DWORD num_byte);
 	void	Disconnect(const unsigned int _user_id);
 
-	void	send_chat_packet(int user_id, int my_id, char* mess);
-	void	send_login_fail_packet(int user_id, LOGIN_FAIL_REASON::TYPE reason);
-	void	send_login_ok_packet(int user_id);
-	void	send_create_id_ok_packet(int user_id);
-	void	send_create_id_fail_packet(int user_id, char reason);
-	void	send_move_packet(int user_id, Position pos);
+	void	send_chat_packet(const unsigned int user_id, const unsigned int my_id, char* mess);
+	void	send_login_fail_packet(const unsigned int user_id, LOGIN_FAIL_REASON::TYPE reason);
+	void	send_login_ok_packet(const unsigned int user_id);
+	void	send_create_id_ok_packet(const unsigned int user_id);
+	void	send_create_id_fail_packet(const unsigned int user_id, char reason);
+	void	send_join_room_success_packet(const unsigned int user_id);
+	void	send_join_room_fail_packet(const unsigned int user_id);
+	void	send_move_packet(const unsigned int user_id, Position pos);
 
 
 

@@ -142,6 +142,8 @@ namespace SC_PACKET
 		SC_CREATE_ROOM_OK,
 		SC_MOVING,
 		SC_PACKET_CHAT,
+		SC_PACKET_JOIN_ROOM_SUCCESS,
+		SC_PACKET_JOIN_ROOM_FAIL,
 		SC_PACKET_ROOM_INFO
 	};
 }
@@ -194,12 +196,17 @@ struct sc_packet_create_room {
 	// 방 생성 내용
 };
 
-struct sc_packet_user_join_room {
+struct sc_packet_join_room_success {
 	unsigned char	size;
 	unsigned char	type;
 
 	unsigned int	room_number;
 	// 유저 방 입장시 room manager에 데이터 이동
+};
+
+struct sc_packet_join_room_fail {
+	unsigned char	size;
+	unsigned char	type;
 };
 
 struct sc_packet_chat { // 유저간 채팅
