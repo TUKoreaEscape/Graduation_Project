@@ -172,9 +172,10 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 {
 	CLIENT& cl = m_clients[_user_id];
 	
-	Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
+
 	// ¿©±â¼­ ÃÊ±âÈ­
 	if (cl.get_join_room_number() != -1) {
+		Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
 		rl.Exit_Player(_user_id);	
 	}
 	cl._state_lock.lock();
@@ -312,15 +313,18 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 {
 	cs_packet_join_room* packet = reinterpret_cast<cs_packet_join_room*>(buff);
 	
-	if (m_room_manager->Join_room(user_id, packet->room_number))
+	if (m_room_manager->Get_Room_Info(packet->room_number)->_room_state == GAME_ROOM_STATE::READY)
 	{
-		m_clients[user_id].set_join_room_number(packet->room_number);
-		m_clients[user_id].set_state(ST_GAMEROOM);
-		send_join_room_success_packet(user_id);
-	}
+		if (m_room_manager->Join_room(user_id, packet->room_number))
+		{
+			m_clients[user_id].set_join_room_number(packet->room_number);
+			m_clients[user_id].set_state(ST_GAMEROOM);
+			send_join_room_success_packet(user_id);
+		}
 
-	else
-		send_join_room_fail_packet(user_id);
+		else
+			send_join_room_fail_packet(user_id);
+	}
 }
 
 void cGameServer::Process_Exit_Room(const int user_id, void* buff)
