@@ -9,8 +9,8 @@ private:
 	void Bind_Socket(short port_num);
 
 public:
-	C_IOCP();
-	~C_IOCP();
+	C_IOCP(){};
+	~C_IOCP(){};
 
 public:
 	void Start_server();

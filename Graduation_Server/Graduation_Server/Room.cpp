@@ -12,8 +12,6 @@ void Room::Reset_Room()
 void Room::Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE room_state) // <- 방 만들때 in_player가 전부 -1에서 0으로 바뀜 이거 수정해야댐
 {
 	cout << "불린횟수가?" << endl;
-	for (auto p : in_player)
-		cout << p << endl;
 	_room_state = room_state;
 	in_player[Number_of_users] = make_player_id;
 	Number_of_users++;
@@ -32,8 +30,6 @@ bool Room::Join_Player(int user_id)
 			p = user_id;
 			Number_of_users++;
 			remain_user = 6 - Number_of_users;
-			cout << p << endl;
-
 			return true;
 		}
 	}
@@ -48,7 +44,6 @@ void Room::Exit_Player(int user_id)
 		if (p == user_id) {
 			p = -1;
 			Number_of_users -= 1;
-			cout << Number_of_users << endl;
 			remain_user = 6 - Number_of_users; 
 			if (Number_of_users == 0)
 				Reset_Room();
@@ -70,4 +65,18 @@ char* Room::Get_Room_Name(char room_name[], int size)
 		room_name[i] = m_room_name[i];
 
 	return room_name;
+}
+
+void Room::init_game_object()
+{
+	fstream in;
+	m_game_object.emplace_back(GameObject(OB_PIANO, 0, 0)); // <- 임시값임! 게임 오브젝트를 서버 시작시 미리 배치만 해둘 예정(서버 켜질때!)
+}
+
+void Room::SetBoundingBox(XMFLOAT3 pos)
+{
+	for (int i = 0; i < in_player_bounding_box.size(); ++i)
+	{
+		in_player_bounding_box[i] = BoundingOrientedBox{ XMFLOAT3(pos), XMFLOAT3(0,0,0), XMFLOAT4{0,0,0,1} };
+	}
 }

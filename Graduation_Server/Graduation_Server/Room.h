@@ -1,17 +1,22 @@
 #pragma once
 #include "stdafx.h"
+#include "object.h"
+#include "User_Client.h"
 
 enum Room_State{ROOM_FREE, ROOM_READY, ROOM_GAMING};
-class CLIENT;
+//class CLIENT;
 class Room {
 private:
-	int			room_number;
-	int			Number_of_users = 0;
-	int			remain_user = 6;
-	char		m_room_name[MAX_NAME_SIZE] {"test"};
+	int					room_number;
+	int					Number_of_users = 0;
+	int					remain_user = 6;
+	unsigned char		m_room_name[MAX_NAME_SIZE] {"test\0"};
 
-	array<int, 6> in_player; // 방에 들어온 플레이어 id XMFLOAT3 
-	
+	array<int, 6>		in_player; // 방에 들어온 플레이어 id XMFLOAT3 
+
+
+	array<BoundingOrientedBox, 6>	in_player_bounding_box;
+	vector<GameObject>				m_game_object;
 
 public:
 	GAME_ROOM_STATE::TYPE _room_state;
@@ -33,11 +38,8 @@ public:
 		room_number = room_num;
 	}
 
-	void SetBoundingBox(CLIENT& cl)
-	{
-		// 충돌체크를 위해 dx12를 추가후 사용예정
-		
-	}
+	void init_game_object();
+	void SetBoundingBox(XMFLOAT3 pos);
 
 
 	void Reset_Room();

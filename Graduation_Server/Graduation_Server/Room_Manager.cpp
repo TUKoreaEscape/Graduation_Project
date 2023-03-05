@@ -30,7 +30,6 @@ int RoomManager::Create_room(int user_id)
 		{
 			a_in_game_room[i].Create_Room(user_id, i, GAME_ROOM_STATE::READY);
 			return_create_room_number = i;
-			cout << "积己等 规锅龋 : " << return_create_room_number << endl;
 			return return_create_room_number;
 		}
 	}
@@ -46,7 +45,6 @@ void RoomManager::Clean_room(int room_number)
 
 bool RoomManager::Join_room(int user_id, int select_room_number)
 {
-	cout << "room_manager join room" << endl;
 	if (a_in_game_room[select_room_number].Join_Player(user_id))
 	{
 		return true;

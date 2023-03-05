@@ -23,7 +23,7 @@ public:
 	mutex		_room_list_lock;
 	mutex		_state_lock;
 
-	SOCKET		_socket;
+	SOCKET		_socket = NULL;
 	EXP_OVER	_recv_over;
 
 public:

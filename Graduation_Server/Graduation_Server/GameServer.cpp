@@ -31,7 +31,7 @@ void cGameServer::StartServer()
 	C_IOCP::Start_server();
 
 	// 이쪽은 이제 맵 로드할 부분
-	for (int i = 0; i < 8; ++i)
+	for (int i = 0; i < 12; ++i)
 		m_worker_threads.emplace_back(std::thread(&cGameServer::WorkerThread, this));
 
 	for (auto& worker : m_worker_threads)
@@ -88,8 +88,9 @@ void cGameServer::WorkerThread()
 			if (num_byte != exp_over->m_wsa_buf.len) {
 				std::cout << "send_error" << std::endl;
 				Disconnect(client_id);
+				delete exp_over;
+				continue;
 			}
-			delete exp_over;
 			break;
 
 		case OP_ACCEPT:
@@ -113,7 +114,7 @@ void cGameServer::Accept(EXP_OVER* exp_over)
 		SOCKET c_socket = *(reinterpret_cast<SOCKET*>(exp_over->m_buf));
 		m_clients[new_id]._socket = c_socket;
 
-		CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), m_h_iocp, new_id, 0);
+		CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), C_IOCP::m_h_iocp, new_id, 0);
 		m_clients[new_id].do_recv();
 
 		ZeroMemory(&exp_over->m_wsa_over, sizeof(exp_over->m_wsa_over));
@@ -334,9 +335,9 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 		// 방을 나가면 로비이므로 방 정보들을 다시 보내줘야함!
 		sc_packet_request_room_info send_packet;
 		int room_number;
-		for (int i = 0; i < 10; ++i) // 1페이지당 10개의 방이 보인다고 가정, 룸정보를 전송할 준비함
+		for (int i = 0; i < MAX_ROOM_INFO_SEND; ++i) // 1페이지당 10개의 방이 보인다고 가정, 룸정보를 전송할 준비함
 		{
-			room_number = i + (packet->request_page * 10);
+			room_number = i + (packet->request_page * MAX_ROOM_INFO_SEND);
 			Room& get_room_info = *m_room_manager->Get_Room_Info(room_number);
 			cout << room_number << " : [" << get_room_info.Get_Number_of_users() << "/6]" << endl;
 			send_packet.room_info[i].room_number = room_number;
@@ -356,16 +357,17 @@ void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
 	sc_packet_request_room_info send_packet;
 
 
-	
+	char room_name[20];
 	int room_number;
-	for (int i = 0; i < 10; ++i) // 1페이지당 10개의 방이 보인다고 가정, 룸정보를 전송할 준비함
+	for (int i = 0; i < MAX_ROOM_INFO_SEND; ++i) // 1페이지당 10개의 방이 보인다고 가정, 룸정보를 전송할 준비함
 	{
-		room_number = i + (packet->request_page * 10);
+		room_number = i + (packet->request_page * MAX_ROOM_INFO_SEND);
 		Room& get_room_info = *m_room_manager->Get_Room_Info(room_number);
-		cout << room_number << " : [" << get_room_info.Get_Number_of_users() << "/6]" << endl;
+		cout << room_number << "번방 [" << get_room_info.Get_Room_Name(room_name, 20) << "] : [" << get_room_info.Get_Number_of_users() << "/6]" << endl;
 		send_packet.room_info[i].room_number = room_number;
 		send_packet.room_info[i].join_member = get_room_info.Get_Number_of_users();
 		send_packet.room_info[i].state = get_room_info._room_state;
+		//get_room_info.Get_Room_Name(send_packet.room_info[i].room_name, 20);
 	}
 	send_packet.size = sizeof(sc_packet_request_room_info);
 	send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
@@ -407,7 +409,7 @@ void cGameServer::send_chat_packet(const unsigned int user_id, const unsigned in
 	packet.id = my_id;
 	packet.type = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_CHAT;
-	strcpy_s(packet.message, mess);
+	//strcpy_s(packet.message, mess);
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 

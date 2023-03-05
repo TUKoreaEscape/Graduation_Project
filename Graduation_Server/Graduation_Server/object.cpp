@@ -5,6 +5,11 @@ GameObject::GameObject()
 
 }
 
+GameObject::GameObject(Object_Type type, float width, float height)
+{
+
+}
+
 GameObject::~GameObject()
 {
 
