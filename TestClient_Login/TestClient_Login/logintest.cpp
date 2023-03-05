@@ -74,7 +74,7 @@ void ProcessPacket(char* ptr)
 
 		cout << "send_packet size : " << sizeof(ptr) << endl;
 		for (int i = 0; i < MAX_ROOM_INFO_SEND; ++i)
-			cout << packet->room_info[i].room_number << "번방 ["  << "] : [" << packet->room_info[i].join_member << "/6]" << endl;
+			cout << packet->room_info[i].room_number << "번방 ["  << packet->room_info[i].room_name << "] : [" << packet->room_info[i].join_member << "/6]" << endl;
 
 		
 		break;
@@ -105,8 +105,15 @@ void PacketReassembly(char* net_buf, size_t io_byte)
 	static char packet_buffer[BUF_SIZE];
 
 	while (io_byte != 0) {
-		if (make_packet_size == 0)
+		if (make_packet_size == 0) {
 			make_packet_size = ptr[0];
+			if (make_packet_size == 127)
+			{
+				make_packet_size *= ptr[2];
+				make_packet_size += ptr[3];
+			}
+		
+		}
 		if (io_byte + saved_packet_size >= make_packet_size) {
 			memcpy(packet_buffer + saved_packet_size, ptr, make_packet_size - saved_packet_size);
 			ProcessPacket(packet_buffer);
@@ -137,7 +144,7 @@ void RecvPacket()
 			;
 
 		if (recv_byte > 0) {
-			//cout << "recv_byte : " << recv_byte << endl;
+			cout << "recv_byte : " << recv_byte << endl;
 			PacketReassembly(wsabuf.buf, recv_byte);
 		}
 	}

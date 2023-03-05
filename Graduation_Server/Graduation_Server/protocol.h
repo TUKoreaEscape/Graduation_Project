@@ -189,6 +189,8 @@ struct sc_packet_move {
 struct sc_packet_request_room_info {
 	unsigned char	size;
 	unsigned char	type;
+	unsigned char	sub_size_mul;
+	unsigned char	sub_size_add;
 
 	Roominfo_by10	room_info[MAX_ROOM_INFO_SEND];
 };

@@ -56,6 +56,7 @@ struct Position {
 	float look;
 	float at;
 };
+
 //#pragma pack (push, 1)
 struct Roominfo_by10 {
 	unsigned short				room_number;
@@ -188,6 +189,8 @@ struct sc_packet_move {
 struct sc_packet_request_room_info {
 	unsigned char	size;
 	unsigned char	type;
+	unsigned char	sub_size_mul;
+	unsigned char	sub_size_add;
 
 	Roominfo_by10	room_info[MAX_ROOM_INFO_SEND];
 };

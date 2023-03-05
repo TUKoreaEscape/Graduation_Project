@@ -14,7 +14,7 @@ public:
 	unsigned char	m_buf[BUFSIZE];
 
 public:
-	EXP_OVER(OP_TYPE comp_op, char num_byte, void* message);
+	EXP_OVER(OP_TYPE comp_op, int num_byte, void* message);
 	EXP_OVER(OP_TYPE comp_op);
 	EXP_OVER();
 

@@ -334,18 +334,29 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 
 		// 방을 나가면 로비이므로 방 정보들을 다시 보내줘야함!
 		sc_packet_request_room_info send_packet;
+		char room_name[20];
 		int room_number;
 		for (int i = 0; i < MAX_ROOM_INFO_SEND; ++i) // 1페이지당 10개의 방이 보인다고 가정, 룸정보를 전송할 준비함
 		{
 			room_number = i + (packet->request_page * MAX_ROOM_INFO_SEND);
 			Room& get_room_info = *m_room_manager->Get_Room_Info(room_number);
-			cout << room_number << " : [" << get_room_info.Get_Number_of_users() << "/6]" << endl;
+			cout << room_number << "번방 [" << get_room_info.Get_Room_Name(room_name, 20) << "] : [" << get_room_info.Get_Number_of_users() << "/6]" << endl;
 			send_packet.room_info[i].room_number = room_number;
 			send_packet.room_info[i].join_member = get_room_info.Get_Number_of_users();
 			send_packet.room_info[i].state = get_room_info._room_state;
+			get_room_info.Get_Room_Name(send_packet.room_info[i].room_name, 20);
 		}
-		send_packet.size = sizeof(sc_packet_request_room_info);
+
+		if (sizeof(sc_packet_request_room_info) >= 127)
+		{
+			send_packet.size = 127;
+			send_packet.sub_size_mul = sizeof(sc_packet_request_room_info) / 127;
+			send_packet.sub_size_add = sizeof(sc_packet_request_room_info) % 127;
+		}
+		else
+			send_packet.size = sizeof(sc_packet_request_room_info);
 		send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
+		cout << "send_packet size : " << sizeof(send_packet) << endl;
 		m_clients[user_id].do_send(sizeof(send_packet), &send_packet);
 	}
 }
@@ -367,11 +378,19 @@ void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
 		send_packet.room_info[i].room_number = room_number;
 		send_packet.room_info[i].join_member = get_room_info.Get_Number_of_users();
 		send_packet.room_info[i].state = get_room_info._room_state;
-		//get_room_info.Get_Room_Name(send_packet.room_info[i].room_name, 20);
+		get_room_info.Get_Room_Name(send_packet.room_info[i].room_name, 20);
 	}
-	send_packet.size = sizeof(sc_packet_request_room_info);
+
+	if (sizeof(sc_packet_request_room_info) >= 127)
+	{
+		send_packet.size = 127;
+		send_packet.sub_size_mul = sizeof(sc_packet_request_room_info) / 127;
+		send_packet.sub_size_add = sizeof(sc_packet_request_room_info) % 127;
+	}
+	else
+		send_packet.size = sizeof(sc_packet_request_room_info);
 	send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
-	cout << "send_packet size : " << int(send_packet.size) << endl;
+	cout << "send_packet size : " << sizeof(send_packet) << endl;
 	m_clients[user_id].do_send(sizeof(send_packet), &send_packet);
 }
 
