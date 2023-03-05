@@ -1,5 +1,3 @@
-#include "stdafx.h"
-#include <bitset>
 #include "GameServer.h"
 
 cGameServer::cGameServer()
@@ -221,6 +219,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		Process_Chat(user_id, p);
 		break;
 	}
+
 	case CS_PACKET::CS_PACKET_CREATE_ROOM:
 	{
 		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == ST_LOBBY) // 로그인하고 로비에 있을때만 방 생성 가능
@@ -297,16 +296,10 @@ void cGameServer::Process_Chat(const int user_id, void* buff)
 
 void cGameServer::Process_Create_Room(const unsigned int _user_id) // 요청받은 새로운 방 생성
 {
-	sc_packet_create_room packet;
-
 	m_clients[_user_id].set_join_room_number(m_room_manager->Create_room(_user_id));
 	m_clients[_user_id].set_state(ST_GAMEROOM);
 
-	packet.size = sizeof(packet);
-	packet.type = SC_PACKET::SC_CREATE_ROOM_OK;
-	packet.room_number = m_clients[_user_id].get_join_room_number();
-
-	m_clients[_user_id].do_send(sizeof(packet), &packet);
+	send_create_room_ok_packet(_user_id, m_clients[_user_id].get_join_room_number());
 }
 
 void cGameServer::Process_Join_Room(const int user_id, void* buff)
@@ -456,6 +449,16 @@ void cGameServer::send_create_id_fail_packet(const unsigned int user_id, char re
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 
+void cGameServer::send_create_room_ok_packet(const unsigned int user_id, const int room_number)
+{
+	sc_packet_create_room packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_CREATE_ROOM_OK;
+	packet.room_number = room_number;
+
+	m_clients[user_id].do_send(sizeof(packet), &packet);
+}
+
 void cGameServer::send_join_room_success_packet(const unsigned int user_id)
 {
 	sc_packet_join_room_success packet;
@@ -486,6 +489,7 @@ void cGameServer::send_move_packet(const unsigned int user_id, Position pos)
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 
 }
+//============================================================================
 
 
 int cGameServer::get_new_id()
@@ -506,4 +510,3 @@ int cGameServer::get_new_id()
 	std::cout << "Maximum Number of Clients Overflow! \n";
 	return -1;
 }
-//============================================================================

@@ -80,6 +80,26 @@ void CLIENT::set_join_room_number(int room_number)
 	_join_room_number = room_number;
 }
 
+void CLIENT::set_user_position(XMFLOAT3 pos)
+{
+	m_pos = pos;
+}
+
+XMFLOAT3 CLIENT::get_user_position()
+{
+	return m_pos;
+}
+
+void CLIENT::set_bounding_box()
+{
+	m_bounding_box = BoundingOrientedBox{ XMFLOAT3{0.f, 0.f, 0.f}, XMFLOAT3{0.65f, 0.37f, 0.65f}, XMFLOAT4{0.0f, 0.0f, 0.0f, 1.0f} }; // 임시값으로 오브젝트별 값을 따로 불러와서 적용 예정
+}
+
+BoundingOrientedBox CLIENT::get_bounding_box()
+{
+	return m_bounding_box;
+}
+
 void CLIENT::error_display(int error_number)
 {
 	WCHAR* lpMsgBuf;

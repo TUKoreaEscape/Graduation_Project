@@ -134,6 +134,7 @@
     <ClCompile Include="IOCP.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Map_Load.cpp" />
+    <ClCompile Include="object.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="Room_Manager.cpp" />
     <ClCompile Include="User_Client.cpp" />
@@ -147,6 +148,7 @@
     <ClInclude Include="GameServer.h" />
     <ClInclude Include="IOCP.h" />
     <ClInclude Include="Map_Load.h" />
+    <ClInclude Include="object.h" />
     <ClInclude Include="protocol.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="Room_Manager.h" />

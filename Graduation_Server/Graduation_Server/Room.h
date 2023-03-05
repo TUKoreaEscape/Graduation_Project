@@ -10,8 +10,9 @@ private:
 	int			remain_user = 6;
 	char		m_room_name[MAX_NAME_SIZE] {"test"};
 
-	array<int, 6> in_player; // 방에 들어온 플레이어 id
+	array<int, 6> in_player; // 방에 들어온 플레이어 id XMFLOAT3 
 	
+
 public:
 	GAME_ROOM_STATE::TYPE _room_state;
 
@@ -35,6 +36,7 @@ public:
 	void SetBoundingBox(CLIENT& cl)
 	{
 		// 충돌체크를 위해 dx12를 추가후 사용예정
+		
 	}
 
 

@@ -37,6 +37,9 @@
     <Filter Include="소스 파일\05 MapData">
       <UniqueIdentifier>{e79569e3-b52e-4279-a508-5d08686dc809}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\06 Object">
+      <UniqueIdentifier>{308bf954-f704-4510-a955-9c172a828c6c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IOCP.h">
@@ -72,6 +75,9 @@
     <ClInclude Include="Map_Load.h">
       <Filter>소스 파일\05 MapData</Filter>
     </ClInclude>
+    <ClInclude Include="object.h">
+      <Filter>소스 파일\06 Object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -103,6 +109,9 @@
     </ClCompile>
     <ClCompile Include="Map_Load.cpp">
       <Filter>소스 파일\05 MapData</Filter>
+    </ClCompile>
+    <ClCompile Include="object.cpp">
+      <Filter>소스 파일\06 Object</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

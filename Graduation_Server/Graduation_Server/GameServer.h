@@ -36,6 +36,7 @@ public:
 	void	send_login_ok_packet(const unsigned int user_id);
 	void	send_create_id_ok_packet(const unsigned int user_id);
 	void	send_create_id_fail_packet(const unsigned int user_id, char reason);
+	void	send_create_room_ok_packet(const unsigned int user_id, const int room_number);
 	void	send_join_room_success_packet(const unsigned int user_id);
 	void	send_join_room_fail_packet(const unsigned int user_id);
 	void	send_move_packet(const unsigned int user_id, Position pos);
@@ -59,7 +60,7 @@ public:
 private:
 	std::vector<std::thread>		m_worker_threads;
 	std::thread						m_timer_thread;
-
+	
 	std::array<CLIENT, MAX_USER>	m_clients;
 	Voice_Chat						*m_voice_chat = nullptr;
 	RoomManager						*m_room_manager = nullptr;
