@@ -38,7 +38,6 @@ void RoomManager::init_object()
 
 	while (in)
 	{
-		std::cout << "파일 받음" << std::endl;
 		in >> type >> center.x >> center.y >> center.z >> extents.x >> extents.y >> extents.z >> orientation.x >> orientation.y >> orientation.z >> orientation.w;
 		m_game_object.emplace_back(static_cast<Object_Type>(type), center, extents, orientation);
 	}

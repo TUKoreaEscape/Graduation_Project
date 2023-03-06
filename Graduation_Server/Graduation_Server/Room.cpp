@@ -32,9 +32,8 @@ bool Room::Join_Player(int user_id)
 
 void Room::Exit_Player(int user_id)
 {
-	for (auto p : in_player)
+	for (auto& p : in_player)
 	{
-		cout << p << endl;
 		if (p == user_id) {
 			p = -1;
 			Number_of_users -= 1;
