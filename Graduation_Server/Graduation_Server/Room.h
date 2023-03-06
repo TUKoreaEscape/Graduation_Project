@@ -38,7 +38,7 @@ public:
 		room_number = room_num;
 	}
 
-	void init_game_object();
+	void init_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation);
 	void SetBoundingBox(XMFLOAT3 pos);
 
 

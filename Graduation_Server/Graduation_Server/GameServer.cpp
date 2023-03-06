@@ -24,6 +24,7 @@ void cGameServer::init()
 
 	m_room_manager = new RoomManager;
 	m_room_manager->init();
+	m_room_manager->init_object();
 }
 
 void cGameServer::StartServer()
@@ -323,7 +324,6 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 
 void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 {
-	cout << "방 나가기 하러 옴" << endl;
 	cs_packet_request_exit_room* packet = reinterpret_cast<cs_packet_request_exit_room*>(buff);
 	
 	if (m_clients[user_id].get_join_room_number() != -1) {
@@ -340,7 +340,6 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 		{
 			room_number = i + (packet->request_page * MAX_ROOM_INFO_SEND);
 			Room& get_room_info = *m_room_manager->Get_Room_Info(room_number);
-			cout << room_number << "번방 [" << get_room_info.Get_Room_Name(room_name, 20) << "] : [" << get_room_info.Get_Number_of_users() << "/6]" << endl;
 			send_packet.room_info[i].room_number = room_number;
 			send_packet.room_info[i].join_member = get_room_info.Get_Number_of_users();
 			send_packet.room_info[i].state = get_room_info._room_state;
@@ -356,7 +355,6 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 		else
 			send_packet.size = sizeof(sc_packet_request_room_info);
 		send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
-		cout << "send_packet size : " << sizeof(send_packet) << endl;
 		m_clients[user_id].do_send(sizeof(send_packet), &send_packet);
 	}
 }
@@ -374,7 +372,6 @@ void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
 	{
 		room_number = i + (packet->request_page * MAX_ROOM_INFO_SEND);
 		Room& get_room_info = *m_room_manager->Get_Room_Info(room_number);
-		cout << room_number << "번방 [" << get_room_info.Get_Room_Name(room_name, 20) << "] : [" << get_room_info.Get_Number_of_users() << "/6]" << endl;
 		send_packet.room_info[i].room_number = room_number;
 		send_packet.room_info[i].join_member = get_room_info.Get_Number_of_users();
 		send_packet.room_info[i].state = get_room_info._room_state;
@@ -390,7 +387,6 @@ void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
 	else
 		send_packet.size = sizeof(sc_packet_request_room_info);
 	send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
-	cout << "send_packet size : " << sizeof(send_packet) << endl;
 	m_clients[user_id].do_send(sizeof(send_packet), &send_packet);
 }
 
@@ -522,7 +518,6 @@ int cGameServer::get_new_id()
 		{
 			m_clients[i].set_state(ST_ACCEPT);
 			m_clients[i]._state_lock.unlock();
-			cout << "gen_id : " << i << endl;
 			return i;
 		}
 		m_clients[i]._state_lock.unlock();

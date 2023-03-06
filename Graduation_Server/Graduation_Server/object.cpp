@@ -5,9 +5,14 @@ GameObject::GameObject()
 
 }
 
-GameObject::GameObject(Object_Type type, float width, float height)
+GameObject::GameObject(Object_Type type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation)
 {
+	m_type = type;
+	m_center = center;
+	m_extents = extents;
+	m_orientation = orientation;
 
+	Set_BoundingBox();
 }
 
 GameObject::~GameObject()
@@ -15,21 +20,38 @@ GameObject::~GameObject()
 
 }
 
-void GameObject::init(Object_Type type, float width, float height)
-{
-	m_type = type;
-	m_width = width;
-	m_height = height;
-
-	Set_BoundingBox();
-}
-
 void GameObject::Set_BoundingBox()
 {
-	m_bounding_box = BoundingOrientedBox{ XMFLOAT3{0.f, 0.f, 0.f}, XMFLOAT3{0.65f, 0.37f, 0.65f}, XMFLOAT4{0.0f, 0.0f, 0.0f, 1.0f} }; // 임시값으로 오브젝트별 값을 따로 불러와서 적용 예정
+	m_bounding_box = BoundingOrientedBox{ m_center, m_extents, m_orientation };
 }
 
 BoundingOrientedBox GameObject::Get_BoundingBox()
 {
 	return m_bounding_box;
+}
+
+Object_Type GameObject::Get_Object_Type()
+{
+	return m_type;
+}
+
+XMFLOAT3 GameObject::Get_center()
+{
+	return m_center;
+}
+
+XMFLOAT3 GameObject::Get_extents()
+{
+	return m_extents;
+}
+
+XMFLOAT4 GameObject::Get_orientation()
+{
+	return m_orientation;
+}
+
+istream& operator>>(istream& in, GameObject& p)
+{
+	in.read(reinterpret_cast<char*>(&p), sizeof(GameObject));
+	return in;
 }
