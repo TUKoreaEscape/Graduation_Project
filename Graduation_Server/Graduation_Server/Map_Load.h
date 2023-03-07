@@ -1,5 +1,5 @@
 #pragma once
-#include <fstream>
+#include "stdafx.h"
 
 class Game_Map {
 private:

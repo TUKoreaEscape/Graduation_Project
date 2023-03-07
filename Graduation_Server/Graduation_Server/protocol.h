@@ -222,7 +222,7 @@ struct sc_packet_chat { // 유저간 채팅
 
 	unsigned int	id;
 
-	unsigned char	message[MAX_CHAT_SIZE];
+	char	message[MAX_CHAT_SIZE];
 };
 
 //#pragma pack(pop)

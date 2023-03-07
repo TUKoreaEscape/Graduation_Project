@@ -26,11 +26,6 @@ void RoomManager::init_object()
 	{
 		std::cout << "object file read fail!" << std::endl;
 	}
-
-	//for (GameObject& p : m_game_object) {
-	//	in >> p;
-	//	cout << "하나 들어옴" << endl;
-	//}
 	int type;
 	XMFLOAT3 center;
 	XMFLOAT3 extents;
@@ -41,18 +36,18 @@ void RoomManager::init_object()
 		in >> type >> center.x >> center.y >> center.z >> extents.x >> extents.y >> extents.z >> orientation.x >> orientation.y >> orientation.z >> orientation.w;
 		m_game_object.emplace_back(static_cast<Object_Type>(type), center, extents, orientation);
 	}
-	std::cout << m_game_object.size() << std::endl;
-	std::cout << "Game Object init success!!!" << std::endl;
+	std::cout << "Game Object load success!!!" << std::endl;
 
 	for (auto& p : m_game_object)
 	{
-		cout << "Type : " << p.Get_Object_Type() << " || Center : (" << p.Get_center().x << ", " << p.Get_center().y << ", " << p.Get_center().z << ")" << endl;
+		for (auto& _room : a_in_game_room)
+			_room.add_game_object(p.Get_Object_Type(), p.Get_center(), p.Get_extents(), p.Get_orientation());
 	}
+	cout << "All room object init!!!" << endl;
 }
 
 int RoomManager::Create_room(int user_id)
 {
-	//in_game_room.emplace_back(Room(user_id, in_game_room.size(), GAME_ROOM_STATE::READY)); // 방을 생성한 사람 id, 게임룸이 몆번방, 게임방 상태
 	int return_create_room_number = -1;
 	for (int i = 0; i < a_in_game_room.size(); ++i)
 	{ 

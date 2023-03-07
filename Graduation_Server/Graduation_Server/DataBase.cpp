@@ -129,3 +129,25 @@ void DataBase::show_error()
 {
 	std::cout << "Error!!! \n";
 }
+
+void DataBase::HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE retcode)
+{
+	SQLSMALLINT iRec = 0;
+	SQLINTEGER iError;
+	WCHAR wszMessage[1000];
+	WCHAR wszState[SQL_SQLSTATE_SIZE + 1];
+
+	if (retcode == SQL_INVALID_HANDLE)
+	{
+		fwprintf(stderr, L"Invalid Handle");
+		return;
+	}
+
+	while (SQLGetDiagRec(hType, hHandle, ++iRec, wszState, &iError, wszMessage, (SQLSMALLINT)(sizeof(wszMessage) / sizeof(WCHAR)), (SQLSMALLINT*)NULL) == SQL_SUCCESS)
+	{
+		if (wcsncmp(wszState, L"01004", 5))
+		{
+			fwprintf(stderr, L"[%5.5s] %s (%d) \n", wszState, wszMessage, iError);
+		}
+	}
+}

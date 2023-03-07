@@ -285,15 +285,24 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 void cGameServer::Process_Chat(const int user_id, void* buff)
 {
 	cs_packet_chat* packet = reinterpret_cast<cs_packet_chat*>(buff);
-	char mess[256];
+	char mess[MAX_CHAT_SIZE];
 
 	strcpy_s(mess, packet->message);
 
 	// 같은 방에 있는 유저한테만 메세지 보낼 예정
-	m_clients[user_id]._room_list_lock.lock();
-	for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
-		send_chat_packet(*ptr, user_id, mess);
-	m_clients[user_id]._room_list_lock.unlock();
+	//m_clients[user_id]._room_list_lock.lock();
+	//for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
+	//	send_chat_packet(*ptr, user_id, mess);
+	//m_clients[user_id]._room_list_lock.unlock();
+
+	Room& rl = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+	
+
+	for (int i = 0; i < 6; ++i)
+	{
+		if (rl.Get_Join_Member(i) != -1)
+			send_chat_packet(rl.Get_Join_Member(i), user_id, mess);
+	}
 }
 
 void cGameServer::Process_Create_Room(const unsigned int _user_id) // 요청받은 새로운 방 생성
@@ -307,6 +316,7 @@ void cGameServer::Process_Create_Room(const unsigned int _user_id) // 요청받은 �
 void cGameServer::Process_Join_Room(const int user_id, void* buff)
 {
 	cs_packet_join_room* packet = reinterpret_cast<cs_packet_join_room*>(buff);
+	Room& rl = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 	
 	if (m_room_manager->Get_Room_Info(packet->room_number)->_room_state == GAME_ROOM_STATE::READY)
 	{
@@ -314,6 +324,7 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 		{
 			m_clients[user_id].set_join_room_number(packet->room_number);
 			m_clients[user_id].set_state(ST_GAMEROOM);
+			m_clients[user_id].room_list.insert(rl.in_player.begin(), rl.in_player.end());
 			send_join_room_success_packet(user_id);
 		}
 
@@ -422,9 +433,12 @@ void cGameServer::send_chat_packet(const unsigned int user_id, const unsigned in
 {
 	sc_packet_chat packet;
 	packet.id = my_id;
-	packet.type = sizeof(packet);
+	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_CHAT;
-	//strcpy_s(packet.message, mess);
+	strcpy_s(packet.message, mess);
+
+	cout << "chat packet size : " << sizeof(packet) << endl;
+	cout << "chat send : " << user_id << endl;
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 

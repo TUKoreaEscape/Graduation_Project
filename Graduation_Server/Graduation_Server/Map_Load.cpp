@@ -14,8 +14,5 @@ void Game_Map::map_init()
 {
 	char map_data;
 
-	fopen_s(&fp, ".txt", "rb");
-	while (fscanf_s(fp, "%c", &map_data) != EOF) {
-
-	}
+	ifstream in;
 }

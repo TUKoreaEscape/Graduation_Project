@@ -94,6 +94,13 @@ void ProcessPacket(char* ptr)
 		break;
 	}
 
+	case SC_PACKET::SC_PACKET_CHAT:
+	{
+		sc_packet_chat* packet = reinterpret_cast<sc_packet_chat*>(ptr);
+		cout << packet->id << " : " << packet->message << endl;
+		break;
+	}
+
 	}
 }
 
@@ -224,8 +231,27 @@ void Exit_Room_Test()
 	SendPacket(0, &packet);
 }
 
+void Chat_Test()
+{
+	cs_packet_chat packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_CHAT;
+
+	cout << "내용 입력: ";
+	cin >> packet.message;
+	packet.room_number = 0;
+
+
+	SendPacket(0, &packet);
+}
+
 void Send_Packet()
 {
+	//while (true)
+	//{
+	//	this_thread::sleep_for(std::chrono::milliseconds(1));
+	//	Request_Room_Info_Test();
+	//}
 	while (true)
 	{
 		int test_code = 0;
@@ -236,6 +262,7 @@ void Send_Packet()
 		cout << "4. 생성된 방 모든 정보 요청" << endl;
 		cout << "5. 방 접속 테스트" << endl;
 		cout << "6. 방 나가기 테스트" << endl;
+		cout << "7. 채팅 테스트 (방 접속시에만 가능)" << endl;
 		cout << "입력 : ";
 		cin >> test_code;
 
@@ -252,6 +279,8 @@ void Send_Packet()
 			Join_Room_Test();
 		else if (test_code == 6)
 			Exit_Room_Test();
+		else if (test_code == 7)
+			Chat_Test();
 
 		this_thread::sleep_for(std::chrono::seconds(1));
 		system("cls");

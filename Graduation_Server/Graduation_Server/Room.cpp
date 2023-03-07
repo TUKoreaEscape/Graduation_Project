@@ -52,6 +52,11 @@ int Room::Get_Number_of_users()
 	return return_user_num;
 }
 
+int Room::Get_Join_Member(int data)
+{
+	return in_player[data];
+}
+
 char* Room::Get_Room_Name(char room_name[], int size)
 {
 	for (int i = 0; i < size; ++i)
@@ -60,7 +65,7 @@ char* Room::Get_Room_Name(char room_name[], int size)
 	return room_name;
 }
 
-void Room::init_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation)
+void Room::add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation)
 {
 	m_game_object.emplace_back(GameObject(ob_type, center, extents, orientation));
 }

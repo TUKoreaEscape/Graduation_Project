@@ -90,9 +90,9 @@ XMFLOAT3 CLIENT::get_user_position()
 	return m_pos;
 }
 
-void CLIENT::set_bounding_box()
+void CLIENT::set_bounding_box(XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation)
 {
-	m_bounding_box = BoundingOrientedBox{ XMFLOAT3{0.f, 0.f, 0.f}, XMFLOAT3{0.65f, 0.37f, 0.65f}, XMFLOAT4{0.0f, 0.0f, 0.0f, 1.0f} }; // 임시값으로 오브젝트별 값을 따로 불러와서 적용 예정
+	m_bounding_box = BoundingOrientedBox{ center, extents, orientation }; // 임시값으로 오브젝트별 값을 따로 불러와서 적용 예정
 }
 
 BoundingOrientedBox CLIENT::get_bounding_box()

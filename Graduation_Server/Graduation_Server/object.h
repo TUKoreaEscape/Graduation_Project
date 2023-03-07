@@ -6,9 +6,9 @@ enum Object_Type{NONE, OB_PIANO, OB_DOOR, OB_DESK };
 class GameObject {
 private:
 	Object_Type				m_type = NONE;
-	XMFLOAT3				m_center;
-	XMFLOAT3				m_extents;
-	XMFLOAT4				m_orientation;
+	XMFLOAT3				m_center = {0, 0, 0};
+	XMFLOAT3				m_extents = {0, 0, 0};
+	XMFLOAT4				m_orientation = { 0, 0, 0, 0 };
 
 	BoundingOrientedBox		m_bounding_box;
 public:

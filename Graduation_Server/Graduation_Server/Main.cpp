@@ -14,4 +14,5 @@ int main()
 	g_server->StartServer();
 
 	delete g_server;
+
 }
