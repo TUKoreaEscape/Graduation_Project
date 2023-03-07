@@ -10,6 +10,7 @@ void Room::Reset_Room()
 
 void Room::Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE room_state) // <- 방 만들때 in_player가 전부 -1에서 0으로 바뀜 이거 수정해야댐
 {
+	in_player.fill(-1);
 	_room_state = room_state;
 	in_player[Number_of_users] = make_player_id;
 	Number_of_users++;

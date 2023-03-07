@@ -215,7 +215,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_MOVE:
 	{
-		if(Y_LOGIN == m_clients[user_id].get_login_state())
+		//if(Y_LOGIN == m_clients[user_id].get_login_state())
 			Process_Move(user_id, p);
 		break;
 	}
@@ -286,7 +286,10 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	m_clients[user_id].set_user_velocity(packet->velocity);
 	m_clients[user_id].set_user_yaw(packet->yaw);
 
-	for (auto ptr = m_clients[user_id].view_list.begin(); ptr != m_clients[user_id].view_list.end(); ++ptr)
+	//for (auto ptr = m_clients[user_id].view_list.begin(); ptr != m_clients[user_id].view_list.end(); ++ptr)
+	//	send_move_packet(*ptr, user_id, packet->position);
+
+	for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
 		send_move_packet(*ptr, user_id, packet->position);
 }
 
@@ -324,7 +327,7 @@ void cGameServer::Process_Create_Room(const unsigned int _user_id) // 요청받은 �
 void cGameServer::Process_Join_Room(const int user_id, void* buff)
 {
 	cs_packet_join_room* packet = reinterpret_cast<cs_packet_join_room*>(buff);
-	Room& rl = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+	
 	
 	if (m_room_manager->Get_Room_Info(packet->room_number)->_room_state == GAME_ROOM_STATE::READY)
 	{
@@ -332,12 +335,35 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 		{
 			m_clients[user_id].set_join_room_number(packet->room_number);
 			m_clients[user_id].set_state(ST_GAMEROOM);
-			m_clients[user_id].room_list.insert(rl.in_player.begin(), rl.in_player.end());
-			send_join_room_success_packet(user_id);
+			Room& rl = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+			for (int i = 0; i < 6; ++i)
+			{
+				cout << "이건 왜? : " << rl.Get_Join_Member(i) << endl;
+				if (rl.Get_Join_Member(i) != -1 && rl.Get_Join_Member(i) != user_id)
+				{
+					m_clients[user_id]._room_list_lock.lock();
+					m_clients[user_id].room_list.insert(rl.Get_Join_Member(i));
+					m_clients[user_id]._room_list_lock.unlock();
+				}
+			}
+
 
 			// 이제 여기에 그 방에 존재하는 모든 사람에게 누가 접속했는지 정보를 전달해야함!
-		}
+			for (int i = 0; i < 6; ++i)
+			{
+				if (rl.Get_Join_Member(i) != -1 && rl.Get_Join_Member(i) != user_id) 
+				{
+					cout << "insert 차례 : " << rl.Get_Join_Member(i) << endl;
+					m_clients[rl.Get_Join_Member(i)]._room_list_lock.lock();
+					m_clients[rl.Get_Join_Member(i)].room_list.insert(user_id);
+					m_clients[rl.Get_Join_Member(i)]._room_list_lock.unlock();
+				}
+				cout << "아니 이게터짐" << endl;
+			}
 
+			send_join_room_success_packet(user_id);
+		}
 		else
 			send_join_room_fail_packet(user_id);
 	}

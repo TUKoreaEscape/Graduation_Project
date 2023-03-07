@@ -102,6 +102,13 @@ void ProcessPacket(char* ptr)
 		cout << packet->id << " : " << packet->message << endl;
 		break;
 	}
+	
+	case SC_PACKET::SC_USER_UPDATE:
+	{
+		sc_update_user_packet* packet = reinterpret_cast<sc_update_user_packet*>(ptr);
+		cout << packet->data.id << "가 이동 pos : (" << packet->data.position.x << ", " << packet->data.yaw << ", " << packet->data.position.z << ") || vel : (" << packet->data.velocity.x << ", " << packet->data.velocity.y << ", " << packet->data.velocity.z << ") || yaw : " << packet->data.yaw << endl;
+		break;
+	}
 
 	}
 }
@@ -246,6 +253,19 @@ void Chat_Test()
 	SendPacket(0, &packet);
 }
 
+void Move_Test()
+{
+	cs_packet_move packet;
+	
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_MOVE;
+	packet.position = { 0,0,0 };
+	packet.velocity = { 1,1,1 };
+	packet.yaw = 0.3f;
+
+	SendPacket(0, &packet);
+}
+
 void Stress_Test()
 {
 	cs_packet_chat packet;
@@ -278,6 +298,7 @@ void Send_Packet()
 		cout << "5. 방 접속 테스트" << endl;
 		cout << "6. 방 나가기 테스트" << endl;
 		cout << "7. 채팅 테스트 (방 접속시에만 가능)" << endl;
+		cout << "8. 이동패킷 전송 테스트" << endl;
 		cout << "입력 : ";
 		cin >> test_code;
 
@@ -296,6 +317,8 @@ void Send_Packet()
 			Exit_Room_Test();
 		else if (test_code == 7)
 			Chat_Test();
+		else if (test_code == 8)
+			Move_Test();
 
 		this_thread::sleep_for(std::chrono::seconds(1));
 		system("cls");
