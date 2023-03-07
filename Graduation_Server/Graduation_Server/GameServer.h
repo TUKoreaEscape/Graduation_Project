@@ -30,6 +30,7 @@ public:
 	void	Send(EXP_OVER* exp_over);
 	void	Recv(EXP_OVER* exp_over, const unsigned int user_id, const DWORD num_byte);
 	void	Disconnect(const unsigned int _user_id);
+	void	Update_Session(const int room_number, CLIENT& cl);
 
 	void	send_chat_packet(const unsigned int user_id, const unsigned int my_id, char* mess);
 	void	send_login_fail_packet(const unsigned int user_id, LOGIN_FAIL_REASON::TYPE reason);
@@ -39,7 +40,7 @@ public:
 	void	send_create_room_ok_packet(const unsigned int user_id, const int room_number);
 	void	send_join_room_success_packet(const unsigned int user_id);
 	void	send_join_room_fail_packet(const unsigned int user_id);
-	void	send_move_packet(const unsigned int user_id, Position pos);
+	void	send_move_packet(const unsigned int id, const unsigned int moved_id, XMFLOAT3 pos);
 
 
 

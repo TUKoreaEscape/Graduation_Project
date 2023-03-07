@@ -1,5 +1,5 @@
 #pragma once
-
+#include <DirectXMath.h>
 // 클라이언트와 서버간 통신에 사용할 구조체를 정의합니다.
 const short SERVER_PORT = 4000;
 const int	BUFSIZE = 1024;
@@ -49,12 +49,12 @@ namespace CS_PACKET
 	};
 }
 
-struct Position {
-	float x;
-	float y;
-	float z;
-	float look;
-	float at;
+struct UserData {
+	int					id;
+	DirectX::XMFLOAT3	position;
+	DirectX::XMFLOAT3	velocity;
+	float				yaw;
+	unsigned char		active;
 };
 
 //#pragma pack (push, 1)
@@ -85,11 +85,10 @@ struct cs_packet_login { // 로그인 시도
 struct cs_packet_move { // 이동관련 데이터
 	unsigned char	size;
 	unsigned char	type;
-
-	unsigned char	input_key;
-	unsigned char	state;
-
-	Position		pos;
+	
+	DirectX::XMFLOAT3 position;
+	DirectX::XMFLOAT3 velocity;
+	float			yaw;
 };
 
 struct cs_packet_voice {
@@ -145,7 +144,7 @@ namespace SC_PACKET
 		SC_CREATE_ID_OK,
 		SC_CREATE_ID_FAIL,
 		SC_CREATE_ROOM_OK,
-		SC_MOVING,
+		SC_USER_UPDATE,
 		SC_PACKET_CHAT,
 		SC_PACKET_JOIN_ROOM_SUCCESS,
 		SC_PACKET_JOIN_ROOM_FAIL,
@@ -176,14 +175,11 @@ struct sc_packet_create_id_fail {
 	unsigned char	reason;
 };
 
-struct sc_packet_move {
+struct sc_update_user_packet {
 	unsigned char	size;
 	unsigned char	type;
 
-	unsigned char	input_key;
-	unsigned char	state;
-
-	Position		pos;
+	UserData		data;
 };
 
 struct sc_packet_request_room_info {
@@ -223,6 +219,14 @@ struct sc_packet_chat { // 유저간 채팅
 	unsigned int	id;
 
 	char	message[MAX_CHAT_SIZE];
+};
+
+struct sc_packet_put_other_client {
+	unsigned char	size;
+	unsigned char	type;
+	unsigned int	user_id;
+
+	char			id[MAX_NAME_SIZE];
 };
 
 //#pragma pack(pop)

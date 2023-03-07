@@ -19,6 +19,7 @@ private:
 	vector<GameObject>				m_game_object;
 
 public:
+	mutex					_room_state_lock;
 	GAME_ROOM_STATE::TYPE	_room_state;
 	array<int, 6>			in_player; // 방에 들어온 플레이어 id XMFLOAT3 
 public:
@@ -40,7 +41,6 @@ public:
 
 	void	add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation);
 	void	SetBoundingBox(XMFLOAT3 pos);
-
 
 	void	Reset_Room();
 	void	Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE room_state);

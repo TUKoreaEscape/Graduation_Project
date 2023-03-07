@@ -1,6 +1,12 @@
 #pragma once
 #include "stdafx.h"
 
+namespace CLIENT_STATE
+{
+	enum STATE {
+		ST_FREE, ST_ACCEPT, ST_LOBBY, ST_GAMEROOM, ST_INGAME
+	};
+}
 enum STATE {ST_FREE, ST_ACCEPT, ST_LOBBY, ST_GAMEROOM, ST_INGAME};
 enum LOGIN_STATE {N_LOGIN, Y_LOGIN};
 class CLIENT {
@@ -14,6 +20,9 @@ private:
 	int						_join_room_number;
 
 	XMFLOAT3				m_pos;
+	XMFLOAT3				m_velocity;
+
+	float					m_yaw;
 	BoundingOrientedBox		m_bounding_box;
 
 public:
@@ -38,27 +47,32 @@ public:
 	}
 
 	int					return_prev_size();
+
 	int					get_id() { return _id; }
 	int					get_join_room_number() { return _join_room_number; }
-
 	STATE				get_state();
 	LOGIN_STATE			get_login_state();
+	float				get_user_yaw();
+	XMFLOAT3			get_user_position();
+	XMFLOAT3			get_user_velocity();
+	BoundingOrientedBox get_bounding_box();
+
 
 	void				set_login_state(LOGIN_STATE _state);
 	void				set_state(STATE state);
 	void				set_id(int id) { _id = id; }
 	void				set_recv_over(EXP_OVER& exp_over, SOCKET c_socket);
 	void				set_join_room_number(int room_number);
+	void				set_prev_size(int _size);
+	void				set_bounding_box(XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation);
+	void				set_user_position(XMFLOAT3 pos);
+	void				set_user_velocity(XMFLOAT3 velocity);
+	void				set_user_yaw(float yaw);
+
 
 	void				error_display(int error_number);
-
-	void				set_prev_size(int _size);
+	
 	void				do_recv();
 	void				do_send(int num_byte, void* mess);
 
-	void				set_user_position(XMFLOAT3 pos);
-	XMFLOAT3			get_user_position();
-
-	void				set_bounding_box(XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation);
-	BoundingOrientedBox get_bounding_box();
 };

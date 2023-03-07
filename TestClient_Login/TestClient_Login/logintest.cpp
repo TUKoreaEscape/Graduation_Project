@@ -1,6 +1,8 @@
 #include <iostream>
 #include <ws2tcpip.h>
 #include <thread>
+#include <locale.h>
+#include <stdio.h>
 #include "EXP_OVER.h"
 #include "protocol.h"
 using namespace std;
@@ -236,22 +238,35 @@ void Chat_Test()
 	cs_packet_chat packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET::CS_PACKET_CHAT;
-
-	cout << "내용 입력: ";
-	cin >> packet.message;
+	cout << "메세지 입력: ";
+	fgets(packet.message, 100, stdin);
 	packet.room_number = 0;
 
 
 	SendPacket(0, &packet);
 }
 
+void Stress_Test()
+{
+	cs_packet_chat packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_CHAT;
+	char mess[100]{ "test" };
+
+	strcpy_s(packet.message, mess);
+
+	packet.room_number = 0;
+
+	SendPacket(0, &packet);
+}
 void Send_Packet()
 {
 	//while (true)
 	//{
 	//	this_thread::sleep_for(std::chrono::milliseconds(1));
-	//	Request_Room_Info_Test();
+	//	Stress_Test();
 	//}
+
 	while (true)
 	{
 		int test_code = 0;
@@ -289,6 +304,8 @@ void Send_Packet()
 
 int main()
 {
+	_wsetlocale(LC_ALL, L"korean");
+	wcin.imbue(locale("korean"));          //입력시 부분적 적용
 	wcout.imbue(locale("korean"));
 	WSADATA WSAdata;
 

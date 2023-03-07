@@ -55,16 +55,6 @@ void CLIENT::set_login_state(LOGIN_STATE _state)
 	_login_state = _state;
 }
 
-STATE CLIENT::get_state()
-{
-	return _state;
-}
-
-LOGIN_STATE CLIENT::get_login_state()
-{
-	return _login_state;
-}
-
 
 void CLIENT::set_recv_over(EXP_OVER& recv_over, SOCKET c_socket)
 {
@@ -85,9 +75,14 @@ void CLIENT::set_user_position(XMFLOAT3 pos)
 	m_pos = pos;
 }
 
-XMFLOAT3 CLIENT::get_user_position()
+void CLIENT::set_user_velocity(XMFLOAT3 velocity)
 {
-	return m_pos;
+	m_velocity = velocity;
+}
+
+void CLIENT::set_user_yaw(float yaw)
+{
+	m_yaw = yaw;
 }
 
 void CLIENT::set_bounding_box(XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation)
@@ -98,6 +93,31 @@ void CLIENT::set_bounding_box(XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orient
 BoundingOrientedBox CLIENT::get_bounding_box()
 {
 	return m_bounding_box;
+}
+
+XMFLOAT3 CLIENT::get_user_position()
+{
+	return m_pos;
+}
+
+XMFLOAT3 CLIENT::get_user_velocity()
+{
+	return m_velocity;
+}
+
+float CLIENT::get_user_yaw()
+{
+	return m_yaw;
+}
+
+STATE CLIENT::get_state()
+{
+	return _state;
+}
+
+LOGIN_STATE CLIENT::get_login_state()
+{
+	return _login_state;
 }
 
 void CLIENT::error_display(int error_number)

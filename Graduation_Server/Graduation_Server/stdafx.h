@@ -17,6 +17,7 @@
 #include <unordered_set>
 #include <mutex>
 #include <bitset>
+#include <locale.h>
 #include "EXPOver.h"
 
 // Windows 헤더 파일:
@@ -39,7 +40,7 @@
 #include <d3d12.h>
 #include <dxgi1_4.h>
 #include <D3Dcompiler.h>
-#include <DirectXMath.h>
+//#include <DirectXMath.h>
 #include <DirectXPackedVector.h>
 #include <DirectXColors.h>
 #include <DirectXCollision.h>

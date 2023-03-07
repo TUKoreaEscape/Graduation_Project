@@ -82,7 +82,6 @@ void cGameServer::WorkerThread()
 			if (num_byte == 0)
 				Disconnect(client_id);
 			Recv(exp_over, client_id, num_byte);
-			cout << client_id << "_send \n";
 			break;
 
 		case OP_SEND:
@@ -186,6 +185,11 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 	closesocket(cl._socket);
 }
 
+void cGameServer::Update_Session(const int room_number, CLIENT& cl)
+{
+	Room& rl = *m_room_manager->Get_Room_Info(room_number);
+
+}
 
 //============================================================================
 // ÆÐÅ¶ ±¸ºÐÈÄ Ã³¸®ÇØÁÖ´Â °ø°£
@@ -278,8 +282,12 @@ void cGameServer::Process_Move(const int user_id, void* buff) // ¿äÃ»¹ÞÀº Ä³¸¯ÅÍ
 {
 	cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(buff);
 
+	m_clients[user_id].set_user_position(packet->position);
+	m_clients[user_id].set_user_velocity(packet->velocity);
+	m_clients[user_id].set_user_yaw(packet->yaw);
+
 	for (auto ptr = m_clients[user_id].view_list.begin(); ptr != m_clients[user_id].view_list.end(); ++ptr)
-		send_move_packet(*ptr, packet->pos);
+		send_move_packet(*ptr, user_id, packet->position);
 }
 
 void cGameServer::Process_Chat(const int user_id, void* buff)
@@ -326,6 +334,8 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 			m_clients[user_id].set_state(ST_GAMEROOM);
 			m_clients[user_id].room_list.insert(rl.in_player.begin(), rl.in_player.end());
 			send_join_room_success_packet(user_id);
+
+			// ÀÌÁ¦ ¿©±â¿¡ ±× ¹æ¿¡ Á¸ÀçÇÏ´Â ¸ðµç »ç¶÷¿¡°Ô ´©°¡ Á¢¼ÓÇß´ÂÁö Á¤º¸¸¦ Àü´ÞÇØ¾ßÇÔ!
 		}
 
 		else
@@ -437,8 +447,6 @@ void cGameServer::send_chat_packet(const unsigned int user_id, const unsigned in
 	packet.type = SC_PACKET::SC_PACKET_CHAT;
 	strcpy_s(packet.message, mess);
 
-	cout << "chat packet size : " << sizeof(packet) << endl;
-	cout << "chat send : " << user_id << endl;
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 
@@ -510,15 +518,19 @@ void cGameServer::send_join_room_fail_packet(const unsigned int user_id)
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 
-void cGameServer::send_move_packet(const unsigned int user_id, Position pos)
+void cGameServer::send_move_packet(const unsigned int id, const unsigned int moved_id, XMFLOAT3 pos)
 {
-	sc_packet_move packet;
+	sc_update_user_packet packet;
 
 	packet.size = sizeof(packet);
-	packet.type = SC_PACKET::SC_MOVING;
+	packet.type = SC_PACKET::SC_USER_UPDATE;
 	
-	m_clients[user_id].do_send(sizeof(packet), &packet);
-
+	packet.data.id = moved_id;
+	packet.data.position = m_clients[moved_id].get_user_position();
+	packet.data.velocity = m_clients[moved_id].get_user_velocity();
+	packet.data.yaw = m_clients[moved_id].get_user_yaw();
+	packet.data.active;
+	m_clients[id].do_send(sizeof(packet), &packet);
 }
 //============================================================================
 
