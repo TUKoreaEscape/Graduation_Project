@@ -311,7 +311,7 @@ void cGameServer::Process_Chat(const int user_id, void* buff)
 
 	for (int i = 0; i < 6; ++i)
 	{
-		if (rl.Get_Join_Member(i) != -1)
+		if (rl.Get_Join_Member(i) != -1 && rl.Get_Join_Member(i) != user_id)
 			send_chat_packet(rl.Get_Join_Member(i), user_id, mess);
 	}
 }
@@ -339,7 +339,6 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 
 			for (int i = 0; i < 6; ++i)
 			{
-				cout << "이건 왜? : " << rl.Get_Join_Member(i) << endl;
 				if (rl.Get_Join_Member(i) != -1 && rl.Get_Join_Member(i) != user_id)
 				{
 					m_clients[user_id]._room_list_lock.lock();
@@ -354,12 +353,10 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 			{
 				if (rl.Get_Join_Member(i) != -1 && rl.Get_Join_Member(i) != user_id) 
 				{
-					cout << "insert 차례 : " << rl.Get_Join_Member(i) << endl;
 					m_clients[rl.Get_Join_Member(i)]._room_list_lock.lock();
 					m_clients[rl.Get_Join_Member(i)].room_list.insert(user_id);
 					m_clients[rl.Get_Join_Member(i)]._room_list_lock.unlock();
 				}
-				cout << "아니 이게터짐" << endl;
 			}
 
 			send_join_room_success_packet(user_id);

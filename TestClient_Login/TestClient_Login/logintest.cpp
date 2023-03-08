@@ -14,7 +14,7 @@ SOCKET g_s_socket;
 thread g_net_recv_Thread;
 thread g_net_send_Thread;
 
-void SendPacket(int cl, void* packet)
+void SendPacket(void* packet)
 {
 	int psize = reinterpret_cast<unsigned char*>(packet)[0];
 	int ptype = reinterpret_cast<unsigned char*>(packet)[1];
@@ -178,7 +178,7 @@ void Login_Test()
 	packet.type = CS_PACKET::CS_LOGIN;
 	packet.size = sizeof(packet);
 
-	SendPacket(0, &packet);
+	SendPacket(&packet);
 }
 
 void CreateID_Test()
@@ -194,7 +194,7 @@ void CreateID_Test()
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET::CS_CREATE_ID;
 
-	SendPacket(0, &packet);
+	SendPacket(&packet);
 }
 
 void Create_Room_Test()
@@ -203,7 +203,7 @@ void Create_Room_Test()
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET::CS_PACKET_CREATE_ROOM;
 
-	SendPacket(0, &packet);
+	SendPacket(&packet);
 }
 
 void Request_Room_Info_Test()
@@ -213,7 +213,7 @@ void Request_Room_Info_Test()
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET::CS_PACKET_REQUEST_ROOM_INFO;
 
-	SendPacket(0, &packet);
+	SendPacket(&packet);
 }
 
 void Join_Room_Test()
@@ -227,7 +227,7 @@ void Join_Room_Test()
 	packet.type = CS_PACKET::CS_PACKET_JOIN_ROOM;
 	packet.room_number = room_number;
 
-	SendPacket(0, &packet);
+	SendPacket(&packet);
 }
 
 void Exit_Room_Test()
@@ -237,7 +237,7 @@ void Exit_Room_Test()
 	packet.type = CS_PACKET::CS_PACKET_EXIT_ROOM;
 	packet.request_page = 0;
 
-	SendPacket(0, &packet);
+	SendPacket(&packet);
 }
 
 void Chat_Test()
@@ -250,7 +250,7 @@ void Chat_Test()
 	packet.room_number = 0;
 
 
-	SendPacket(0, &packet);
+	SendPacket(&packet);
 }
 
 void Move_Test()
@@ -263,21 +263,24 @@ void Move_Test()
 	packet.velocity = { 1,1,1 };
 	packet.yaw = 0.3f;
 
-	SendPacket(0, &packet);
+	SendPacket(&packet);
 }
 
 void Stress_Test()
 {
-	cs_packet_chat packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET::CS_PACKET_CHAT;
-	char mess[100]{ "test" };
+	while (true)
+	{
+		cs_packet_move packet;
 
-	strcpy_s(packet.message, mess);
+		packet.size = sizeof(packet);
+		packet.type = CS_PACKET::CS_MOVE;
+		packet.position = { 0,0,0 };
+		packet.velocity = { 1,1,1 };
+		packet.yaw = 0.3f;
 
-	packet.room_number = 0;
-
-	SendPacket(0, &packet);
+		SendPacket(&packet);
+		this_thread::sleep_for(std::chrono::milliseconds(1));
+	}
 }
 void Send_Packet()
 {
@@ -319,6 +322,8 @@ void Send_Packet()
 			Chat_Test();
 		else if (test_code == 8)
 			Move_Test();
+		else if (test_code == 9)
+			Stress_Test();
 
 		this_thread::sleep_for(std::chrono::seconds(1));
 		system("cls");
