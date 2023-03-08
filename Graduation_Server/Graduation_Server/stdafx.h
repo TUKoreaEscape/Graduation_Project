@@ -18,6 +18,10 @@
 #include <mutex>
 #include <bitset>
 #include <locale.h>
+#include <random>
+#include <ctime>
+#include <functional>
+#include <chrono>
 #include "EXPOver.h"
 
 // Windows 헤더 파일:

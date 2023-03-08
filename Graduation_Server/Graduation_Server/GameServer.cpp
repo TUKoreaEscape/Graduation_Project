@@ -25,6 +25,8 @@ void cGameServer::init()
 	m_room_manager = new RoomManager;
 	m_room_manager->init();
 	m_room_manager->init_object();
+
+	m_PerformanceCounter.reset();
 }
 
 void cGameServer::StartServer()
@@ -35,8 +37,12 @@ void cGameServer::StartServer()
 	for (int i = 0; i < 12; ++i)
 		m_worker_threads.emplace_back(std::thread(&cGameServer::WorkerThread, this));
 
+	m_timer_thread.emplace_back(std::thread(&cGameServer::Update_Session, this));
 	for (auto& worker : m_worker_threads)
 		worker.join();
+	
+	for (auto& timer_worker : m_timer_thread)
+		timer_worker.join();
 }
 
 void cGameServer::WorkerThread()
@@ -185,10 +191,27 @@ void cGameServer::Disconnect(const unsigned int _user_id) // ≈¨∂Û¿Ãæ∆Æ ø¨∞·¿ª «
 	closesocket(cl._socket);
 }
 
-void cGameServer::Update_Session(const int room_number, CLIENT& cl)
+void cGameServer::Update_Session()
 {
-	Room& rl = *m_room_manager->Get_Room_Info(room_number);
-
+	while (true)
+	{
+		if (m_PerformanceCounter.Frame_Limit(1.f)) // √ ¥Á 1π¯ æ˜µ•¿Ã∆Æ!
+		{
+			//cout << "Update Session!" << endl;
+			for (int i = 0; i < MAX_ROOM; ++i)
+			{
+				Room& rl = *m_room_manager->Get_Room_Info(i);
+				rl._room_state_lock.lock();
+				if (rl._room_state == GAME_ROOM_STATE::FREE || rl._room_state == GAME_ROOM_STATE::READY)
+				{
+					rl._room_state_lock.unlock();
+					continue;
+				}
+				rl._room_state_lock.unlock();
+				rl.Update_room_time();
+			}
+		}
+	}
 }
 
 //============================================================================
@@ -375,6 +398,17 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 		cl_room.Exit_Player(user_id);
 		m_clients[user_id].set_join_room_number(-1);
 		m_clients[user_id].set_state(ST_LOBBY);
+
+		for (auto& p : m_clients[user_id].room_list)
+		{
+			m_clients[p]._room_list_lock.lock();
+			m_clients[p].room_list.erase(m_clients[p].room_list.find(user_id));
+			m_clients[p]._room_list_lock.unlock();
+		}
+
+		m_clients[user_id]._room_list_lock.lock();
+		m_clients[user_id].room_list.clear();
+		m_clients[user_id]._room_list_lock.unlock();
 
 		// πÊ¿ª ≥™∞°∏È ∑Œ∫Ò¿Ãπ«∑Œ πÊ ¡§∫∏µÈ¿ª ¥ŸΩ√ ∫∏≥ª¡‡æﬂ«‘!
 		sc_packet_request_room_info send_packet;
