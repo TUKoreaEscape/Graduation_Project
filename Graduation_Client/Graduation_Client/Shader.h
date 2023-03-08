@@ -2,12 +2,14 @@
 #include "GameObject.h"
 #include "Camera.h"
 
-class Shader
+class Shader : Component
 {
 public:
 	Shader();
 	virtual ~Shader();
 
+	virtual void start() = 0;
+	virtual void update(float elapsedTime) = 0;
 private:
 	int									m_nReferences = 0;
 
@@ -52,89 +54,88 @@ protected:
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC	m_d3dPipelineStateDesc;
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////
+//class TerrainShader : public Shader
+//{
+//public:
+//	TerrainShader();
+//	virtual ~TerrainShader();
 //
-class TerrainShader : public Shader
-{
-public:
-	TerrainShader();
-	virtual ~TerrainShader();
-
-	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
-
-	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
-	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
 //
-class SkyBoxShader : public Shader
-{
-public:
-	SkyBoxShader();
-	virtual ~SkyBoxShader();
-
-	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
-	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
-
-	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
-	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
+//	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
+//};
 //
-class StandardShader : public Shader
-{
-public:
-	StandardShader();
-	virtual ~StandardShader();
-
-	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
-
-	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
-	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////
+//class SkyBoxShader : public Shader
+//{
+//public:
+//	SkyBoxShader();
+//	virtual ~SkyBoxShader();
 //
-class ObjectsShader : public StandardShader
-{
-public:
-	ObjectsShader();
-	virtual ~ObjectsShader();
-
-	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext = NULL);
-	virtual void AnimateObjects(float fTimeElapsed);
-	virtual void ReleaseObjects();
-
-	virtual void ReleaseUploadBuffers();
-
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera);
-
-protected:
-	GameObject** m_ppObjects = 0;
-	int								m_nObjects = 0;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
+//	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
 //
-class PlayerShader : public StandardShader
-{
-public:
-	PlayerShader();
-	virtual ~PlayerShader();
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
+//	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
+//};
 //
-class SkinnedAnimationShader : public StandardShader
-{
-public:
-	SkinnedAnimationShader();
-	virtual ~SkinnedAnimationShader();
-
-	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
-
-	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
-};
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////
+//class StandardShader : public Shader
+//{
+//public:
+//	StandardShader();
+//	virtual ~StandardShader();
+//
+//	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
+//
+//	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
+//	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
+//};
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////
+//class ObjectsShader : public StandardShader
+//{
+//public:
+//	ObjectsShader();
+//	virtual ~ObjectsShader();
+//
+//	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext = NULL);
+//	virtual void AnimateObjects(float fTimeElapsed);
+//	virtual void ReleaseObjects();
+//
+//	virtual void ReleaseUploadBuffers();
+//
+//	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera);
+//
+//protected:
+//	GameObject** m_ppObjects = 0;
+//	int								m_nObjects = 0;
+//};
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////
+//class PlayerShader : public StandardShader
+//{
+//public:
+//	PlayerShader();
+//	virtual ~PlayerShader();
+//};
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////
+//class SkinnedAnimationShader : public StandardShader
+//{
+//public:
+//	SkinnedAnimationShader();
+//	virtual ~SkinnedAnimationShader();
+//
+//	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
+//
+//	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
+//};

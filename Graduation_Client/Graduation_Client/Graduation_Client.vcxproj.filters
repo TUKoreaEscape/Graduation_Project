@@ -93,6 +93,18 @@
     <ClInclude Include="Animation.h">
       <Filter>Engine\Framework</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Engine\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dx12.h">
+      <Filter>Engine\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Client\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Client\Component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -145,6 +157,15 @@
     </ClCompile>
     <ClCompile Include="Animation.cpp">
       <Filter>Engine\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Engine\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Client\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Client\Component</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

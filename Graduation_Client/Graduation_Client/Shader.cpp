@@ -1,18 +1,18 @@
 #include "stdafx.h"
 #include "Shader.h"
 
-Shader::Shader()
+ShaderComponent::ShaderComponent()
 {
 }
 
-Shader::~Shader()
+ShaderComponent::~ShaderComponent()
 {
 	ReleaseShaderVariables();
 
 	if (m_pd3dPipelineState) m_pd3dPipelineState->Release();
 }
 
-D3D12_SHADER_BYTECODE Shader::CreateVertexShader()
+D3D12_SHADER_BYTECODE ShaderComponent::CreateVertexShader()
 {
 	D3D12_SHADER_BYTECODE d3dShaderByteCode;
 	d3dShaderByteCode.BytecodeLength = 0;
@@ -21,7 +21,7 @@ D3D12_SHADER_BYTECODE Shader::CreateVertexShader()
 	return(d3dShaderByteCode);
 }
 
-D3D12_SHADER_BYTECODE Shader::CreatePixelShader()
+D3D12_SHADER_BYTECODE ShaderComponent::CreatePixelShader()
 {
 	D3D12_SHADER_BYTECODE d3dShaderByteCode;
 	d3dShaderByteCode.BytecodeLength = 0;
@@ -30,7 +30,7 @@ D3D12_SHADER_BYTECODE Shader::CreatePixelShader()
 	return(d3dShaderByteCode);
 }
 
-D3D12_SHADER_BYTECODE Shader::CompileShaderFromFile(WCHAR* pszFileName, LPCSTR pszShaderName, LPCSTR pszShaderProfile, ID3DBlob** ppd3dShaderBlob)
+D3D12_SHADER_BYTECODE ShaderComponent::CompileShaderFromFile(WCHAR* pszFileName, LPCSTR pszShaderName, LPCSTR pszShaderProfile, ID3DBlob** ppd3dShaderBlob)
 {
 	UINT nCompileFlags = 0;
 #if defined(_DEBUG)
@@ -59,7 +59,7 @@ D3D12_SHADER_BYTECODE Shader::CompileShaderFromFile(WCHAR* pszFileName, LPCSTR p
 #include <sstream>
 #endif
 
-D3D12_SHADER_BYTECODE Shader::ReadCompiledShaderFromFile(WCHAR* pszFileName, ID3DBlob** ppd3dShaderBlob)
+D3D12_SHADER_BYTECODE ShaderComponent::ReadCompiledShaderFromFile(WCHAR* pszFileName, ID3DBlob** ppd3dShaderBlob)
 {
 	UINT nReadBytes = 0;
 #ifdef _WITH_WFOPEN
@@ -100,7 +100,7 @@ D3D12_SHADER_BYTECODE Shader::ReadCompiledShaderFromFile(WCHAR* pszFileName, ID3
 	return(d3dShaderByteCode);
 }
 
-D3D12_INPUT_LAYOUT_DESC Shader::CreateInputLayout()
+D3D12_INPUT_LAYOUT_DESC ShaderComponent::CreateInputLayout()
 {
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	d3dInputLayoutDesc.pInputElementDescs = NULL;
@@ -109,7 +109,7 @@ D3D12_INPUT_LAYOUT_DESC Shader::CreateInputLayout()
 	return(d3dInputLayoutDesc);
 }
 
-D3D12_RASTERIZER_DESC Shader::CreateRasterizerState()
+D3D12_RASTERIZER_DESC ShaderComponent::CreateRasterizerState()
 {
 	D3D12_RASTERIZER_DESC d3dRasterizerDesc;
 	::ZeroMemory(&d3dRasterizerDesc, sizeof(D3D12_RASTERIZER_DESC));
@@ -129,7 +129,7 @@ D3D12_RASTERIZER_DESC Shader::CreateRasterizerState()
 	return(d3dRasterizerDesc);
 }
 
-D3D12_DEPTH_STENCIL_DESC Shader::CreateDepthStencilState()
+D3D12_DEPTH_STENCIL_DESC ShaderComponent::CreateDepthStencilState()
 {
 	D3D12_DEPTH_STENCIL_DESC d3dDepthStencilDesc;
 	::ZeroMemory(&d3dDepthStencilDesc, sizeof(D3D12_DEPTH_STENCIL_DESC));
@@ -151,7 +151,7 @@ D3D12_DEPTH_STENCIL_DESC Shader::CreateDepthStencilState()
 	return(d3dDepthStencilDesc);
 }
 
-D3D12_BLEND_DESC Shader::CreateBlendState()
+D3D12_BLEND_DESC ShaderComponent::CreateBlendState()
 {
 	D3D12_BLEND_DESC d3dBlendDesc;
 	::ZeroMemory(&d3dBlendDesc, sizeof(D3D12_BLEND_DESC));
@@ -171,7 +171,7 @@ D3D12_BLEND_DESC Shader::CreateBlendState()
 	return(d3dBlendDesc);
 }
 
-void Shader::CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
+void ShaderComponent::CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
 	::ZeroMemory(&m_d3dPipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 	m_d3dPipelineStateDesc.pRootSignature = pd3dGraphicsRootSignature;
@@ -197,315 +197,311 @@ void Shader::CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	if (m_d3dPipelineStateDesc.InputLayout.pInputElementDescs) delete[] m_d3dPipelineStateDesc.InputLayout.pInputElementDescs;
 }
 
-void Shader::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList, int nPipelineState)
+void ShaderComponent::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList, int nPipelineState)
 {
 	if (m_pd3dPipelineState) pd3dCommandList->SetPipelineState(m_pd3dPipelineState);
 }
 
-void Shader::Render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera)
+void ShaderComponent::Render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera)
 {
 	OnPrepareRender(pd3dCommandList);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////
+//TerrainShaderComponent::TerrainShaderComponent()
+//{
+//}
 //
-TerrainShader::CTerrainShader()
-{
-}
-
-TerrainShader::~CTerrainShader()
-{
-}
-
-D3D12_INPUT_LAYOUT_DESC TerrainShader::CreateInputLayout()
-{
-	UINT nInputElementDescs = 4;
-	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
-
-	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[1] = { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[2] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 2, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[3] = { "TEXCOORD", 1, DXGI_FORMAT_R32G32_FLOAT, 3, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-
-	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
-	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
-	d3dInputLayoutDesc.NumElements = nInputElementDescs;
-
-	return(d3dInputLayoutDesc);
-}
-
-D3D12_SHADER_BYTECODE TerrainShader::CreateVertexShader()
-{
-	return(Shader::CompileShaderFromFile(L"Shaders.hlsl", "VSTerrain", "vs_5_1", &m_pd3dVertexShaderBlob));
-}
-
-D3D12_SHADER_BYTECODE TerrainShader::CreatePixelShader()
-{
-	return(Shader::CompileShaderFromFile(L"Shaders.hlsl", "PSTerrain", "ps_5_1", &m_pd3dPixelShaderBlob));
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//TerrainShaderComponent::~TerrainShaderComponent()
+//{
+//}
 //
-SkyBoxShader::CSkyBoxShader()
-{
-}
-
-SkyBoxShader::~CSkyBoxShader()
-{
-}
-
-D3D12_INPUT_LAYOUT_DESC SkyBoxShader::CreateInputLayout()
-{
-	UINT nInputElementDescs = 1;
-	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
-
-	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-
-	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
-	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
-	d3dInputLayoutDesc.NumElements = nInputElementDescs;
-
-	return(d3dInputLayoutDesc);
-}
-
-D3D12_DEPTH_STENCIL_DESC SkyBoxShader::CreateDepthStencilState()
-{
-	D3D12_DEPTH_STENCIL_DESC d3dDepthStencilDesc;
-	d3dDepthStencilDesc.DepthEnable = FALSE;
-	d3dDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-	d3dDepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_NEVER;
-	d3dDepthStencilDesc.StencilEnable = FALSE;
-	d3dDepthStencilDesc.StencilReadMask = 0xff;
-	d3dDepthStencilDesc.StencilWriteMask = 0xff;
-	d3dDepthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-	d3dDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_INCR;
-	d3dDepthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
-	d3dDepthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
-	d3dDepthStencilDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-	d3dDepthStencilDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_DECR;
-	d3dDepthStencilDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
-	d3dDepthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
-
-	return(d3dDepthStencilDesc);
-}
-
-D3D12_SHADER_BYTECODE SkyBoxShader::CreateVertexShader()
-{
-	return(Shader::CompileShaderFromFile(L"Shaders.hlsl", "VSSkyBox", "vs_5_1", &m_pd3dVertexShaderBlob));
-}
-
-D3D12_SHADER_BYTECODE SkyBoxShader::CreatePixelShader()
-{
-	return(Shader::CompileShaderFromFile(L"Shaders.hlsl", "PSSkyBox", "ps_5_1", &m_pd3dPixelShaderBlob));
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//D3D12_INPUT_LAYOUT_DESC TerrainShaderComponent::CreateInputLayout()
+//{
+//	UINT nInputElementDescs = 4;
+//	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
 //
-StandardShader::CStandardShader()
-{
-}
-
-StandardShader::~CStandardShader()
-{
-}
-
-D3D12_INPUT_LAYOUT_DESC StandardShader::CreateInputLayout()
-{
-	UINT nInputElementDescs = 5;
-	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
-
-	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[1] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[2] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 2, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[3] = { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 3, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[4] = { "BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 4, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-
-	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
-	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
-	d3dInputLayoutDesc.NumElements = nInputElementDescs;
-
-	return(d3dInputLayoutDesc);
-}
-
-D3D12_SHADER_BYTECODE StandardShader::CreateVertexShader()
-{
-	return(Shader::CompileShaderFromFile(L"Shaders.hlsl", "VSStandard", "vs_5_1", &m_pd3dVertexShaderBlob));
-}
-
-D3D12_SHADER_BYTECODE StandardShader::CreatePixelShader()
-{
-	return(Shader::CompileShaderFromFile(L"Shaders.hlsl", "PSStandard", "ps_5_1", &m_pd3dPixelShaderBlob));
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//	pd3dInputElementDescs[1] = { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//	pd3dInputElementDescs[2] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 2, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//	pd3dInputElementDescs[3] = { "TEXCOORD", 1, DXGI_FORMAT_R32G32_FLOAT, 3, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 //
-SkinnedAnimationShader::CSkinnedAnimationShader()
-{
-}
-
-SkinnedAnimationShader::~CSkinnedAnimationShader()
-{
-}
-
-D3D12_INPUT_LAYOUT_DESC SkinnedAnimationShader::CreateInputLayout()
-{
-	UINT nInputElementDescs = 7;
-	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
-
-	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[1] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[2] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 2, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[3] = { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 3, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[4] = { "BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 4, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[5] = { "BONEINDEX", 0, DXGI_FORMAT_R32G32B32A32_UINT, 5, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[6] = { "BONEWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 6, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-
-	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
-	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
-	d3dInputLayoutDesc.NumElements = nInputElementDescs;
-
-	return(d3dInputLayoutDesc);
-}
-
-D3D12_SHADER_BYTECODE SkinnedAnimationShader::CreateVertexShader()
-{
-	return(Shader::CompileShaderFromFile(L"Shaders.hlsl", "VSSkinnedAnimationStandard", "vs_5_1", &m_pd3dVertexShaderBlob));
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
+//	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+//	d3dInputLayoutDesc.NumElements = nInputElementDescs;
 //
-ObjectsShader::CObjectsShader()
-{
-}
-
-ObjectsShader::~CObjectsShader()
-{
-}
-
-float Random(float fMin, float fMax)
-{
-	float fRandomValue = (float)rand();
-	if (fRandomValue < fMin) fRandomValue = fMin;
-	if (fRandomValue > fMax) fRandomValue = fMax;
-	return(fRandomValue);
-}
-
-float Random()
-{
-	return(rand() / float(RAND_MAX));
-}
-
-XMFLOAT3 RandomPositionInSphere(XMFLOAT3 xmf3Center, float fRadius, int nColumn, int nColumnSpace)
-{
-	float fAngle = Random() * 360.0f * (2.0f * 3.14159f / 360.0f);
-
-	XMFLOAT3 xmf3Position;
-	xmf3Position.x = xmf3Center.x + fRadius * sin(fAngle);
-	xmf3Position.y = xmf3Center.y - (nColumn * float(nColumnSpace) / 2.0f) + (nColumn * nColumnSpace) + Random();
-	xmf3Position.z = xmf3Center.z + fRadius * cos(fAngle);
-
-	return(xmf3Position);
-}
-
-void ObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext)
-{
-	m_nObjects = 40;
-	m_ppObjects = new CGameObject * [m_nObjects];
-
-	CGameObject* pSuperCobraModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/SuperCobra.bin", this, false);
-	CGameObject* pGunshipModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Gunship.bin", this, false);
-
-	int nColumnSpace = 5, nColumnSize = 30;
-	int nFirstPassColumnSize = (m_nObjects % nColumnSize) > 0 ? (nColumnSize - 1) : nColumnSize;
-
-	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
-
-	int nObjects = 0;
-	for (int h = 0; h < nFirstPassColumnSize; h++)
-	{
-		for (int i = 0; i < floor(float(m_nObjects) / float(nColumnSize)); i++)
-		{
-			if (nObjects % 2)
-			{
-				m_ppObjects[nObjects] = new SuperCobraObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
-				m_ppObjects[nObjects]->SetChild(pSuperCobraModel, true);
-			}
-			else
-			{
-				m_ppObjects[nObjects] = new GunshipObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
-				m_ppObjects[nObjects]->SetChild(pGunshipModel, true);
-			}
-			float fHeight = pTerrain->GetHeight(390.0f, 670.0f);
-			XMFLOAT3 xmf3Position = RandomPositionInSphere(XMFLOAT3(390.0f, fHeight + 35.0f, 670.0f), Random(20.0f, 100.0f), h - int(floor(nColumnSize / 2.0f)), nColumnSpace);
-			xmf3Position.y = pTerrain->GetHeight(xmf3Position.x, xmf3Position.z) + Random(0.0f, 25.0f);
-			m_ppObjects[nObjects]->SetPosition(xmf3Position);
-			m_ppObjects[nObjects]->Rotate(0.0f, 90.0f, 0.0f);
-			m_ppObjects[nObjects++]->OnPrepareAnimate();
-		}
-	}
-
-	if (nFirstPassColumnSize != nColumnSize)
-	{
-		for (int i = 0; i < m_nObjects - int(floor(float(m_nObjects) / float(nColumnSize)) * nFirstPassColumnSize); i++)
-		{
-			if (nObjects % 2)
-			{
-				m_ppObjects[nObjects] = new SuperCobraObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
-				m_ppObjects[nObjects]->SetChild(pSuperCobraModel, true);
-			}
-			else
-			{
-				m_ppObjects[nObjects] = new GunshipObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
-				m_ppObjects[nObjects]->SetChild(pGunshipModel, true);
-			}
-			m_ppObjects[nObjects]->SetPosition(RandomPositionInSphere(XMFLOAT3(0.0f, 0.0f, 0.0f), Random(20.0f, 100.0f), nColumnSize - int(floor(nColumnSize / 2.0f)), nColumnSpace));
-			m_ppObjects[nObjects]->Rotate(0.0f, 90.0f, 0.0f);
-			m_ppObjects[nObjects++]->OnPrepareAnimate();
-		}
-	}
-
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-}
-
-void ObjectsShader::ReleaseObjects()
-{
-	if (m_ppObjects)
-	{
-		for (int j = 0; j < m_nObjects; j++) if (m_ppObjects[j]) m_ppObjects[j]->Release();
-		delete[] m_ppObjects;
-	}
-}
-
-void ObjectsShader::AnimateObjects(float fTimeElapsed)
-{
-}
-
-void ObjectsShader::ReleaseUploadBuffers()
-{
-	for (int j = 0; j < m_nObjects; j++) if (m_ppObjects[j]) m_ppObjects[j]->ReleaseUploadBuffers();
-}
-
-void ObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera)
-{
-	Shader::Render(pd3dCommandList, pCamera);
-
-	for (int j = 0; j < m_nObjects; j++)
-	{
-		if (m_ppObjects[j])
-		{
-			m_ppObjects[j]->Animate(0.16f);
-			m_ppObjects[j]->UpdateTransform(NULL);
-			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
-		}
-	}
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	return(d3dInputLayoutDesc);
+//}
 //
-PlayerShader::PlayerShader()
-{
-}
-
-PlayerShader::~PlayerShader()
-{
-}
+//D3D12_SHADER_BYTECODE TerrainShaderComponent::CreateVertexShader()
+//{
+//	return(ShaderComponent::CompileShaderFromFile(L"Shaders.hlsl", "VSTerrain", "vs_5_1", &m_pd3dVertexShaderBlob));
+//}
+//
+//D3D12_SHADER_BYTECODE TerrainShaderComponent::CreatePixelShader()
+//{
+//	return(ShaderComponent::CompileShaderFromFile(L"Shaders.hlsl", "PSTerrain", "ps_5_1", &m_pd3dPixelShaderBlob));
+//}
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////
+//SkyBoxShaderComponent::SkyBoxShaderComponent()
+//{
+//}
+//
+//SkyBoxShaderComponent::~SkyBoxShaderComponent()
+//{
+//}
+//
+//D3D12_INPUT_LAYOUT_DESC SkyBoxShaderComponent::CreateInputLayout()
+//{
+//	UINT nInputElementDescs = 1;
+//	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
+//
+//	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//
+//	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
+//	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+//	d3dInputLayoutDesc.NumElements = nInputElementDescs;
+//
+//	return(d3dInputLayoutDesc);
+//}
+//
+//D3D12_DEPTH_STENCIL_DESC SkyBoxShaderComponent::CreateDepthStencilState()
+//{
+//	D3D12_DEPTH_STENCIL_DESC d3dDepthStencilDesc;
+//	d3dDepthStencilDesc.DepthEnable = FALSE;
+//	d3dDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+//	d3dDepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_NEVER;
+//	d3dDepthStencilDesc.StencilEnable = FALSE;
+//	d3dDepthStencilDesc.StencilReadMask = 0xff;
+//	d3dDepthStencilDesc.StencilWriteMask = 0xff;
+//	d3dDepthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+//	d3dDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_INCR;
+//	d3dDepthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+//	d3dDepthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+//	d3dDepthStencilDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+//	d3dDepthStencilDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_DECR;
+//	d3dDepthStencilDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+//	d3dDepthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+//
+//	return(d3dDepthStencilDesc);
+//}
+//
+//D3D12_SHADER_BYTECODE SkyBoxShaderComponent::CreateVertexShader()
+//{
+//	return(ShaderComponent::CompileShaderFromFile(L"Shaders.hlsl", "VSSkyBox", "vs_5_1", &m_pd3dVertexShaderBlob));
+//}
+//
+//D3D12_SHADER_BYTECODE SkyBoxShaderComponent::CreatePixelShader()
+//{
+//	return(ShaderComponent::CompileShaderFromFile(L"Shaders.hlsl", "PSSkyBox", "ps_5_1", &m_pd3dPixelShaderBlob));
+//}
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////
+//StandardShaderComponent::StandardShaderComponent()
+//{
+//}
+//
+//StandardShaderComponent::~StandardShaderComponent()
+//{
+//}
+//
+//D3D12_INPUT_LAYOUT_DESC StandardShaderComponent::CreateInputLayout()
+//{
+//	UINT nInputElementDescs = 5;
+//	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
+//
+//	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//	pd3dInputElementDescs[1] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//	pd3dInputElementDescs[2] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 2, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//	pd3dInputElementDescs[3] = { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 3, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//	pd3dInputElementDescs[4] = { "BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 4, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//
+//	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
+//	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+//	d3dInputLayoutDesc.NumElements = nInputElementDescs;
+//
+//	return(d3dInputLayoutDesc);
+//}
+//
+//D3D12_SHADER_BYTECODE StandardShaderComponent::CreateVertexShader()
+//{
+//	return(ShaderComponent::CompileShaderFromFile(L"Shaders.hlsl", "VSStandard", "vs_5_1", &m_pd3dVertexShaderBlob));
+//}
+//
+//D3D12_SHADER_BYTECODE StandardShaderComponent::CreatePixelShader()
+//{
+//	return(ShaderComponent::CompileShaderFromFile(L"Shaders.hlsl", "PSStandard", "ps_5_1", &m_pd3dPixelShaderBlob));
+//}
+//
+//ObjectsShaderComponent::ObjectsShaderComponent()
+//{
+//}
+//
+//ObjectsShaderComponent::~ObjectsShaderComponent()
+//{
+//}
+//
+//float Random(float fMin, float fMax)
+//{
+//	float fRandomValue = (float)rand();
+//	if (fRandomValue < fMin) fRandomValue = fMin;
+//	if (fRandomValue > fMax) fRandomValue = fMax;
+//	return(fRandomValue);
+//}
+//
+//float Random()
+//{
+//	return(rand() / float(RAND_MAX));
+//}
+//
+//XMFLOAT3 RandomPositionInSphere(XMFLOAT3 xmf3Center, float fRadius, int nColumn, int nColumnSpace)
+//{
+//	float fAngle = Random() * 360.0f * (2.0f * 3.14159f / 360.0f);
+//
+//	XMFLOAT3 xmf3Position;
+//	xmf3Position.x = xmf3Center.x + fRadius * sin(fAngle);
+//	xmf3Position.y = xmf3Center.y - (nColumn * float(nColumnSpace) / 2.0f) + (nColumn * nColumnSpace) + Random();
+//	xmf3Position.z = xmf3Center.z + fRadius * cos(fAngle);
+//
+//	return(xmf3Position);
+//}
+//
+//void ObjectsShaderComponent::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext)
+//{
+//	m_nObjects = 40;
+//	m_ppObjects = new GameObject * [m_nObjects];
+//
+//	GameObject* pSuperCobraModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/SuperCobra.bin", this, false);
+//	GameObject* pGunshipModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Gunship.bin", this, false);
+//
+//	int nColumnSpace = 5, nColumnSize = 30;
+//	int nFirstPassColumnSize = (m_nObjects % nColumnSize) > 0 ? (nColumnSize - 1) : nColumnSize;
+//
+//	HeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
+//
+//	int nObjects = 0;
+//	for (int h = 0; h < nFirstPassColumnSize; h++)
+//	{
+//		for (int i = 0; i < floor(float(m_nObjects) / float(nColumnSize)); i++)
+//		{
+//			if (nObjects % 2)
+//			{
+//				m_ppObjects[nObjects] = new SuperCobraObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+//				m_ppObjects[nObjects]->SetChild(pSuperCobraModel, true);
+//			}
+//			else
+//			{
+//				m_ppObjects[nObjects] = new GunshipObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+//				m_ppObjects[nObjects]->SetChild(pGunshipModel, true);
+//			}
+//			float fHeight = pTerrain->GetHeight(390.0f, 670.0f);
+//			XMFLOAT3 xmf3Position = RandomPositionInSphere(XMFLOAT3(390.0f, fHeight + 35.0f, 670.0f), Random(20.0f, 100.0f), h - int(floor(nColumnSize / 2.0f)), nColumnSpace);
+//			xmf3Position.y = pTerrain->GetHeight(xmf3Position.x, xmf3Position.z) + Random(0.0f, 25.0f);
+//			m_ppObjects[nObjects]->SetPosition(xmf3Position);
+//			m_ppObjects[nObjects]->Rotate(0.0f, 90.0f, 0.0f);
+//			m_ppObjects[nObjects++]->OnPrepareAnimate();
+//		}
+//	}
+//
+//	if (nFirstPassColumnSize != nColumnSize)
+//	{
+//		for (int i = 0; i < m_nObjects - int(floor(float(m_nObjects) / float(nColumnSize)) * nFirstPassColumnSize); i++)
+//		{
+//			if (nObjects % 2)
+//			{
+//				m_ppObjects[nObjects] = new SuperCobraObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+//				m_ppObjects[nObjects]->SetChild(pSuperCobraModel, true);
+//			}
+//			else
+//			{
+//				m_ppObjects[nObjects] = new GunshipObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+//				m_ppObjects[nObjects]->SetChild(pGunshipModel, true);
+//			}
+//			m_ppObjects[nObjects]->SetPosition(RandomPositionInSphere(XMFLOAT3(0.0f, 0.0f, 0.0f), Random(20.0f, 100.0f), nColumnSize - int(floor(nColumnSize / 2.0f)), nColumnSpace));
+//			m_ppObjects[nObjects]->Rotate(0.0f, 90.0f, 0.0f);
+//			m_ppObjects[nObjects++]->OnPrepareAnimate();
+//		}
+//	}
+//
+//	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+//}
+//
+//void ObjectsShaderComponent::ReleaseObjects()
+//{
+//	if (m_ppObjects)
+//	{
+//		for (int j = 0; j < m_nObjects; j++) if (m_ppObjects[j]) m_ppObjects[j]->Release();
+//		delete[] m_ppObjects;
+//	}
+//}
+//
+//void ObjectsShaderComponent::AnimateObjects(float fTimeElapsed)
+//{
+//}
+//
+//void ObjectsShaderComponent::ReleaseUploadBuffers()
+//{
+//	for (int j = 0; j < m_nObjects; j++) if (m_ppObjects[j]) m_ppObjects[j]->ReleaseUploadBuffers();
+//}
+//
+//void ObjectsShaderComponent::Render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera)
+//{
+//	ShaderComponent::Render(pd3dCommandList, pCamera);
+//
+//	for (int j = 0; j < m_nObjects; j++)
+//	{
+//		if (m_ppObjects[j])
+//		{
+//			m_ppObjects[j]->Animate(0.16f);
+//			m_ppObjects[j]->UpdateTransform(NULL);
+//			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+//		}
+//	}
+//}
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////
+//PlayerShaderComponent::PlayerShaderComponent()
+//{
+//}
+//
+//PlayerShaderComponent::~PlayerShaderComponent()
+//{
+//}
+//
+//SkinnedAnimationShaderComponent::SkinnedAnimationShaderComponent()
+//{
+//}
+//
+//SkinnedAnimationShaderComponent::~SkinnedAnimationShaderComponent()
+//{
+//}
+//
+//D3D12_INPUT_LAYOUT_DESC SkinnedAnimationShaderComponent::CreateInputLayout()
+//{
+//	UINT nInputElementDescs = 7;
+//	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
+//
+//	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//	pd3dInputElementDescs[1] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//	pd3dInputElementDescs[2] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 2, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//	pd3dInputElementDescs[3] = { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 3, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//	pd3dInputElementDescs[4] = { "BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 4, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//	pd3dInputElementDescs[5] = { "BONEINDEX", 0, DXGI_FORMAT_R32G32B32A32_UINT, 5, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//	pd3dInputElementDescs[6] = { "BONEWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 6, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//
+//	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
+//	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+//	d3dInputLayoutDesc.NumElements = nInputElementDescs;
+//
+//	return(d3dInputLayoutDesc);
+//}
+//
+//D3D12_SHADER_BYTECODE SkinnedAnimationShaderComponent::CreateVertexShader()
+//{
+//	return(ShaderComponent::CompileShaderFromFile(L"Shaders.hlsl", "VSSkinnedAnimationStandard", "vs_5_1", &m_pd3dVertexShaderBlob));
+//}
