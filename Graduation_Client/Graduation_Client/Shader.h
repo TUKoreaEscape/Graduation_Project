@@ -8,8 +8,8 @@ public:
 	Shader();
 	virtual ~Shader();
 
-	virtual void start() = 0;
-	virtual void update(float elapsedTime) = 0;
+	virtual void start() {};
+	virtual void update(float elapsedTime) {};
 private:
 	int									m_nReferences = 0;
 

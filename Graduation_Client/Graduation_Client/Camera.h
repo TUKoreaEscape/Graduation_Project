@@ -17,7 +17,7 @@ class Player;
 
 class Camera
 {
-protected:
+private:
 	XMFLOAT3						m_xmf3Position;
 	XMFLOAT3						m_xmf3Right;
 	XMFLOAT3						m_xmf3Up;
@@ -44,10 +44,18 @@ protected:
 	ID3D12Resource* m_pd3dcbCamera = NULL;
 	VS_CB_CAMERA_INFO* m_pcbMappedCamera = NULL;
 
-public:
+	static Camera*			CameraInstance;
 	Camera();
-	Camera(Camera* pCamera);
-	virtual ~Camera();
+	Camera(const Camera& other);
+	 ~Camera();
+	//Camera(Camera* pCamera);
+public:
+	static Camera* GetInstance() {
+		if (CameraInstance == NULL) {
+			CameraInstance = new Camera;
+		}
+		return CameraInstance;
+	}
 
 	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void ReleaseShaderVariables();
@@ -102,31 +110,31 @@ public:
 	virtual void SetLookAt(XMFLOAT3& xmf3LookAt) { }
 };
 
-class CSpaceShipCamera : public Camera
-{
-public:
-	CSpaceShipCamera(Camera* pCamera);
-	virtual ~CSpaceShipCamera() { }
-
-	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
-};
-
-class CFirstPersonCamera : public Camera
-{
-public:
-	CFirstPersonCamera(Camera* pCamera);
-	virtual ~CFirstPersonCamera() { }
-
-	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
-};
-
-class CThirdPersonCamera : public Camera
-{
-public:
-	CThirdPersonCamera(Camera* pCamera);
-	virtual ~CThirdPersonCamera() { }
-
-	virtual void Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed);
-	virtual void SetLookAt(XMFLOAT3& vLookAt);
-};
+//class CSpaceShipCamera : public Camera
+//{
+//public:
+//	CSpaceShipCamera(Camera* pCamera);
+//	virtual ~CSpaceShipCamera() { }
+//
+//	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
+//};
+//
+//class CFirstPersonCamera : public Camera
+//{
+//public:
+//	CFirstPersonCamera(Camera* pCamera);
+//	virtual ~CFirstPersonCamera() { }
+//
+//	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
+//};
+//
+//class CThirdPersonCamera : public Camera
+//{
+//public:
+//	CThirdPersonCamera(Camera* pCamera);
+//	virtual ~CThirdPersonCamera() { }
+//
+//	virtual void Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed);
+//	virtual void SetLookAt(XMFLOAT3& vLookAt);
+//};
 

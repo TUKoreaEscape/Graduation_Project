@@ -25,8 +25,8 @@ public:
 	Mesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual ~Mesh();
 
-	virtual void start() = 0;
-	virtual void update(float elapsedTime) = 0;
+	virtual void start() {};
+	virtual void update(float elapsedTime) {};
 
 private:
 	int								m_nReferences = 0;

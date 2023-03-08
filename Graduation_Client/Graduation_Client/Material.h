@@ -3,6 +3,8 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Component.h"
+#include "Object.h"
+#include "GameScene.h"
 
 #define MATERIAL_ALBEDO_MAP			0x01
 #define MATERIAL_SPECULAR_MAP		0x02
@@ -18,8 +20,8 @@ public:
 	Material(int nTextures);
 	virtual ~Material();
 
-	virtual void start() = 0;
-	virtual void update(float elapsedTime) = 0;
+	virtual void start() {};
+	virtual void update(float elapsedTime) {};
 
 private:
 	int								m_nReferences = 0;
@@ -64,7 +66,7 @@ public:
 	static Shader* m_pStandardShader;
 	static Shader* m_pSkinnedAnimationShader;
 
-	static void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
+	static void PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
 
 	void SetStandardShader() { Material::SetShader(m_pStandardShader); }
 	void SetSkinnedAnimationShader() { Material::SetShader(m_pSkinnedAnimationShader); }
