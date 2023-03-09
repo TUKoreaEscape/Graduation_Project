@@ -11,12 +11,14 @@ private:
 	int					Number_of_users = 0;
 	int					remain_user = 6;
 	unsigned char		m_room_name[MAX_NAME_SIZE] {"test\0"};
-
-
-
+	int					m_tagger_id = -1;
+	long long			duration_time;
 
 	array<BoundingOrientedBox, 6>	in_player_bounding_box;
 	vector<GameObject>				m_game_object;
+
+	chrono::system_clock::time_point start_time;
+	chrono::system_clock::time_point now_time;
 
 public:
 	mutex					_room_state_lock;
@@ -44,6 +46,11 @@ public:
 
 	void	Reset_Room();
 	void	Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE room_state);
+
+	void	Start_Game();
+	void	Update_room_time();
+
+	int		Select_Tagger();
 	bool	Join_Player(int user_id);
 	void	Exit_Player(int user_id);
 

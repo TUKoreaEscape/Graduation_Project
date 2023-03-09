@@ -7,6 +7,7 @@
 #include "User_Client.h"
 #include "Room_Manager.h"
 #include "DataBase.h"
+#include "Server_Timer.h"
 
 class EXP_OVER;
 class CLIENT;
@@ -30,7 +31,7 @@ public:
 	void	Send(EXP_OVER* exp_over);
 	void	Recv(EXP_OVER* exp_over, const unsigned int user_id, const DWORD num_byte);
 	void	Disconnect(const unsigned int _user_id);
-	void	Update_Session(const int room_number, CLIENT& cl);
+	void	Update_Session();
 
 	void	send_chat_packet(const unsigned int user_id, const unsigned int my_id, char* mess);
 	void	send_login_fail_packet(const unsigned int user_id, LOGIN_FAIL_REASON::TYPE reason);
@@ -60,10 +61,11 @@ public:
 
 private:
 	std::vector<std::thread>		m_worker_threads;
-	std::thread						m_timer_thread;
+	std::vector<std::thread>		m_timer_thread;
 	
 	std::array<CLIENT, MAX_USER>	m_clients;
 	Voice_Chat						*m_voice_chat = nullptr;
 	RoomManager						*m_room_manager = nullptr;
 	DataBase						*m_database = nullptr;
+	Server_Timer					m_PerformanceCounter;
 };
