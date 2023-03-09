@@ -26,7 +26,7 @@ private:
 	BoundingOrientedBox		m_bounding_box;
 
 public:
-	unordered_set <int> room_list; 
+	unordered_set <int> room_list; // 원래는 같은방에 누가 있는지만 저장하려 했지만 room 클래스 내부에 in_player가 누가 있는지 저장하므로 중복역할...ㅠ
 	unordered_set <int> view_list;
 
 	mutex		_room_list_lock;

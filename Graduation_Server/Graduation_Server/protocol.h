@@ -49,7 +49,6 @@ namespace CS_PACKET
 	};
 }
 
-#pragma pack (push, 1)
 struct UserData {
 	int					id;
 	DirectX::XMFLOAT3	position;
@@ -58,7 +57,7 @@ struct UserData {
 	unsigned char		active;
 };
 
-
+//#pragma pack (push, 1)
 struct Roominfo_by10 {
 	unsigned short				room_number;
 	char						room_name[20];
@@ -230,4 +229,4 @@ struct sc_packet_put_other_client {
 	char			id[MAX_NAME_SIZE];
 };
 
-#pragma pack(pop)
+//#pragma pack(pop)

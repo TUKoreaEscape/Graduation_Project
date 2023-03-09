@@ -78,32 +78,3 @@ void Room::SetBoundingBox(XMFLOAT3 pos)
 		in_player_bounding_box[i] = BoundingOrientedBox{ XMFLOAT3(pos), XMFLOAT3(0,0,0), XMFLOAT4{0,0,0,1} };
 	}
 }
-
-int Room::Select_Tagger()
-{
-	mt19937 engine((unsigned int)time(NULL));
-	uniform_int_distribution<int> distribution(0, Number_of_users);
-
-	auto generator = bind(distribution, engine);
-
-	return generator();
-}
-
-void Room::Start_Game()
-{
-	start_time = chrono::system_clock::now();
-	_room_state = GAME_ROOM_STATE::PLAYING;
-}
-
-void Room::Update_room_time()
-{
-	now_time = chrono::system_clock::now();
-	
-	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 60 && m_tagger_id == -1)
-	{
-		m_tagger_id = in_player[Select_Tagger()];
-		cout << "술래로 player [" << m_tagger_id << "]가 선정되었습니다." << endl;
-	}
-
-	duration_time = std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count();
-}

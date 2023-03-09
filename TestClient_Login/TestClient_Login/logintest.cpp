@@ -9,7 +9,7 @@ using namespace std;
 #pragma comment(lib, "WS2_32.LIB")
 #define BUF_SIZE 512
 
-const char* SERVER_ADDR = "112.170.181.188";
+const char* SERVER_ADDR = "127.0.0.1";
 SOCKET g_s_socket;
 thread g_net_recv_Thread;
 thread g_net_send_Thread;

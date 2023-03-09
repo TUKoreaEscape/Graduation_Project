@@ -78,9 +78,6 @@
     <ClInclude Include="object.h">
       <Filter>소스 파일\06 Object</Filter>
     </ClInclude>
-    <ClInclude Include="Server_Timer.h">
-      <Filter>소스 파일\00 Main</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
