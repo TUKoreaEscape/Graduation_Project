@@ -1,7 +1,7 @@
 #pragma once
 #include <DirectXMath.h>
 // 클라이언트와 서버간 통신에 사용할 구조체를 정의합니다.
-const short SERVER_PORT = 4000;
+const short SERVER_PORT = 5000;
 const int	BUFSIZE = 1024;
 const int	MAX_CHAT_SIZE = 100;
 
@@ -45,11 +45,12 @@ namespace CS_PACKET
 		CS_PACKET_CREATE_ROOM,
 		CS_PACKET_JOIN_ROOM,
 		CS_PACKET_EXIT_ROOM,
+		CS_PACKET_READY,
 		CS_PACKET_REQUEST_ROOM_INFO
 	};
 }
 
-#pragma pack (push, 1)
+//#pragma pack (push, 1)
 struct UserData {
 	int					id;
 	DirectX::XMFLOAT3	position;
@@ -119,6 +120,13 @@ struct cs_packet_join_room {
 	unsigned int	room_number;
 };
 
+struct cs_packet_ready {
+	unsigned char	size;
+	unsigned char	type;
+
+	bool			ready_type;
+};
+
 struct cs_packet_request_exit_room {
 	unsigned char	size;
 	unsigned char	type;
@@ -149,6 +157,7 @@ namespace SC_PACKET
 		SC_PACKET_CHAT,
 		SC_PACKET_JOIN_ROOM_SUCCESS,
 		SC_PACKET_JOIN_ROOM_FAIL,
+		SC_PACKET_GAME_START,
 		SC_PACKET_ROOM_INFO
 	};
 }
@@ -165,12 +174,12 @@ struct sc_packet_login_fail { // 로그인 실패를 클라에게 전송
 	unsigned char   reason;
 };
 
-struct sc_packet_create_id_ok {
+struct sc_packet_create_id_ok { // 아이디 생성 성공을 전송해줌
 	unsigned char	size;
 	unsigned char	type;
 };
 
-struct sc_packet_create_id_fail {
+struct sc_packet_create_id_fail { // 아이디 생성 실패를 전송해줌 (사유코드와 함께)
 	unsigned char	size;
 	unsigned char	type;
 	unsigned char	reason;
@@ -230,4 +239,8 @@ struct sc_packet_put_other_client {
 	char			id[MAX_NAME_SIZE];
 };
 
-#pragma pack(pop)
+struct sc_packet_game_start { // 게임 시작을 방에 있는 플레이어에게 알려줌
+	unsigned char	size;
+	unsigned char	type;
+};
+//#pragma pack(pop)

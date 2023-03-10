@@ -262,6 +262,13 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 			Process_Join_Room(user_id, p);
 		break;
 	}
+
+	case CS_PACKET::CS_PACKET_READY:
+	{
+		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == ST_GAMEROOM)
+			Process_Ready(user_id, p);
+		break;
+	}
 	
 	case CS_PACKET::CS_PACKET_EXIT_ROOM:
 	{
@@ -437,6 +444,25 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 	}
 }
 
+void cGameServer::Process_Ready(const int user_id, void* buff)
+{
+	cs_packet_ready* packet = reinterpret_cast<cs_packet_ready*>(buff);
+
+	Room& rl = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+	cout << "id : " << user_id << "가 ready함" << endl;
+	cout << rl.All_Player_Ready() << endl;
+	rl.SetReady(packet->ready_type, user_id);
+	if (rl.All_Player_Ready())
+	{
+		for (auto p : rl.in_player)
+			send_game_start_packet(p);
+		// 모든 플레이어가 레디가 된 경우 이제 게임을 시작하게 바꿔줘야하는 부분!
+		rl._room_state_lock.lock();
+		rl._room_state = GAME_ROOM_STATE::PLAYING;
+		rl._room_state_lock.unlock();
+	}
+}
+
 void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
 {
 	cs_packet_request_all_room_info* packet = reinterpret_cast<cs_packet_request_all_room_info*>(buff);
@@ -573,6 +599,15 @@ void cGameServer::send_join_room_fail_packet(const unsigned int user_id)
 	packet.type = SC_PACKET::SC_PACKET_JOIN_ROOM_FAIL;
 
 	m_clients[user_id].do_send(sizeof(packet), &packet);
+}
+
+void cGameServer::send_game_start_packet(const unsigned int id)
+{
+	sc_packet_game_start packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_GAME_START;
+
+	m_clients[id].do_send(sizeof(packet), &packet);
 }
 
 void cGameServer::send_move_packet(const unsigned int id, const unsigned int moved_id, XMFLOAT3 pos)

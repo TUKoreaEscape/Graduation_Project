@@ -79,14 +79,32 @@ void Room::SetBoundingBox(XMFLOAT3 pos)
 	}
 }
 
+void Room::SetReady(const bool is_ready, const int user_id)
+{
+	for (int i = 0; i < in_player.size(); ++i)
+	{
+		if (in_player[i] == user_id) {
+			in_player_ready[i] = is_ready;
+			break;
+		}
+	}
+}
+
+bool Room::All_Player_Ready()
+{
+	for (auto p : in_player_ready)
+	{
+		if (p == false)
+			return false;
+	}
+	return true;
+}
+
 int Room::Select_Tagger()
 {
 	mt19937 engine((unsigned int)time(NULL));
-	uniform_int_distribution<int> distribution(0, Number_of_users);
 
-	auto generator = bind(distribution, engine);
-
-	return generator();
+	return engine() % 6;
 }
 
 void Room::Start_Game()

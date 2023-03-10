@@ -20,7 +20,6 @@
 #include <locale.h>
 #include <random>
 #include <ctime>
-#include <functional>
 #include <chrono>
 #include "EXPOver.h"
 

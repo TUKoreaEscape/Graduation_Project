@@ -9,7 +9,7 @@ using namespace std;
 #pragma comment(lib, "WS2_32.LIB")
 #define BUF_SIZE 512
 
-const char* SERVER_ADDR = "112.170.181.188";
+const char* SERVER_ADDR = "127.0.0.1";
 SOCKET g_s_socket;
 thread g_net_recv_Thread;
 thread g_net_send_Thread;
@@ -107,6 +107,12 @@ void ProcessPacket(char* ptr)
 	{
 		sc_update_user_packet* packet = reinterpret_cast<sc_update_user_packet*>(ptr);
 		cout << packet->data.id << "가 이동 pos : (" << packet->data.position.x << ", " << packet->data.yaw << ", " << packet->data.position.z << ") || vel : (" << packet->data.velocity.x << ", " << packet->data.velocity.y << ", " << packet->data.velocity.z << ") || yaw : " << packet->data.yaw << endl;
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_GAME_START:
+	{
+		cout << "모든 플레이어가 준비되어 게임을 시작합니다." << endl;
 		break;
 	}
 
@@ -266,6 +272,17 @@ void Move_Test()
 	SendPacket(&packet);
 }
 
+void Ready_Test()
+{
+	cs_packet_ready packet;
+	
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_READY;
+	packet.ready_type = true;
+
+	SendPacket(&packet);
+}
+
 void Stress_Test()
 {
 	while (true)
@@ -302,6 +319,7 @@ void Send_Packet()
 		cout << "6. 방 나가기 테스트" << endl;
 		cout << "7. 채팅 테스트 (방 접속시에만 가능)" << endl;
 		cout << "8. 이동패킷 전송 테스트" << endl;
+		cout << "9. Ready, 전원Ready시 게임시작 테스트" << endl;
 		cout << "입력 : ";
 		cin >> test_code;
 
@@ -323,7 +341,8 @@ void Send_Packet()
 		else if (test_code == 8)
 			Move_Test();
 		else if (test_code == 9)
-			Stress_Test();
+			Ready_Test();
+
 
 		this_thread::sleep_for(std::chrono::seconds(1));
 		system("cls");
