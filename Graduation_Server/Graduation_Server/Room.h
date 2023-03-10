@@ -25,6 +25,7 @@ public:
 	GAME_ROOM_STATE::TYPE	_room_state;
 	array<int, 6>			in_player; // 방에 들어온 플레이어 id XMFLOAT3 
 	array<bool, 6>			in_player_ready;
+	array<bool, 6>			in_player_loading_success;
 public:
 	Room()
 	{
@@ -46,9 +47,12 @@ public:
 	void	add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation);
 	void	Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE room_state);
 	void	SetReady(const bool is_ready, const int user_id);
+	void	SetLoading(const bool is_loading, const int user_id);
 	void	SetBoundingBox(XMFLOAT3 pos);
 	void	Exit_Player(int user_id);
+
 	void	Update_room_time();
+
 	void	Reset_Room();
 	void	Start_Game();
 
@@ -58,6 +62,7 @@ public:
 
 	bool	Join_Player(int user_id);
 	bool	All_Player_Ready();
+	bool	All_Player_Loading();
 
 	char*	Get_Room_Name(char room_name[], int size);
 };

@@ -6,11 +6,15 @@ void Room::Reset_Room()
 	remain_user = 6;
 	_room_state = GAME_ROOM_STATE::FREE;
 	in_player.fill(-1);
+	in_player_ready.fill(false);
+	in_player_loading_success.fill(false);
 }
 
 void Room::Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE room_state) // <- 방 만들때 in_player가 전부 -1에서 0으로 바뀜 이거 수정해야댐
 {
 	in_player.fill(-1);
+	in_player_ready.fill(false);
+	in_player_loading_success.fill(false);
 	_room_state = room_state;
 	in_player[Number_of_users] = make_player_id;
 	Number_of_users++;
@@ -33,12 +37,15 @@ bool Room::Join_Player(int user_id)
 
 void Room::Exit_Player(int user_id)
 {
-	for (auto& p : in_player)
+	for (int i = 0; i < in_player.size(); ++i)
 	{
-		if (p == user_id) {
-			p = -1;
+		if (in_player[i] == user_id)
+		{
+			in_player[i] = -1;
+			in_player_ready[i] = false;
+			in_player_loading_success[i] = false;
 			Number_of_users -= 1;
-			remain_user = 6 - Number_of_users; 
+			remain_user = 6 - Number_of_users;
 			if (Number_of_users == 0)
 				Reset_Room();
 			break;
@@ -90,9 +97,30 @@ void Room::SetReady(const bool is_ready, const int user_id)
 	}
 }
 
+void Room::SetLoading(const bool is_loading, const int user_id)
+{
+	for (int i = 0; i < in_player_loading_success.size(); ++i)
+	{
+		if (in_player[i] == user_id) {
+			in_player_loading_success[i] = is_loading;
+			break;
+		}
+	}
+}
+
 bool Room::All_Player_Ready()
 {
 	for (auto p : in_player_ready)
+	{
+		if (p == false)
+			return false;
+	}
+	return true;
+}
+
+bool Room::All_Player_Loading()
+{
+	for (auto p : in_player_loading_success)
 	{
 		if (p == false)
 			return false;
@@ -116,7 +144,8 @@ void Room::Start_Game()
 void Room::Update_room_time()
 {
 	now_time = chrono::system_clock::now();
-	
+	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() < 60)
+		cout << "술래가 " << 60 - std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() << "초 후에 결정됩니다." << endl;
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 60 && m_tagger_id == -1)
 	{
 		m_tagger_id = in_player[Select_Tagger()];

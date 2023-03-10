@@ -56,6 +56,7 @@ public:
 	void	Process_Join_Room(const int user_id, void* buff);
 	void	Process_Exit_Room(const int user_id, void* buff);
 	void	Process_Ready(const int user_id, void* buff);
+	void	Process_Game_Start(const int user_id);
 
 	int		get_new_id();
 

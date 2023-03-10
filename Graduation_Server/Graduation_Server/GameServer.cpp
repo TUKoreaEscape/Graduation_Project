@@ -205,10 +205,12 @@ void cGameServer::Update_Session()
 				if (rl._room_state == GAME_ROOM_STATE::FREE || rl._room_state == GAME_ROOM_STATE::READY)
 				{
 					rl._room_state_lock.unlock();
-					continue;
 				}
-				rl._room_state_lock.unlock();
-				rl.Update_room_time();
+				else
+				{
+					rl._room_state_lock.unlock();
+					rl.Update_room_time();
+				}
 			}
 		}
 	}
@@ -280,6 +282,12 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	case CS_PACKET::CS_PACKET_REQUEST_ROOM_INFO:
 	{
 		Process_Request_Room_Info(user_id, p);
+		break;
+	}
+
+	case CS_PACKET::CS_PACKET_GAME_LOADING_SUCCESS:
+	{
+
 		break;
 	}
 
@@ -454,13 +462,24 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 	rl.SetReady(packet->ready_type, user_id);
 	if (rl.All_Player_Ready())
 	{
-		for (auto p : rl.in_player)
+		for (auto p : rl.in_player) {
 			send_game_start_packet(p);
+			m_clients[p]._state_lock.lock();
+			m_clients[p].set_state(ST_INGAME);
+			m_clients[p]._state_lock.unlock();
+		}
 		// 모든 플레이어가 레디가 된 경우 이제 게임을 시작하게 바꿔줘야하는 부분!
 		rl._room_state_lock.lock();
-		rl._room_state = GAME_ROOM_STATE::PLAYING;
 		rl._room_state_lock.unlock();
 	}
+}
+
+void cGameServer::Process_Game_Start(const int user_id)
+{
+	Room& rl = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+	rl.SetLoading(true, user_id);
+	if (rl.All_Player_Loading())
+		rl.Start_Game();
 }
 
 void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
