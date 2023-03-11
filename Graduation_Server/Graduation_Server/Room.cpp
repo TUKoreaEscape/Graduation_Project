@@ -90,10 +90,13 @@ void Room::SetReady(const bool is_ready, const int user_id)
 {
 	for (int i = 0; i < in_player.size(); ++i)
 	{
+		in_player_lock.lock();
 		if (in_player[i] == user_id) {
 			in_player_ready[i] = is_ready;
+			in_player_lock.unlock();
 			break;
 		}
+		in_player_lock.unlock();
 	}
 }
 
@@ -101,10 +104,13 @@ void Room::SetLoading(const bool is_loading, const int user_id)
 {
 	for (int i = 0; i < in_player_loading_success.size(); ++i)
 	{
+		in_player_lock.lock();
 		if (in_player[i] == user_id) {
 			in_player_loading_success[i] = is_loading;
+			in_player_lock.unlock();
 			break;
 		}
+		in_player_lock.unlock();
 	}
 }
 

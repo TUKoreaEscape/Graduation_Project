@@ -287,7 +287,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_PACKET_GAME_LOADING_SUCCESS:
 	{
-
+		Process_Game_Start(user_id);
 		break;
 	}
 

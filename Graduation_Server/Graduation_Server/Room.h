@@ -23,7 +23,9 @@ private:
 public:
 	mutex					_room_state_lock;
 	GAME_ROOM_STATE::TYPE	_room_state;
+
 	array<int, 6>			in_player; // 방에 들어온 플레이어 id XMFLOAT3 
+	mutex					in_player_lock;
 	array<bool, 6>			in_player_ready;
 	array<bool, 6>			in_player_loading_success;
 public:

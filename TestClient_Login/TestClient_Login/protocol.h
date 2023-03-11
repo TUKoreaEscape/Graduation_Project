@@ -46,6 +46,7 @@ namespace CS_PACKET
 		CS_PACKET_JOIN_ROOM,
 		CS_PACKET_EXIT_ROOM,
 		CS_PACKET_READY,
+		CS_PACKET_GAME_LOADING_SUCCESS,
 		CS_PACKET_REQUEST_ROOM_INFO
 	};
 }
@@ -125,6 +126,11 @@ struct cs_packet_ready {
 	unsigned char	type;
 
 	bool			ready_type;
+};
+
+struct cs_packet_loading_success {
+	unsigned char	size;
+	unsigned char	type;
 };
 
 struct cs_packet_request_exit_room {
