@@ -67,9 +67,7 @@ int Room::Get_Join_Member(int data)
 
 char* Room::Get_Room_Name(char room_name[], int size)
 {
-	for (int i = 0; i < size; ++i)
-		room_name[i] = m_room_name[i];
-
+	strcpy_s(room_name, size, m_room_name);
 	return room_name;
 }
 

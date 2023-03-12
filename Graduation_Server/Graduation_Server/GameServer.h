@@ -31,7 +31,7 @@ public:
 	void	Send(EXP_OVER* exp_over);
 	void	Recv(EXP_OVER* exp_over, const unsigned int user_id, const DWORD num_byte);
 	void	Disconnect(const unsigned int _user_id);
-	void	Update_Session();
+	void	Update_Session(); // 방의 시간, 실시간으로 체크해야하는 부분은 여기서 전부 처리 할 예정입니다.
 
 	void	send_chat_packet(const unsigned int user_id, const unsigned int my_id, char* mess);
 	void	send_login_fail_packet(const unsigned int user_id, LOGIN_FAIL_REASON::TYPE reason);

@@ -45,7 +45,12 @@ void CLIENT::do_send(int num_byte, void* mess)
 	delete ex_over;
 }
 
-void CLIENT::set_state(STATE state)
+void CLIENT::set_name(char* name)
+{
+	strcpy_s(_name, MAX_NAME_SIZE, name);
+}
+
+void CLIENT::set_state(CLIENT_STATE::STATE state)
 {
 	_state = state;
 }
@@ -110,7 +115,7 @@ float CLIENT::get_user_yaw()
 	return m_yaw;
 }
 
-STATE CLIENT::get_state()
+CLIENT_STATE::STATE CLIENT::get_state()
 {
 	return _state;
 }
@@ -118,6 +123,11 @@ STATE CLIENT::get_state()
 LOGIN_STATE CLIENT::get_login_state()
 {
 	return _login_state;
+}
+
+void CLIENT::get_client_name(char& name, int size)
+{
+	strcpy_s(&name, size, _name);
 }
 
 void CLIENT::error_display(int error_number)

@@ -51,7 +51,7 @@ namespace CS_PACKET
 	};
 }
 
-//#pragma pack (push, 1)
+#pragma pack (push, 1)
 struct UserData {
 	int					id;
 	DirectX::XMFLOAT3	position;
@@ -232,9 +232,8 @@ struct sc_packet_chat { // 유저간 채팅
 	unsigned char	size;
 	unsigned char	type;
 
-	unsigned int	id;
-
-	char	message[MAX_CHAT_SIZE];
+	char			name[MAX_NAME_SIZE];
+	char			message[MAX_CHAT_SIZE];
 };
 
 struct sc_packet_put_other_client {
@@ -243,10 +242,11 @@ struct sc_packet_put_other_client {
 	unsigned int	user_id;
 
 	char			id[MAX_NAME_SIZE];
+	float			yaw;
 };
 
 struct sc_packet_game_start { // 게임 시작을 방에 있는 플레이어에게 알려줌
 	unsigned char	size;
 	unsigned char	type;
 };
-//#pragma pack(pop)
+#pragma pack(pop)

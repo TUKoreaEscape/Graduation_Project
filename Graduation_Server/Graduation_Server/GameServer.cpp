@@ -184,7 +184,7 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 		rl.Exit_Player(_user_id);	
 	}
 	cl._state_lock.lock();
-	cl.set_state(ST_FREE);
+	cl.set_state(CLIENT_STATE::ST_FREE);
 	cl.set_login_state(N_LOGIN);
 	cl.set_id(-1);
 	cl._state_lock.unlock();
@@ -253,28 +253,28 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_PACKET_CREATE_ROOM:
 	{
-		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == ST_LOBBY) // ·Î±×ÀÎÇÏ°í ·Îºñ¿¡ ÀÖÀ»¶§¸¸ ¹æ »ý¼º °¡´É
+		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY) // ·Î±×ÀÎÇÏ°í ·Îºñ¿¡ ÀÖÀ»¶§¸¸ ¹æ »ý¼º °¡´É
 			Process_Create_Room(user_id);
 		break;
 	}
 
 	case CS_PACKET::CS_PACKET_JOIN_ROOM:
 	{
-		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == ST_LOBBY)
+		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY)
 			Process_Join_Room(user_id, p);
 		break;
 	}
 
 	case CS_PACKET::CS_PACKET_READY:
 	{
-		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == ST_GAMEROOM)
+		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_GAMEROOM)
 			Process_Ready(user_id, p);
 		break;
 	}
 	
 	case CS_PACKET::CS_PACKET_EXIT_ROOM:
 	{
-		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == ST_GAMEROOM)
+		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_GAMEROOM)
 			Process_Exit_Room(user_id, p);
 		break;
 	}
@@ -357,7 +357,7 @@ void cGameServer::Process_Chat(const int user_id, void* buff)
 void cGameServer::Process_Create_Room(const unsigned int _user_id) // ¿äÃ»¹ÞÀº »õ·Î¿î ¹æ »ý¼º
 {
 	m_clients[_user_id].set_join_room_number(m_room_manager->Create_room(_user_id));
-	m_clients[_user_id].set_state(ST_GAMEROOM);
+	m_clients[_user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
 
 	send_create_room_ok_packet(_user_id, m_clients[_user_id].get_join_room_number());
 }
@@ -372,7 +372,7 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 		if (m_room_manager->Join_room(user_id, packet->room_number))
 		{
 			m_clients[user_id].set_join_room_number(packet->room_number);
-			m_clients[user_id].set_state(ST_GAMEROOM);
+			m_clients[user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
 			Room& rl = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
 			for (int i = 0; i < 6; ++i)
@@ -412,7 +412,7 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 		Room& cl_room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 		cl_room.Exit_Player(user_id);
 		m_clients[user_id].set_join_room_number(-1);
-		m_clients[user_id].set_state(ST_LOBBY);
+		m_clients[user_id].set_state(CLIENT_STATE::ST_LOBBY);
 
 		for (auto& p : m_clients[user_id].room_list)
 		{
@@ -465,7 +465,7 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 		for (auto p : rl.in_player) {
 			send_game_start_packet(p);
 			m_clients[p]._state_lock.lock();
-			m_clients[p].set_state(ST_INGAME);
+			m_clients[p].set_state(CLIENT_STATE::ST_INGAME);
 			m_clients[p]._state_lock.unlock();
 		}
 		// ¸ðµç ÇÃ·¹ÀÌ¾î°¡ ·¹µð°¡ µÈ °æ¿ì ÀÌÁ¦ °ÔÀÓÀ» ½ÃÀÛÇÏ°Ô ¹Ù²ãÁà¾ßÇÏ´Â ºÎºÐ!
@@ -527,8 +527,9 @@ void cGameServer::Process_User_Login(int c_id, void* buff) // ·Î±×ÀÎ ¿äÃ»
 	if (reason == 1) // reason 0 : id°¡ Á¸ÀçÇÏÁö ¾ÊÀ½ / reason 1 : ¼º°ø / reason 2 : pw°¡ Æ²¸²
 	{
 		send_login_ok_packet(c_id);
+		m_clients[c_id].set_name(packet->id);
 		m_clients[c_id].set_login_state(Y_LOGIN);
-		m_clients[c_id].set_state(ST_LOBBY);
+		m_clients[c_id].set_state(CLIENT_STATE::ST_LOBBY);
 	}
 	else
 	{
@@ -544,7 +545,9 @@ void cGameServer::Process_User_Login(int c_id, void* buff) // ·Î±×ÀÎ ¿äÃ»
 void cGameServer::send_chat_packet(const unsigned int user_id, const unsigned int my_id, char* mess)
 {
 	sc_packet_chat packet;
-	packet.id = my_id;
+	//packet.id = my_id;
+	m_clients[my_id].get_client_name(*packet.name, MAX_NAME_SIZE);
+	cout << "´Ð³×ÀÓ : " << packet.name << endl;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_CHAT;
 	strcpy_s(packet.message, mess);
@@ -651,9 +654,9 @@ int cGameServer::get_new_id()
 	for (int i = 0; i < MAX_USER; ++i)
 	{
 		m_clients[i]._state_lock.lock();
-		if (ST_FREE == m_clients[i].get_state())
+		if (CLIENT_STATE::ST_FREE == m_clients[i].get_state())
 		{
-			m_clients[i].set_state(ST_ACCEPT);
+			m_clients[i].set_state(CLIENT_STATE::ST_ACCEPT);
 			m_clients[i]._state_lock.unlock();
 			return i;
 		}

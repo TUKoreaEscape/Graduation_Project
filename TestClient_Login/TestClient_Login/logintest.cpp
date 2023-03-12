@@ -99,7 +99,7 @@ void ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_CHAT:
 	{
 		sc_packet_chat* packet = reinterpret_cast<sc_packet_chat*>(ptr);
-		cout << packet->id << " : " << packet->message << endl;
+		cout << packet->name << " : " << packet->message << endl;
 		break;
 	}
 	
