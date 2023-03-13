@@ -240,7 +240,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_MOVE:
 	{
-		//if(Y_LOGIN == m_clients[user_id].get_login_state())
+		if(Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_INGAME)
 			Process_Move(user_id, p);
 		break;
 	}
@@ -547,7 +547,6 @@ void cGameServer::send_chat_packet(const unsigned int user_id, const unsigned in
 	sc_packet_chat packet;
 	//packet.id = my_id;
 	m_clients[my_id].get_client_name(*packet.name, MAX_NAME_SIZE);
-	cout << "´Ð³×ÀÓ : " << packet.name << endl;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_CHAT;
 	strcpy_s(packet.message, mess);

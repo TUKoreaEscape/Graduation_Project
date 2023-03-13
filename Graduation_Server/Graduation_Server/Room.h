@@ -54,15 +54,20 @@ public:
 	void	SetLoading(const bool is_loading, const int user_id);
 	void	Exit_Player(int user_id);
 
+public:
 	// 인게임 시작후 사용하는 함수
-	void	SetBoundingBox(XMFLOAT3 pos);
+	void	SetBoundingBox(XMFLOAT3 pos, XMFLOAT3 extents, XMFLOAT4 orientation);
 	void	SetPlayerPos(CLIENT& player);
 	void	Update_room_time();
 
+public:
 	void	Reset_Room();
 	void	Start_Game();
-
+	void	End_Game();
+private:
 	int		Select_Tagger();
+	
+public:
 	int		Get_Number_of_users();
 	int		Get_Join_Member(int data);
 

@@ -76,11 +76,11 @@ void Room::add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extent
 	m_game_object.emplace_back(GameObject(ob_type, center, extents, orientation));
 }
 
-void Room::SetBoundingBox(XMFLOAT3 pos)
+void Room::SetBoundingBox(XMFLOAT3 pos, XMFLOAT3 extents, XMFLOAT4 orientation)
 {
 	for (int i = 0; i < in_player_bounding_box.size(); ++i)
 	{
-		in_player_bounding_box[i] = BoundingOrientedBox{ XMFLOAT3(pos), XMFLOAT3(0,0,0), XMFLOAT4{0,0,0,1} };
+		in_player_bounding_box[i] = BoundingOrientedBox{ pos, extents, orientation };
 	}
 }
 
@@ -145,6 +145,17 @@ void Room::Start_Game()
 	_room_state = GAME_ROOM_STATE::PLAYING;
 }
 
+void Room::End_Game()
+{
+	/*_room_state_lock.lock();
+	_room_state = GAME_ROOM_STATE::READY;
+	_room_state_lock.unlock();*/
+
+	cout << "게임이 종료되었습니다." << endl;
+	// 엔딩패킷처리 보내는곳
+
+}
+
 void Room::Update_room_time()
 {
 	now_time = chrono::system_clock::now();
@@ -156,5 +167,9 @@ void Room::Update_room_time()
 		cout << "술래로 player [" << m_tagger_id << "]가 선정되었습니다." << endl;
 	}
 
+	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 600)
+	{
+		End_Game();
+	}
 	duration_time = std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count();
 }
