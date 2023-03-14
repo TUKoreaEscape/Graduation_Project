@@ -11,13 +11,13 @@ enum LOGIN_STATE {N_LOGIN, Y_LOGIN};
 
 class CLIENT {
 private:
-	char					_name[MAX_NAME_SIZE]{};
-	LOGIN_STATE				_login_state = N_LOGIN;
-	CLIENT_STATE::STATE		_state = CLIENT_STATE::ST_FREE;
+	char					m_name[MAX_NAME_SIZE]{};
+	LOGIN_STATE				m_login_state = N_LOGIN;
+	CLIENT_STATE::STATE		m_state = CLIENT_STATE::ST_FREE;
 
-	unsigned short			_prev_size;
-	int						_id;
-	int						_join_room_number;
+	unsigned short			m_prev_size;
+	int						m_id;
+	int						m_join_room_number;
 
 	XMFLOAT3				m_pos{};
 	XMFLOAT3				m_velocity{};
@@ -36,7 +36,7 @@ public:
 	EXP_OVER	_recv_over;
 
 public:
-	CLIENT() : _id(-1), _state(CLIENT_STATE::ST_FREE), _prev_size(0), _login_state(N_LOGIN), _join_room_number(-1)
+	CLIENT() : m_id(-1), m_state(CLIENT_STATE::ST_FREE), m_prev_size(0), m_login_state(N_LOGIN), m_join_room_number(-1)
 	{
 
 	}
@@ -47,8 +47,8 @@ public:
 	}
 
 	int					return_prev_size();
-	int					get_id() { return _id; }
-	int					get_join_room_number() { return _join_room_number; }
+	int					get_id() { return m_id; }
+	int					get_join_room_number() { return m_join_room_number; }
 	float				get_user_yaw();
 	XMFLOAT3			get_user_position();
 	XMFLOAT3			get_user_velocity();
@@ -59,7 +59,7 @@ public:
 
 	void				set_login_state(LOGIN_STATE _state);
 	void				set_state(CLIENT_STATE::STATE state);
-	void				set_id(int id) { _id = id; }
+	void				set_id(int id) { m_id = id; }
 	void				set_name(char* name);
 	void				set_recv_over(EXP_OVER& exp_over, SOCKET c_socket);
 	void				set_join_room_number(int room_number);
@@ -71,6 +71,8 @@ public:
 
 	void				error_display(int error_number);
 	
+
+	// 네트워크용 함수 2개
 	void				do_recv();
 	void				do_send(int num_byte, void* mess);
 

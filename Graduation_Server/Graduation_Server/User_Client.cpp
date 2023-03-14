@@ -2,12 +2,12 @@
 
 void CLIENT::set_prev_size(int _size)
 {
-	_prev_size = _size;
+	m_prev_size = _size;
 }
 
 int CLIENT::return_prev_size()
 {
-	return _prev_size;
+	return m_prev_size;
 }
 
 void CLIENT::do_recv()
@@ -15,8 +15,8 @@ void CLIENT::do_recv()
 	DWORD recv_flag = 0;
 
 	ZeroMemory(&_recv_over.m_wsa_over, sizeof(_recv_over.m_wsa_over));
-	_recv_over.m_wsa_buf.buf = reinterpret_cast<char*>(_recv_over.m_buf + _prev_size);
-	_recv_over.m_wsa_buf.len = sizeof(_recv_over.m_buf) - _prev_size;
+	_recv_over.m_wsa_buf.buf = reinterpret_cast<char*>(_recv_over.m_buf + m_prev_size);
+	_recv_over.m_wsa_buf.len = sizeof(_recv_over.m_buf) - m_prev_size;
 
 	int ret = WSARecv(_socket, &_recv_over.m_wsa_buf, 1, 0, &recv_flag, &_recv_over.m_wsa_over, NULL);
 	
@@ -47,17 +47,17 @@ void CLIENT::do_send(int num_byte, void* mess)
 
 void CLIENT::set_name(char* name)
 {
-	strcpy_s(_name, MAX_NAME_SIZE, name);
+	strcpy_s(m_name, MAX_NAME_SIZE, name);
 }
 
 void CLIENT::set_state(CLIENT_STATE::STATE state)
 {
-	_state = state;
+	m_state = state;
 }
 
 void CLIENT::set_login_state(LOGIN_STATE _state)
 {
-	_login_state = _state;
+	m_login_state = _state;
 }
 
 
@@ -72,7 +72,7 @@ void CLIENT::set_recv_over(EXP_OVER& recv_over, SOCKET c_socket)
 
 void CLIENT::set_join_room_number(int room_number)
 {
-	_join_room_number = room_number;
+	m_join_room_number = room_number;
 }
 
 void CLIENT::set_user_position(XMFLOAT3 pos)
@@ -117,17 +117,17 @@ float CLIENT::get_user_yaw()
 
 CLIENT_STATE::STATE CLIENT::get_state()
 {
-	return _state;
+	return m_state;
 }
 
 LOGIN_STATE CLIENT::get_login_state()
 {
-	return _login_state;
+	return m_login_state;
 }
 
 void CLIENT::get_client_name(char& name, int size)
 {
-	strcpy_s(&name, size, _name);
+	strcpy_s(&name, size, m_name);
 }
 
 void CLIENT::error_display(int error_number)

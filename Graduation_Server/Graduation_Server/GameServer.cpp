@@ -201,24 +201,36 @@ void cGameServer::Update_Session()
 			for (int i = 0; i < MAX_ROOM; ++i)
 			{
 				Room& rl = *m_room_manager->Get_Room_Info(i);
-
 				rl._room_state_lock.lock();
-				if (rl._room_state == GAME_ROOM_STATE::FREE || rl._room_state == GAME_ROOM_STATE::READY)
+				switch (rl._room_state)
+				{
+				case GAME_ROOM_STATE::FREE:
 				{
 					rl._room_state_lock.unlock();
+					break;
 				}
 
-				else if (rl._room_state == GAME_ROOM_STATE::END)
+				case GAME_ROOM_STATE::READY:
 				{
 					rl._room_state_lock.unlock();
-					;
+					break;
 				}
 
-				else
+				case GAME_ROOM_STATE::PLAYING:
 				{
 					rl._room_state_lock.unlock();
 					rl.Update_room_time();
+					break;
 				}
+
+				case GAME_ROOM_STATE::END:
+				{
+					rl._room_state_lock.unlock();
+					break;
+				}
+
+				}
+
 			}
 		}
 	}
