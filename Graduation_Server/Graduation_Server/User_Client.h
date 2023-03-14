@@ -11,19 +11,19 @@ enum LOGIN_STATE {N_LOGIN, Y_LOGIN};
 
 class CLIENT {
 private:
-	char					_name[MAX_NAME_SIZE];
-	LOGIN_STATE				_login_state;
-	CLIENT_STATE::STATE		_state;
+	char					_name[MAX_NAME_SIZE]{};
+	LOGIN_STATE				_login_state = N_LOGIN;
+	CLIENT_STATE::STATE		_state = CLIENT_STATE::ST_FREE;
 
 	unsigned short			_prev_size;
 	int						_id;
 	int						_join_room_number;
 
-	XMFLOAT3				m_pos;
-	XMFLOAT3				m_velocity;
-	float					m_yaw;
+	XMFLOAT3				m_pos{};
+	XMFLOAT3				m_velocity{};
+	float					m_yaw{};
 
-	BoundingOrientedBox		m_bounding_box;
+	BoundingOrientedBox		m_bounding_box{};
 
 public:
 	unordered_set <int> room_list; 

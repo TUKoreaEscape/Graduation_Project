@@ -201,11 +201,19 @@ void cGameServer::Update_Session()
 			for (int i = 0; i < MAX_ROOM; ++i)
 			{
 				Room& rl = *m_room_manager->Get_Room_Info(i);
+
 				rl._room_state_lock.lock();
 				if (rl._room_state == GAME_ROOM_STATE::FREE || rl._room_state == GAME_ROOM_STATE::READY)
 				{
 					rl._room_state_lock.unlock();
 				}
+
+				else if (rl._room_state == GAME_ROOM_STATE::END)
+				{
+					rl._room_state_lock.unlock();
+					;
+				}
+
 				else
 				{
 					rl._room_state_lock.unlock();
@@ -427,7 +435,6 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 
 		// 방을 나가면 로비이므로 방 정보들을 다시 보내줘야함!
 		sc_packet_request_room_info send_packet;
-		char room_name[20];
 		int room_number;
 		for (int i = 0; i < MAX_ROOM_INFO_SEND; ++i) // 1페이지당 10개의 방이 보인다고 가정, 룸정보를 전송할 준비함
 		{
@@ -439,11 +446,11 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 			get_room_info.Get_Room_Name(send_packet.room_info[i].room_name, 20);
 		}
 
-		if (sizeof(sc_packet_request_room_info) >= 127)
+		if (sizeof(send_packet) >= CHECK_MAX_PACKET_SIZE)
 		{
-			send_packet.size = 127;
-			send_packet.sub_size_mul = sizeof(sc_packet_request_room_info) / 127;
-			send_packet.sub_size_add = sizeof(sc_packet_request_room_info) % 127;
+			send_packet.size = CHECK_MAX_PACKET_SIZE;
+			send_packet.sub_size_mul = sizeof(sc_packet_request_room_info) / CHECK_MAX_PACKET_SIZE;
+			send_packet.sub_size_add = sizeof(sc_packet_request_room_info) % CHECK_MAX_PACKET_SIZE;
 		}
 		else
 			send_packet.size = sizeof(sc_packet_request_room_info);
@@ -488,8 +495,6 @@ void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
 
 	sc_packet_request_room_info send_packet;
 
-
-	char room_name[20];
 	int room_number;
 	for (int i = 0; i < MAX_ROOM_INFO_SEND; ++i) // 1페이지당 10개의 방이 보인다고 가정, 룸정보를 전송할 준비함
 	{

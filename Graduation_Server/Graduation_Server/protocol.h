@@ -9,6 +9,8 @@ const int  MAX_NAME_SIZE = 20;
 const int  MAX_ROOM = 5000;
 
 const int  MAX_ROOM_INFO_SEND = 10;
+
+const int CHECK_MAX_PACKET_SIZE = 127;
 // ----- 클라이언트가 서버에게 보낼때 ------
 
 
@@ -20,7 +22,8 @@ namespace GAME_ROOM_STATE
 		NONE = 0,
 		FREE,
 		READY,
-		PLAYING
+		PLAYING,
+		END
 	};
 }
 

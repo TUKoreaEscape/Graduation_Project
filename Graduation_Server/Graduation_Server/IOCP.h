@@ -19,8 +19,8 @@ public:
 	void Disconnect();
 
 public:
-	HANDLE		m_h_iocp;
-	SOCKET		m_client_socket;
-	SOCKET		m_listen_socket;
-	EXP_OVER	m_exp_over;
+	HANDLE		m_h_iocp{};
+	SOCKET		m_client_socket{};
+	SOCKET		m_listen_socket{};
+	EXP_OVER	m_exp_over{};
 };

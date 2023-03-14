@@ -147,9 +147,9 @@ void Room::Start_Game()
 
 void Room::End_Game()
 {
-	/*_room_state_lock.lock();
-	_room_state = GAME_ROOM_STATE::READY;
-	_room_state_lock.unlock();*/
+	_room_state_lock.lock();
+	_room_state = GAME_ROOM_STATE::END;
+	_room_state_lock.unlock();
 
 	cout << "게임이 종료되었습니다." << endl;
 	// 엔딩패킷처리 보내는곳

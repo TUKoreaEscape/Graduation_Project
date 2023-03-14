@@ -3,7 +3,6 @@
 #include "object.h"
 #include "User_Client.h"
 
-enum Room_State{ROOM_FREE, ROOM_READY, ROOM_GAMING};
 //class CLIENT;
 class Room {
 private:
