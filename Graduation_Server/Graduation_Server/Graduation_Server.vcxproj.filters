@@ -116,5 +116,11 @@
     <ClCompile Include="object.cpp">
       <Filter>소스 파일\06 Object</Filter>
     </ClCompile>
+    <ClCompile Include="Update_Session.cpp">
+      <Filter>소스 파일\00 Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Server_SendPacket.cpp">
+      <Filter>소스 파일\00 Main</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
