@@ -26,7 +26,7 @@ void cGameServer::init()
 	m_room_manager->init();
 	m_room_manager->init_object();
 
-	m_PerformanceCounter.reset();
+	m_session_timer.reset();
 }
 
 void cGameServer::StartServer()

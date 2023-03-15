@@ -40,6 +40,12 @@
     <Filter Include="소스 파일\06 Object">
       <UniqueIdentifier>{308bf954-f704-4510-a955-9c172a828c6c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\00 Main\Packet">
+      <UniqueIdentifier>{4939896e-552a-4a9f-ab25-c61887c5746f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\00 Main\Session">
+      <UniqueIdentifier>{b8fdc777-af48-4e58-9e79-beedc4b58d77}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IOCP.h">
@@ -79,7 +85,7 @@
       <Filter>소스 파일\06 Object</Filter>
     </ClInclude>
     <ClInclude Include="Server_Timer.h">
-      <Filter>소스 파일\00 Main</Filter>
+      <Filter>소스 파일\00 Main\Session</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -116,11 +122,11 @@
     <ClCompile Include="object.cpp">
       <Filter>소스 파일\06 Object</Filter>
     </ClCompile>
-    <ClCompile Include="Update_Session.cpp">
-      <Filter>소스 파일\00 Main</Filter>
-    </ClCompile>
     <ClCompile Include="Server_SendPacket.cpp">
-      <Filter>소스 파일\00 Main</Filter>
+      <Filter>소스 파일\00 Main\Packet</Filter>
+    </ClCompile>
+    <ClCompile Include="Update_Session.cpp">
+      <Filter>소스 파일\00 Main\Session</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -71,4 +71,5 @@ private:
 	RoomManager						*m_room_manager = nullptr;
 	DataBase						*m_database = nullptr;
 	Server_Timer					m_PerformanceCounter;
+	Server_Timer					m_session_timer;
 };
