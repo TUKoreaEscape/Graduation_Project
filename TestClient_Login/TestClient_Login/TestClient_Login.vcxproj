@@ -130,12 +130,10 @@
   <ItemGroup>
     <ClCompile Include="EXP_OVER.cpp" />
     <ClCompile Include="logintest.cpp" />
-    <ClCompile Include="Vivox_Voice.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EXP_OVER.h" />
     <ClInclude Include="protocol.h" />
-    <ClInclude Include="Vivox_Voice.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

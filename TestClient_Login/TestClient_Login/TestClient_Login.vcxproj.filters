@@ -21,18 +21,12 @@
     <ClCompile Include="EXP_OVER.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Vivox_Voice.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="protocol.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="EXP_OVER.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Vivox_Voice.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
