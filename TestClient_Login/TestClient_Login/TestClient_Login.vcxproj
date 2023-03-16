@@ -118,6 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>SDK\Libraries\Release\x64\vivoxsdk.lib;SDK\Libraries\Release\x64\vivoxsdk.dll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,10 +130,12 @@
   <ItemGroup>
     <ClCompile Include="EXP_OVER.cpp" />
     <ClCompile Include="logintest.cpp" />
+    <ClCompile Include="Vivox_Voice.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EXP_OVER.h" />
     <ClInclude Include="protocol.h" />
+    <ClInclude Include="Vivox_Voice.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

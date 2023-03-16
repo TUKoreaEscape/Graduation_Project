@@ -3,9 +3,14 @@
 #include <thread>
 #include <locale.h>
 #include <stdio.h>
+
+
 #include "EXP_OVER.h"
+#include "Vivox_Voice.h"
 #include "protocol.h"
 using namespace std;
+
+#pragma comment(lib, "vivoxsdk.lib")
 #pragma comment(lib, "WS2_32.LIB")
 #define BUF_SIZE 512
 
@@ -354,8 +359,13 @@ void Send_Packet()
 	}
 }
 
+
+
+
+
 int main()
 {
+	Vivox_Voice* m_voice = nullptr;
 	_wsetlocale(LC_ALL, L"korean");
 	wcin.imbue(locale("korean"));          //입력시 부분적 적용
 	wcout.imbue(locale("korean"));
@@ -375,9 +385,22 @@ int main()
 	connect(g_s_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
 	
 	cout << "서버에 연결완료" << endl;
+
+	
+
+	
+	m_voice = new Vivox_Voice;
+	if(m_voice->init_Vivox())
+		cout << "Vivox Client SDK가 초기화됨" << endl;
+
+	if (m_voice->Start_Login_Process())
+		cout << "Vivox Client Login Process가 시작되었습니다. " << endl;
+	
+	
+	
 	g_net_recv_Thread = thread{ RecvPacket };
 	g_net_send_Thread = thread{ Send_Packet };
-		
+	
 	g_net_recv_Thread.join();
 	g_net_send_Thread.join();
 
