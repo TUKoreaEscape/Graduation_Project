@@ -21,19 +21,11 @@ void Input::Update(HWND hWnd)
 		SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
 	}
 
-	if ((cxDelta != 0.0f) || (cyDelta != 0.0f))
+	if (cxDelta || cyDelta)
 	{
-		if (cxDelta || cyDelta)
-		{
-			if (keyBuffer[VK_RBUTTON] & 0xF0)
-			{
-				// 버튼누르고 화면을 회전했을때
-				// m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
-					//else
-				// m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
-				// 이런 코드가 들어가있었음.
-				//
-			}
+		if (m_pPlayer) {
+			if (keyBuffer[VK_RBUTTON] & 0xF0) m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
+			else m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
 		}
 	}
 }

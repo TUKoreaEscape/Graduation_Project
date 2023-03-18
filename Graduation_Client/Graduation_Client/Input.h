@@ -1,12 +1,11 @@
 #pragma once
 #include "stdafx.h"
 #include "Time.h"
+#include "Player.h"
 
 class Input
 {
 private:
-	Time				m_time;
-	POINT				m_ptOldCursorPos{ 0,0 };
 	static Input*		InputInstance;
 	Input() {}
 	Input(const Input& other);
@@ -21,6 +20,9 @@ public:
 
 	static UCHAR keyBuffer[256];
 
+	Player*			m_pPlayer=NULL;
+	Time				m_time;
+	POINT				m_ptOldCursorPos{ 0,0 };
 
 	void Update(HWND hWnd);
 	void KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
