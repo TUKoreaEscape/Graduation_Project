@@ -263,7 +263,7 @@ void Framework::BuildObjects()
 {
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 	input = Input::GetInstance();
-	scene = new GameScene();
+	scene = new GameScene(m_pd3dDevice, m_pd3dCommandList);
 	scene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 	time.Reset();
 }
@@ -284,10 +284,11 @@ void Framework::FrameAdvance()
 	time.Tick(0.0);
 	input->Update(m_hWnd);
 
-	UpdateObjects();
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL); //명령 할당자와 명령 리스트를 리셋한다.
+
+	UpdateObjects();
 
 	D3D12_RESOURCE_BARRIER d3dResourceBarrier;
 	::ZeroMemory(&d3dResourceBarrier, sizeof(D3D12_RESOURCE_BARRIER));

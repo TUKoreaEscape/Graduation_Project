@@ -49,7 +49,7 @@ public:
 	//~Camera();
 	//Camera(Camera* pCamera);
 public:
-	virtual void start();
+	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void update(float elapsedTime) {};
 
 	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
@@ -105,33 +105,33 @@ public:
 	virtual void SetLookAt(XMFLOAT3& xmf3LookAt) { }
 };
 
-class SpaceShipCamera : public Camera
-{
-public:
-	//CSpaceShipCamera(Camera* pCamera);
-	//virtual ~CSpaceShipCamera() { }
-	virtual void start();
-	virtual void update(float elapsedTime) {};
-	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
-};
+//class SpaceShipCamera : public Camera
+//{
+//public:
+//	//CSpaceShipCamera(Camera* pCamera);
+//	//virtual ~CSpaceShipCamera() { }
+//	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+//	virtual void update(float elapsedTime) {};
+//	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
+//};
 
 class FirstPersonCamera : public Camera
 {
 public:
 	//CFirstPersonCamera(Camera* pCamera);
 	//virtual ~CFirstPersonCamera() { }
-	virtual void start();
+	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void update(float elapsedTime) {};
 	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
 };
 
-class ThirdPersonCamera : public Camera
-{
-public:
-	//CThirdPersonCamera(Camera* pCamera);
-	//virtual ~CThirdPersonCamera() { }
-	virtual void start();
-	virtual void update(float elapsedTime);
-	virtual void SetLookAt(XMFLOAT3& vLookAt);
-};
+//class ThirdPersonCamera : public Camera
+//{
+//public:
+//	//CThirdPersonCamera(Camera* pCamera);
+//	//virtual ~CThirdPersonCamera() { }
+//	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+//	virtual void update(float elapsedTime);
+//	virtual void SetLookAt(XMFLOAT3& vLookAt);
+//};
 

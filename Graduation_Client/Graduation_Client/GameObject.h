@@ -10,10 +10,10 @@ class GameObject
 
 public:
 	GameObject();
-	virtual void start()
+	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 	{
 		for (auto component : components)
-			component->start();
+			component->start(pd3dDevice, pd3dCommandList);
 	}
 
 	virtual void update(float elapsedTime)
@@ -22,7 +22,7 @@ public:
 			component->update(elapsedTime);
 	}
 
-	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera = NULL) {};
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera = NULL) { }
 
 	template<typename T>
 	T* AddComponent();
@@ -37,6 +37,18 @@ public:
 		}
 		return nullptr;
 	}
+
+public:
+	XMFLOAT4X4 m_xmf4x4World;
+	XMFLOAT4X4 m_xmf4x4ToParent;
+
+	GameObject* m_pParent;
+	GameObject* m_pSibling;
+	GameObject* m_pChild;
+
+	Mesh* m_pMesh;
+
+	Renderer* render;
 };
 
 template<typename T>

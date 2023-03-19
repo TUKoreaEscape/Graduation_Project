@@ -2,9 +2,11 @@
 
 Scene* Scene::scene{ nullptr };
 
-Scene::Scene()
+Scene::Scene(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	scene = this;
+	m_pd3dDevice = pd3dDevice;
+	m_pd3dCommandList = pd3dCommandList;
 }
 
 GameObject* Scene::CreateEmpty()
@@ -17,7 +19,7 @@ void Scene::update(float elapsedTime)
 	while (!creationQueue.empty())
 	{
 		auto gameObject = creationQueue.front();
-		gameObject->start();
+		gameObject->start(m_pd3dDevice, m_pd3dCommandList);
 		gameObjects.push_back(gameObject);
 		creationQueue.pop();
 	}

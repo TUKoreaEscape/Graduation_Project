@@ -3,7 +3,7 @@
 
 E_GAME_STATE gameState;
 
-GameScene::GameScene() : Scene()
+GameScene::GameScene(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) : Scene(pd3dDevice, pd3dCommandList)
 {
 	gameState = E_GAME_RUNNING;
 }

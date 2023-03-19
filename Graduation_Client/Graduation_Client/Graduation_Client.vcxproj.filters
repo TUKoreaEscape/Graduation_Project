@@ -16,9 +16,6 @@
     <Filter Include="Client\Component">
       <UniqueIdentifier>{255a505b-638d-406a-a17a-3b9abc1fc88d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Client\GameObjects">
-      <UniqueIdentifier>{4fbf0c34-6af3-4e24-878b-d5d52e21b03d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Client\Scene">
       <UniqueIdentifier>{3c0cc299-b31e-4193-9038-ea396a60828e}</UniqueIdentifier>
     </Filter>
@@ -33,6 +30,9 @@
     </Filter>
     <Filter Include="Engine\Shader">
       <UniqueIdentifier>{2e496cfb-0032-4d37-9c04-227629dff23f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Client\GameObjects">
+      <UniqueIdentifier>{4fbf0c34-6af3-4e24-878b-d5d52e21b03d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -105,6 +105,12 @@
     <ClInclude Include="Material.h">
       <Filter>Client\Component</Filter>
     </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Client\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Engine\Framework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -166,6 +172,12 @@
     </ClCompile>
     <ClCompile Include="Material.cpp">
       <Filter>Client\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Client\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Engine\Framework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

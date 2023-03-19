@@ -14,14 +14,11 @@
 #define MATERIAL_DETAIL_ALBEDO_MAP	0x20
 #define MATERIAL_DETAIL_NORMAL_MAP	0x40
 
-class Material : Component
+class Material
 {
 public:
 	Material(int nTextures);
 	virtual ~Material();
-
-	virtual void start() {};
-	virtual void update(float elapsedTime) {};
 
 private:
 	int								m_nReferences = 0;
@@ -31,20 +28,22 @@ public:
 	void Release() { if (--m_nReferences <= 0) delete this; }
 
 public:
-	Shader* m_pShader = NULL;
+	Texture* m_pTexture = NULL;
 
 	XMFLOAT4						m_xmf4AlbedoColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	XMFLOAT4						m_xmf4EmissiveColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	XMFLOAT4						m_xmf4SpecularColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	XMFLOAT4						m_xmf4AmbientColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
-	void SetShader(Shader* pShader);
 	void SetMaterialType(UINT nType) { m_nType |= nType; }
-	void SetTexture(Texture* pTexture, UINT nTexture = 0);
+	void SetTexture(Texture* pTexture);
 
-	virtual void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void ReleaseShaderVariables();
 
 	virtual void ReleaseUploadBuffers();
+
+	void LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, UINT nType, UINT nRootParameter, _TCHAR* pwstrTextureName, Texture** ppTexture, GameObject* pParent, FILE* pInFile);
 
 public:
 	UINT							m_nType = 0x00;
@@ -55,19 +54,8 @@ public:
 	float							m_fMetallic = 0.0f;
 	float							m_fGlossyReflection = 0.0f;
 
-public:
 	int 							m_nTextures = 0;
 	_TCHAR(*m_ppstrTextureNames)[64] = NULL;
 	Texture** m_ppTextures = NULL; //0:Albedo, 1:Specular, 2:Metallic, 3:Normal, 4:Emission, 5:DetailAlbedo, 6:DetailNormal
 
-	void LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, UINT nType, UINT nRootParameter, _TCHAR* pwstrTextureName, Texture** ppTexture, Object* pParent, FILE* pInFile, Shader* pShader);
-
-public:
-	static Shader* m_pStandardShader;
-	static Shader* m_pSkinnedAnimationShader;
-
-	static void PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
-
-	void SetStandardShader() { Material::SetShader(m_pStandardShader); }
-	void SetSkinnedAnimationShader() { Material::SetShader(m_pSkinnedAnimationShader); }
 };
