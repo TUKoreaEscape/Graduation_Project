@@ -1,4 +1,40 @@
+#include "stdafx.h"
+#include "Movement.h"
+#include "Camera.h"
+#include "Input.h"
 #include "Player.h"
+
+
+Player::Player() : GameObject()
+{
+	AddComponent<CommonMovement>();
+//	GetComponent<CommonMovement>()->m_pPlayer = this;//movenment에서 player변수가 있는데 이걸 넘겨줘야한다.
+	AddComponent<FirstPersonCamera>();
+	//GetComponent<FirstPersonCamera>()->targetObject = this; //마찬가지로 camera에서도 player변수가 있음
+	//m_pCamera = GetComponent<FirstPersonCamera>();//플레이어가 사용하는 카메라를 지정해줘야한다.
+
+	//m_pCamera = NULL;
+
+	m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
+	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
+
+	m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_fMaxVelocityXZ = 0.0f;
+	m_fMaxVelocityY = 0.0f;
+	m_fFriction = 0.0f;
+
+	m_fPitch = 0.0f;
+	m_fRoll = 0.0f;
+	m_fYaw = 0.0f;
+
+	m_pPlayerUpdatedContext = NULL;
+	m_pCameraUpdatedContext = NULL;
+
+	Input::GetInstance()->m_pPlayer = this;
+}
 
 void Player::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 {
@@ -25,13 +61,13 @@ void Player::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 	else
 	{
 		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
-		m_pCamera->Move(xmf3Shift);
+		//m_pCamera->Move(xmf3Shift);
 	}
 }
 
 void Player::Rotate(float x, float y, float z)
 {
-	DWORD nCurrentCameraMode = m_pCamera->GetMode();
+	/*DWORD nCurrentCameraMode = m_pCamera->GetMode();
 	if ((nCurrentCameraMode == FIRST_PERSON_CAMERA) || (nCurrentCameraMode == THIRD_PERSON_CAMERA))
 	{
 		if (x != 0.0f)
@@ -59,7 +95,7 @@ void Player::Rotate(float x, float y, float z)
 			m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
 			m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
 		}
-	}
+	}*/
 	/*else if (nCurrentCameraMode == SPACESHIP_CAMERA)
 	{
 		m_pCamera->Rotate(x, y, z);
@@ -108,11 +144,11 @@ void Player::update(float fTimeElapsed)
 
 	if (m_pPlayerUpdatedContext) OnPlayerUpdateCallback(fTimeElapsed);
 
-	DWORD nCurrentCameraMode = m_pCamera->GetMode();
+	/*DWORD nCurrentCameraMode = m_pCamera->GetMode();
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->update(fTimeElapsed);
 	if (m_pCameraUpdatedContext) OnCameraUpdateCallback(fTimeElapsed);
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
-	m_pCamera->RegenerateViewMatrix();
+	m_pCamera->RegenerateViewMatrix();*/
 
 	fLength = Vector3::Length(m_xmf3Velocity);
 	float fDeceleration = (m_fFriction * fTimeElapsed);
@@ -122,7 +158,7 @@ void Player::update(float fTimeElapsed)
 
 void Player::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	if (m_pCamera) m_pCamera->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	//if (m_pCamera) m_pCamera->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
 void Player::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -131,5 +167,5 @@ void Player::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Player::ReleaseShaderVariables()
 {
-	if (m_pCamera) m_pCamera->ReleaseShaderVariables();
+	//if (m_pCamera) m_pCamera->ReleaseShaderVariables();
 }

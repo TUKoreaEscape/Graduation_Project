@@ -70,7 +70,7 @@ void Camera::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComm
 	m_fTimeLag = 0.0f;
 	m_xmf3LookAtWorld = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	m_nMode = 0x00;
-	m_pPlayer = static_cast<Player*>(this->targetObject);
+	//m_pPlayer = reinterpret_cast<Player*>(this->targetObject);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
@@ -226,7 +226,7 @@ void FirstPersonCamera::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	m_xmf3Look.y = 0.0f;
 	m_xmf3Right = Vector3::Normalize(m_xmf3Right);
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
-	m_pPlayer = static_cast<Player*>(this->targetObject);
+	//m_pPlayer = reinterpret_cast<Player*>(this->targetObject);
 }
 
 void FirstPersonCamera::Rotate(float x, float y, float z)

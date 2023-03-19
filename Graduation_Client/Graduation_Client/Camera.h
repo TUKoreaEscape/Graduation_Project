@@ -1,6 +1,7 @@
 #pragma once
 #include "Component.h"
-#include "GameObject.h"
+
+class Player;
 
 #define ASPECT_RATIO				(float(FRAME_BUFFER_WIDTH) / float(FRAME_BUFFER_HEIGHT))
 
@@ -18,7 +19,6 @@ struct VS_CB_CAMERA_INFO
 class Camera : public Component
 {
 public:
-	GameObject*					targetObject=NULL;
 	XMFLOAT3						m_xmf3Position;
 	XMFLOAT3						m_xmf3Right;
 	XMFLOAT3						m_xmf3Up;
@@ -40,7 +40,7 @@ public:
 	D3D12_VIEWPORT					m_d3dViewport;
 	D3D12_RECT						m_d3dScissorRect;
 
-	Player*								m_pPlayer = NULL;
+	Player*							m_pPlayer = NULL;
 
 	ID3D12Resource* m_pd3dcbCamera = NULL;
 	VS_CB_CAMERA_INFO* m_pcbMappedCamera = NULL;

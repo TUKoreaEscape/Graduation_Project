@@ -2,7 +2,6 @@
 #include "Scene.h"
 #include "Player.h"
 #include "Camera.h"
-#include "GameObject.h"
 #include "Object.h"
 
 enum E_GAME_STATE { E_GAME_OVER, E_GAME_RUNNING };
@@ -15,10 +14,10 @@ class GameScene : public Scene
 {
 public:
 	Player*						m_pPlayer;
-	Camera*						m_pCamera = NULL;
-	HeightMapTerrain*		m_pTerrain = NULL;
+	GameObject*						m_pCamera = NULL;
+	//HeightMapTerrain*		m_pTerrain = NULL;
 	ID3D12RootSignature*	m_pd3dGraphicsRootSignature = NULL; //루트 시그너쳐를 나타내는 인터페이스 포인터이다.
-	ID3D12PipelineState *	m_pd3dPipelineState = NULL; //파이프라인 상태를 나타내는 인터페이스 포인터이다.
+
 public:
 	GameScene(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	~GameScene() {}
@@ -30,6 +29,5 @@ public:
 
 	void ReleaseObjects();
 
-	void CreateGraphicsRootSignature(ID3D12Device* pd3dDevice); //루트 시그너쳐를 생성한다.
-	void CreateGraphicsPipelineState(ID3D12Device* pd3dDevice); //정점 셰이더와 픽셀 셰이더를 생성한다
+	ID3D12RootSignature* CreateGraphicsRootSignature(ID3D12Device* pd3dDevice); //루트 시그너쳐를 생성한다.
 };

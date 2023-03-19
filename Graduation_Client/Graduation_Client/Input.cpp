@@ -1,7 +1,8 @@
 #pragma once
-#include "Input.h"
+#include "stdafx.h"
 #include "Framework.h"
 #include "Graduation_Client.h"
+#include "Input.h"
 
 Input* Input::InputInstance = nullptr;
 UCHAR Input::keyBuffer[256];

@@ -1,4 +1,5 @@
-#pragma once
+#include "stdafx.h"
+#include "GameObject.h"
 #include "Material.h"
 
 Material::Material(int nTextures)
@@ -13,14 +14,29 @@ Material::Material(int nTextures)
 
 Material::~Material()
 {
-	if (m_pTexture) m_pTexture->Release();
+	if (m_pShader) m_pShader->Release();
+
+	if (m_nTextures > 0)
+	{
+		for (int i = 0; i < m_nTextures; i++) if (m_ppTextures[i]) m_ppTextures[i]->Release();
+		delete[] m_ppTextures;
+
+		if (m_ppstrTextureNames) delete[] m_ppstrTextureNames;
+	}
 }
 
-void Material::SetTexture(Texture* pTexture)
+void Material::SetShader(Shader* pShader)
 {
-	if (m_pTexture) m_pTexture->Release();
-	m_pTexture = pTexture;
-	if (m_pTexture) m_pTexture->AddRef();
+	if (m_pShader) m_pShader->Release();
+	m_pShader = pShader;
+	if (m_pShader) m_pShader->AddRef();
+}
+
+void Material::SetTexture(Texture* pTexture, UINT nTexture)
+{
+	if (m_ppTextures[nTexture]) m_ppTextures[nTexture]->Release();
+	m_ppTextures[nTexture] = pTexture;
+	if (m_ppTextures[nTexture]) m_ppTextures[nTexture]->AddRef();
 }
 
 void Material::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -32,18 +48,34 @@ void Material::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 1, &m_nType, 32);
 
-	if (m_pTexture) m_pTexture->UpdateShaderVariables(pd3dCommandList);
-}
-
-void Material::ReleaseShaderVariables()
-{
-	if (m_pTexture) m_pTexture->ReleaseShaderVariables();
+	for (int i = 0; i < m_nTextures; i++)
+	{
+		if (m_ppTextures[i]) m_ppTextures[i]->UpdateShaderVariables(pd3dCommandList);
+		//		if (m_ppTextures[i]) m_ppTextures[i]->UpdateShaderVariable(pd3dCommandList, 0, 0);
+	}
 }
 
 void Material::ReleaseUploadBuffers()
 {
-	if (m_pTexture) m_pTexture->ReleaseUploadBuffers();
+	for (int i = 0; i < m_nTextures; i++)
+	{
+		if (m_ppTextures[i]) m_ppTextures[i]->ReleaseUploadBuffers();
+	}
 }
+
+void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
+{
+	m_pStandardShader = new StandardShader();
+	m_pStandardShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	m_pStandardShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	/*m_pSkinnedAnimationShader = new SkinnedAnimationShader();
+	m_pSkinnedAnimationShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	m_pSkinnedAnimationShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);*/
+}
+
+//Shader* Material::m_pSkinnedAnimationShader = nullptr;
+Shader* Material::m_pStandardShader = nullptr;
 
 void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, UINT nType, UINT nRootParameter, _TCHAR* pwstrTextureName, Texture** ppTexture, GameObject* pParent, FILE* pInFile)
 {
@@ -83,8 +115,8 @@ void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 			{
 				while (pParent)
 				{
-					if (!pParent->m_parent) break;
-					pParent = pParent->m_parent;
+					if (!pParent->m_pParent) break;
+					pParent = pParent->m_pParent;
 				}
 				GameObject* pRootGameObject = pParent;
 				*ppTexture = pRootGameObject->FindReplicatedTexture(pwstrTextureName);

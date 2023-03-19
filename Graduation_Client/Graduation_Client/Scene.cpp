@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Scene.h"
 
 Scene* Scene::scene{ nullptr };
@@ -24,7 +25,7 @@ void Scene::update(float elapsedTime)
 		creationQueue.pop();
 	}
 
-	for (auto gameObject : gameObjects)
+	for (auto& gameObject : gameObjects)
 		gameObject->update(elapsedTime);
 
 	auto t = deletionQueue;
@@ -38,9 +39,8 @@ void Scene::update(float elapsedTime)
 	}
 }
 
-void Scene::render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera)
+void Scene::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	pd3dCommandList->DrawInstanced(3, 1, 0, 0);
-	for (auto object : Scene::scene->gameObjects)
-		object->render(pd3dCommandList, pCamera);
+	for (auto& object : gameObjects)
+		object->render(pd3dCommandList);
 }

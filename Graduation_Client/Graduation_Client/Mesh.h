@@ -1,6 +1,4 @@
 #pragma once
-#include "stdafx.h"
-#include "Component.h"
 #define VERTEXT_POSITION				0x0001
 #define VERTEXT_COLOR					0x0002
 #define VERTEXT_NORMAL					0x0004
@@ -19,14 +17,11 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-class Mesh : Component
+class Mesh
 {
 public:
 	Mesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual ~Mesh();
-
-	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void update(float elapsedTime) {};
 
 private:
 	int								m_nReferences = 0;
@@ -63,6 +58,14 @@ protected:
 	UINT m_nStartIndex = 0;
 	int m_nBaseVertex = 0;
 
+	int m_nSubMeshes = 0;
+	int* m_pnSubSetIndices = nullptr;
+	UINT** m_ppnSubSetIndices = nullptr;
+
+	ID3D12Resource** m_ppd3dSubSetIndexBuffers = NULL;
+	ID3D12Resource** m_ppd3dSubSetIndexUploadBuffers = NULL;
+	D3D12_INDEX_BUFFER_VIEW* m_pd3dSubSetIndexBufferViews = NULL;
+
 public:
 	UINT GetType() { return(m_nType); }
 
@@ -73,6 +76,50 @@ public:
 	virtual void ReleaseUploadBuffers();
 
 	virtual void OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, int nSubSet);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, int nSubSet = 0);
 	virtual void OnPostRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+
+class StandardMesh : public Mesh
+{
+public:
+	StandardMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual ~StandardMesh();
+
+	void  ReleaseUploadBuffers();
+
+	void LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
+
+	void Render(ID3D12GraphicsCommandList* pd3dCommandList, int nSubSet = 0);
+
+protected:
+	XMFLOAT4* m_pxmf4Colors = nullptr;
+	XMFLOAT3* m_pxmf3Normals = nullptr;
+	XMFLOAT3* m_pxmf3Tangents = nullptr;
+	XMFLOAT3* m_pxmf3BiTangents = nullptr;
+	XMFLOAT2* m_pxmf2TextureCoords0 = nullptr;
+	XMFLOAT2* m_pxmf2TextureCoords1 = nullptr;
+
+	ID3D12Resource* m_pd3dTextureCoord0Buffer = nullptr;
+	ID3D12Resource* m_pd3dTextureCoord0UploadBuffer = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dTextureCoord0BufferView;
+
+	ID3D12Resource* m_pd3dTextureCoord1Buffer = nullptr;
+	ID3D12Resource* m_pd3dTextureCoord1UploadBuffer = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dTextureCoord1BufferView;
+
+	ID3D12Resource* m_pd3dNormalBuffer = nullptr;
+	ID3D12Resource* m_pd3dNormalUploadBuffer = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dNormalBufferView;
+
+	ID3D12Resource* m_pd3dTangentBuffer = nullptr;
+	ID3D12Resource* m_pd3dTangentUploadBuffer = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dTangentBufferView;
+
+	ID3D12Resource* m_pd3dBiTangentBuffer = nullptr;
+	ID3D12Resource* m_pd3dBiTangentUploadBuffer = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dBiTangentBufferView;
 };

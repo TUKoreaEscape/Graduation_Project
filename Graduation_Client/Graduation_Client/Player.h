@@ -1,8 +1,5 @@
 #pragma once
 #include "GameObject.h"
-#include "Movement.h"
-#include "Camera.h"
-#include "Input.h"
 
 #define DIR_FORWARD					0x01
 #define DIR_BACKWARD				0x02
@@ -14,36 +11,7 @@
 class Player : public GameObject
 {
 public:
-	Player() : GameObject()
-	{
-		AddComponent<CommonMovement>();
-		GetComponent<CommonMovement>()->m_pPlayer = this;//movenment에서 player변수가 있는데 이걸 넘겨줘야한다.
-		AddComponent<FirstPersonCamera>();
-		GetComponent<FirstPersonCamera>()->targetObject = this; //마찬가지로 camera에서도 player변수가 있음
-		m_pCamera = GetComponent<FirstPersonCamera>();//플레이어가 사용하는 카메라를 지정해줘야한다.
-
-		m_pCamera = NULL;
-
-		m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
-		m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
-		m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
-		m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
-
-		m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-		m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-		m_fMaxVelocityXZ = 0.0f;
-		m_fMaxVelocityY = 0.0f;
-		m_fFriction = 0.0f;
-
-		m_fPitch = 0.0f;
-		m_fRoll = 0.0f;
-		m_fYaw = 0.0f;
-
-		m_pPlayerUpdatedContext = NULL;
-		m_pCameraUpdatedContext = NULL;
-
-		Input::GetInstance()->m_pPlayer = this;
-	}
+	Player();
 
 	virtual void update(float elapsedTime);
 	XMFLOAT3 GetPosition() { return(m_xmf3Position); }
@@ -89,7 +57,7 @@ public:
 	virtual void OnPrepareRender();
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);*/
 
-	Camera*						m_pCamera = NULL;
+	//Camera*						m_pCamera = NULL;
 protected:
 	XMFLOAT3					m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3					m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);

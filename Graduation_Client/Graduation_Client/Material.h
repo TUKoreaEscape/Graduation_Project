@@ -1,10 +1,8 @@
 #pragma once
-#include "stdafx.h"
-#include "Shader.h"
 #include "Texture.h"
-#include "Component.h"
-#include "Object.h"
-#include "GameScene.h"
+#include "Shader.h"
+
+class GameObject;
 
 #define MATERIAL_ALBEDO_MAP			0x01
 #define MATERIAL_SPECULAR_MAP		0x02
@@ -28,18 +26,18 @@ public:
 	void Release() { if (--m_nReferences <= 0) delete this; }
 
 public:
-	Texture* m_pTexture = NULL;
+	Shader* m_pShader = nullptr;
 
 	XMFLOAT4						m_xmf4AlbedoColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	XMFLOAT4						m_xmf4EmissiveColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	XMFLOAT4						m_xmf4SpecularColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	XMFLOAT4						m_xmf4AmbientColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
+	void SetShader(Shader* pShader);
 	void SetMaterialType(UINT nType) { m_nType |= nType; }
-	void SetTexture(Texture* pTexture);
+	void SetTexture(Texture* pTexture, UINT nTexture = 0);
 
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void ReleaseShaderVariables();
 
 	virtual void ReleaseUploadBuffers();
 
@@ -58,4 +56,10 @@ public:
 	_TCHAR(*m_ppstrTextureNames)[64] = NULL;
 	Texture** m_ppTextures = NULL; //0:Albedo, 1:Specular, 2:Metallic, 3:Normal, 4:Emission, 5:DetailAlbedo, 6:DetailNormal
 
+public:
+	static Shader* m_pStandardShader;
+
+	static void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
+
+	void SetStandardShader() { Material::SetShader(m_pStandardShader); }
 };

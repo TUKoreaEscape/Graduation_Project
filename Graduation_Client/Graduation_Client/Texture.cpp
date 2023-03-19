@@ -1,4 +1,6 @@
 #pragma once
+
+#include "stdafx.h"
 #include "Texture.h"
 
 Texture::Texture(int nTextures, UINT nTextureType, int nSamplers, int nRootParameters)

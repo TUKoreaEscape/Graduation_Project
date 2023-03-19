@@ -1,5 +1,4 @@
 #pragma once
-#include "stdafx.h"
 
 #define RESOURCE_TEXTURE2D			0x01
 #define RESOURCE_TEXTURE2D_ARRAY	0x02

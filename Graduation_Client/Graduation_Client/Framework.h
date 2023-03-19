@@ -1,5 +1,4 @@
 #pragma once
-#include "stdafx.h"
 #include "Input.h"
 #include "Player.h"
 #include "Scene.h"

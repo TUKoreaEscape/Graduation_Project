@@ -1,8 +1,7 @@
 #pragma once
-#include "stdafx.h"
 #include "Component.h"
-#include "Camera.h"
-
+#include "Mesh.h"
+#include "Renderer.h"
 
 class GameObject
 {
@@ -12,17 +11,17 @@ public:
 	GameObject();
 	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 	{
-		for (auto component : components)
+		for (auto& component : components)
 			component->start(pd3dDevice, pd3dCommandList);
 	}
 
 	virtual void update(float elapsedTime)
 	{
-		for (auto component : components)
+		for (auto& component : components)
 			component->update(elapsedTime);
 	}
 
-	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera = NULL) { }
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList) { }
 
 	template<typename T>
 	T* AddComponent();
@@ -30,13 +29,15 @@ public:
 	template<typename T>
 	T* GetComponent()
 	{
-		for (auto component : components)
+		for (auto& component : components)
 		{
 			auto c = dynamic_cast<T*>(component);
 			if (c) return c;
 		}
 		return nullptr;
 	}
+
+	Texture* FindReplicatedTexture(_TCHAR* pstrTextureName);
 
 public:
 	XMFLOAT4X4 m_xmf4x4World;
@@ -48,7 +49,7 @@ public:
 
 	Mesh* m_pMesh;
 
-	Renderer* render;
+	StandardRenderer* renderer; 
 };
 
 template<typename T>

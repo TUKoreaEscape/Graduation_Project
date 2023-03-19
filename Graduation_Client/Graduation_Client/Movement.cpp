@@ -1,15 +1,13 @@
-﻿#pragma once
+﻿#include "stdafx.h"
 #include "Movement.h"
 #include "Input.h"
 
-void CommonMovement::start()
+void CommonMovement::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 }
 
 void CommonMovement::update(float elapsedTime)
 {
-	if (m_pPlayer)
-	{
 		UCHAR keyBuffer[256];
 		memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
 		if (keyBuffer['w'] & 0xF0 || keyBuffer['W'] & 0xF0)
@@ -33,5 +31,4 @@ void CommonMovement::update(float elapsedTime)
 		{
 			std::cout << "스페이스바" << std::endl;
 		}
-	}
 }

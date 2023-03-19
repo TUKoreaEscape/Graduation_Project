@@ -1,7 +1,7 @@
 #pragma once
-#include "stdafx.h"
 #include "GameObject.h"
-#include "Camera.h"
+
+class GameObject;
 
 class Scene
 {
@@ -26,12 +26,12 @@ public:
 	Scene(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual ~Scene()
 	{
-		for (auto object : gameObjects)
+		for (auto& object : gameObjects)
 			delete object;
 		gameObjects.clear();
 	}
 	virtual void update(float elapsedTime);
-	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera);
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void PushDelete(GameObject* gameObject)
 	{

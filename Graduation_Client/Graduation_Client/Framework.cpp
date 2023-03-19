@@ -1,4 +1,4 @@
-#pragma once
+#include "stdafx.h"
 #include "Framework.h"
 
 Framework::Framework()
