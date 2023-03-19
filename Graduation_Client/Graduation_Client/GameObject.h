@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "Component.h"
+#include "Camera.h"
 
 
 class GameObject
@@ -21,7 +22,7 @@ public:
 			component->update(elapsedTime);
 	}
 
-	virtual void render() {}
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera = NULL) {};
 
 	template<typename T>
 	T* AddComponent();

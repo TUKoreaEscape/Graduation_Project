@@ -70,7 +70,7 @@ void Camera::start()
 	m_fTimeLag = 0.0f;
 	m_xmf3LookAtWorld = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	m_nMode = 0x00;
-	m_pPlayer = static_cast<Player*>(this->gameObject);
+	m_pPlayer = static_cast<Player*>(this->targetObject);
 }
 
 void Camera::SetViewport(int xTopLeft, int yTopLeft, int nWidth, int nHeight, float fMinZ, float fMaxZ)
@@ -171,7 +171,7 @@ void Camera::SetViewportsAndScissorRects(ID3D12GraphicsCommandList* pd3dCommandL
 void SpaceShipCamera::start()
 {
 	m_nMode = SPACESHIP_CAMERA;
-	m_pPlayer = static_cast<Player*>(this->gameObject);
+	m_pPlayer = static_cast<Player*>(this->targetObject);
 }
 
 void SpaceShipCamera::Rotate(float x, float y, float z)
@@ -222,6 +222,7 @@ void FirstPersonCamera::start()
 	m_xmf3Look.y = 0.0f;
 	m_xmf3Right = Vector3::Normalize(m_xmf3Right);
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
+	m_pPlayer = static_cast<Player*>(this->targetObject);
 }
 
 void FirstPersonCamera::Rotate(float x, float y, float z)
@@ -265,6 +266,7 @@ void ThirdPersonCamera::start()
 	m_xmf3Look.y = 0.0f;
 	m_xmf3Right = Vector3::Normalize(m_xmf3Right);
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
+	m_pPlayer = static_cast<Player*>(this->targetObject);
 }
 
 void ThirdPersonCamera::update(float elapsedTime)

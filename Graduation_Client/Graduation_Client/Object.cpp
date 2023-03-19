@@ -129,12 +129,13 @@ void Object::SetAnimationSet(int nAnimationSet)
 	if (m_pChild) m_pChild->SetAnimationSet(nAnimationSet);
 }
 
-void Object::Animate(float fTimeElapsed)
+void Object::update(float fTimeElapsed)
 {
+	GameObject::update(fTimeElapsed);
 	if (m_pAnimationController) m_pAnimationController->AdvanceTime(fTimeElapsed, NULL);
 
-	if (m_pSibling) m_pSibling->Animate(fTimeElapsed);
-	if (m_pChild) m_pChild->Animate(fTimeElapsed);
+	if (m_pSibling) m_pSibling->update(fTimeElapsed);
+	if (m_pChild) m_pChild->update(fTimeElapsed);
 }
 
 void Object::Render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera)
@@ -783,16 +784,23 @@ float HeightMapImage::GetHeight(float fx, float fz, bool bReverseQuad)
 	return(fHeight);
 }
 
-HeightMapTerrain::HeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, LPCTSTR pFileName, int nWidth, int nLength, XMFLOAT3 xmf3Scale, XMFLOAT4 xmf4Color) : CGameObject(1)
+HeightMapTerrain::HeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : GameObject()
 {
-	m_nWidth = nWidth;
-	m_nLength = nLength;
+	XMFLOAT4 xmf4Color(0.0f, 0.3f, 0.0f, 0.0f);
+	LPCTSTR pFileName = _T("Terrain/HeightMap.raw");
+	m_nWidth = 257;
+	m_nLength = 257;
+	m_xmf3Scale = XMFLOAT3(8.0f, 2.0f, 8.0f);
+	m_nMaterials = 1;
+	if (m_nMaterials > 0)
+	{
+		m_ppMaterials = new Material * [m_nMaterials]; //°íÄ¥ºÎºĞ
+		for (int i = 0; i < m_nMaterials; i++) m_ppMaterials[i] = NULL;
+	}
 
-	m_xmf3Scale = xmf3Scale;
+	m_pHeightMapImage = new HeightMapImage(pFileName, m_nWidth, m_nLength, m_xmf3Scale);
 
-	m_pHeightMapImage = new HeightMapImage(pFileName, nWidth, nLength, xmf3Scale);
-
-	HeightMapGridMesh* pMesh = new HeightMapGridMesh(pd3dDevice, pd3dCommandList, 0, 0, nWidth, nLength, xmf3Scale, xmf4Color, m_pHeightMapImage);
+	HeightMapGridMesh* pMesh = new HeightMapGridMesh(pd3dDevice, pd3dCommandList, 0, 0, m_nWidth, m_nLength, m_xmf3Scale, xmf4Color, m_pHeightMapImage);
 	SetMesh(pMesh);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);

@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "GameObject.h"
+#include "Camera.h"
 
 class Scene
 {
@@ -28,7 +29,7 @@ public:
 		gameObjects.clear();
 	}
 	virtual void update(float elapsedTime);
-	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera);
 
 	void PushDelete(GameObject* gameObject)
 	{

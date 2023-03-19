@@ -5,7 +5,6 @@ E_GAME_STATE gameState;
 
 GameScene::GameScene() : Scene()
 {
-	player = new Player();
 	gameState = E_GAME_RUNNING;
 }
 
@@ -17,11 +16,15 @@ void GameScene::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	 pd3dCommandList->SetPipelineState(m_pd3dPipelineState);
 	//프리미티브 토폴로지(삼각형 리스트)를 설정한다.
 	 pd3dCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	Scene::render(pd3dCommandList);
+	Scene::render(pd3dCommandList, m_pCamera);
 }
 
-void GameScene::BuildObjects(ID3D12Device* pd3dDevice)
+void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	m_pPlayer = new Player();
+	m_pCamera = m_pPlayer->m_pCamera;
+	m_pTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+
 	CreateGraphicsRootSignature(pd3dDevice);
 	CreateGraphicsPipelineState(pd3dDevice);
 }

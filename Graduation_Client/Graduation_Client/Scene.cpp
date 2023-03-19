@@ -36,9 +36,9 @@ void Scene::update(float elapsedTime)
 	}
 }
 
-void Scene::render(ID3D12GraphicsCommandList* pd3dCommandList)
+void Scene::render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera)
 {
 	pd3dCommandList->DrawInstanced(3, 1, 0, 0);
-	/*for (auto object : Scene::scene->gameObjects)
-		object->render();*/
+	for (auto object : Scene::scene->gameObjects)
+		object->render(pd3dCommandList, pCamera);
 }

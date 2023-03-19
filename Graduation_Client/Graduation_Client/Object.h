@@ -15,7 +15,7 @@
 //class CStandardShader;
 //class CGameObject;
 
-class Object
+class Object : virtual public GameObject
 {
 private:
 	int								m_nReferences = 0;
@@ -54,10 +54,10 @@ public:
 	virtual void BuildMaterials(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) { }
 
 	virtual void OnPrepareAnimate() { }
-	virtual void Animate(float fTimeElapsed);
+	virtual void update(float fTimeElapsed); //정의할때 부모클래스의 update도 불러줘야한다.
 
 	virtual void OnPrepareRender() { }
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera = NULL);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* pCamera = NULL); //
 
 	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
@@ -133,12 +133,12 @@ public:
 	int GetHeightMapLength() { return(m_nLength); }
 };
 
-class HeightMapTerrain : public GameObject, Object
+class HeightMapTerrain : public Object
 {
 public:
-	HeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, LPCTSTR pFileName, int nWidth, int nLength, XMFLOAT3 xmf3Scale, XMFLOAT4 xmf4Color) :GameObject()
+	HeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : GameObject()
 	{
-		AddComponent<Texture>();
+		//AddComponent<Texture>();
 	}
 	virtual ~HeightMapTerrain();
 

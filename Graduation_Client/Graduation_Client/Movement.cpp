@@ -4,7 +4,6 @@
 
 void CommonMovement::start()
 {
-	m_pPlayer = static_cast<Player*>(this->gameObject);
 }
 
 void CommonMovement::update(float elapsedTime)

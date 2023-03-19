@@ -261,9 +261,10 @@ void Framework::CreateDepthStencilView()
 
 void Framework::BuildObjects()
 {
+	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 	input = Input::GetInstance();
 	scene = new GameScene();
-	scene->BuildObjects(m_pd3dDevice);
+	scene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 	time.Reset();
 }
 

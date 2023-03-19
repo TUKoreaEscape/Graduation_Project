@@ -17,9 +17,9 @@ public:
 	Player() : GameObject()
 	{
 		AddComponent<CommonMovement>();
-		GetComponent<CommonMovement>()->gameObject = this;//movenment에서 player변수가 있는데 이걸 넘겨줘야한다.
+		GetComponent<CommonMovement>()->m_pPlayer = this;//movenment에서 player변수가 있는데 이걸 넘겨줘야한다.
 		AddComponent<ThirdPersonCamera>();
-		GetComponent<ThirdPersonCamera>()->gameObject = this; //마찬가지로 camera에서도 player변수가 있음
+		GetComponent<ThirdPersonCamera>()->targetObject = this; //마찬가지로 camera에서도 player변수가 있음
 		m_pCamera = GetComponent<ThirdPersonCamera>();//플레이어가 사용하는 카메라를 지정해줘야한다.
 	}
 
@@ -69,6 +69,7 @@ public:
 	virtual void OnPrepareRender();
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);*/
 
+	Camera*						m_pCamera = NULL;
 protected:
 	XMFLOAT3					m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3					m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
@@ -90,5 +91,4 @@ protected:
 	LPVOID						m_pPlayerUpdatedContext = NULL;
 	LPVOID						m_pCameraUpdatedContext = NULL;
 
-	Camera*						m_pCamera = NULL;
 };

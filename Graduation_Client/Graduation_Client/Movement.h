@@ -1,35 +1,37 @@
 #pragma once
 #include "Component.h"
 #include "Player.h"
+#include "GameObject.h"
 
 class CommonMovement : public Component
 {
-	Player* m_pPlayer = nullptr;
 public:
+	Player* m_pPlayer = nullptr;
+
 	void start();
 	void update(float elapsedTime);
 };
 
 class TaggerMovement : public Component
 {
-	Player* m_pPlayer = nullptr;
 public:
+	Player* m_pPlayer = nullptr;
 	void start() {};
 	void update(float elapsedTime) {};
 };
 
 class SurvivorMovement : public Component
 {
-	Player* m_pPlayer = nullptr;
 public:
+	Player* m_pPlayer = nullptr;
 	void start() {};
 	void update(float elapsedTime) {};
 };
 
 class DeadMovement : public Component
 {
-	Player* m_pPlayer = nullptr;
 public:
+	Player* m_pPlayer = nullptr;
 	void start() {};
 	void update(float elapsedTime) {};
 };
