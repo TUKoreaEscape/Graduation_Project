@@ -71,6 +71,12 @@ void Camera::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComm
 	m_xmf3LookAtWorld = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	m_nMode = 0x00;
 	//m_pPlayer = reinterpret_cast<Player*>(this->targetObject);
+	m_xmf3Position = XMFLOAT3(0.0f, 15.0f, -25.0f);
+	m_xmf4x4View = Matrix4x4::LookAtLH(XMFLOAT3(0.0f, 15.0f, -25.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	m_xmf4x4Projection = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(90.0f),
+		float(FRAME_BUFFER_WIDTH) / float(FRAME_BUFFER_HEIGHT), 1.0f, 500.0f);
+	m_d3dViewport = { 0, 0, FRAME_BUFFER_WIDTH , FRAME_BUFFER_HEIGHT, 0.0f, 1.0f };
+	m_d3dScissorRect = { 0, 0, FRAME_BUFFER_WIDTH , FRAME_BUFFER_HEIGHT };
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
@@ -126,6 +132,12 @@ void Camera::RegenerateViewMatrix()
 	m_xmf4x4View._41 = -Vector3::DotProduct(m_xmf3Position, m_xmf3Right);
 	m_xmf4x4View._42 = -Vector3::DotProduct(m_xmf3Position, m_xmf3Up);
 	m_xmf4x4View._43 = -Vector3::DotProduct(m_xmf3Position, m_xmf3Look);
+}
+
+void Camera::update(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	SetViewportsAndScissorRects(pd3dCommandList);
+	UpdateShaderVariables(pd3dCommandList);
 }
 
 void Camera::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)

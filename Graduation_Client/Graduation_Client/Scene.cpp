@@ -3,11 +3,13 @@
 
 Scene* Scene::scene{ nullptr };
 
-Scene::Scene(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+Scene::Scene()
 {
 	scene = this;
-	m_pd3dDevice = pd3dDevice;
-	m_pd3dCommandList = pd3dCommandList;
+//	m_pd3dDevice = pd3dDevice;
+	//pd3dDevice->AddRef();
+	//m_pd3dCommandList = pd3dCommandList;
+	//pd3dCommandList->AddRef();
 }
 
 GameObject* Scene::CreateEmpty()
@@ -15,12 +17,12 @@ GameObject* Scene::CreateEmpty()
 	return new GameObject();
 }
 
-void Scene::update(float elapsedTime)
+void Scene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	while (!creationQueue.empty())
 	{
 		auto gameObject = creationQueue.front();
-		gameObject->start(m_pd3dDevice, m_pd3dCommandList);
+		gameObject->start(pd3dDevice, pd3dCommandList);
 		gameObjects.push_back(gameObject);
 		creationQueue.pop();
 	}
@@ -43,4 +45,9 @@ void Scene::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	for (auto& object : gameObjects)
 		object->render(pd3dCommandList);
+}
+
+void Scene::AddPlayer(GameObject* player)
+{
+	creationQueue.push(player);
 }

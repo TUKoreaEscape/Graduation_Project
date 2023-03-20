@@ -1,25 +1,42 @@
 #include "stdafx.h"
+#include "Light.h"
 #include "GameScene.h"
 
 E_GAME_STATE gameState;
 
-GameScene::GameScene(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) : Scene(pd3dDevice, pd3dCommandList)
+GameScene::GameScene() : Scene()
 {
 	gameState = E_GAME_RUNNING;
 }
 
 void GameScene::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+
+	m_pCamera->GetComponent<Camera>()->update(pd3dCommandList);
+	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
 	Scene::render(pd3dCommandList);
 }
 
 void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
+
+	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+
+	GameObject* pGameObject = GameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Mi24.bin", nullptr);
+
 	m_pPlayer = new Player();
+	m_pPlayer->SetChild(pGameObject);
 	m_pCamera = new GameObject();
+	m_pCamera->AddComponent<Camera>();
+	m_pCamera->start(pd3dDevice, pd3dCommandList);
+	m_pLight = new GameObject();
+	m_pLight->AddComponent<Light>();
+	m_pLight->start(pd3dDevice, pd3dCommandList);
 	//m_pTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
-	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
+	AddPlayer(m_pPlayer);
 }
 
 void GameScene::ReleaseObjects()

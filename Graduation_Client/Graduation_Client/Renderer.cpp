@@ -13,13 +13,14 @@ void StandardRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	UpdateShaderVariable(pd3dCommandList, &gameObject->m_xmf4x4World);
 	if (m_ppMaterials) {
 		for (int i = 0; i < m_nMaterials; ++i) {
-			// m_ppMaterials[i]; material->shader->render; material->render;
+			if (m_ppMaterials[i]->m_pShader) m_ppMaterials[i]->m_pShader->Render(pd3dCommandList);
+			m_ppMaterials[i]->UpdateShaderVariables(pd3dCommandList);
 		}
 	}
 	if (gameObject->m_pMesh) gameObject->m_pMesh->Render(pd3dCommandList);
 }
 
-void StandardRenderer::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, GameObject* pParent, FILE* pInFile)
+void StandardRenderer::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, GameObject* pParent, FILE* pInFile, Shader* pShader)
 {
 	char pstrToken[64] = { '\0' };
 
@@ -44,6 +45,10 @@ void StandardRenderer::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12Gra
 			nReads = (UINT)::fread(&nMaterial, sizeof(int), 1, pInFile);
 
 			pMaterial = new Material(7); //0:Albedo, 1:Specular, 2:Metallic, 3:Normal, 4:Emission, 5:DetailAlbedo, 6:DetailNormal
+
+			if (!pShader) {
+				pMaterial->SetStandardShader();
+			}
 
 			SetMaterial(nMaterial, pMaterial);
 		}

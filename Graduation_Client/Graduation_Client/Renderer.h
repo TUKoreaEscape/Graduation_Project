@@ -16,7 +16,7 @@ public:
 
 	void render(ID3D12GraphicsCommandList* pd3dCommandList);
 
-	virtual void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, GameObject* pParent, FILE* pInFile);
+	virtual void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, GameObject* pParent, FILE* pInFile, Shader* pShader);
 	Texture* FindReplicatedTexture(_TCHAR* pstrTextureName);
 
 	void SetMaterial(int nMaterial, Material* pMaterial);

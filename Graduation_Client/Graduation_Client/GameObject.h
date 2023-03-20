@@ -19,9 +19,10 @@ public:
 	{
 		for (auto& component : components)
 			component->update(elapsedTime);
+		UpdateTransform(nullptr);
 	}
 
-	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList) { }
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	template<typename T>
 	T* AddComponent();
@@ -39,7 +40,17 @@ public:
 
 	Texture* FindReplicatedTexture(_TCHAR* pstrTextureName);
 
+	static GameObject* LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, GameObject* pParent, FILE* pInFile, Shader* pShader);
+	static GameObject* LoadGeometryFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, char* pstrFileName, Shader* pShader);
+
+	void SetMesh(Mesh* pMesh);
+	void SetChild(GameObject* pChild);
+
+	void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = nullptr);
+
 public:
+	char m_pstrFrameName[64];
+
 	XMFLOAT4X4 m_xmf4x4World;
 	XMFLOAT4X4 m_xmf4x4ToParent;
 

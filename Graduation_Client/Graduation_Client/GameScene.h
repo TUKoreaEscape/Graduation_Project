@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene.h"
+#include "GameObject.h"
 #include "Player.h"
 #include "Camera.h"
 #include "Object.h"
@@ -13,13 +14,14 @@ extern E_GAME_STATE gameState; //게임이 진행중인지 끝났는지 사용하기위한 변수이�
 class GameScene : public Scene
 {
 public:
-	Player*						m_pPlayer;
+	GameObject* m_pPlayer = nullptr;
 	GameObject*						m_pCamera = NULL;
+	GameObject* m_pLight = nullptr;
 	//HeightMapTerrain*		m_pTerrain = NULL;
 	ID3D12RootSignature*	m_pd3dGraphicsRootSignature = NULL; //루트 시그너쳐를 나타내는 인터페이스 포인터이다.
 
 public:
-	GameScene(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	GameScene();
 	~GameScene() {}
 
 	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);

@@ -263,8 +263,15 @@ void Framework::BuildObjects()
 {
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 	input = Input::GetInstance();
-	scene = new GameScene(m_pd3dDevice, m_pd3dCommandList);
+	scene = new GameScene();
 	scene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+
+	m_pd3dCommandList->Close();
+	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
+	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
+
+	WaitForGpuComplete();
+
 	time.Reset();
 }
 
@@ -276,7 +283,7 @@ void Framework::ReleaseObjects()
 
 void Framework::UpdateObjects()
 {
-	scene->update(time.GetTimeElapsed());
+	scene->update(time.GetTimeElapsed(), m_pd3dDevice, m_pd3dCommandList);
 }
 
 void Framework::FrameAdvance()
@@ -302,8 +309,8 @@ void Framework::FrameAdvance()
 	/*현재 렌더 타겟에 대한 프리젠트가 끝나기를 기다린다. 프리젠트가 끝나면 렌더 타겟 버퍼의 상태는 프리젠트 상태
 	(D3D12_RESOURCE_STATE_PRESENT)에서 렌더 타겟 상태(D3D12_RESOURCE_STATE_RENDER_TARGET)로 바뀔 것이다.*/
 
-	m_pd3dCommandList->RSSetViewports(1, &m_d3dViewport);
-	m_pd3dCommandList->RSSetScissorRects(1, &m_d3dScissorRect); //뷰포트와 씨저 사각형을 설정한다.
+	//m_pd3dCommandList->RSSetViewports(1, &m_d3dViewport);
+	//m_pd3dCommandList->RSSetScissorRects(1, &m_d3dScissorRect); //뷰포트와 씨저 사각형을 설정한다.
 
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle =  m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * m_nRtvDescriptorIncrementSize); //현재의 렌더 타겟에 해당하는 서술자의 CPU 주소(핸들)를 계산한다.

@@ -31,10 +31,12 @@ struct LIGHTS
 	int									m_nLights;
 };
 
-class Light: Component
+class Light: public Component
 {
 public:
 	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void update(float elapsedTime) {}
+	
 	virtual void update(ID3D12GraphicsCommandList* pd3dCommandList);
 
 public:
