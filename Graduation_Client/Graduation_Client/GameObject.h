@@ -13,13 +13,13 @@ public:
 	{
 		for (auto& component : components)
 			component->start(pd3dDevice, pd3dCommandList);
+		UpdateTransform(nullptr);
 	}
 
 	virtual void update(float elapsedTime)
 	{
 		for (auto& component : components)
 			component->update(elapsedTime);
-		UpdateTransform(nullptr);
 	}
 
 	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
