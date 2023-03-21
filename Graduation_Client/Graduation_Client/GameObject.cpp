@@ -22,10 +22,6 @@ void GameObject::render(ID3D12GraphicsCommandList* pd3dCommandList)
 Texture* GameObject::FindReplicatedTexture(_TCHAR* pstrTextureName)
 {
 	Texture* pTexture = nullptr;
-	
-	
-	
-	
 	if (renderer) if (pTexture = renderer->FindReplicatedTexture(pstrTextureName)) return pTexture;
 	if (m_pSibling) if (pTexture = m_pSibling->FindReplicatedTexture(pstrTextureName)) return pTexture;
 	if (m_pChild) if (pTexture = m_pChild->FindReplicatedTexture(pstrTextureName)) return pTexture;

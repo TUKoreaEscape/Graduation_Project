@@ -16,6 +16,7 @@ class GameScene : public Scene
 public:
 	GameObject* m_pPlayer = nullptr;
 	GameObject*						m_pCamera = NULL;
+	GameObject* m_pNPC = nullptr;
 	GameObject* m_pLight = nullptr;
 	//HeightMapTerrain*		m_pTerrain = NULL;
 	ID3D12RootSignature*	m_pd3dGraphicsRootSignature = NULL; //루트 시그너쳐를 나타내는 인터페이스 포인터이다.

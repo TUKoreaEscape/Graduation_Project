@@ -19,6 +19,9 @@ public:
 
 	virtual void update(float elapsedTime)
 	{
+		if (m_pAnimationController) m_pAnimationController->AdvanceTime(elapsedTime, NULL);
+		if (m_pSibling) m_pSibling->update(elapsedTime);
+		if (m_pChild) m_pChild->update(elapsedTime);
 		for (auto& component : components)
 			component->update(elapsedTime);
 	}

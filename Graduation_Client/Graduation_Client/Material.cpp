@@ -40,22 +40,6 @@ void Material::SetTexture(Texture* pTexture, UINT nTexture)
 	if (m_ppTextures[nTexture]) m_ppTextures[nTexture]->AddRef();
 }
 
-void Material::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 4, &m_xmf4AmbientColor, 16);
-	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 4, &m_xmf4AlbedoColor, 20);
-	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 4, &m_xmf4SpecularColor, 24);
-	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 4, &m_xmf4EmissiveColor, 28);
-
-	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 1, &m_nType, 32);
-
-	for (int i = 0; i < m_nTextures; i++)
-	{
-		if (m_ppTextures[i]) m_ppTextures[i]->UpdateShaderVariables(pd3dCommandList);
-		//		if (m_ppTextures[i]) m_ppTextures[i]->UpdateShaderVariable(pd3dCommandList, 0, 0);
-	}
-}
-
 void Material::ReleaseUploadBuffers()
 {
 	for (int i = 0; i < m_nTextures; i++)
@@ -63,6 +47,9 @@ void Material::ReleaseUploadBuffers()
 		if (m_ppTextures[i]) m_ppTextures[i]->ReleaseUploadBuffers();
 	}
 }
+
+Shader* Material::m_pSkinnedAnimationShader = nullptr;
+Shader* Material::m_pStandardShader = nullptr;
 
 void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
@@ -75,8 +62,21 @@ void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	m_pSkinnedAnimationShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
-Shader* Material::m_pSkinnedAnimationShader = nullptr;
-Shader* Material::m_pStandardShader = nullptr;
+void Material::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 4, &m_xmf4AmbientColor, 16);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 4, &m_xmf4AlbedoColor, 20);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 4, &m_xmf4SpecularColor, 24);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 4, &m_xmf4EmissiveColor, 28);
+
+	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 1, &m_nType, 32);
+
+	for (int i = 0; i < m_nTextures; i++)
+	{
+		//if (m_ppTextures[i]) m_ppTextures[i]->UpdateShaderVariables(pd3dCommandList);
+		if (m_ppTextures[i]) m_ppTextures[i]->UpdateShaderVariable(pd3dCommandList, 0, 0);
+	}
+}
 
 void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, UINT nType, UINT nRootParameter, _TCHAR* pwstrTextureName, Texture** ppTexture, GameObject* pParent, FILE* pInFile, Shader* pShader)
 {

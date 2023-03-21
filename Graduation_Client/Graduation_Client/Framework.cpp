@@ -15,25 +15,19 @@ Framework::Framework()
 	m_pd3dCommandQueue = NULL;
 	m_pd3dCommandAllocator = NULL;
 	m_pd3dCommandList = NULL;
-	m_pd3dPipelineState = NULL;
 
 	for (int i = 0; i < m_nSwapChainBuffers; i++) m_ppd3dRenderTargetBuffers[i] = NULL;
 	m_pd3dRtvDescriptorHeap = NULL;
-	m_nRtvDescriptorIncrementSize = 0;
-
+	
 	m_pd3dDepthStencilBuffer = NULL;
 	m_pd3dDsvDescriptorHeap = NULL;
-	m_nDsvDescriptorIncrementSize = 0;
-
+	
 	m_hFenceEvent = NULL;
 	m_pd3dFence = NULL;
 	for (int i = 0; i < m_nSwapChainBuffers; i++) m_nFenceValues[i] = 0;
 
 	m_nWndClientWidth = FRAME_BUFFER_WIDTH;
 	m_nWndClientHeight = FRAME_BUFFER_HEIGHT;
-
-	m_d3dViewport = { 0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f };
-	m_d3dScissorRect = { 0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT };
 
 	scene = NULL;
 }
@@ -70,7 +64,6 @@ void Framework::OnDestroy()
 	if (m_pd3dDsvDescriptorHeap) m_pd3dDsvDescriptorHeap->Release();
 	if (m_pd3dCommandAllocator) m_pd3dCommandAllocator->Release();
 	if (m_pd3dCommandQueue) m_pd3dCommandQueue->Release();
-	if (m_pd3dPipelineState) m_pd3dPipelineState->Release();
 	if (m_pd3dCommandList) m_pd3dCommandList->Release();
 	if (m_pd3dFence) m_pd3dFence->Release();
 	m_pdxgiSwapChain->SetFullscreenState(FALSE, NULL);
@@ -126,18 +119,10 @@ void Framework::CreateRtvAndDsvDescriptorHeaps()
 	d3dDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	d3dDescriptorHeapDesc.NodeMask = 0;
 	HRESULT hResult = m_pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pd3dRtvDescriptorHeap);
-	//렌더 타겟 서술자 힙(서술자의 개수는 스왑체인 버퍼의 개수)을 생성한다.
-
-	m_nRtvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	//렌더 타겟 서술자 힙의 원소의 크기를 저장한다.
 
 	d3dDescriptorHeapDesc.NumDescriptors = 1;
 	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 	hResult = m_pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pd3dDsvDescriptorHeap);
-	//깊이-스텐실 서술자 힙(서술자의 개수는 1)을 생성한다.
-
-	m_nDsvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	//깊이-스텐실 서술자 힙의 원소의 크기를 저장한다.
 }
 
 void Framework::CreateDirect3DDevice()
@@ -187,13 +172,10 @@ void Framework::CreateDirect3DDevice()
 	/*펜스와 동기화를 위한 이벤트 객체를 생성한다(이벤트 객체의 초기값을 FALSE이다).
 	이벤트가 실행되면(Signal) 이벤트의 값을 자동적으로 FALSE가 되도록 생성한다.*/
 
-	m_d3dViewport.TopLeftX = 0;
-	m_d3dViewport.TopLeftY = 0;
-	m_d3dViewport.Width = static_cast<float>(m_nWndClientWidth);
-	m_d3dViewport.Height = static_cast<float>(m_nWndClientHeight);
-	m_d3dViewport.MinDepth = 0.0f;
-	m_d3dViewport.MaxDepth = 1.0f; //뷰포트를 주 윈도우의 클라이언트 영역 전체로 설정한다.
-	m_d3dScissorRect = { 0, 0, m_nWndClientWidth, m_nWndClientHeight }; //씨저 사각형을 주 윈도우의 클라이언트 영역 전체로 설정한다.
+	::gnCbvSrvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	::gnRtvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	::gnDsvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	
 	if (pd3dAdapter) pd3dAdapter->Release();
 }
 
@@ -221,9 +203,9 @@ void Framework::CreateRenderTargetViews()
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	for (UINT i = 0; i < m_nSwapChainBuffers; i++)
 	{
-		m_pdxgiSwapChain->GetBuffer(i, __uuidof(ID3D12Resource), (void **)&m_ppd3dRenderTargetBuffers[i]);
+		m_pdxgiSwapChain->GetBuffer(i, __uuidof(ID3D12Resource), (void**)&m_ppd3dRenderTargetBuffers[i]);
 		m_pd3dDevice->CreateRenderTargetView(m_ppd3dRenderTargetBuffers[i], NULL, d3dRtvCPUDescriptorHandle);
-		d3dRtvCPUDescriptorHandle.ptr += m_nRtvDescriptorIncrementSize;
+		d3dRtvCPUDescriptorHandle.ptr += ::gnRtvDescriptorIncrementSize;
 	}
 }
 
@@ -292,12 +274,11 @@ void Framework::FrameAdvance()
 {
 	time.Tick(0.0);
 	input->Update(m_hWnd);
-
+	
+	UpdateObjects();
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL); //명령 할당자와 명령 리스트를 리셋한다.
-
-	UpdateObjects();
 
 	D3D12_RESOURCE_BARRIER d3dResourceBarrier;
 	::ZeroMemory(&d3dResourceBarrier, sizeof(D3D12_RESOURCE_BARRIER));
@@ -315,7 +296,7 @@ void Framework::FrameAdvance()
 	//m_pd3dCommandList->RSSetScissorRects(1, &m_d3dScissorRect); //뷰포트와 씨저 사각형을 설정한다.
 
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle =  m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * m_nRtvDescriptorIncrementSize); //현재의 렌더 타겟에 해당하는 서술자의 CPU 주소(핸들)를 계산한다.
+	d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * ::gnRtvDescriptorIncrementSize); //현재의 렌더 타겟에 해당하는 서술자의 CPU 주소(핸들)를 계산한다.
 
 	float pfClearColor[4] = { 0.0f, 0.3f, 0.3f, 1.0f };
 	m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor/*Colors::Azure*/, 0, NULL); //원하는 색상으로 렌더 타겟(뷰)을 지운다.

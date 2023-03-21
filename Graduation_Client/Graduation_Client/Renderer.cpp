@@ -10,12 +10,22 @@ void StandardRenderer::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 void StandardRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	UpdateShaderVariable(pd3dCommandList, &gameObject->m_xmf4x4World);
-	if (m_ppMaterials) {
-		for (int i = 0; i < m_nMaterials; ++i) {
-			if (m_ppMaterials[i]->m_pShader) m_ppMaterials[i]->m_pShader->Render(pd3dCommandList);
-			m_ppMaterials[i]->UpdateShaderVariables(pd3dCommandList);
-			if (gameObject->m_pMesh) gameObject->m_pMesh->Render(pd3dCommandList, i);
+	if (gameObject->m_pMesh)
+	{
+		UpdateShaderVariable(pd3dCommandList, &gameObject->m_xmf4x4World);
+		
+		if (m_nMaterials > 0) 
+		{
+			for (int i = 0; i < m_nMaterials; ++i)
+			{
+				if (m_ppMaterials[i])
+				{
+					if (m_ppMaterials[i]->m_pShader) m_ppMaterials[i]->m_pShader->Render(pd3dCommandList);
+					m_ppMaterials[i]->UpdateShaderVariables(pd3dCommandList);
+				}
+
+				gameObject->m_pMesh->Render(pd3dCommandList, i);
+			}
 		}
 	}
 }
@@ -46,8 +56,20 @@ void StandardRenderer::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12Gra
 
 			pMaterial = new Material(7); //0:Albedo, 1:Specular, 2:Metallic, 3:Normal, 4:Emission, 5:DetailAlbedo, 6:DetailNormal
 
-			if (!pShader) {
-				pMaterial->SetStandardShader();
+			if (!pShader)
+			{
+				UINT nMeshType = GetMeshType();
+				if (nMeshType & VERTEXT_NORMAL_TANGENT_TEXTURE)
+				{
+					if (nMeshType & VERTEXT_BONE_INDEX_WEIGHT)
+					{
+						pMaterial->SetSkinnedAnimationShader();
+					}
+					else
+					{
+						pMaterial->SetStandardShader();
+					}
+				}
 			}
 
 			SetMaterial(nMaterial, pMaterial);
@@ -74,11 +96,11 @@ void StandardRenderer::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12Gra
 		}
 		else if (!strcmp(pstrToken, "<Metallic>:"))
 		{
-			nReads = (UINT)::fread(&(pMaterial->m_fSpecularHighlight), sizeof(float), 1, pInFile);
+			nReads = (UINT)::fread(&(pMaterial->m_fMetallic), sizeof(float), 1, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<SpecularHighlight>:"))
 		{
-			nReads = (UINT)::fread(&(pMaterial->m_fMetallic), sizeof(float), 1, pInFile);
+			nReads = (UINT)::fread(&(pMaterial->m_fSpecularHighlight), sizeof(float), 1, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<GlossyReflection>:"))
 		{
@@ -157,4 +179,9 @@ void StandardRenderer::ReleaseUploadBuffers()
 	{
 		if (m_ppMaterials[i]) m_ppMaterials[i]->ReleaseUploadBuffers();
 	}
+}
+
+UINT StandardRenderer::GetMeshType()
+{
+	return((gameObject->m_pMesh) ? gameObject->m_pMesh->GetType() : 0x00);
 }

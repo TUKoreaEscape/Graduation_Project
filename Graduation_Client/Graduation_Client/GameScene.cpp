@@ -33,14 +33,16 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 2);
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 50);
 
 	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
-	GameObject* pGameObject = GameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Mi24.bin", nullptr);
-
+	GameObject* pGameObject = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", NULL, true);
+	GameObject* pGameObject1 = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", NULL, true);
 	m_pPlayer = new Player();
-	m_pPlayer->SetChild(pGameObject);
+	m_pPlayer->SetChild(pGameObject1);
+	m_pNPC = new GameObject();
+	m_pNPC->SetChild(pGameObject);
 	m_pCamera = new GameObject();
 	m_pCamera->AddComponent<Camera>();
 	m_pCamera->start(pd3dDevice, pd3dCommandList);
@@ -49,6 +51,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pLight->start(pd3dDevice, pd3dCommandList);
 	//m_pTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
+	AddPlayer(m_pNPC);
 	AddPlayer(m_pPlayer);
 }
 

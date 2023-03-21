@@ -29,6 +29,9 @@ public:
 	virtual void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4X4* pxmf4x4World);
 
 	void ReleaseUploadBuffers();
+	
+	UINT GetMeshType();
+
 private:
 	int m_nMaterials = 0;
 	Material** m_ppMaterials = nullptr;

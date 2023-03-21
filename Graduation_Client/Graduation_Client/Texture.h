@@ -15,7 +15,7 @@ public:
 private:
 	int								m_nReferences = 0;
 
-	UINT							m_nTextureType;
+	UINT							m_nTextureType = RESOURCE_TEXTURE2D;
 
 	int								m_nTextures = 0;
 	ID3D12Resource** m_ppd3dTextures = NULL;
