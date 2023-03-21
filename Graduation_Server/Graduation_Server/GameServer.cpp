@@ -512,6 +512,23 @@ void cGameServer::Process_User_Login(int c_id, void* buff) // 로그인 요청
 	}
 }
 
+void cGameServer::Process_Voice_Data(int user_id)
+{
+	sc_packet_voice_data packet;
+
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_VIVOX_DATA;
+
+	strcpy_s(packet.api, strlen(API), API);
+	strcpy_s(packet.domain, strlen(DOMAIN), DOMAIN);
+	strcpy_s(packet.issuer, strlen(ISSUER), ISSUER);
+	strcpy_s(packet.key, strlen(KEY), KEY);
+
+	packet.join_room_number = m_clients[user_id].get_join_room_number();
+
+	m_clients[user_id].do_send(sizeof(packet), &packet);
+}
+
 int cGameServer::get_new_id()
 {
 	for (int i = 0; i < MAX_USER; ++i)

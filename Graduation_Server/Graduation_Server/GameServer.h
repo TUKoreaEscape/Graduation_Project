@@ -58,6 +58,9 @@ public:
 	void	Process_Ready(const int user_id, void* buff);
 	void	Process_Game_Start(const int user_id);
 
+	// voice chat data를 전송하는 부분!
+	void	Process_Voice_Data(int user_id);
+
 	int		get_new_id();
 
 	wstring stringToWstring(const std::string& t_str);

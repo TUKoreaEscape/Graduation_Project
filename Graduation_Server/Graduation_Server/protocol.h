@@ -13,7 +13,10 @@ const int  MAX_ROOM_INFO_SEND = 10;
 const int CHECK_MAX_PACKET_SIZE = 127;
 // ----- 클라이언트가 서버에게 보낼때 ------
 
-
+#define ISSUER "작성해야됨"
+#define DOMAIN "작성해야됨"
+#define KEY "작성해야됨"
+#define API "작성해야됨"
 
 namespace GAME_ROOM_STATE
 {
@@ -50,7 +53,8 @@ namespace CS_PACKET
 		CS_PACKET_EXIT_ROOM,
 		CS_PACKET_READY,
 		CS_PACKET_GAME_LOADING_SUCCESS, 
-		CS_PACKET_REQUEST_ROOM_INFO
+		CS_PACKET_REQUEST_ROOM_INFO,
+		CS_PACKET_REQUEST_VIVOX_DATA
 	};
 }
 
@@ -150,6 +154,13 @@ struct cs_packet_request_all_room_info {
 	unsigned char   request_page;
 };
 
+struct cs_packet_request_vivox_data {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned int	room_number;
+};
+
 // ----- 서버가 클라이언트에게 보낼때 -----
 
 namespace SC_PACKET
@@ -167,7 +178,8 @@ namespace SC_PACKET
 		SC_PACKET_JOIN_ROOM_SUCCESS,
 		SC_PACKET_JOIN_ROOM_FAIL,
 		SC_PACKET_GAME_START,
-		SC_PACKET_ROOM_INFO
+		SC_PACKET_ROOM_INFO,
+		SC_PACKET_VIVOX_DATA
 	};
 }
 
@@ -251,5 +263,19 @@ struct sc_packet_put_other_client {
 struct sc_packet_game_start { // 게임 시작을 방에 있는 플레이어에게 알려줌
 	unsigned char	size;
 	unsigned char	type;
+};
+
+
+
+struct sc_packet_voice_data {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned int	join_room_number;
+
+	char			issuer[20];
+	char			domain[15];
+	char			key[8];
+	char			api[33];
 };
 #pragma pack(pop)
