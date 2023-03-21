@@ -18,7 +18,6 @@ private:
 	UINT							m_nTextureType;
 
 	int								m_nTextures = 0;
-	_TCHAR(*m_ppstrTextureNames)[64] = NULL;
 	ID3D12Resource** m_ppd3dTextures = NULL;
 	ID3D12Resource** m_ppd3dTextureUploadBuffers;
 
@@ -28,7 +27,7 @@ private:
 	int* m_pnBufferElements = NULL;
 
 	int								m_nRootParameters = 0;
-	int* m_pnRootParameterIndices = NULL;
+	UINT* m_pnRootParameterIndices = NULL;
 	D3D12_GPU_DESCRIPTOR_HANDLE* m_pd3dSrvGpuDescriptorHandles = NULL;
 
 	int								m_nSamplers = 0;
@@ -55,8 +54,8 @@ public:
 
 	int GetRootParameters() { return(m_nRootParameters); }
 	int GetTextures() { return(m_nTextures); }
-	_TCHAR* GetTextureName(int nIndex) { return(m_ppstrTextureNames[nIndex]); }
 	ID3D12Resource* GetResource(int nIndex) { return(m_ppd3dTextures[nIndex]); }
+	
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGpuDescriptorHandle(int nIndex) { return(m_pd3dSrvGpuDescriptorHandles[nIndex]); }
 	int GetRootParameter(int nIndex) { return(m_pnRootParameterIndices[nIndex]); }
 

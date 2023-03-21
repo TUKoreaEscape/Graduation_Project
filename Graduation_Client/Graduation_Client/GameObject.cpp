@@ -22,6 +22,10 @@ void GameObject::render(ID3D12GraphicsCommandList* pd3dCommandList)
 Texture* GameObject::FindReplicatedTexture(_TCHAR* pstrTextureName)
 {
 	Texture* pTexture = nullptr;
+	
+	
+	
+	
 	if (renderer) if (pTexture = renderer->FindReplicatedTexture(pstrTextureName)) return pTexture;
 	if (m_pSibling) if (pTexture = m_pSibling->FindReplicatedTexture(pstrTextureName)) return pTexture;
 	if (m_pChild) if (pTexture = m_pChild->FindReplicatedTexture(pstrTextureName)) return pTexture;
@@ -146,4 +150,13 @@ void GameObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 
 	if (m_pSibling) m_pSibling->UpdateTransform(pxmf4x4Parent);
 	if (m_pChild) m_pChild->UpdateTransform(&m_xmf4x4World);
+}
+
+void GameObject::ReleaseUploadBuffers()
+{
+	if (m_pMesh) m_pMesh->ReleaseUploadBuffers();
+	renderer->ReleaseUploadBuffers();
+
+	if (m_pSibling) m_pSibling->ReleaseUploadBuffers();
+	if (m_pChild) m_pChild->ReleaseUploadBuffers();
 }

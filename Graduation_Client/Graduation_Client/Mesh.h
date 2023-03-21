@@ -30,8 +30,13 @@ public:
 	void AddRef() { m_nReferences++; }
 	void Release() { if (--m_nReferences <= 0) delete this; }
 
-protected:
+public:
+	// for test
 	char							m_pstrMeshName[64] = { 0 };
+
+
+protected:
+	//char							m_pstrMeshName[64] = { 0 };
 	UINT							m_nType = 0x00;
 
 	XMFLOAT3						m_xmf3AABBCenter = XMFLOAT3(0.0f, 0.0f, 0.0f);

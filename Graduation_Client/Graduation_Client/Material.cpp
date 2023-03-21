@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "GameObject.h"
+#include "GameScene.h"
 #include "Material.h"
 
 Material::Material(int nTextures)
@@ -77,7 +78,7 @@ void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 //Shader* Material::m_pSkinnedAnimationShader = nullptr;
 Shader* Material::m_pStandardShader = nullptr;
 
-void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, UINT nType, UINT nRootParameter, _TCHAR* pwstrTextureName, Texture** ppTexture, GameObject* pParent, FILE* pInFile)
+void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, UINT nType, UINT nRootParameter, _TCHAR* pwstrTextureName, Texture** ppTexture, GameObject* pParent, FILE* pInFile, Shader* pShader)
 {
 	char pstrTextureName[64] = { '\0' };
 
@@ -101,13 +102,21 @@ void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 		size_t nConverted = 0;
 		mbstowcs_s(&nConverted, pwstrTextureName, 64, pstrFilePath, _TRUNCATE);
+		#define _WITH_DISPLAY_TEXTURE_NAME
+
+#ifdef _WITH_DISPLAY_TEXTURE_NAME
+		static int nTextures = 0, nRepeatedTextures = 0;
+		TCHAR pstrDebug[256] = { 0 };
+		_stprintf_s(pstrDebug, 256, _T("Texture Name: %d %c %s\n"), (pstrTextureName[0] == '@') ? nRepeatedTextures++ : nTextures++, (pstrTextureName[0] == '@') ? '@' : ' ', pwstrTextureName);
+		OutputDebugString(pstrDebug);
+#endif
 		if (!bDuplicated)
 		{
 			*ppTexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
 			(*ppTexture)->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, pwstrTextureName, RESOURCE_TEXTURE2D, 0);
 			if (*ppTexture) (*ppTexture)->AddRef();
 
-			//CScene::CreateShaderResourceViews(pd3dDevice, *ppTexture, 0, nRootParameter);
+			GameScene::CreateShaderResourceViews(pd3dDevice, *ppTexture, 0, nRootParameter);
 		}
 		else
 		{

@@ -14,19 +14,14 @@ Texture::Texture(int nTextures, UINT nTextureType, int nSamplers, int nRootParam
 		m_ppd3dTextures = new ID3D12Resource * [m_nTextures];
 		for (int i = 0; i < m_nTextures; i++) m_ppd3dTextureUploadBuffers[i] = m_ppd3dTextures[i] = NULL;
 
-		m_ppstrTextureNames = new _TCHAR[m_nTextures][64];
-		for (int i = 0; i < m_nTextures; i++) m_ppstrTextureNames[i][0] = '\0';
-
 		m_pd3dSrvGpuDescriptorHandles = new D3D12_GPU_DESCRIPTOR_HANDLE[m_nTextures];
-		for (int i = 0; i < m_nTextures; i++) m_pd3dSrvGpuDescriptorHandles[i].ptr = NULL;
 
 		m_pnResourceTypes = new UINT[m_nTextures];
 		m_pdxgiBufferFormats = new DXGI_FORMAT[m_nTextures];
 		m_pnBufferElements = new int[m_nTextures];
 	}
 	m_nRootParameters = nRootParameters;
-	if (nRootParameters > 0) m_pnRootParameterIndices = new int[nRootParameters];
-	for (int i = 0; i < m_nRootParameters; i++) m_pnRootParameterIndices[i] = -1;
+	if (nRootParameters > 0) m_pnRootParameterIndices = new UINT[nRootParameters];
 
 	m_nSamplers = nSamplers;
 	if (m_nSamplers > 0) m_pd3dSamplerGpuDescriptorHandles = new D3D12_GPU_DESCRIPTOR_HANDLE[m_nSamplers];
@@ -41,8 +36,6 @@ Texture::~Texture()
 		delete[] m_ppd3dTextures;
 	}
 
-	if (m_ppstrTextureNames) delete[] m_ppstrTextureNames;
-
 	if (m_pnResourceTypes) delete[] m_pnResourceTypes;
 	if (m_pdxgiBufferFormats) delete[] m_pdxgiBufferFormats;
 	if (m_pnBufferElements) delete[] m_pnBufferElements;
@@ -52,6 +45,16 @@ Texture::~Texture()
 
 	if (m_pd3dSamplerGpuDescriptorHandles) delete[] m_pd3dSamplerGpuDescriptorHandles;
 
+}
+
+void Texture::SetRootParameterIndex(int nIndex, UINT nRootParameterIndex)
+{
+	m_pnRootParameterIndices[nIndex] = nRootParameterIndex;
+}
+
+void Texture::SetGpuDescriptorHandle(int nIndex, D3D12_GPU_DESCRIPTOR_HANDLE d3dSrvGpuDescriptorHandle)
+{
+	m_pd3dSrvGpuDescriptorHandles[nIndex] = d3dSrvGpuDescriptorHandle;
 }
 
 void Texture::SetSampler(int nIndex, D3D12_GPU_DESCRIPTOR_HANDLE d3dSamplerGpuDescriptorHandle)
@@ -70,12 +73,12 @@ void Texture::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 	{
 		for (int i = 0; i < m_nRootParameters; i++)
 		{
-			if (m_pd3dSrvGpuDescriptorHandles[i].ptr && (m_pnRootParameterIndices[i] != -1)) pd3dCommandList->SetGraphicsRootDescriptorTable(m_pnRootParameterIndices[i], m_pd3dSrvGpuDescriptorHandles[i]);
+			pd3dCommandList->SetGraphicsRootDescriptorTable(m_pnRootParameterIndices[i], m_pd3dSrvGpuDescriptorHandles[i]);
 		}
 	}
 	else
 	{
-		if (m_pd3dSrvGpuDescriptorHandles[0].ptr) pd3dCommandList->SetGraphicsRootDescriptorTable(m_pnRootParameterIndices[0], m_pd3dSrvGpuDescriptorHandles[0]);
+		pd3dCommandList->SetGraphicsRootDescriptorTable(m_pnRootParameterIndices[0], m_pd3dSrvGpuDescriptorHandles[0]);
 	}
 }
 
@@ -102,16 +105,6 @@ ID3D12Resource* Texture::CreateTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	m_pnResourceTypes[nIndex] = nResourceType;
 	m_ppd3dTextures[nIndex] = ::CreateTexture2DResource(pd3dDevice, pd3dCommandList, nWidth, nHeight, nElements, nMipLevels, dxgiFormat, d3dResourceFlags, d3dResourceStates, pd3dClearValue);
 	return(m_ppd3dTextures[nIndex]);
-}
-
-void Texture::SetRootParameterIndex(int nIndex, UINT nRootParameterIndex)
-{
-	m_pnRootParameterIndices[nIndex] = nRootParameterIndex;
-}
-
-void Texture::SetGpuDescriptorHandle(int nIndex, D3D12_GPU_DESCRIPTOR_HANDLE d3dSrvGpuDescriptorHandle)
-{
-	m_pd3dSrvGpuDescriptorHandles[nIndex] = d3dSrvGpuDescriptorHandle;
 }
 
 D3D12_SHADER_RESOURCE_VIEW_DESC Texture::GetShaderResourceViewDesc(int nIndex)

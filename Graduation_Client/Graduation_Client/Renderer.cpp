@@ -15,9 +15,9 @@ void StandardRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < m_nMaterials; ++i) {
 			if (m_ppMaterials[i]->m_pShader) m_ppMaterials[i]->m_pShader->Render(pd3dCommandList);
 			m_ppMaterials[i]->UpdateShaderVariables(pd3dCommandList);
+			if (gameObject->m_pMesh) gameObject->m_pMesh->Render(pd3dCommandList, i);
 		}
 	}
-	if (gameObject->m_pMesh) gameObject->m_pMesh->Render(pd3dCommandList);
 }
 
 void StandardRenderer::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, GameObject* pParent, FILE* pInFile, Shader* pShader)
@@ -86,31 +86,31 @@ void StandardRenderer::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12Gra
 		}
 		else if (!strcmp(pstrToken, "<AlbedoMap>:"))
 		{
-			pMaterial->LoadTextureFromFile(pd3dDevice, pd3dCommandList, MATERIAL_ALBEDO_MAP, 3, pMaterial->m_ppstrTextureNames[0], &(pMaterial->m_ppTextures[0]), pParent, pInFile);
+			pMaterial->LoadTextureFromFile(pd3dDevice, pd3dCommandList, MATERIAL_ALBEDO_MAP, 3, pMaterial->m_ppstrTextureNames[0], &(pMaterial->m_ppTextures[0]), pParent, pInFile, pShader);
 		}
 		else if (!strcmp(pstrToken, "<SpecularMap>:"))
 		{
-			m_ppMaterials[nMaterial]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, MATERIAL_SPECULAR_MAP, 4, pMaterial->m_ppstrTextureNames[1], &(pMaterial->m_ppTextures[1]), pParent, pInFile);
+			m_ppMaterials[nMaterial]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, MATERIAL_SPECULAR_MAP, 4, pMaterial->m_ppstrTextureNames[1], &(pMaterial->m_ppTextures[1]), pParent, pInFile, pShader);
 		}
 		else if (!strcmp(pstrToken, "<NormalMap>:"))
 		{
-			m_ppMaterials[nMaterial]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, MATERIAL_NORMAL_MAP, 5, pMaterial->m_ppstrTextureNames[2], &(pMaterial->m_ppTextures[2]), pParent, pInFile);
+			m_ppMaterials[nMaterial]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, MATERIAL_NORMAL_MAP, 5, pMaterial->m_ppstrTextureNames[2], &(pMaterial->m_ppTextures[2]), pParent, pInFile, pShader);
 		}
 		else if (!strcmp(pstrToken, "<MetallicMap>:"))
 		{
-			m_ppMaterials[nMaterial]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, MATERIAL_METALLIC_MAP, 6, pMaterial->m_ppstrTextureNames[3], &(pMaterial->m_ppTextures[3]), pParent, pInFile);
+			m_ppMaterials[nMaterial]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, MATERIAL_METALLIC_MAP, 6, pMaterial->m_ppstrTextureNames[3], &(pMaterial->m_ppTextures[3]), pParent, pInFile, pShader);
 		}
 		else if (!strcmp(pstrToken, "<EmissionMap>:"))
 		{
-			m_ppMaterials[nMaterial]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, MATERIAL_EMISSION_MAP, 7, pMaterial->m_ppstrTextureNames[4], &(pMaterial->m_ppTextures[4]), pParent, pInFile);
+			m_ppMaterials[nMaterial]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, MATERIAL_EMISSION_MAP, 7, pMaterial->m_ppstrTextureNames[4], &(pMaterial->m_ppTextures[4]), pParent, pInFile, pShader);
 		}
 		else if (!strcmp(pstrToken, "<DetailAlbedoMap>:"))
 		{
-			m_ppMaterials[nMaterial]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, MATERIAL_DETAIL_ALBEDO_MAP, 8, pMaterial->m_ppstrTextureNames[5], &(pMaterial->m_ppTextures[5]), pParent, pInFile);
+			m_ppMaterials[nMaterial]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, MATERIAL_DETAIL_ALBEDO_MAP, 8, pMaterial->m_ppstrTextureNames[5], &(pMaterial->m_ppTextures[5]), pParent, pInFile, pShader);
 		}
 		else if (!strcmp(pstrToken, "<DetailNormalMap>:"))
 		{
-			m_ppMaterials[nMaterial]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, MATERIAL_DETAIL_NORMAL_MAP, 9, pMaterial->m_ppstrTextureNames[6], &(pMaterial->m_ppTextures[6]), pParent, pInFile);
+			m_ppMaterials[nMaterial]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, MATERIAL_DETAIL_NORMAL_MAP, 9, pMaterial->m_ppstrTextureNames[6], &(pMaterial->m_ppTextures[6]), pParent, pInFile, pShader);
 		}
 		else if (!strcmp(pstrToken, "</Materials>"))
 		{
@@ -149,4 +149,12 @@ void StandardRenderer::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dComma
 	XMFLOAT4X4 xmf4x4World;
 	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(pxmf4x4World)));
 	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4World, 0);
+}
+
+void StandardRenderer::ReleaseUploadBuffers()
+{
+	for (int i = 0; i < m_nMaterials; i++)
+	{
+		if (m_ppMaterials[i]) m_ppMaterials[i]->ReleaseUploadBuffers();
+	}
 }

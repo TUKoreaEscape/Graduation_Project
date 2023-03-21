@@ -272,6 +272,8 @@ void Framework::BuildObjects()
 
 	WaitForGpuComplete();
 
+	scene->ReleaseUploadBuffers();
+
 	time.Reset();
 }
 

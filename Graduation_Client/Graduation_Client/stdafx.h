@@ -43,6 +43,8 @@ using Microsoft::WRL::ComPtr;
 #include <algorithm>
 #include <iostream>
 
+//#define _WITH_DEBUG_FRAME_HIERARCHY
+
 
 //#define _WITH_CB_GAMEOBJECT_32BIT_CONSTANTS
 //#define _WITH_CB_GAMEOBJECT_ROOT_DESCRIPTOR

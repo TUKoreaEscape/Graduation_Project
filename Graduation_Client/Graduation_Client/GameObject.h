@@ -48,6 +48,8 @@ public:
 
 	void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = nullptr);
 
+	virtual void ReleaseUploadBuffers();
+
 public:
 	char m_pstrFrameName[64];
 
