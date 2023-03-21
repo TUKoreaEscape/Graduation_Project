@@ -70,6 +70,11 @@ public:
 	StandardRenderer* renderer; 
 
 public:
+	bool isNotDraw = false;
+
+	void SetNotDraw();
+
+public:
 	AnimationController* m_pAnimationController = nullptr;
 
 	GameObject* GetRootSkinnedGameObject();

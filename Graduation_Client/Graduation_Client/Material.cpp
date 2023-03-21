@@ -71,7 +71,7 @@ void Material::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 1, &m_nType, 32);
 
-	for (int i = 0; i < m_nTextures; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		//if (m_ppTextures[i]) m_ppTextures[i]->UpdateShaderVariables(pd3dCommandList);
 		if (m_ppTextures[i]) m_ppTextures[i]->UpdateShaderVariable(pd3dCommandList, 0, 0);

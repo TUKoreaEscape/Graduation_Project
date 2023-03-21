@@ -171,6 +171,13 @@ void GameObject::ReleaseUploadBuffers()
 	if (m_pChild) m_pChild->ReleaseUploadBuffers();
 }
 
+void GameObject::SetNotDraw()
+{
+	isNotDraw = true;
+	if (m_pSibling) m_pSibling->SetNotDraw();
+	if (m_pChild) m_pChild->SetNotDraw();
+}
+
 GameObject* GameObject::GetRootSkinnedGameObject()
 {
 	if (m_pAnimationController) return(this);

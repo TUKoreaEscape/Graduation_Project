@@ -24,7 +24,8 @@ void StandardRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
 					m_ppMaterials[i]->UpdateShaderVariables(pd3dCommandList);
 				}
 
-				gameObject->m_pMesh->Render(pd3dCommandList, i);
+				if (!gameObject->isNotDraw)
+					gameObject->m_pMesh->Render(pd3dCommandList, i);
 			}
 		}
 	}

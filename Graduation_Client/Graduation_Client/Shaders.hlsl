@@ -92,7 +92,8 @@ float4 PSStandard(VS_STANDARD_OUTPUT input) : SV_TARGET
 	if (gnTexturesMask & MATERIAL_EMISSION_MAP) cEmissionColor = gtxtEmissionTexture.Sample(gssWrap, input.uv);
 
 	float3 normalW;
-	float4 cColor = cAlbedoColor + cSpecularColor + cEmissionColor;
+	float4 cColor = cAlbedoColor + cSpecularColor + cMetallicColor + cEmissionColor;
+	
 	if (gnTexturesMask & MATERIAL_NORMAL_MAP)
 	{
 		float3x3 TBN = float3x3(normalize(input.tangentW), normalize(input.bitangentW), normalize(input.normalW));

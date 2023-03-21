@@ -33,7 +33,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 50);
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 4);
 
 	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
@@ -43,6 +43,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pPlayer->SetChild(pGameObject1);
 	m_pNPC = new GameObject();
 	m_pNPC->SetChild(pGameObject);
+	m_pNPC->SetNotDraw();
 	m_pCamera = new GameObject();
 	m_pCamera->AddComponent<Camera>();
 	m_pCamera->start(pd3dDevice, pd3dCommandList);
