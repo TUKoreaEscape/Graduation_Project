@@ -2,6 +2,7 @@
 #include "Component.h"
 #include "Mesh.h"
 #include "Renderer.h"
+#include "Animation.h"
 
 class GameObject
 {
@@ -63,6 +64,23 @@ public:
 	Mesh* m_pMesh;
 
 	StandardRenderer* renderer; 
+
+public:
+	AnimationController* m_pAnimationController = nullptr;
+
+	GameObject* GetRootSkinnedGameObject();
+	
+	void SetAnimationSet(int nAnimationSet);
+
+	void CacheSkinningBoneFrames(GameObject* pRootFrame);
+
+	void LoadAnimationFromFile(FILE* pInFile);
+
+	//static GameObject* LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, GameObject* pParent, FILE* pInFile, Shader* pShader);
+	static GameObject* LoadGeometryAndAnimationFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, char* pstrFileName, Shader* pShader, bool bHasAnimation);
+
+	static void PrintFrameInfo(GameObject* pGameObject, GameObject* pParent);
+	GameObject* FindFrame(char* pstrFrameName);
 };
 
 template<typename T>

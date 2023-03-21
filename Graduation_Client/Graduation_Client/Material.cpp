@@ -70,12 +70,12 @@ void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	m_pStandardShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	m_pStandardShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
-	/*m_pSkinnedAnimationShader = new SkinnedAnimationShader();
+	m_pSkinnedAnimationShader = new SkinnedAnimationShader();
 	m_pSkinnedAnimationShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
-	m_pSkinnedAnimationShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);*/
+	m_pSkinnedAnimationShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
-//Shader* Material::m_pSkinnedAnimationShader = nullptr;
+Shader* Material::m_pSkinnedAnimationShader = nullptr;
 Shader* Material::m_pStandardShader = nullptr;
 
 void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, UINT nType, UINT nRootParameter, _TCHAR* pwstrTextureName, Texture** ppTexture, GameObject* pParent, FILE* pInFile, Shader* pShader)
