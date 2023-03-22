@@ -159,12 +159,16 @@ void Room::End_Game()
 void Room::Update_room_time()
 {
 	now_time = chrono::system_clock::now();
+#ifdef DEBUG
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() < 60)
 		cout << "술래가 " << 60 - std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() << "초 후에 결정됩니다." << endl;
+#endif // DEBUG
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 60 && m_tagger_id == -1)
 	{
 		m_tagger_id = in_player[Select_Tagger()];
+#ifdef DEBUG
 		cout << "술래로 player [" << m_tagger_id << "]가 선정되었습니다." << endl;
+#endif // DEBUG
 	}
 
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 600)
@@ -172,4 +176,9 @@ void Room::Update_room_time()
 		End_Game();
 	}
 	duration_time = std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count();
+}
+
+bool Room::Is_Door_Open()
+{
+
 }

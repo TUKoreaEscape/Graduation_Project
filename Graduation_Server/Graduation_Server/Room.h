@@ -74,5 +74,6 @@ public:
 	bool	All_Player_Ready();
 	bool	All_Player_Loading();
 
+	bool	Is_Door_Open();
 	char*	Get_Room_Name(char room_name[], int size);
 };

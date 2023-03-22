@@ -1,4 +1,5 @@
 #include "object.h"
+#include "GameServer.h"
 
 GameObject::GameObject()
 {
@@ -47,11 +48,6 @@ XMFLOAT3 GameObject::Get_extents()
 
 XMFLOAT4 GameObject::Get_orientation()
 {
+	cGameServer& server = cGameServer::GetInstance();
 	return m_orientation;
-}
-
-istream& operator>>(istream& in, GameObject& p)
-{
-	in.read(reinterpret_cast<char*>(&p), sizeof(GameObject));
-	return in;
 }

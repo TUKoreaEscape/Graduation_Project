@@ -20,6 +20,8 @@ public:
 	cGameServer();
 	~cGameServer();
 
+	static cGameServer& GetInstance();
+
 	void	init();
 	void	StartServer();
 	void	WorkerThread();

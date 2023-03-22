@@ -1,5 +1,11 @@
 #include "GameServer.h"
 
+cGameServer& cGameServer::GetInstance()
+{
+	static cGameServer instance;
+	return instance;
+}
+
 cGameServer::cGameServer()
 {
 
