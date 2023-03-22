@@ -103,3 +103,19 @@ void cGameServer::send_move_packet(const unsigned int id, const unsigned int mov
 	packet.data.active;
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
+
+void cGameServer::send_voice_data(const unsigned int id)
+{
+	sc_packet_voice_data packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_VIVOX_DATA;
+
+	strcpy_s(packet.api, strlen(VOICE_API), VOICE_API);
+	strcpy_s(packet.domain, strlen(VOICE_DOMAIN), VOICE_DOMAIN);
+	strcpy_s(packet.issuer, strlen(VOICE_ISSUER), VOICE_ISSUER);
+	strcpy_s(packet.key, strlen(VOICE_KEY), VOICE_KEY);
+
+	packet.join_room_number = m_clients[id].get_join_room_number();
+
+	m_clients[id].do_send(sizeof(packet), &packet);
+}

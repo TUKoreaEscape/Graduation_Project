@@ -44,6 +44,8 @@ public:
 	void	send_move_packet(const unsigned int id, const unsigned int moved_id, XMFLOAT3 pos);
 	void	send_game_start_packet(const unsigned int id);
 
+	void	send_voice_data(const unsigned int id);
+
 
 
 	void	ProcessPacket(const unsigned int user_id, unsigned char* p); // 패킷을 구분후 처리함

@@ -13,10 +13,10 @@ const int  MAX_ROOM_INFO_SEND = 10;
 const int CHECK_MAX_PACKET_SIZE = 127;
 // ----- 클라이언트가 서버에게 보낼때 ------
 
-#define ISSUER "작성해야됨"
-#define DOMAIN "작성해야됨"
-#define KEY "작성해야됨"
-#define API "작성해야됨"
+#define VOICE_ISSUER "작성해야됨"
+#define VOICE_DOMAIN "작성해야됨"
+#define VOICE_KEY "작성해야됨"
+#define VOICE_API "작성해야됨"
 
 namespace GAME_ROOM_STATE
 {
