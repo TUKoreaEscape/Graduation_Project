@@ -66,19 +66,30 @@ void Camera::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComm
 	m_fPitch = 0.0f;
 	m_fRoll = 0.0f;
 	m_fYaw = 0.0f;
-	m_xmf3Offset = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_xmf3Offset = XMFLOAT3(0.0f, 1.0f, -1.0f);
 	m_fTimeLag = 0.0f;
 	m_xmf3LookAtWorld = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	m_nMode = 0x00;
 	//m_pPlayer = reinterpret_cast<Player*>(this->targetObject);
-	m_xmf3Position = XMFLOAT3(0.0f, 2.5f, -5.0f);
-	m_xmf4x4View = Matrix4x4::LookAtLH(XMFLOAT3(0.0f, 2.5f, -5.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
-	m_xmf4x4Projection = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(90.0f),
-		float(FRAME_BUFFER_WIDTH) / float(FRAME_BUFFER_HEIGHT), 1.0f, 500.0f);
+
+	gameObject->m_xmf4x4ToParent._41;
+	m_xmf3Position = XMFLOAT3(gameObject->m_xmf4x4ToParent._41, gameObject->m_xmf4x4ToParent._42, gameObject->m_xmf4x4ToParent._43);
+	m_xmf3Position = Vector3::Add(m_xmf3Position, m_xmf3Offset);
+	//m_xmf3Position = XMFLOAT3(0.0f, 2.5f, -5.0f);
+	//m_xmf4x4View = Matrix4x4::LookAtLH(XMFLOAT3(0.0f, 2.5f, -5.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	m_xmf4x4View = Matrix4x4::LookAtLH(m_xmf3Position, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	
+	m_xmf4x4Projection = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(60.0f),
+		float(FRAME_BUFFER_WIDTH) / float(FRAME_BUFFER_HEIGHT), 1.01f, 500.0f);
 	m_d3dViewport = { 0, 0, FRAME_BUFFER_WIDTH , FRAME_BUFFER_HEIGHT, 0.0f, 1.0f };
 	m_d3dScissorRect = { 0, 0, FRAME_BUFFER_WIDTH , FRAME_BUFFER_HEIGHT };
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+}
+
+void Camera::update(float elapsedTime)
+{
+	RegenerateViewMatrix();
 }
 
 void Camera::SetViewport(int xTopLeft, int yTopLeft, int nWidth, int nHeight, float fMinZ, float fMaxZ)
@@ -177,6 +188,38 @@ void Camera::SetViewportsAndScissorRects(ID3D12GraphicsCommandList* pd3dCommandL
 {
 	pd3dCommandList->RSSetViewports(1, &m_d3dViewport);
 	pd3dCommandList->RSSetScissorRects(1, &m_d3dScissorRect);
+}
+
+void Camera::Rotate(float x, float y, float z)
+{
+	if (x != 0.0f)
+	{
+		XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), XMConvertToRadians(x));
+		m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
+		m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, xmmtxRotate);
+		m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
+	}
+	if (y != 0.0f)
+	{
+		XMFLOAT3 xmf3Up = gameObject->GetUpVector();
+		XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&xmf3Up), XMConvertToRadians(y));
+		m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
+		m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, xmmtxRotate);
+		m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
+	}
+	if (z != 0.0f)
+	{
+		XMFLOAT3 playerPos = XMFLOAT3(gameObject->m_xmf4x4ToParent._41, gameObject->m_xmf4x4ToParent._42, gameObject->m_xmf4x4ToParent._43);
+
+		XMFLOAT3 xmf3Look = gameObject->GetLookVector();
+		XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&xmf3Look), XMConvertToRadians(z));
+		m_xmf3Position = Vector3::Subtract(m_xmf3Position, playerPos);
+		m_xmf3Position = Vector3::TransformCoord(m_xmf3Position, xmmtxRotate);
+		m_xmf3Position = Vector3::Add(m_xmf3Position, playerPos);
+		m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
+		m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, xmmtxRotate);
+		m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -138,7 +138,7 @@ void Player::Rotate(float x, float y, float z)
 		if (m_fRoll > +20.0f) { z -= (m_fRoll - 20.0f); m_fRoll = +20.0f; }
 		if (m_fRoll < -20.0f) { z -= (m_fRoll + 20.0f); m_fRoll = -20.0f; }
 	}
-	//m_pCamera->Rotate(x, y, z);
+	GetComponent<Camera>()->Rotate(x, y, z);
 	if (y != 0.0f)
 	{
 		XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(y));
