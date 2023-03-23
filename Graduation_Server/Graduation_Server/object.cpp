@@ -47,3 +47,12 @@ XMFLOAT4 GameObject::Get_orientation()
 	cGameServer& server = cGameServer::GetInstance();
 	return m_orientation;
 }
+
+Door::Door()
+{
+	m_pos = { 0.0f, 0.0f, 0.0f };
+	m_center = { 0.0f, 0.0f, 0.0f };
+	m_extents = { 0.0f, 0.0f, 0.0f };
+	m_orientation = { 0.0f, 0.0f, 0.0f, 0.0f };
+	m_type = Object_Type::OB_DOOR;
+}

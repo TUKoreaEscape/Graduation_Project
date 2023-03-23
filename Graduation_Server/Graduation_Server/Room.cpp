@@ -180,5 +180,5 @@ void Room::Update_room_time()
 
 bool Room::Is_Door_Open()
 {
-
+	return true;
 }

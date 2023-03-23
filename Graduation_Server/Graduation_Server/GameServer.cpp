@@ -114,15 +114,16 @@ void cGameServer::WorkerThread()
 
 void cGameServer::Accept(EXP_OVER* exp_over)
 {
-	if(DEBUG)
+#if DEBUG
 		std::cout << "Accept Completed \n";
-
+#endif
 	unsigned int new_id = get_new_id();
 	if (-1 == new_id) {}
 	else
 	{
-		if(DEBUG)
-			cout << "Accept Client! new_id : " << new_id << endl;
+#if DEBUG
+		cout << "Accept Client! new_id : " << new_id << endl;
+#endif
 		SOCKET c_socket = *(reinterpret_cast<SOCKET*>(exp_over->m_buf));
 		m_clients[new_id]._socket = c_socket;
 
@@ -221,7 +222,9 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_MOVE:
 	{
-		if(Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_INGAME)
+#if DEBUG
+		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_INGAME)
+#endif
 			Process_Move(user_id, p);
 		break;
 	}
@@ -234,28 +237,36 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_PACKET_CREATE_ROOM:
 	{
+#if DEBUG
 		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY) // 로그인하고 로비에 있을때만 방 생성 가능
+#endif
 			Process_Create_Room(user_id);
 		break;
 	}
 
 	case CS_PACKET::CS_PACKET_JOIN_ROOM:
 	{
+#if DEBUG
 		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY)
+#endif
 			Process_Join_Room(user_id, p);
 		break;
 	}
 
 	case CS_PACKET::CS_PACKET_READY:
 	{
+#if DEBUG
 		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_GAMEROOM)
+#endif
 			Process_Ready(user_id, p);
 		break;
 	}
 	
 	case CS_PACKET::CS_PACKET_EXIT_ROOM:
 	{
+#if DEBUG
 		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_GAMEROOM)
+#endif
 			Process_Exit_Room(user_id, p);
 		break;
 	}
