@@ -18,7 +18,7 @@ public:
 	GameObject(Object_Type type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation);
 	virtual ~GameObject() = default;
 
-	void					Set_BoundingBox(const BoundingOrientedBox& box) { m_bounding_box = box; };
+	void					Set_BoundingBox(const BoundingOrientedBox& box);
 	void					Set_Position(XMFLOAT3 pos) { m_pos = pos; }
 
 	BoundingOrientedBox		Get_BoundingBox();

@@ -13,16 +13,12 @@ GameObject::GameObject(Object_Type type, XMFLOAT3 center, XMFLOAT3 extents, XMFL
 	m_extents = extents;
 	m_orientation = orientation;
 
-	Set_BoundingBox();
+	//Set_BoundingBox();
 }
 
-GameObject::~GameObject()
+void GameObject::Set_BoundingBox(const BoundingOrientedBox& box)
 {
-
-}
-
-void GameObject::Set_BoundingBox()
-{
+	m_bounding_box = box;
 	m_bounding_box = BoundingOrientedBox{ m_center, m_extents, m_orientation };
 }
 
