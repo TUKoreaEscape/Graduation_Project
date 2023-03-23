@@ -1,3 +1,4 @@
+#pragma once
 #include "stdafx.h"
 #include "Movement.h"
 #include "Camera.h"
@@ -8,25 +9,20 @@
 Player::Player() : GameObject()
 {
 	AddComponent<CommonMovement>();
-//	GetComponent<CommonMovement>()->m_pPlayer = this;//movenment에서 player변수가 있는데 이걸 넘겨줘야한다.
+	//GetComponent<CommonMovement>()->m_pPlayer = this;//movenment에서 player변수가 있는데 이걸 넘겨줘야한다.
 	//AddComponent<FirstPersonCamera>();
 	//GetComponent<FirstPersonCamera>()->targetObject = this; //마찬가지로 camera에서도 player변수가 있음
 	//m_pCamera = GetComponent<FirstPersonCamera>();//플레이어가 사용하는 카메라를 지정해줘야한다.
 	//AddComponent<StandardRenderer>();
 
 
-	//m_pCamera = NULL;
-
-	m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	//m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
 	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 	m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_fMaxVelocityXZ = 0.0f;
-	m_fMaxVelocityY = 0.0f;
-	m_fFriction = 0.0f;
 
 	m_fPitch = 0.0f;
 	m_fRoll = 0.0f;
@@ -36,6 +32,9 @@ Player::Player() : GameObject()
 	m_pCameraUpdatedContext = NULL;
 
 	Input::GetInstance()->m_pPlayer = this;
+	AddComponent<ThirdPersonCamera>();
+	m_pCamera = GetComponent<ThirdPersonCamera>();
+	m_pCamera->m_pPlayer = this;
 }
 
 void Player::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
@@ -63,8 +62,12 @@ void Player::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 	else
 	{
 		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
-		//m_pCamera->Move(xmf3Shift);
+		m_pCamera->Move(xmf3Shift);
 	}
+	//if (this == Input::GetInstance()->m_pPlayer)
+	//{
+	//	std::cout << "같음" << std::endl;
+	//}
 }
 
 void Player::Rotate(float x, float y, float z)
@@ -138,7 +141,7 @@ void Player::Rotate(float x, float y, float z)
 		if (m_fRoll > +20.0f) { z -= (m_fRoll - 20.0f); m_fRoll = +20.0f; }
 		if (m_fRoll < -20.0f) { z -= (m_fRoll + 20.0f); m_fRoll = -20.0f; }
 	}
-	GetComponent<Camera>()->Rotate(x, y, z);
+	m_pCamera->Rotate(x, y, z);
 	if (y != 0.0f)
 	{
 		XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(y));
@@ -152,6 +155,8 @@ void Player::Rotate(float x, float y, float z)
 
 void Player::update(float fTimeElapsed)
 {
+	OnPrepareRender();
+
 	GameObject::update(fTimeElapsed);
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
 	float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
@@ -173,13 +178,13 @@ void Player::update(float fTimeElapsed)
 	/*DWORD nCurrentCameraMode = m_pCamera->GetMode();
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->update(fTimeElapsed);
 	if (m_pCameraUpdatedContext) OnCameraUpdateCallback(fTimeElapsed);
-	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
-	m_pCamera->RegenerateViewMatrix();*/
+	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);*/
 
 	fLength = Vector3::Length(m_xmf3Velocity);
 	float fDeceleration = (m_fFriction * fTimeElapsed);
 	if (fDeceleration > fLength) fDeceleration = fLength;
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
+
 }
 
 void Player::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -196,8 +201,7 @@ void Player::OnPrepareRender()
 	m_xmf4x4ToParent._11 = m_xmf3Right.x; m_xmf4x4ToParent._12 = m_xmf3Right.y; m_xmf4x4ToParent._13 = m_xmf3Right.z;
 	m_xmf4x4ToParent._21 = m_xmf3Up.x; m_xmf4x4ToParent._22 = m_xmf3Up.y; m_xmf4x4ToParent._23 = m_xmf3Up.z;
 	m_xmf4x4ToParent._31 = m_xmf3Look.x; m_xmf4x4ToParent._32 = m_xmf3Look.y; m_xmf4x4ToParent._33 = m_xmf3Look.z;
-	//m_xmf4x4ToParent._41 = m_xmf3Position.x; m_xmf4x4ToParent._42 = m_xmf3Position.y; m_xmf4x4ToParent._43 = m_xmf3Position.z;
-
+	m_xmf4x4ToParent._41 = m_xmf3Position.x; m_xmf4x4ToParent._42 = m_xmf3Position.y; m_xmf4x4ToParent._43 = m_xmf3Position.z;
 	m_xmf4x4ToParent = Matrix4x4::Multiply(XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z), m_xmf4x4ToParent);
 
 	UpdateTransform(NULL);

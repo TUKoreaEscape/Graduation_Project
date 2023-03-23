@@ -24,7 +24,7 @@ void GameScene::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 
-	m_pPlayer->GetComponent<Camera>()->update(pd3dCommandList);
+	m_pPlayer->m_pCamera->update(pd3dCommandList);
 	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
 	Scene::render(pd3dCommandList);
 }
@@ -41,7 +41,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	GameObject* pGameObject1 = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", NULL, true);
 	m_pPlayer = new Player();
 	m_pPlayer->SetChild(pGameObject1);
-	m_pPlayer->AddComponent<Camera>();
+
 	m_pNPC = new GameObject();
 	m_pNPC->SetChild(pGameObject);
 	//m_pNPC->SetNotDraw();

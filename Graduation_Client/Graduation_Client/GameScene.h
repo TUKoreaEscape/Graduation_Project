@@ -14,7 +14,7 @@ extern E_GAME_STATE gameState; //게임이 진행중인지 끝났는지 사용하기위한 변수이�
 class GameScene : public Scene
 {
 public:
-	GameObject* m_pPlayer = nullptr;
+	Player* m_pPlayer = nullptr;
 	//GameObject*						m_pCamera = NULL;
 	GameObject* m_pNPC = nullptr;
 	GameObject* m_pLight = nullptr;
