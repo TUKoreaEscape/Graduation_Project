@@ -60,11 +60,11 @@ namespace CS_PACKET
 
 #pragma pack (push, 1)
 struct UserData {
-	int					id;
+	short				id;
 	DirectX::XMFLOAT3	position;
 	DirectX::XMFLOAT3	velocity;
-	float				yaw;
-	unsigned char		active;
+	float				yaw; // 각도
+	unsigned char		active; // 생명칩유무 :D
 };
 
 

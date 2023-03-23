@@ -249,6 +249,9 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 #if DEBUG
 		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY)
 #endif
+#if !DEBUG
+		if(m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY)
+#endif
 			Process_Join_Room(user_id, p);
 		break;
 	}
