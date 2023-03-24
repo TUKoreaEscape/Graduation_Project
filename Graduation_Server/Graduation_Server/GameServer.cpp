@@ -352,7 +352,9 @@ void cGameServer::Process_Chat(const int user_id, void* buff)
 void cGameServer::Process_Create_Room(const unsigned int _user_id) // 夸没罐篮 货肺款 规 积己
 {
 	m_clients[_user_id].set_join_room_number(m_room_manager->Create_room(_user_id));
+	m_clients[_user_id]._state_lock.lock();
 	m_clients[_user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
+	m_clients[_user_id]._state_lock.unlock();
 
 	send_create_room_ok_packet(_user_id, m_clients[_user_id].get_join_room_number());
 }

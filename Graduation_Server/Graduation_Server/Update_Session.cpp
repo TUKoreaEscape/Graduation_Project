@@ -5,7 +5,7 @@ void cGameServer::Update_Session()
 {
 	while (true)
 	{
-		if (m_session_timer.Frame_Limit(1.f)) // 초당 1번 업데이트!
+		if (m_session_timer.Frame_Limit(30.f)) // 초당 1번 업데이트!
 		{
 			//cout << "Update Session!" << endl;
 			for (int i = 0; i < MAX_ROOM; ++i)

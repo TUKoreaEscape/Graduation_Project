@@ -51,13 +51,16 @@ int RoomManager::Create_room(int user_id)
 	int return_create_room_number = -1;
 	for (int i = 0; i < a_in_game_room.size(); ++i)
 	{ 
-
+		a_in_game_room[i]._room_state_lock.lock();
 		if (a_in_game_room[i]._room_state == GAME_ROOM_STATE::FREE)
 		{
 			a_in_game_room[i].Create_Room(user_id, i, GAME_ROOM_STATE::READY);
+			a_in_game_room[i]._room_state_lock.unlock();
 			return_create_room_number = i;
+			cout << return_create_room_number << "번방 생성! " << endl;
 			return return_create_room_number;
 		}
+		a_in_game_room[i]._room_state_lock.unlock();
 	}
 
 	return return_create_room_number;
