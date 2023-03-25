@@ -23,6 +23,7 @@ void cGameServer::Update_Session()
 				case GAME_ROOM_STATE::READY:
 				{
 					rl._room_state_lock.unlock();
+					rl.is_collision_player_to_object(rl.Get_Join_Member(0));
 					break;
 				}/**/
 

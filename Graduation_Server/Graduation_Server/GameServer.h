@@ -66,6 +66,7 @@ public:
 	void	Process_Voice_Data(int user_id);
 
 	int		get_new_id();
+	CLIENT*	get_client_info(const int player_id);
 
 	wstring stringToWstring(const std::string& t_str);
 

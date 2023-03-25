@@ -3,6 +3,7 @@
 #include "object.h"
 #include "User_Client.h"
 
+
 //class CLIENT;
 class Room {
 private:
@@ -75,5 +76,9 @@ public:
 	bool	All_Player_Loading();
 
 	bool	Is_Door_Open();
+	bool	is_collision_wall_to_player(const int player_id);
+	bool	is_collision_player_to_player(const int player_id);
+	bool	is_collision_player_to_object(const int player_id);
+
 	char*	Get_Room_Name(char room_name[], int size);
 };

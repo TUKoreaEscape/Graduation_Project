@@ -128,5 +128,8 @@
     <ClCompile Include="Update_Session.cpp">
       <Filter>소스 파일\00 Main\Session</Filter>
     </ClCompile>
+    <ClCompile Include="Server_ProcessPacket.cpp">
+      <Filter>소스 파일\00 Main\Packet</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
 #include "Room.h"
+#include "GameServer.h"
 
 void Room::Reset_Room()
 {
@@ -180,5 +181,30 @@ void Room::Update_room_time()
 
 bool Room::Is_Door_Open()
 {
+	return true;
+}
+
+bool Room::is_collision_player_to_object(const int player_id)
+{
+	cGameServer& server = cGameServer::GetInstance();
+	CLIENT& cl = *server.get_client_info(player_id);
+
+	return true;
+}
+
+bool Room::is_collision_player_to_player(const int player_id)
+{
+	cGameServer& server = cGameServer::GetInstance();
+	CLIENT& cl = *server.get_client_info(player_id);
+
+
+	return true;
+}
+
+bool Room::is_collision_wall_to_player(const int player_id)
+{
+	cGameServer& server = cGameServer::GetInstance();
+	CLIENT& cl = *server.get_client_info(player_id);
+
 	return true;
 }
