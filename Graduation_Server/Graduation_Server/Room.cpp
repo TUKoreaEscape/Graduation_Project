@@ -160,14 +160,14 @@ void Room::End_Game()
 void Room::Update_room_time()
 {
 	now_time = chrono::system_clock::now();
-#ifdef DEBUG
+#if DEBUG
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() < 60)
 		cout << "술래가 " << 60 - std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() << "초 후에 결정됩니다." << endl;
 #endif // DEBUG
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 60 && m_tagger_id == -1)
 	{
 		m_tagger_id = in_player[Select_Tagger()];
-#ifdef DEBUG
+#if DEBUG
 		cout << "술래로 player [" << m_tagger_id << "]가 선정되었습니다." << endl;
 #endif // DEBUG
 	}
@@ -189,16 +189,34 @@ bool Room::is_collision_player_to_object(const int player_id)
 	cGameServer& server = cGameServer::GetInstance();
 	CLIENT& cl = *server.get_client_info(player_id);
 
-	return true;
+	BoundingOrientedBox player_bounding_box =  cl.get_bounding_box();
+	for (auto& object : m_game_object)
+	{
+		BoundingOrientedBox object_bounding_box = object.Get_BoundingBox();
+		// 여기서 충돌을 체크합니다.
+		if (player_bounding_box.Intersects(object_bounding_box))
+			return true;
+	}
+	return false;
 }
 
 bool Room::is_collision_player_to_player(const int player_id)
 {
 	cGameServer& server = cGameServer::GetInstance();
 	CLIENT& cl = *server.get_client_info(player_id);
+	BoundingOrientedBox player_bounding_box = cl.get_bounding_box();
+	for (int i = 0; i < 6; ++i)
+	{
+		if (in_player[i] == player_id)
+			continue;
 
+		CLIENT& other_player = *server.get_client_info(in_player[i]);
+		BoundingOrientedBox other_player_bounding_box = other_player.get_bounding_box();
 
-	return true;
+		if (player_bounding_box.Intersects(other_player_bounding_box))
+			return true;
+	}
+	return false;
 }
 
 bool Room::is_collision_wall_to_player(const int player_id)
