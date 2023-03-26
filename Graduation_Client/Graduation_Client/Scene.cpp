@@ -27,8 +27,10 @@ void Scene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 		creationQueue.pop();
 	}
 
-	for (auto& gameObject : gameObjects)
+	for (auto& gameObject : gameObjects) {
 		gameObject->update(elapsedTime);
+		//gameObject->UpdateTransform(nullptr);
+	}
 
 	auto t = deletionQueue;
 	while (!deletionQueue.empty())
@@ -44,7 +46,7 @@ void Scene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 void Scene::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	for (auto& object : gameObjects) {
-		object->UpdateTransform(nullptr);
+		//object->OnPrepareRender();
 		object->render(pd3dCommandList);
 	}
 }

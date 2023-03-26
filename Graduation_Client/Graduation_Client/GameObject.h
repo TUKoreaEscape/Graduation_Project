@@ -8,18 +8,28 @@ class GameObject
 {
 	std::list<Component*> components;
 
+private:
+	int m_nReferences = 0;
+
+public:
+	void AddRef();
+	void Release();
+
 public:
 	GameObject();
 	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 	{
 		for (auto& component : components)
 			component->start(pd3dDevice, pd3dCommandList);
-		UpdateTransform(nullptr);
+		//UpdateTransform(nullptr);
 	}
 
 	virtual void update(float elapsedTime)
 	{
-		if (m_pAnimationController) m_pAnimationController->AdvanceTime(elapsedTime, NULL);
+		OnPrepareRender();
+
+		if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->AdvanceTime(elapsedTime, this);
+		
 		if (m_pSibling) m_pSibling->update(elapsedTime);
 		if (m_pChild) m_pChild->update(elapsedTime);
 		for (auto& component : components)
@@ -45,11 +55,8 @@ public:
 
 	Texture* FindReplicatedTexture(_TCHAR* pstrTextureName);
 
-	static GameObject* LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, GameObject* pParent, FILE* pInFile, Shader* pShader);
-	static GameObject* LoadGeometryFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, char* pstrFileName, Shader* pShader);
-
 	void SetMesh(Mesh* pMesh);
-	void SetChild(GameObject* pChild);
+	void SetChild(GameObject* pChild, bool bReferenceUpdate = false);
 
 	void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = nullptr);
 
@@ -86,21 +93,27 @@ public:
 	void SetNotDraw();
 
 public:
-	AnimationController* m_pAnimationController = nullptr;
-
-	GameObject* GetRootSkinnedGameObject();
-	
-	void SetAnimationSet(int nAnimationSet);
+	AnimationController* m_pSkinnedAnimationController = nullptr;
 
 	void CacheSkinningBoneFrames(GameObject* pRootFrame);
 
-	void LoadAnimationFromFile(FILE* pInFile);
-
 	//static GameObject* LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, GameObject* pParent, FILE* pInFile, Shader* pShader);
-	static GameObject* LoadGeometryAndAnimationFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, char* pstrFileName, Shader* pShader, bool bHasAnimation);
-
+	
 	static void PrintFrameInfo(GameObject* pGameObject, GameObject* pParent);
 	GameObject* FindFrame(char* pstrFrameName);
+
+public:
+	SkinnedMesh* FindSkinnedMesh(char* pstrSkinnedMeshName);
+	
+	void SetTrackAnimationSet(int nAnimationTrack, int nAnimationSet);
+	void SetTrackAnimationPosition(int nAnimationTrack, float fPosition);
+
+	static void LoadAnimationFromFile(FILE* pInFile, LoadedModelInfo* pLoadedModel);
+	
+	static GameObject* LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, GameObject* pParent, FILE* pInFile, Shader* pShader, int* pnSkinnedMeshes);
+
+	static LoadedModelInfo* LoadGeometryAndAnimationFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, char* pstrFileName, Shader* pShader);
+
 };
 
 template<typename T>

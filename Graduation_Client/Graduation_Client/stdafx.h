@@ -56,7 +56,7 @@ using Microsoft::WRL::ComPtr;
 
 #pragma comment(lib, "dxguid.lib")
 
-//#define _WITH_DEBUG_SKINNING_BONE
+#define _WITH_DEBUG_SKINNING_BONE
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
 
@@ -79,6 +79,8 @@ extern ID3D12Resource* CreateTextureResourceFromWICFile(ID3D12Device* pd3dDevice
 
 inline bool IsZero(float fValue) { return((fabsf(fValue) < EPSILON)); }
 inline bool IsEqual(float fA, float fB) { return(::IsZero(fA - fB)); }
+inline bool IsZero(float fValue, float fEpsilon) { return((fabsf(fValue) < fEpsilon)); }
+inline bool IsEqual(float fA, float fB, float fEpsilon) { return(::IsZero(fA - fB, fEpsilon)); }
 inline float InverseSqrt(float fValue) { return 1.0f / sqrtf(fValue); }
 inline void Swap(float* pfS, float* pfT) { float fTemp = *pfS; *pfS = *pfT; *pfT = fTemp; }
 
@@ -224,11 +226,41 @@ namespace Matrix4x4
 		return(xmmtx4x4Result);
 	}
 
+	inline XMFLOAT4X4 Zero()
+	{
+		XMFLOAT4X4 xmf4x4Result;
+		XMStoreFloat4x4(&xmf4x4Result, XMMatrixSet(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
+		return(xmf4x4Result);
+	}
+
 	inline XMFLOAT4X4 Multiply(XMFLOAT4X4& xmmtx4x4Matrix1, XMFLOAT4X4& xmmtx4x4Matrix2)
 	{
 		XMFLOAT4X4 xmmtx4x4Result;
 		XMStoreFloat4x4(&xmmtx4x4Result, XMLoadFloat4x4(&xmmtx4x4Matrix1) * XMLoadFloat4x4(&xmmtx4x4Matrix2));
 		return(xmmtx4x4Result);
+	}
+
+	inline XMFLOAT4X4 Scale(XMFLOAT4X4& xmf4x4Matrix, float fScale)
+	{
+		XMFLOAT4X4 xmf4x4Result;
+		XMStoreFloat4x4(&xmf4x4Result, XMLoadFloat4x4(&xmf4x4Matrix) * fScale);
+		/*
+				XMVECTOR S, R, T;
+				XMMatrixDecompose(&S, &R, &T, XMLoadFloat4x4(&xmf4x4Matrix));
+				S = XMVectorScale(S, fScale);
+				T = XMVectorScale(T, fScale);
+				R = XMVectorScale(R, fScale);
+				//R = XMQuaternionMultiply(R, XMVectorSet(0, 0, 0, fScale));
+				XMStoreFloat4x4(&xmf4x4Result, XMMatrixAffineTransformation(S, XMVectorZero(), R, T));
+		*/
+		return(xmf4x4Result);
+	}
+
+	inline XMFLOAT4X4 Add(XMFLOAT4X4& xmmtx4x4Matrix1, XMFLOAT4X4& xmmtx4x4Matrix2)
+	{
+		XMFLOAT4X4 xmf4x4Result;
+		XMStoreFloat4x4(&xmf4x4Result, XMLoadFloat4x4(&xmmtx4x4Matrix1) + XMLoadFloat4x4(&xmmtx4x4Matrix2));
+		return(xmf4x4Result);
 	}
 
 	inline XMFLOAT4X4 Multiply(XMFLOAT4X4& xmmtx4x4Matrix1, XMMATRIX& xmmtxMatrix2)
@@ -243,6 +275,19 @@ namespace Matrix4x4
 		XMFLOAT4X4 xmmtx4x4Result;
 		XMStoreFloat4x4(&xmmtx4x4Result, xmmtxMatrix1 * XMLoadFloat4x4(&xmmtx4x4Matrix2));
 		return(xmmtx4x4Result);
+	}
+
+	inline XMFLOAT4X4 Interpolate(XMFLOAT4X4& xmf4x4Matrix1, XMFLOAT4X4& xmf4x4Matrix2, float t)
+	{
+		XMFLOAT4X4 xmf4x4Result;
+		XMVECTOR S0, R0, T0, S1, R1, T1;
+		XMMatrixDecompose(&S0, &R0, &T0, XMLoadFloat4x4(&xmf4x4Matrix1));
+		XMMatrixDecompose(&S1, &R1, &T1, XMLoadFloat4x4(&xmf4x4Matrix2));
+		XMVECTOR S = XMVectorLerp(S0, S1, t);
+		XMVECTOR T = XMVectorLerp(T0, T1, t);
+		XMVECTOR R = XMQuaternionSlerp(R0, R1, t);
+		XMStoreFloat4x4(&xmf4x4Result, XMMatrixAffineTransformation(S, XMVectorZero(), R, T));
+		return(xmf4x4Result);
 	}
 
 	inline XMFLOAT4X4 Inverse(XMFLOAT4X4& xmmtx4x4Matrix)

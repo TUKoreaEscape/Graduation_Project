@@ -17,33 +17,33 @@ void CommonMovement::update(float elapsedTime)
 			std::cout << "w키" << std::endl;
 			//gameObject->m_xmf4x4ToParent._43 += 0.005f;
 			dwDirection |= DIR_FORWARD;
-			gameObject->SetAnimationSet(1);
+			gameObject->SetTrackAnimationSet(0, 1);
 		}
 		if (keyBuffer['s'] & 0xF0 || keyBuffer['S'] & 0xF0)
 		{
 			std::cout << "s키" << std::endl;
 			//gameObject->m_xmf4x4ToParent._43 -= 0.005f;
 			dwDirection |= DIR_BACKWARD;
-			gameObject->SetAnimationSet(2);
+			gameObject->SetTrackAnimationSet(0, 2);
 		}
 		if (keyBuffer['a'] & 0xF0 || keyBuffer['A'] & 0xF0)
 		{
 			std::cout << "a키" << std::endl;
 			//gameObject->m_xmf4x4ToParent._41 -= 0.005f;
 			dwDirection |= DIR_LEFT;
-			gameObject->SetAnimationSet(3);
+			gameObject->SetTrackAnimationSet(0, 3);
 		}
 		if (keyBuffer['d'] & 0xF0 || keyBuffer['D'] & 0xF0)
 		{
 			std::cout << "d키" << std::endl;
 			//gameObject->m_xmf4x4ToParent._41 += 0.005f;
 			dwDirection |= DIR_RIGHT;
-			gameObject->SetAnimationSet(4);
+			gameObject->SetTrackAnimationSet(0, 4);
 		}
 		if (keyBuffer[VK_SPACE] & 0xF0)
 		{
 			std::cout << "스페이스바" << std::endl;
-			gameObject->SetAnimationSet(5);
+			gameObject->SetTrackAnimationSet(0, 5);
 		}
 		else {
 			//gameObject->SetAnimationSet(0);

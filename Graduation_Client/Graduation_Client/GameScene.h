@@ -15,6 +15,10 @@ class GameScene : public Scene
 {
 public:
 	Player* m_pPlayer = nullptr;
+
+	int m_nPlayers = 0;
+	Player** m_ppPlayers = nullptr;
+
 	//GameObject*						m_pCamera = NULL;
 	GameObject* m_pNPC = nullptr;
 	GameObject* m_pLight = nullptr;
