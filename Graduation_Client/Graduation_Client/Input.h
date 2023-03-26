@@ -17,7 +17,7 @@ public:
 		return InputInstance;
 	}
 
-	static UCHAR keyBuffer[256];
+	static UCHAR		keyBuffer[256];
 
 	Player*			m_pPlayer=NULL;
 	Time				m_time;
