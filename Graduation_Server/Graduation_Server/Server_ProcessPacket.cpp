@@ -35,6 +35,11 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 		// 이쪽은 충돌 했을 경우 처리해야하는 부분입니다.
 	}
 
+	if (join_room.is_collision_player_to_object(user_id))
+	{
+		// 이쪽은 오브젝트와 충돌한것을 처리하는 부분입니다.
+	}
+
 	//for (auto ptr = m_clients[user_id].view_list.begin(); ptr != m_clients[user_id].view_list.end(); ++ptr)
 	//	send_move_packet(*ptr, user_id, packet->position);
 

@@ -40,8 +40,9 @@ void RoomManager::init_object()
 
 	for (auto& p : m_game_object)
 	{
-		for (auto& _room : a_in_game_room)
+		for (auto& _room : a_in_game_room) {
 			_room.add_game_object(p.Get_Object_Type(), p.Get_center(), p.Get_extents(), p.Get_orientation());
+		}
 	}
 	cout << "All room object init!!!" << endl;
 }

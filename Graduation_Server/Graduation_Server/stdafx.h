@@ -1,5 +1,6 @@
 #pragma once
 #define DEBUG 0
+#define PRINT 1
 #define MAX_USER 30000
 #include <iostream>
 #include <WS2tcpip.h>

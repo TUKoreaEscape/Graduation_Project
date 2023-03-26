@@ -7,13 +7,23 @@ namespace CLIENT_STATE
 		ST_FREE, ST_ACCEPT, ST_LOBBY, ST_GAMEROOM, ST_INGAME
 	};
 }
+
+namespace CLIENT_ROLE
+{
+	enum STATE {
+		ROLE_NONE, ROLE_RUNNER,  ROLE_TAGGER
+	};
+}
+
 enum LOGIN_STATE {N_LOGIN, Y_LOGIN};
 
 class CLIENT {
 private:
 	char					m_name[MAX_NAME_SIZE]{};
+
 	LOGIN_STATE				m_login_state = N_LOGIN;
 	CLIENT_STATE::STATE		m_state = CLIENT_STATE::ST_FREE;
+	CLIENT_ROLE::STATE		m_role = CLIENT_ROLE::ROLE_NONE;
 
 	unsigned short			m_prev_size;
 	int						m_id;
@@ -54,11 +64,13 @@ public:
 	XMFLOAT3			get_user_velocity();
 	LOGIN_STATE			get_login_state();
 	CLIENT_STATE::STATE	get_state();
+	CLIENT_ROLE::STATE	get_role();
 	BoundingOrientedBox get_bounding_box();
 	void				get_client_name(char& name, int size);
 
 	void				set_login_state(LOGIN_STATE _state);
 	void				set_state(CLIENT_STATE::STATE state);
+	void				set_role(CLIENT_ROLE::STATE role);
 	void				set_id(int id) { m_id = id; }
 	void				set_name(char* name);
 	void				set_recv_over(EXP_OVER& exp_over, SOCKET c_socket);

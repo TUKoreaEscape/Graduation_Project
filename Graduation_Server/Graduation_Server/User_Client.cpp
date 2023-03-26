@@ -60,6 +60,10 @@ void CLIENT::set_login_state(LOGIN_STATE _state)
 	m_login_state = _state;
 }
 
+void CLIENT::set_role(CLIENT_ROLE::STATE role)
+{
+	m_role = role;
+}
 
 void CLIENT::set_recv_over(EXP_OVER& recv_over, SOCKET c_socket)
 {
@@ -118,6 +122,11 @@ float CLIENT::get_user_yaw()
 CLIENT_STATE::STATE CLIENT::get_state()
 {
 	return m_state;
+}
+
+CLIENT_ROLE::STATE CLIENT::get_role()
+{
+	return m_role;
 }
 
 LOGIN_STATE CLIENT::get_login_state()

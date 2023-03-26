@@ -144,6 +144,14 @@ void Room::Start_Game()
 {
 	start_time = chrono::system_clock::now();
 	_room_state = GAME_ROOM_STATE::PLAYING;
+
+	cGameServer& server = cGameServer::GetInstance();
+
+	for (auto p : in_player)
+	{
+		CLIENT& player = *server.get_client_info(p);
+		player.set_user_position({ 100,100,100 });
+	}
 }
 
 void Room::End_Game()
