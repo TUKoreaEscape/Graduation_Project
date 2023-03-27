@@ -8,7 +8,7 @@
 
 Player::Player() : GameObject()
 {
-	AddComponent<CommonMovement>();
+	//AddComponent<CommonMovement>();
 	//GetComponent<CommonMovement>()->m_pPlayer = this;//movenment에서 player변수가 있는데 이걸 넘겨줘야한다.
 	//AddComponent<FirstPersonCamera>();
 	//GetComponent<FirstPersonCamera>()->targetObject = this; //마찬가지로 camera에서도 player변수가 있음

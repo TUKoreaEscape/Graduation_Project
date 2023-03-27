@@ -41,4 +41,6 @@ public:
 	void AddPlayer(GameObject* player);
 
 	friend GameObject;
+
+	float m_fElapsedTime = 0.0f;
 };

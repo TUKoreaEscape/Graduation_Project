@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Light.h"
 #include "GameScene.h"
+#include "Movement.h"
 
 E_GAME_STATE gameState;
 ID3D12DescriptorHeap* GameScene::m_pd3dCbvSrvDescriptorHeap = NULL;
@@ -33,88 +34,61 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 50);
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 66);
 
 	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
 	LoadedModelInfo* pPlayerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", nullptr); 
-	LoadedModelInfo* pPlayerModel2 = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", nullptr);
+	//LoadedModelInfo* pPlayerModel2 = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", nullptr);
 
 	m_pNPC = new GameObject();
-	m_pNPC->SetChild(pPlayerModel2->m_pModelRootObject, true);
-	m_pNPC->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 1, pPlayerModel2);
+	m_pNPC->SetChild(pPlayerModel->m_pModelRootObject, true);
+	m_pNPC->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 1, pPlayerModel);
 	m_pNPC->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 1);
 	m_pNPC->m_pSkinnedAnimationController->SetTrackPosition(0, 0.5f);
 	m_pNPC->m_pSkinnedAnimationController->SetTrackSpeed(0, 2.0f);
+	m_pNPC->m_xmf4x4ToParent._42 = 100.0f;
 
 	m_nPlayers = 5;
 	m_ppPlayers = new Player * [m_nPlayers];
 	for (int i = 0; i < m_nPlayers; ++i) {
 		m_ppPlayers[i] = new Player();
-		m_ppPlayers[i]->SetChild(pPlayerModel2->m_pModelRootObject, true);
-		m_ppPlayers[i]->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 1, pPlayerModel2);
-		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-		m_ppPlayers[i]->SetPosition(XMFLOAT3(i * 1.0f, 0, 0));
+		m_ppPlayers[i]->SetChild(pPlayerModel->m_pModelRootObject, true);
+		m_ppPlayers[i]->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 1, pPlayerModel);
+		m_ppPlayers[i]->SetPosition(XMFLOAT3(0, 1.f, i * 3.f));
 	}
-
+	m_ppPlayers[0]->m_pSkinnedAnimationController->SetTrackSpeed(0, 0.5f); 
+	m_ppPlayers[0]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+	m_ppPlayers[1]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.0f);
+	m_ppPlayers[1]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 1);
+	m_ppPlayers[2]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.5f);
+	m_ppPlayers[2]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 1);
+	m_ppPlayers[3]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.0f);
+	m_ppPlayers[3]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 3);
+	m_ppPlayers[4]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.0f);
+	m_ppPlayers[4]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 2);
+	
 	m_pPlayer = new Player();
 	m_pPlayer->SetChild(pPlayerModel->m_pModelRootObject, true);
 	m_pPlayer->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 1, pPlayerModel);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.0f);
-	//m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
+	m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
 
 	
-	//if (pPlayerModel) delete pPlayerModel;
-	//GameObject* pGameObject = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", NULL, true);
-	////GameObject* pGameObject1 = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", NULL, true);
-	//
-	//GameObject* pGameObject0 = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", NULL, true);
-	//GameObject* pGameObject1 = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", NULL, true);
-	//GameObject* pGameObject2 = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", NULL, true);
-	//GameObject* pGameObject3 = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", NULL, true);
-	//GameObject* pGameObject4 = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", NULL, true);
+	if (pPlayerModel) delete pPlayerModel;
 
-	//m_nPlayers = 5;
-	//m_ppPlayers = new Player*[m_nPlayers];
-	//
-	//m_ppPlayers[0] = new Player();
-	//m_ppPlayers[0]->SetChild(pGameObject0);
-	//m_ppPlayers[0]->SetPosition(XMFLOAT3(5.0f, 0.0f, 0.0f));
-	//m_ppPlayers[1] = new Player();
-	//m_ppPlayers[1]->SetChild(pGameObject1);
-	//m_ppPlayers[1]->SetPosition(XMFLOAT3(0.0f, 0.0f, 5.0f));
-	//m_ppPlayers[2] = new Player();
-	//m_ppPlayers[2]->SetChild(pGameObject2);
-	//m_ppPlayers[2]->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
-	//m_ppPlayers[3] = new Player();
-	//m_ppPlayers[3]->SetChild(pGameObject3);
-	//m_ppPlayers[3]->SetPosition(XMFLOAT3(-5.0f, 0.0f, 0.0f));
-	//m_ppPlayers[4] = new Player();
-	//m_ppPlayers[4]->SetChild(pGameObject4);
-	//m_ppPlayers[4]->SetPosition(XMFLOAT3(5.0f, 0.0f, 55.0f));
-
-	//m_pPlayer = new Player();
-	//m_pPlayer->SetChild(pGameObject);
-
-
-	//m_pNPC = new GameObject();
-	//m_pNPC->SetChild(pGameObject);
-	//m_pNPC->SetNotDraw();
-	//m_pCamera = new GameObject();
-	//m_pCamera->AddComponent<Camera>();
-	//m_pCamera->start(pd3dDevice, pd3dCommandList);
 	m_pLight = new GameObject();
 	m_pLight->AddComponent<Light>();
 	m_pLight->start(pd3dDevice, pd3dCommandList);
 	//m_pTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
-	//AddPlayer(m_pNPC);
+	m_pPlayer->AddComponent<CommonMovement>(); 
+
+	AddPlayer(m_pNPC);
 	for (int i = 0; i < m_nPlayers; ++i) {
 		AddPlayer(m_ppPlayers[i]);
 	}
-	//AddPlayer(m_pPlayer);
-	AddPlayer(m_pNPC);
 	AddPlayer(m_pPlayer);
 }
 

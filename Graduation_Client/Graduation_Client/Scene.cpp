@@ -19,6 +19,7 @@ GameObject* Scene::CreateEmpty()
 
 void Scene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	m_fElapsedTime = elapsedTime;
 	while (!creationQueue.empty())
 	{
 		auto gameObject = creationQueue.front();
@@ -46,7 +47,8 @@ void Scene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 void Scene::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	for (auto& object : gameObjects) {
-		//object->OnPrepareRender();
+		object->OnPrepareRender();
+		object->Animate(m_fElapsedTime);
 		object->render(pd3dCommandList);
 	}
 }

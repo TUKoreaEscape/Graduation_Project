@@ -26,10 +26,6 @@ public:
 
 	virtual void update(float elapsedTime)
 	{
-		OnPrepareRender();
-
-		if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->AdvanceTime(elapsedTime, this);
-		
 		if (m_pSibling) m_pSibling->update(elapsedTime);
 		if (m_pChild) m_pChild->update(elapsedTime);
 		for (auto& component : components)
@@ -114,6 +110,7 @@ public:
 
 	static LoadedModelInfo* LoadGeometryAndAnimationFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, char* pstrFileName, Shader* pShader);
 
+	void Animate(float fTimeElapsed);
 };
 
 template<typename T>

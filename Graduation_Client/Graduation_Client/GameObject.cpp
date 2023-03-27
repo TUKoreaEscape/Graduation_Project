@@ -435,3 +435,13 @@ LoadedModelInfo* GameObject::LoadGeometryAndAnimationFromFile(ID3D12Device* pd3d
 
 	return(pLoadedModel);
 }
+
+void GameObject::Animate(float fTimeElapsed)
+{
+	OnPrepareRender();
+
+	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->AdvanceTime(fTimeElapsed, this);
+
+	if (m_pSibling) m_pSibling->Animate(fTimeElapsed);
+	if (m_pChild) m_pChild->Animate(fTimeElapsed);
+}
