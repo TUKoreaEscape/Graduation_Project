@@ -1,5 +1,5 @@
 #pragma once
-#define DEBUG 0
+#define DEBUG 1
 #define PRINT 1
 #define MAX_USER 30000
 #include <iostream>

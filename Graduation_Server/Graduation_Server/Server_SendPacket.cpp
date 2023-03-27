@@ -119,3 +119,16 @@ void cGameServer::send_voice_data(const unsigned int id)
 
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
+
+void cGameServer::send_put_other_player(const unsigned int put_id, const unsigned int recv_id)
+{
+	sc_packet_put_other_client packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_PUT_OTHER_PLAYER;
+	packet.position = m_clients[put_id].get_user_position();
+	packet.yaw = m_clients[put_id].get_user_yaw();
+#if PRINT
+	cout << "유저 정보를 보넀습니다." << endl;
+#endif
+	m_clients[recv_id].do_send(sizeof(packet), &packet);
+}

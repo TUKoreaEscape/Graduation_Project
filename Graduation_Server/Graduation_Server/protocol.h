@@ -178,6 +178,7 @@ namespace SC_PACKET
 		SC_PACKET_JOIN_ROOM_SUCCESS,
 		SC_PACKET_JOIN_ROOM_FAIL,
 		SC_PACKET_GAME_START,
+		SC_PACKET_PUT_OTHER_PLAYER,
 		SC_PACKET_ROOM_INFO,
 		SC_PACKET_VIVOX_DATA
 	};
@@ -252,12 +253,13 @@ struct sc_packet_chat { // 유저간 채팅
 };
 
 struct sc_packet_put_other_client {
-	unsigned char	size;
-	unsigned char	type;
-	unsigned int	user_id;
+	unsigned char		size;
+	unsigned char		type;
+	unsigned int		user_id;
 
-	char			id[MAX_NAME_SIZE];
-	float			yaw;
+	char				id[MAX_NAME_SIZE];
+	DirectX::XMFLOAT3	position;
+	float				yaw;
 };
 
 struct sc_packet_game_start { // 게임 시작을 방에 있는 플레이어에게 알려줌

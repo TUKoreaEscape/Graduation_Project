@@ -49,6 +49,8 @@ void cGameServer::StartServer()
 	
 	for (auto& timer_worker : m_timer_thread)
 		timer_worker.join();
+
+	cout << "이쪽 넘어옴" << endl;
 }
 
 void cGameServer::WorkerThread()
@@ -129,11 +131,25 @@ void cGameServer::Accept(EXP_OVER* exp_over)
 
 		CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), C_IOCP::m_h_iocp, new_id, 0);
 		m_clients[new_id].do_recv();
-
+		m_clients[new_id].set_id(new_id);
 		ZeroMemory(&exp_over->m_wsa_over, sizeof(exp_over->m_wsa_over));
 		c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 		*(reinterpret_cast<SOCKET*>(exp_over->m_buf)) = c_socket;
 		AcceptEx(C_IOCP::m_listen_socket, c_socket, exp_over->m_buf + 8, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &exp_over->m_wsa_over);
+
+#if DEBUG // 테스트용으로 사용중입니다. 추후 제거해야하는 코드임!
+		for (int i = 0; i < MAX_USER; ++i)
+		{
+			if (m_clients[i].get_id() == -1)
+				;
+
+			else if (new_id != i) {
+				send_put_other_player(new_id, i);
+				send_put_other_player(i, new_id);
+			}
+		}
+#endif
+
 	}
 }
 
@@ -245,7 +261,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_MOVE:
 	{
-#if DEBUG
+#if !DEBUG
 		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_INGAME)
 #endif
 			Process_Move(user_id, p);
@@ -260,7 +276,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_PACKET_CREATE_ROOM:
 	{
-#if DEBUG
+#if !DEBUG
 		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY) // 로그인하고 로비에 있을때만 방 생성 가능
 #endif
 			Process_Create_Room(user_id);
@@ -269,7 +285,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_PACKET_JOIN_ROOM:
 	{
-#if DEBUG
+#if !DEBUG
 		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY)
 #endif
 #if !DEBUG
@@ -281,7 +297,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_PACKET_READY:
 	{
-#if DEBUG
+#if !DEBUG
 		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_GAMEROOM)
 #endif
 			Process_Ready(user_id, p);
@@ -290,7 +306,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	
 	case CS_PACKET::CS_PACKET_EXIT_ROOM:
 	{
-#if DEBUG
+#if !DEBUG
 		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_GAMEROOM)
 #endif
 			Process_Exit_Room(user_id, p);
