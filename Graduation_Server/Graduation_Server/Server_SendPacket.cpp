@@ -94,7 +94,7 @@ void cGameServer::send_move_packet(const unsigned int id, const unsigned int mov
 	sc_update_user_packet packet;
 
 	packet.size = sizeof(packet);
-	packet.type = SC_PACKET::SC_USER_UPDATE;
+	packet.type = SC_PACKET::SC_PACKET_MOVE;
 
 	packet.data.id = moved_id;
 	packet.data.position = m_clients[moved_id].get_user_position();
@@ -127,7 +127,7 @@ void cGameServer::send_put_player_data(const unsigned int recv_id)
 	packet.type = SC_PACKET::SC_PACKET_PUT_PLAYER;
 	packet.data.active = false;
 	packet.data.id = recv_id;
-	packet.data.position = XMFLOAT3{ recv_id * 1.0f, 0.0f, 0.0f };
+	packet.data.position = XMFLOAT3{ recv_id * 20.0f, 0.0f, 0.0f };
 	packet.data.velocity = XMFLOAT3{ 0,0,0 };
 	packet.data.yaw = 0.0f;
 

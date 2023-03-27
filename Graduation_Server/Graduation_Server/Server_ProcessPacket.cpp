@@ -25,26 +25,37 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(buff);
 
 	m_clients[user_id].set_user_position(packet->position);
-	m_clients[user_id].set_user_velocity(packet->velocity);
 	m_clients[user_id].set_user_yaw(packet->yaw);
 
 	Room& join_room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
-	if (join_room.is_collision_player_to_player(user_id))
-	{
-		// 이쪽은 충돌 했을 경우 처리해야하는 부분입니다.
-	}
+	//if (join_room.is_collision_player_to_player(user_id))
+	//{
+	//	// 이쪽은 충돌 했을 경우 처리해야하는 부분입니다.
+	//}
 
-	if (join_room.is_collision_player_to_object(user_id))
-	{
-		// 이쪽은 오브젝트와 충돌한것을 처리하는 부분입니다.
-	}
+	//if (join_room.is_collision_player_to_object(user_id))
+	//{
+	//	// 이쪽은 오브젝트와 충돌한것을 처리하는 부분입니다.
+	//}
 
 	//for (auto ptr = m_clients[user_id].view_list.begin(); ptr != m_clients[user_id].view_list.end(); ++ptr)
 	//	send_move_packet(*ptr, user_id, packet->position);
-
+#if !DEBUG
 	for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
 		send_move_packet(*ptr, user_id, packet->position);
+#endif
+
+#if DEBUG
+	for (int i = 0; i < MAX_USER; ++i)
+	{
+		if (m_clients[i].get_id() != -1 && m_clients[i].get_id() != user_id)
+		{
+			cout << "send_move" << endl;
+			send_move_packet(i, user_id, packet->position);
+		}
+	}
+#endif
 }
 
 void cGameServer::Process_Chat(const int user_id, void* buff)

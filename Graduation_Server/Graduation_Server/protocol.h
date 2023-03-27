@@ -96,9 +96,8 @@ struct cs_packet_move { // 이동관련 데이터
 	unsigned char	size;
 	unsigned char	type;
 	
-	DirectX::XMFLOAT3 position;
-	DirectX::XMFLOAT3 velocity;
-	float			yaw;
+	DirectX::XMFLOAT3	position;
+	float				yaw;
 };
 
 struct cs_packet_voice {
@@ -180,6 +179,7 @@ namespace SC_PACKET
 		SC_PACKET_GAME_START,
 		SC_PACKET_PUT_PLAYER,
 		SC_PACKET_PUT_OTHER_PLAYER,
+		SC_PACKET_MOVE,
 		SC_PACKET_ROOM_INFO,
 		SC_PACKET_VIVOX_DATA
 	};
@@ -280,5 +280,14 @@ struct sc_packet_voice_data {
 	char			domain[15];
 	char			key[8];
 	char			api[33];
+};
+
+struct sc_packet_move {
+	unsigned char	size;
+	unsigned char	type;
+	unsigned short	id;
+
+	DirectX::XMFLOAT3	pos;
+	float				yaw;
 };
 #pragma pack(pop)
