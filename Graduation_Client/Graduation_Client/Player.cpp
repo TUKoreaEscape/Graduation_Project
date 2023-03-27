@@ -4,7 +4,7 @@
 #include "Camera.h"
 #include "Input.h"
 #include "Player.h"
-
+#include "Network.h"
 
 Player::Player() : GameObject()
 {
@@ -57,12 +57,23 @@ void Player::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 	if (bUpdateVelocity)
 	{
 		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, xmf3Shift);
+
+
+		Network& server = *Network::GetInstance();
+		cs_packet_move packet;
+		packet.size = sizeof(packet);
+		packet.type = CS_PACKET::CS_MOVE;
+		packet.position = m_xmf3Position;
+		packet.yaw = m_fYaw;
+		server.send_packet(&packet);
+		std::cout << "send_move" << std::endl;
 	}
 	else
 	{
 		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
 		m_pCamera->Move(xmf3Shift);
 	}
+
 	//if (this == Input::GetInstance()->m_pPlayer)
 	//{
 	//	std::cout << "°°À½" << std::endl;

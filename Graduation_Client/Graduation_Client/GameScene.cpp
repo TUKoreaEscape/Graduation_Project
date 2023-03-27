@@ -2,6 +2,7 @@
 #include "Light.h"
 #include "GameScene.h"
 #include "Movement.h"
+#include "Network.h"
 
 E_GAME_STATE gameState;
 ID3D12DescriptorHeap* GameScene::m_pd3dCbvSrvDescriptorHeap = NULL;
@@ -90,6 +91,12 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 		AddPlayer(m_ppPlayers[i]);
 	}
 	AddPlayer(m_pPlayer);
+
+	m_network = Network::GetInstance();
+	m_network->init_network();
+	m_network->m_pPlayer = m_pPlayer;
+	m_network->m_ppOther = m_ppPlayers;
+	recv_thread = std::thread{ &Network::listen_thread, m_network };
 }
 
 void GameScene::ReleaseObjects()

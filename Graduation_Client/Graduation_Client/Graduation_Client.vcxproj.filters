@@ -34,6 +34,9 @@
     <Filter Include="Client\GameObjects">
       <UniqueIdentifier>{4fbf0c34-6af3-4e24-878b-d5d52e21b03d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Client\Network">
+      <UniqueIdentifier>{7ffd88b5-8cb1-451c-98d6-caf81b302046}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -111,6 +114,15 @@
     <ClInclude Include="Renderer.h">
       <Filter>Engine\Framework</Filter>
     </ClInclude>
+    <ClInclude Include="EXP_OVER.h">
+      <Filter>Client\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Network.h">
+      <Filter>Client\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="protocol.h">
+      <Filter>Client\Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -178,6 +190,12 @@
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Engine\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="EXP_OVER.cpp">
+      <Filter>Client\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Network.cpp">
+      <Filter>Client\Network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

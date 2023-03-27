@@ -42,7 +42,11 @@ using Microsoft::WRL::ComPtr;
 #include <deque>
 #include <algorithm>
 #include <iostream>
+#include <WS2tcpip.h>
+#include <MSWSock.h>
+#include <WinSock2.h>
 
+#pragma comment(lib, "ws2_32.lib")
 //#define _WITH_DEBUG_FRAME_HIERARCHY
 
 
