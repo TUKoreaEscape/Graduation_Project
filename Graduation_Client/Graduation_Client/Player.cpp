@@ -22,7 +22,6 @@ Player::Player() : GameObject()
 	m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 	m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 
 	m_fPitch = 0.0f;
 	m_fRoll = 0.0f;
@@ -46,7 +45,7 @@ void Player::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 		if (dwDirection & DIR_BACKWARD)	xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, -fDistance);
 		if (dwDirection & DIR_RIGHT)			xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, fDistance);
 		if (dwDirection & DIR_LEFT)				xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, -fDistance);
-		if (dwDirection & DIR_UP)				xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, fDistance);
+		if (dwDirection & DIR_UP)				xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, fDistance*20.0f);
 		if (dwDirection & DIR_DOWN)			xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, -fDistance);
 
 		Move(xmf3Shift, bUpdateVelocity);
@@ -158,7 +157,12 @@ void Player::update(float fTimeElapsed)
 	OnPrepareRender();
 
 	GameObject::update(fTimeElapsed);
-	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
+	if (m_xmf3Position.y > 0.0f)
+	{
+		//std::cout << "중력작용중" << std::endl;
+		//m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Gravity, fTimeElapsed, false));
+		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
+	}
 	float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
 	float fMaxVelocityXZ = m_fMaxVelocityXZ;
 	if (fLength > m_fMaxVelocityXZ)

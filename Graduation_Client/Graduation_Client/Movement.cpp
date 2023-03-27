@@ -49,8 +49,8 @@ void CommonMovement::update(float elapsedTime)
 				(dwDirection == DIR_NOT_LR) ||
 				(dwDirection == DIR_NOT_FBLR))
 				m_emptyKey = true;
-
-			Input::GetInstance()->m_pPlayer->Move(dwDirection, 100.f, true);
+			std::cout << elapsedTime << std::endl;
+			Input::GetInstance()->m_pPlayer->Move(dwDirection, 25.f * elapsedTime, true);
 		}
 		else m_emptyKey = true;
 
