@@ -5,16 +5,6 @@
 
 using namespace std;
 
-C_IOCP::C_IOCP()
-{
-
-}
-
-C_IOCP::~C_IOCP()
-{
-
-}
-
 void C_IOCP::Start_server()
 {
 	WSADATA wsa;
@@ -40,7 +30,7 @@ void C_IOCP::Bind_Socket(short port_num)
 	bind(m_listen_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
 	listen(m_listen_socket, SOMAXCONN);
 
-	m_h_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
+	m_h_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
 	CreateIoCompletionPort(reinterpret_cast<HANDLE>(m_listen_socket), m_h_iocp, 0, 0);
 
 	m_client_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
@@ -49,7 +39,7 @@ void C_IOCP::Bind_Socket(short port_num)
 	ZeroMemory(&m_exp_over.m_wsa_over, sizeof(m_exp_over.m_wsa_over));
 	m_exp_over.m_comp_op = OP_TYPE(OP_ACCEPT);
 
-	bool ret = AcceptEx(m_listen_socket, m_client_socket, buf_accept, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &m_exp_over.m_wsa_over);
+	AcceptEx(m_listen_socket, m_client_socket, buf_accept, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &m_exp_over.m_wsa_over);
 
 	std::cout << "Server Start!!! \n";
 }

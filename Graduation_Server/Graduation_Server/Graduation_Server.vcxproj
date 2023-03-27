@@ -116,9 +116,10 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,8 +134,13 @@
     <ClCompile Include="GameServer.cpp" />
     <ClCompile Include="IOCP.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Map_Load.cpp" />
+    <ClCompile Include="object.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="Room_Manager.cpp" />
+    <ClCompile Include="Server_ProcessPacket.cpp" />
+    <ClCompile Include="Server_SendPacket.cpp" />
+    <ClCompile Include="Update_Session.cpp" />
     <ClCompile Include="User_Client.cpp" />
     <ClCompile Include="Voice_chat.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -145,9 +151,12 @@
     <ClInclude Include="EXPOver.h" />
     <ClInclude Include="GameServer.h" />
     <ClInclude Include="IOCP.h" />
+    <ClInclude Include="Map_Load.h" />
+    <ClInclude Include="object.h" />
     <ClInclude Include="protocol.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="Room_Manager.h" />
+    <ClInclude Include="Server_Timer.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="User_Client.h" />
     <ClInclude Include="Voice_chat.h">

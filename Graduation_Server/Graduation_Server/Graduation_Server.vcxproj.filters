@@ -34,6 +34,18 @@
     <Filter Include="소스 파일\02 DataBase">
       <UniqueIdentifier>{888e1868-1bce-414e-99a0-09516a91821b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\05 MapData">
+      <UniqueIdentifier>{e79569e3-b52e-4279-a508-5d08686dc809}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\06 Object">
+      <UniqueIdentifier>{308bf954-f704-4510-a955-9c172a828c6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\00 Main\Packet">
+      <UniqueIdentifier>{4939896e-552a-4a9f-ab25-c61887c5746f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\00 Main\Session">
+      <UniqueIdentifier>{b8fdc777-af48-4e58-9e79-beedc4b58d77}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IOCP.h">
@@ -66,6 +78,15 @@
     <ClInclude Include="DataBase.h">
       <Filter>소스 파일\02 DataBase</Filter>
     </ClInclude>
+    <ClInclude Include="Map_Load.h">
+      <Filter>소스 파일\05 MapData</Filter>
+    </ClInclude>
+    <ClInclude Include="object.h">
+      <Filter>소스 파일\06 Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Server_Timer.h">
+      <Filter>소스 파일\00 Main\Session</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -94,6 +115,21 @@
     </ClCompile>
     <ClCompile Include="DataBase.cpp">
       <Filter>소스 파일\02 DataBase</Filter>
+    </ClCompile>
+    <ClCompile Include="Map_Load.cpp">
+      <Filter>소스 파일\05 MapData</Filter>
+    </ClCompile>
+    <ClCompile Include="object.cpp">
+      <Filter>소스 파일\06 Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Server_SendPacket.cpp">
+      <Filter>소스 파일\00 Main\Packet</Filter>
+    </ClCompile>
+    <ClCompile Include="Update_Session.cpp">
+      <Filter>소스 파일\00 Main\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="Server_ProcessPacket.cpp">
+      <Filter>소스 파일\00 Main\Packet</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

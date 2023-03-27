@@ -1,6 +1,10 @@
-#include "stdafx.h"
-#include <bitset>
 #include "GameServer.h"
+
+cGameServer& cGameServer::GetInstance()
+{
+	static cGameServer instance;
+	return instance;
+}
 
 cGameServer::cGameServer()
 {
@@ -26,6 +30,9 @@ void cGameServer::init()
 
 	m_room_manager = new RoomManager;
 	m_room_manager->init();
+	m_room_manager->init_object();
+
+	m_session_timer.reset();
 }
 
 void cGameServer::StartServer()
@@ -33,11 +40,17 @@ void cGameServer::StartServer()
 	C_IOCP::Start_server();
 
 	// 이쪽은 이제 맵 로드할 부분
-	for (int i = 0; i < 8; ++i)
+	for (int i = 0; i < 12; ++i)
 		m_worker_threads.emplace_back(std::thread(&cGameServer::WorkerThread, this));
 
+	m_timer_thread.emplace_back(std::thread(&cGameServer::Update_Session, this));
 	for (auto& worker : m_worker_threads)
 		worker.join();
+	
+	for (auto& timer_worker : m_timer_thread)
+		timer_worker.join();
+
+	cout << "이쪽 넘어옴" << endl;
 }
 
 void cGameServer::WorkerThread()
@@ -72,7 +85,7 @@ void cGameServer::WorkerThread()
 
 			LocalFree(lpMsgBuf);
 			Disconnect(client_id);
-			
+			cout << "disconnect ID : " << client_id << endl;
 			if (exp_over->m_comp_op == OP_SEND)
 				delete exp_over;
 			continue;
@@ -80,18 +93,18 @@ void cGameServer::WorkerThread()
 
 		switch (exp_over->m_comp_op) {
 		case OP_RECV:
-			//if (num_byte == 0)
-			//	//Disconnect(client_id);
+			if (num_byte == 0)
+				Disconnect(client_id);
 			Recv(exp_over, client_id, num_byte);
-			cout << client_id << "_send \n";
 			break;
 
 		case OP_SEND:
 			if (num_byte != exp_over->m_wsa_buf.len) {
 				std::cout << "send_error" << std::endl;
-				//Disconnect(client_id);
+				Disconnect(client_id);
+				delete exp_over;
+				continue;
 			}
-			delete exp_over;
 			break;
 
 		case OP_ACCEPT:
@@ -103,25 +116,42 @@ void cGameServer::WorkerThread()
 
 void cGameServer::Accept(EXP_OVER* exp_over)
 {
-	if(DEBUG)
+#if DEBUG
 		std::cout << "Accept Completed \n";
-
+#endif
 	unsigned int new_id = get_new_id();
 	if (-1 == new_id) {}
 	else
 	{
-		if(DEBUG)
-			cout << "Accept Client! new_id : " << new_id << endl;
+#if DEBUG
+		cout << "Accept Client! new_id : " << new_id << endl;
+#endif
 		SOCKET c_socket = *(reinterpret_cast<SOCKET*>(exp_over->m_buf));
 		m_clients[new_id]._socket = c_socket;
 
-		CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), m_h_iocp, new_id, 0);
+		CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), C_IOCP::m_h_iocp, new_id, 0);
 		m_clients[new_id].do_recv();
-
+		m_clients[new_id].set_id(new_id);
 		ZeroMemory(&exp_over->m_wsa_over, sizeof(exp_over->m_wsa_over));
 		c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 		*(reinterpret_cast<SOCKET*>(exp_over->m_buf)) = c_socket;
 		AcceptEx(C_IOCP::m_listen_socket, c_socket, exp_over->m_buf + 8, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &exp_over->m_wsa_over);
+
+#if DEBUG // 테스트용으로 사용중입니다. 추후 제거해야하는 코드임!
+		send_put_player_data(new_id);
+
+		for (int i = 0; i < MAX_USER; ++i)
+		{
+			if (m_clients[i].get_id() == -1)
+				;
+
+			else if (new_id != i) {
+				send_put_other_player(new_id, i);
+				send_put_other_player(i, new_id);
+			}
+		}
+#endif
+
 	}
 }
 
@@ -163,6 +193,29 @@ wstring cGameServer::stringToWstring(const std::string& t_str) // string -> wstr
 
 }
 
+int cGameServer::get_new_id()
+{
+	for (int i = 0; i < MAX_USER; ++i)
+	{
+		m_clients[i]._state_lock.lock();
+		if (CLIENT_STATE::ST_FREE == m_clients[i].get_state())
+		{
+			m_clients[i].set_state(CLIENT_STATE::ST_ACCEPT);
+			m_clients[i]._state_lock.unlock();
+			return i;
+		}
+		m_clients[i]._state_lock.unlock();
+	}
+
+	std::cout << "Maximum Number of Clients Overflow! \n";
+	return -1;
+}
+
+CLIENT* cGameServer::get_client_info(const int player_id)
+{
+	return &m_clients[player_id];
+}
+
 void cGameServer::Send(EXP_OVER* exp_over)
 {
 
@@ -171,16 +224,20 @@ void cGameServer::Send(EXP_OVER* exp_over)
 void cGameServer::Disconnect(const unsigned int _user_id) // 클라이언트 연결을 풀어줌(비정상 접속해제 or 정상종료시 사용)
 {
 	CLIENT& cl = m_clients[_user_id];
+	
 
 	// 여기서 초기화
-
-	m_clients[_user_id]._state_lock.lock();
-	closesocket(m_clients[_user_id]._socket);
-	m_clients[_user_id].set_state(ST_FREE);
-	m_clients[_user_id].set_login_state(N_LOGIN);
-	m_clients[_user_id]._state_lock.unlock();
+	if (cl.get_join_room_number() != -1) {
+		Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
+		rl.Exit_Player(_user_id);	
+	}
+	cl._state_lock.lock();
+	cl.set_state(CLIENT_STATE::ST_FREE);
+	cl.set_login_state(N_LOGIN);
+	cl.set_id(-1);
+	cl._state_lock.unlock();
+	closesocket(cl._socket);
 }
-
 
 //============================================================================
 // 패킷 구분후 처리해주는 공간
@@ -206,7 +263,9 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_MOVE:
 	{
-		if(Y_LOGIN == m_clients[user_id].get_login_state())
+#if !DEBUG
+		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_INGAME)
+#endif
 			Process_Move(user_id, p);
 		break;
 	}
@@ -216,16 +275,43 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		Process_Chat(user_id, p);
 		break;
 	}
+
 	case CS_PACKET::CS_PACKET_CREATE_ROOM:
 	{
-		//if (Y_LOGIN == m_clients[user_id].get_login_state())
+#if !DEBUG
+		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY) // 로그인하고 로비에 있을때만 방 생성 가능
+#endif
 			Process_Create_Room(user_id);
 		break;
 	}
 
 	case CS_PACKET::CS_PACKET_JOIN_ROOM:
 	{
+#if !DEBUG
+		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY)
+#endif
+#if !DEBUG
+		if(m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY)
+#endif
+			Process_Join_Room(user_id, p);
+		break;
+	}
 
+	case CS_PACKET::CS_PACKET_READY:
+	{
+#if !DEBUG
+		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_GAMEROOM)
+#endif
+			Process_Ready(user_id, p);
+		break;
+	}
+	
+	case CS_PACKET::CS_PACKET_EXIT_ROOM:
+	{
+#if !DEBUG
+		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_GAMEROOM)
+#endif
+			Process_Exit_Room(user_id, p);
 		break;
 	}
 
@@ -235,189 +321,14 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		break;
 	}
 
-	}
-}
-//============================================================================
-// 구분한 패킷 처리하는 공간
-//============================================================================
-void cGameServer::Process_Create_ID(int c_id, void* buff) // 요청받은 ID생성패킷 처리
-{
-	int reason = 0;
-
-	cs_packet_create_id* packet = reinterpret_cast<cs_packet_create_id*>(buff);
-
-	string stringID{};
-	string stringPW{};
-
-	stringID = packet->id;
-	stringPW = packet->pass_word;
-	reason = m_database->create_id(stringToWstring(stringID), stringToWstring(stringPW));
-
-	cout << "reason : " << reason << endl;
-	if (reason == 1) // id 생성 성공
-		send_create_id_ok_packet(c_id);
-	else // id 생성 실패
-		send_create_id_fail_packet(c_id, reason);
-}
-
-void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터 이동을 처리
-{
-	cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(buff);
-
-	for (auto ptr = m_clients[user_id].view_list.begin(); ptr != m_clients[user_id].view_list.end(); ++ptr)
-		send_move_packet(*ptr, packet->pos);
-}
-
-void cGameServer::Process_Chat(const int user_id, void* buff)
-{
-	cs_packet_chat* packet = reinterpret_cast<cs_packet_chat*>(buff);
-	char mess[256];
-
-	strcpy_s(mess, packet->message);
-
-	// 같은 방에 있는 유저한테만 메세지 보낼 예정
-	m_clients[user_id]._room_list_lock.lock();
-	for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
-		send_chat_packet(*ptr, user_id, mess);
-	m_clients[user_id]._room_list_lock.unlock();
-}
-
-void cGameServer::Process_Create_Room(const unsigned int _user_id) // 요청받은 새로운 방 생성
-{
-	sc_packet_create_room packet;
-	packet.size = sizeof(packet);
-	packet.type = SC_PACKET::SC_CREATE_ROOM_OK;
-	packet.room_number = m_room_manager->Create_room(_user_id);
-
-	m_clients[_user_id].do_send(sizeof(packet), &packet);
-}
-
-void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
-{
-	cs_packet_request_all_room_info* packet = reinterpret_cast<cs_packet_request_all_room_info*>(buff);
-
-	sc_packet_request_room_info send_packet;
-
-
-	Room get_room_info;
-	int room_number;
-	for (int i = 0; i < 10; ++i) // 1페이지당 10개의 방이 보인다고 가정, 룸정보를 전송할 준비함
+	case CS_PACKET::CS_PACKET_GAME_LOADING_SUCCESS:
 	{
-		room_number = i + (packet->request_page * 10);
-
-		send_packet.room_info[i].room_number = room_number;
-		send_packet.room_info[i].join_member = m_room_manager->Get_Room_Info(room_number).Get_Number_of_users();
-		send_packet.room_info[i].state = m_room_manager->Get_Room_Info(room_number)._room_state;
-	}
-	send_packet.size = sizeof(sc_packet_request_room_info);
-	send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
-	cout << "send_packet size : " << int(send_packet.size) << endl;
-	m_clients[user_id].do_send(sizeof(send_packet), &send_packet);
-}
-
-void cGameServer::Process_User_Login(int c_id, void* buff) // 로그인 요청
-{
-	int reason = 0;
-
-	cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(buff);
-	string stringID{};
-	string stringPW{};
-
-	stringID = packet->id;
-	stringPW = packet->pass_word;
-	reason = m_database->check_login(stringToWstring(stringID), stringToWstring(stringPW));
-	if (reason == 1) // reason 0 : id가 존재하지 않음 / reason 1 : 성공 / reason 2 : pw가 틀림
-	{
-		send_login_ok_packet(c_id);
-		m_clients[c_id].set_login_state(Y_LOGIN);
-	}
-	else
-	{
-		if (reason == 0)
-			send_login_fail_packet(c_id, LOGIN_FAIL_REASON::INVALID_ID);
-		else
-			send_login_fail_packet(c_id, LOGIN_FAIL_REASON::WRONG_PW);
-	}
-}
-//============================================================================
-// 서버에서 보내는 패킷 함수들 
-//============================================================================
-void cGameServer::send_chat_packet(int user_id, int my_id, char* mess)
-{
-	sc_packet_chat packet;
-	packet.id = my_id;
-	packet.type = sizeof(packet);
-	packet.type = SC_PACKET::SC_PACKET_CHAT;
-	strcpy_s(packet.message, mess);
-	m_clients[user_id].do_send(sizeof(packet), &packet);
-}
-
-void cGameServer::send_login_fail_packet(int user_id, LOGIN_FAIL_REASON::TYPE reason)
-{
-	sc_packet_login_fail packet;
-	packet.type = SC_PACKET::SC_LOGINFAIL;
-	packet.size = sizeof(sc_packet_login_fail);
-	packet.reason = reason;
-	m_clients[user_id].do_send(sizeof(packet), &packet);
-}
-
-void cGameServer::send_login_ok_packet(int user_id)
-{
-	sc_packet_login_ok packet;
-	packet.id = user_id;
-	packet.size = sizeof(sc_packet_login_ok);
-	packet.type = SC_PACKET::SC_LOGINOK;
-
-	m_clients[user_id].do_send(sizeof(packet), &packet);
-}
-
-void cGameServer::send_create_id_ok_packet(int user_id)
-{
-	sc_packet_create_id_ok packet;
-	packet.size = sizeof(packet);
-	packet.type = SC_PACKET::SC_CREATE_ID_OK;
-
-	m_clients[user_id].do_send(sizeof(packet), &packet);
-}
-
-void cGameServer::send_create_id_fail_packet(int user_id, char reason)
-{
-	sc_packet_create_id_fail packet;
-	packet.size = sizeof(packet);
-	packet.type = SC_PACKET::SC_CREATE_ID_FAIL;
-	packet.reason = reason;
-
-	m_clients[user_id].do_send(sizeof(packet), &packet);
-}
-
-void cGameServer::send_move_packet(int user_id, Position pos)
-{
-	sc_packet_move packet;
-
-	packet.size = sizeof(packet);
-	packet.type = SC_PACKET::SC_MOVING;
-	
-	m_clients[user_id].do_send(sizeof(packet), &packet);
-
-}
-
-
-int cGameServer::get_new_id()
-{
-	for (int i = 0; i < MAX_USER; ++i)
-	{
-		m_clients[i]._state_lock.lock();
-		if (ST_FREE == m_clients[i].get_state())
-		{
-			m_clients[i].set_state(ST_ACCEPT);
-			m_clients[i]._state_lock.unlock();
-			cout << "gen_id : " << i << endl;
-			return i;
-		}
-		m_clients[i]._state_lock.unlock();
+		Process_Game_Start(user_id);
+		break;
 	}
 
-	std::cout << "Maximum Number of Clients Overflow! \n";
-	return -1;
+	}
 }
-//============================================================================
+
+
+
