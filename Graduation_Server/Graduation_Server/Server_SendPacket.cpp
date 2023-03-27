@@ -120,13 +120,30 @@ void cGameServer::send_voice_data(const unsigned int id)
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 
+void cGameServer::send_put_player_data(const unsigned int recv_id)
+{
+	sc_update_user_packet packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_PUT_PLAYER;
+	packet.data.active = false;
+	packet.data.id = recv_id;
+	packet.data.position = XMFLOAT3{ recv_id * 1.0f, 0.0f, 0.0f };
+	packet.data.velocity = XMFLOAT3{ 0,0,0 };
+	packet.data.yaw = 0.0f;
+
+	m_clients[recv_id].do_send(sizeof(packet), &packet);
+}
+
 void cGameServer::send_put_other_player(const unsigned int put_id, const unsigned int recv_id)
 {
-	sc_packet_put_other_client packet;
+	sc_update_user_packet packet;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_PUT_OTHER_PLAYER;
-	packet.position = m_clients[put_id].get_user_position();
-	packet.yaw = m_clients[put_id].get_user_yaw();
+	packet.data.active = false;
+	packet.data.id = put_id;
+	packet.data.position = XMFLOAT3{ put_id * 1.0f, 0.0f, 0.0f };
+	packet.data.velocity = XMFLOAT3{ 0,0,0 };
+	packet.data.yaw = 0.0f;
 #if PRINT
 	cout << "유저 정보를 보넀습니다." << endl;
 #endif

@@ -45,6 +45,7 @@ public:
 	void	send_join_room_fail_packet(const unsigned int user_id);
 	void	send_move_packet(const unsigned int id, const unsigned int moved_id, XMFLOAT3 pos);
 	void	send_game_start_packet(const unsigned int id);
+	void	send_put_player_data(const unsigned int recv_id);
 	void	send_put_other_player(const unsigned int put_id, const unsigned int recv_id);
 	void	send_voice_data(const unsigned int id);
 

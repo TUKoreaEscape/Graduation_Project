@@ -138,6 +138,8 @@ void cGameServer::Accept(EXP_OVER* exp_over)
 		AcceptEx(C_IOCP::m_listen_socket, c_socket, exp_over->m_buf + 8, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &exp_over->m_wsa_over);
 
 #if DEBUG // 테스트용으로 사용중입니다. 추후 제거해야하는 코드임!
+		send_put_player_data(new_id);
+
 		for (int i = 0; i < MAX_USER; ++i)
 		{
 			if (m_clients[i].get_id() == -1)
