@@ -95,14 +95,28 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_MOVE:
 	{
 		sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(ptr);
-		for (int i = 0; i < 5; ++i)
+
+		if (packet->id != m_pPlayer->GetID()) 
 		{
-			if (m_ppOther[i]->GetID() == packet->id)
+			for (int i = 0; i < 5; ++i)
 			{
-				m_ppOther[i]->SetPosition(packet->pos);
-				break;
+				if (m_ppOther[i]->GetID() == packet->id)
+				{
+					m_ppOther[i]->SetPosition(packet->pos);
+					break;
+				}
 			}
 		}
+
+		else
+		{
+			/*std::cout << "current velocity : " << m_pPlayer->GetVelocity().x << ", " << m_pPlayer->GetVelocity().y << ", " << m_pPlayer->GetVelocity().z << std::endl;
+			std::cout << "client pos : ( " << m_pPlayer->GetPosition().x << ", " << m_pPlayer->GetPosition().y << ", " << m_pPlayer->GetPosition().z << ")" << std::endl;*/
+			m_pPlayer->SetPosition(packet->pos, true);
+			std::cout << "Network m_pPlayer Pos : (" << m_pPlayer->GetPosition().x << ", " << m_pPlayer->GetPosition().y << ", " << m_pPlayer->GetPosition().z << ")" << std::endl;
+			// 회전각도 여기 추가해야할수도?
+		}
+
 		break;
 	}
 
@@ -124,6 +138,7 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_PUT_OTHER_PLAYER:
 	{
 		sc_update_user_packet* packet = reinterpret_cast<sc_update_user_packet*>(ptr);
+
 		for (int i = 0; i < 5; ++i)
 		{
 			if (m_ppOther[i]->GetID() == -1)

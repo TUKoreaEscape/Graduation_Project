@@ -97,7 +97,7 @@ void cGameServer::send_move_packet(const unsigned int id, const unsigned int mov
 	packet.type = SC_PACKET::SC_PACKET_MOVE;
 
 	packet.data.id = moved_id;
-	packet.data.position = m_clients[moved_id].get_user_position();
+	packet.data.position = pos;
 	packet.data.velocity = m_clients[moved_id].get_user_velocity();
 	packet.data.yaw = m_clients[moved_id].get_user_yaw();
 	packet.data.active;

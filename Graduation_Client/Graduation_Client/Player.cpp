@@ -57,20 +57,24 @@ void Player::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 	if (bUpdateVelocity)
 	{
 		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, xmf3Shift);
-
-
-		Network& server = *Network::GetInstance();
-		cs_packet_move packet;
-		packet.size = sizeof(packet);
-		packet.type = CS_PACKET::CS_MOVE;
-		packet.position = m_xmf3Position;
-		packet.yaw = m_fYaw;
-		server.send_packet(&packet);
-		std::cout << "send_move" << std::endl;
 	}
 	else
 	{
-		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
+		//m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
+		if (m_xmf3Velocity.x != 0 || m_xmf3Velocity.y != 0 || m_xmf3Velocity.z != 0) {
+			if (xmf3Shift.x < 1 && xmf3Shift.x > -1 && xmf3Shift.y < 1 && xmf3Shift.y > -1 && xmf3Shift.z > -1 && xmf3Shift.z < 1)
+			{
+				std::cout << "Player : " << m_xmf3Position.x << ", " << m_xmf3Position.y << ", " << m_xmf3Position.z << std::endl;
+				Network& server = *Network::GetInstance();
+				cs_packet_move packet;
+				packet.size = sizeof(packet);
+				packet.type = CS_PACKET::CS_MOVE;
+				packet.velocity = m_xmf3Velocity;
+				packet.xmf3Shift = xmf3Shift;
+				packet.yaw = m_fYaw;
+				server.send_packet(&packet);
+			}
+		}
 		m_pCamera->Move(xmf3Shift);
 	}
 
@@ -199,7 +203,6 @@ void Player::update(float fTimeElapsed)
 	float fDeceleration = (m_fFriction * fTimeElapsed);
 	if (fDeceleration > fLength) fDeceleration = fLength;
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
-
 }
 
 void Player::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)

@@ -39,6 +39,10 @@ void cGameServer::StartServer()
 {
 	C_IOCP::Start_server();
 
+	for (auto& player : m_clients)
+	{
+		player.set_user_position({ 0,0,0 });
+	}
 	// ¿Ã¬ ¿∫ ¿Ã¡¶ ∏  ∑ŒµÂ«“ ∫Œ∫–
 	for (int i = 0; i < 12; ++i)
 		m_worker_threads.emplace_back(std::thread(&cGameServer::WorkerThread, this));
@@ -49,8 +53,6 @@ void cGameServer::StartServer()
 	
 	for (auto& timer_worker : m_timer_thread)
 		timer_worker.join();
-
-	cout << "¿Ã¬  ≥—æÓø»" << endl;
 }
 
 void cGameServer::WorkerThread()
@@ -236,6 +238,9 @@ void cGameServer::Disconnect(const unsigned int _user_id) // ≈¨∂Û¿Ãæ∆Æ ø¨∞·¿ª «
 	cl.set_login_state(N_LOGIN);
 	cl.set_id(-1);
 	cl._state_lock.unlock();
+	cl.set_user_position({ 0,0,0 });
+	cl.set_user_velocity({ 0,0,0 });
+	cl.set_user_yaw(0);
 	closesocket(cl._socket);
 }
 

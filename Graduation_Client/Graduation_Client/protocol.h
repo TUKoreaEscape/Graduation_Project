@@ -98,7 +98,8 @@ struct cs_packet_move { // 이동관련 데이터
 	unsigned char	size;
 	unsigned char	type;
 
-	DirectX::XMFLOAT3	position;
+	DirectX::XMFLOAT3	velocity;
+	DirectX::XMFLOAT3	xmf3Shift;
 	float				yaw;
 };
 

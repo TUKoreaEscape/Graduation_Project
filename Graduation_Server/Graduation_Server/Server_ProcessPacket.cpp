@@ -24,11 +24,19 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 {
 	cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(buff);
 
-	m_clients[user_id].set_user_position(packet->position);
+	m_clients[user_id].set_user_velocity(packet->velocity);
 	m_clients[user_id].set_user_yaw(packet->yaw);
 
 	Room& join_room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
+	XMFLOAT3 current_player_position = m_clients[user_id].get_user_position();
+	XMFLOAT3 current_shift = packet->xmf3Shift;
+	XMFLOAT3 calculate_player_position = Add(current_player_position, current_shift);
+
+	m_clients[user_id].set_user_position(calculate_player_position);
+
+	//cout << "current client velocity  :" << m_clients[user_id].get_user_velocity().x << ", " << m_clients[user_id].get_user_velocity().y << ", " << m_clients[user_id].get_user_velocity().z << endl;
+	cout << "client_pos : (" << m_clients[user_id].get_user_position().x << ", " << m_clients[user_id].get_user_position().y << ", " << m_clients[user_id].get_user_position().z << ")" << endl;
 	//if (join_room.is_collision_player_to_player(user_id))
 	//{
 	//	// 이쪽은 충돌 했을 경우 처리해야하는 부분입니다.
@@ -47,12 +55,13 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 #endif
 
 #if DEBUG
+	send_move_packet(user_id, user_id, calculate_player_position);
 	for (int i = 0; i < MAX_USER; ++i)
 	{
 		if (m_clients[i].get_id() != -1 && m_clients[i].get_id() != user_id)
 		{
 			cout << "send_move" << endl;
-			send_move_packet(i, user_id, packet->position);
+			send_move_packet(i, user_id, calculate_player_position);
 		}
 	}
 #endif

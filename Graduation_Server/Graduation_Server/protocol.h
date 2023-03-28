@@ -11,6 +11,8 @@ const int  MAX_ROOM = 5000;
 const int  MAX_ROOM_INFO_SEND = 10;
 
 const int CHECK_MAX_PACKET_SIZE = 127;
+
+const int BUF_SIZE = 512;
 // ----- 클라이언트가 서버에게 보낼때 ------
 
 #define VOICE_ISSUER "작성해야됨"
@@ -52,7 +54,7 @@ namespace CS_PACKET
 		CS_PACKET_JOIN_ROOM,
 		CS_PACKET_EXIT_ROOM,
 		CS_PACKET_READY,
-		CS_PACKET_GAME_LOADING_SUCCESS, 
+		CS_PACKET_GAME_LOADING_SUCCESS,
 		CS_PACKET_REQUEST_ROOM_INFO,
 		CS_PACKET_REQUEST_VIVOX_DATA
 	};
@@ -95,8 +97,9 @@ struct cs_packet_login { // 로그인 시도
 struct cs_packet_move { // 이동관련 데이터
 	unsigned char	size;
 	unsigned char	type;
-	
-	DirectX::XMFLOAT3	position;
+
+	DirectX::XMFLOAT3	velocity;
+	DirectX::XMFLOAT3	xmf3Shift;
 	float				yaw;
 };
 
