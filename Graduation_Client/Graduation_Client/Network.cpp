@@ -102,7 +102,7 @@ void Network::ProcessPacket(char* ptr)
 			{
 				if (m_ppOther[i]->GetID() == packet->id)
 				{
-					m_ppOther[i]->SetPosition(packet->pos);
+					m_ppOther[i]->SetPosition(packet->pos, true);
 					break;
 				}
 			}
