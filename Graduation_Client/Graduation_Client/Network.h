@@ -9,7 +9,7 @@ class Network {
 private:
 	static Network* NetworkInstance;
 	SOCKET			m_socket;
-	const char*		SERVER_ADDR = "127.0.0.1";
+	const char*		SERVER_ADDR = "172.30.1.4";
 public:
 	Player* m_pPlayer = nullptr;;
 	Player** m_ppOther = nullptr;
