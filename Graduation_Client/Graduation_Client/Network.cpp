@@ -128,9 +128,11 @@ void Network::ProcessPacket(char* ptr)
 		{
 			if (m_ppOther[i]->GetID() == -1)
 			{
+				std::cout << i << "번째에 플레이어 할당" << std::endl;
 				m_ppOther[i]->SetID(packet->data.id);
 				m_ppOther[i]->SetPosition(packet->data.position);
 				m_ppOther[i]->SetVelocity(packet->data.velocity);
+				break;
 			}
 		}
 		std::cout << "put player_other packet recv!" << std::endl;
