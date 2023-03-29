@@ -89,18 +89,16 @@ void cGameServer::send_game_start_packet(const unsigned int id)
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 
-void cGameServer::send_move_packet(const unsigned int id, const unsigned int moved_id, XMFLOAT3 pos)
+void cGameServer::send_move_packet(const unsigned int id, const unsigned int moved_id, cs_packet_move recv_packet, XMFLOAT3 calculate_pos)
 {
-	sc_update_user_packet packet;
+	sc_packet_move packet;
 
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_MOVE;
-
-	packet.data.id = moved_id;
-	packet.data.position = pos;
-	packet.data.velocity = m_clients[moved_id].get_user_velocity();
-	packet.data.yaw = m_clients[moved_id].get_user_yaw();
-	packet.data.active;
+	packet.pos = calculate_pos;
+	packet.yaw;
+	packet.id = moved_id;
+	packet.input_key = recv_packet.input_key;
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 

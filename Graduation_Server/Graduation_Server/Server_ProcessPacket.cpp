@@ -55,7 +55,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 #endif
 
 #if DEBUG
-	send_move_packet(user_id, user_id, calculate_player_position);
+	send_move_packet(user_id, user_id, *packet, current_player_position);
 	//for (int i = 0; i < MAX_USER; ++i)
 	//{
 	//	if (m_clients[i].get_id() != -1 && m_clients[i].get_id() != user_id)
@@ -68,7 +68,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
 	{
 		cout << "send -> " << *ptr << endl;
-		send_move_packet(*ptr, user_id, calculate_player_position);
+		send_move_packet(*ptr, user_id, *packet, current_player_position);
 	}
 
 #endif

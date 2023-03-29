@@ -91,4 +91,5 @@ protected:
 	LPVOID						m_pPlayerUpdatedContext = NULL;
 	LPVOID						m_pCameraUpdatedContext = NULL;
 
+	DWORD						m_direction;
 };

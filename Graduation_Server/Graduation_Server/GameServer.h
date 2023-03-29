@@ -43,7 +43,7 @@ public:
 	void	send_create_room_ok_packet(const unsigned int user_id, const int room_number);
 	void	send_join_room_success_packet(const unsigned int user_id);
 	void	send_join_room_fail_packet(const unsigned int user_id);
-	void	send_move_packet(const unsigned int id, const unsigned int moved_id, XMFLOAT3 pos);
+	void	send_move_packet(const unsigned int id, const unsigned int moved_id, cs_packet_move recv_packet, XMFLOAT3 calculate_pos);
 	void	send_rotate_packet(const unsigned int id, const unsigned int rotate_id, cs_packet_player_rotate recv_packet);
 	void	send_game_start_packet(const unsigned int id);
 	void	send_put_player_data(const unsigned int recv_id);

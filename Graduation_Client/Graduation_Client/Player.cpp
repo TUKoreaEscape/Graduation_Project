@@ -47,7 +47,8 @@ void Player::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 		if (dwDirection & DIR_LEFT)				xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, -fDistance);
 		if (dwDirection & DIR_UP)				xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, fDistance*20.0f);
 		if (dwDirection & DIR_DOWN)			xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, -fDistance);
-
+		
+		m_direction = dwDirection;
 		Move(xmf3Shift, bUpdateVelocity);
 	}
 }
@@ -74,6 +75,7 @@ void Player::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 				packet.velocity = m_xmf3Velocity;
 				packet.xmf3Shift = xmf3Shift;
 				packet.yaw = m_fYaw;
+				packet.input_key = m_direction;
 				server.send_packet(&packet);
 			}
 		}

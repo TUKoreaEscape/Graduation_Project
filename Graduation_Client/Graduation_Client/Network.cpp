@@ -123,6 +123,16 @@ void Network::ProcessPacket(char* ptr)
 				if (m_ppOther[i]->GetID() == packet->id)
 				{
 					m_ppOther[i]->SetPosition(packet->pos, true);
+					if(packet->input_key == DIR_FORWARD)
+						m_ppOther[i]->SetTrackAnimationSet(0, 1);
+					if (packet->input_key == DIR_BACKWARD)
+						m_ppOther[i]->SetTrackAnimationSet(0, 2);
+					if (packet->input_key == DIR_LEFT)
+						m_ppOther[i]->SetTrackAnimationSet(0, 3);
+					if (packet->input_key == DIR_RIGHT)
+						m_ppOther[i]->SetTrackAnimationSet(0, 4);
+					if (packet->input_key == DIR_UP)
+						m_ppOther[i]->SetTrackAnimationSet(0, 5);
 					break;
 				}
 			}
