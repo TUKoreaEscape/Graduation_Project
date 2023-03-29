@@ -92,6 +92,24 @@ void Network::ProcessPacket(char* ptr)
 
 		break;
 
+	case SC_PACKET::SC_LOGINOK:
+	{
+		cs_packet_join_room packet;
+		packet.size = sizeof(packet);
+		packet.type = CS_PACKET::CS_PACKET_JOIN_ROOM;
+		packet.room_number = 0;
+		send_packet(&packet);
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_JOIN_ROOM_FAIL:
+	{
+		cs_packet_create_room packet;
+		packet.size = sizeof(packet);
+		packet.type = CS_PACKET::CS_PACKET_CREATE_ROOM;
+		send_packet(&packet);
+		break;
+	}
 	case SC_PACKET::SC_PACKET_MOVE:
 	{
 		sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(ptr);

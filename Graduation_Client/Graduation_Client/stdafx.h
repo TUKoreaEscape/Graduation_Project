@@ -37,6 +37,8 @@ using Microsoft::WRL::ComPtr;
 #define FRAME_BUFFER_WIDTH 1600
 #define FRAME_BUFFER_HEIGHT 900
 
+#define USE_NETWORK 0
+
 #include <list>
 #include <queue>
 #include <deque>

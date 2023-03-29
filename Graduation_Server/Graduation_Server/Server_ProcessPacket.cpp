@@ -34,6 +34,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	XMFLOAT3 calculate_player_position = Add(current_player_position, current_shift);
 
 	m_clients[user_id].set_user_position(calculate_player_position);
+	m_clients[user_id].set_bounding_box(calculate_player_position, { 10, 10, 10 }, { 10, 10, 10, 10 });
 
 	//cout << "current client velocity  :" << m_clients[user_id].get_user_velocity().x << ", " << m_clients[user_id].get_user_velocity().y << ", " << m_clients[user_id].get_user_velocity().z << endl;
 	cout << "client_pos : (" << m_clients[user_id].get_user_position().x << ", " << m_clients[user_id].get_user_position().y << ", " << m_clients[user_id].get_user_position().z << ")" << endl;

@@ -60,7 +60,10 @@ void Player::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 	}
 	else
 	{
-		//m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
+#if !USE_NETWORK
+		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
+#endif
+#if USE_NETWORK
 		if (m_xmf3Velocity.x != 0 || m_xmf3Velocity.y != 0 || m_xmf3Velocity.z != 0) {
 			if (xmf3Shift.x < 1 && xmf3Shift.x > -1 && xmf3Shift.y < 1 && xmf3Shift.y > -1 && xmf3Shift.z > -1 && xmf3Shift.z < 1)
 			{
@@ -75,6 +78,7 @@ void Player::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 				server.send_packet(&packet);
 			}
 		}
+#endif
 		m_pCamera->Move(xmf3Shift);
 	}
 
