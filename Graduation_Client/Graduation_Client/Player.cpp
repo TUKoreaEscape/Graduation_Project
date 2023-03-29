@@ -67,7 +67,6 @@ void Player::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 		if (m_xmf3Velocity.x != 0 || m_xmf3Velocity.y != 0 || m_xmf3Velocity.z != 0) {
 			if (xmf3Shift.x < 1 && xmf3Shift.x > -1 && xmf3Shift.y < 1 && xmf3Shift.y > -1 && xmf3Shift.z > -1 && xmf3Shift.z < 1)
 			{
-				std::cout << "Player : " << m_xmf3Position.x << ", " << m_xmf3Position.y << ", " << m_xmf3Position.z << std::endl;
 				Network& server = *Network::GetInstance();
 				cs_packet_move packet;
 				packet.size = sizeof(packet);
@@ -169,6 +168,18 @@ void Player::Rotate(float x, float y, float z)
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
 	m_xmf3Right = Vector3::CrossProduct(m_xmf3Up, m_xmf3Look, true);
 	m_xmf3Up = Vector3::CrossProduct(m_xmf3Look, m_xmf3Right, true);
+
+	Network& server = *Network::GetInstance();
+	cs_packet_player_rotate rotate_packet;
+	rotate_packet.size = sizeof(rotate_packet);
+	rotate_packet.type = CS_PACKET::CS_ROTATE;
+	rotate_packet.xmf3Look = m_xmf3Look;
+	rotate_packet.m_xmf3Up = m_xmf3Up;
+	rotate_packet.xmf3Right = m_xmf3Right;
+	
+
+	std::cout << "Player look  : " << m_xmf3Look.x << ", " << m_xmf3Look.y << ", " << m_xmf3Look.z << std::endl;
+	server.send_packet(&rotate_packet);
 }
 
 void Player::update(float fTimeElapsed)
@@ -195,6 +206,7 @@ void Player::update(float fTimeElapsed)
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
 	Move(xmf3Velocity, false);
+
 
 	if (m_pPlayerUpdatedContext) OnPlayerUpdateCallback(fTimeElapsed);
 

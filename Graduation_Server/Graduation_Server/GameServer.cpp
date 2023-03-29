@@ -268,10 +268,13 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_MOVE:
 	{
-#if !DEBUG
-		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_INGAME)
-#endif
-			Process_Move(user_id, p);
+		Process_Move(user_id, p);
+		break;
+	}
+
+	case CS_PACKET::CS_ROTATE:
+	{
+		Process_Rotate(user_id, p);	
 		break;
 	}
 
@@ -296,9 +299,10 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY)
 #endif
 #if !DEBUG
-		if(m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY)
+			if (m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY)
 #endif
-			Process_Join_Room(user_id, p);
+		cout << "recv Join Room" << endl;
+		Process_Join_Room(user_id, p);
 		break;
 	}
 

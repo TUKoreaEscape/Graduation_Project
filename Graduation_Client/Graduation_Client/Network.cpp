@@ -94,6 +94,7 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_LOGINOK:
 	{
+		std::cout << "recv login ok" << std::endl;
 		cs_packet_join_room packet;
 		packet.size = sizeof(packet);
 		packet.type = CS_PACKET::CS_PACKET_JOIN_ROOM;
@@ -104,6 +105,7 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_JOIN_ROOM_FAIL:
 	{
+		std::cout << "recv SC_PACKET_JOIN_ROOM_FAIL" << std::endl;
 		cs_packet_create_room packet;
 		packet.size = sizeof(packet);
 		packet.type = CS_PACKET::CS_PACKET_CREATE_ROOM;
@@ -131,8 +133,24 @@ void Network::ProcessPacket(char* ptr)
 			/*std::cout << "current velocity : " << m_pPlayer->GetVelocity().x << ", " << m_pPlayer->GetVelocity().y << ", " << m_pPlayer->GetVelocity().z << std::endl;
 			std::cout << "client pos : ( " << m_pPlayer->GetPosition().x << ", " << m_pPlayer->GetPosition().y << ", " << m_pPlayer->GetPosition().z << ")" << std::endl;*/
 			m_pPlayer->SetPosition(packet->pos, true);
-			std::cout << "Network m_pPlayer Pos : (" << m_pPlayer->GetPosition().x << ", " << m_pPlayer->GetPosition().y << ", " << m_pPlayer->GetPosition().z << ")" << std::endl;
 			// 회전각도 여기 추가해야할수도?
+		}
+
+		break;
+	}
+
+	case SC_PACKET::SC_USER_ROTATE:
+	{
+		sc_packet_player_rotate* packet = reinterpret_cast<sc_packet_player_rotate*>(ptr);
+		for (int i = 0; i < 5; ++i)
+		{
+			if (m_ppOther[i]->GetID() == packet->id)
+			{
+				m_ppOther[i]->m_xmf3Look = packet->xmf3Look;
+				m_ppOther[i]->m_xmf3Right = packet->xmf3Right;
+				m_ppOther[i]->m_xmf3Up = packet->m_xmf3Up;
+				break;
+			}
 		}
 
 		break;

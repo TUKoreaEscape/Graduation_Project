@@ -49,6 +49,7 @@ namespace CS_PACKET
 		CS_CREATE_ID,
 		CS_LOGIN,
 		CS_MOVE,
+		CS_ROTATE,
 		CS_PACKET_CHAT,
 		CS_PACKET_CREATE_ROOM,
 		CS_PACKET_JOIN_ROOM,
@@ -69,7 +70,6 @@ struct UserData {
 	unsigned char		active; // 생명칩유무 :D
 };
 
-
 struct Roominfo_by10 {
 	unsigned short				room_number;
 	char						room_name[20];
@@ -77,6 +77,14 @@ struct Roominfo_by10 {
 	GAME_ROOM_STATE::TYPE		state;
 };
 
+struct cs_packet_player_rotate {
+	unsigned char	size;
+	unsigned char	type;
+
+	DirectX::XMFLOAT3 xmf3Look;
+	DirectX::XMFLOAT3 xmf3Right;
+	DirectX::XMFLOAT3 m_xmf3Up;
+};
 
 struct cs_packet_create_id {
 	unsigned char	size;
@@ -176,6 +184,7 @@ namespace SC_PACKET
 		SC_CREATE_ID_FAIL,
 		SC_CREATE_ROOM_OK,
 		SC_USER_UPDATE,
+		SC_USER_ROTATE,
 		SC_PACKET_CHAT,
 		SC_PACKET_JOIN_ROOM_SUCCESS,
 		SC_PACKET_JOIN_ROOM_FAIL,
@@ -216,6 +225,17 @@ struct sc_update_user_packet {
 	unsigned char	type;
 
 	UserData		data;
+};
+
+struct sc_packet_player_rotate {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned short	id;
+
+	DirectX::XMFLOAT3 xmf3Look;
+	DirectX::XMFLOAT3 xmf3Right;
+	DirectX::XMFLOAT3 m_xmf3Up;
 };
 
 struct sc_packet_request_room_info {
