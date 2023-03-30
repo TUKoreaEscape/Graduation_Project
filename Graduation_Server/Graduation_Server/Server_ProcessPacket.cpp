@@ -34,18 +34,22 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	XMFLOAT3 calculate_player_position = Add(current_player_position, current_shift);
 
 	m_clients[user_id].set_user_position(calculate_player_position);
-	m_clients[user_id].set_bounding_box(calculate_player_position, { 10, 10, 10 }, { 10, 10, 10, 10 });
+	m_clients[user_id].set_bounding_box(calculate_player_position, XMFLOAT3(0.37f, 0.37f, 0.37f), XMFLOAT4(0, 0, 0, 1));
 
 	//cout << "current client velocity  :" << m_clients[user_id].get_user_velocity().x << ", " << m_clients[user_id].get_user_velocity().y << ", " << m_clients[user_id].get_user_velocity().z << endl;
-	//if (join_room.is_collision_player_to_player(user_id))
-	//{
-	//	// 이쪽은 충돌 했을 경우 처리해야하는 부분입니다.
-	//}
+	if (join_room.is_collision_player_to_player(user_id))
+	{
+		cout << "충돌하였습니다" << endl;
+		m_clients[user_id].set_user_position(current_player_position);
+		calculate_player_position = current_player_position;
+		m_clients[user_id].set_bounding_box(m_clients[user_id].get_user_position(), XMFLOAT3(0.37f, 0.37f, 0.37f), XMFLOAT4(0, 0, 0, 1));
+		// 이쪽은 충돌 했을 경우 처리해야하는 부분입니다.
+	}
 
-	//if (join_room.is_collision_player_to_object(user_id))
-	//{
-	//	// 이쪽은 오브젝트와 충돌한것을 처리하는 부분입니다.
-	//}
+	if (join_room.is_collision_player_to_object(user_id))
+	{
+		// 이쪽은 오브젝트와 충돌한것을 처리하는 부분입니다.
+	}
 
 	//for (auto ptr = m_clients[user_id].view_list.begin(); ptr != m_clients[user_id].view_list.end(); ++ptr)
 	//	send_move_packet(*ptr, user_id, packet->position);
@@ -115,7 +119,7 @@ void cGameServer::Process_Create_Room(const unsigned int _user_id) // 요청받은 �
 	m_clients[_user_id]._state_lock.lock();
 	m_clients[_user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
 	m_clients[_user_id]._state_lock.unlock();
-
+	m_clients[_user_id].set_bounding_box(m_clients[_user_id].get_user_position(), XMFLOAT3(0.37f, 0.37f, 0.37f), XMFLOAT4(0, 0, 0, 1));
 	send_create_room_ok_packet(_user_id, m_clients[_user_id].get_join_room_number());
 }
 

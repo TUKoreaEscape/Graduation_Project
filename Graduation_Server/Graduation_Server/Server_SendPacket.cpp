@@ -154,7 +154,7 @@ void cGameServer::send_put_other_player(const unsigned int put_id, const unsigne
 	packet.type = SC_PACKET::SC_PACKET_PUT_OTHER_PLAYER;
 	packet.data.active = false;
 	packet.data.id = put_id;
-	packet.data.position = XMFLOAT3{ put_id * 1.0f, 0.0f, 0.0f };
+	packet.data.position = m_clients[put_id].get_user_position();
 	packet.data.velocity = XMFLOAT3{ 0,0,0 };
 	packet.data.yaw = 0.0f;
 #if PRINT

@@ -215,14 +215,14 @@ bool Room::is_collision_player_to_player(const int player_id)
 	BoundingOrientedBox player_bounding_box = cl.get_bounding_box();
 	for (int i = 0; i < 6; ++i)
 	{
-		if (in_player[i] == player_id)
-			continue;
+		if (in_player[i] != player_id && in_player[i] != -1)
+		{
+			CLIENT& other_player = *server.get_client_info(in_player[i]);
+			BoundingOrientedBox other_player_bounding_box = other_player.get_bounding_box();
 
-		CLIENT& other_player = *server.get_client_info(in_player[i]);
-		BoundingOrientedBox other_player_bounding_box = other_player.get_bounding_box();
-
-		if (player_bounding_box.Intersects(other_player_bounding_box))
-			return true;
+			if (player_bounding_box.Intersects(other_player_bounding_box))
+				return true;
+		}
 	}
 	return false;
 }

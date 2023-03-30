@@ -191,7 +191,7 @@ void Network::ProcessPacket(char* ptr)
 			{
 				std::cout << i << "번째에 플레이어 할당" << std::endl;
 				m_ppOther[i]->SetID(packet->data.id);
-				m_ppOther[i]->SetPosition(packet->data.position);
+				m_ppOther[i]->SetPosition(packet->data.position, true);
 				m_ppOther[i]->SetVelocity(packet->data.velocity);
 				break;
 			}
