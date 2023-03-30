@@ -29,17 +29,20 @@ public:
 	void SetMaxVelocityXZ(float fMaxVelocity) { m_fMaxVelocityXZ = fMaxVelocity; }
 	void SetMaxVelocityY(float fMaxVelocity) { m_fMaxVelocityY = fMaxVelocity; }
 	void SetVelocity(const XMFLOAT3& xmf3Velocity) { m_xmf3Velocity = xmf3Velocity; }
+	void SetShift(const XMFLOAT3& xmf3shift) { m_xmf3Shift = xmf3shift; }
 	void SetPosition(const XMFLOAT3& xmf3Position) { Move(XMFLOAT3(xmf3Position.x - m_xmf3Position.x, xmf3Position.y - m_xmf3Position.y, xmf3Position.z - m_xmf3Position.z), false); }
 	
 	
 	void SetPosition(const XMFLOAT3& xmf3Position, bool is) { m_xmf3Position = xmf3Position; }
 	void SetScale(XMFLOAT3& xmf3Scale) { m_xmf3Scale = xmf3Scale; }
+	void SetDirection(const DWORD direction) { m_direction = direction; }
 
+	const XMFLOAT3& GetShift() const { return (m_xmf3Shift); }
 	const XMFLOAT3& GetVelocity() const { return(m_xmf3Velocity); }
 	float GetYaw() const { return(m_fYaw); }
 	float GetPitch() const { return(m_fPitch); }
 	float GetRoll() const { return(m_fRoll); }
-
+	DWORD GetDirection() const { return (m_direction); }
 	//CCamera* GetCamera() { return(m_pCamera); }
 	//void SetCamera(CCamera* pCamera) { m_pCamera = pCamera; }
 
@@ -82,6 +85,7 @@ protected:
 	float           			m_fYaw = 0.0f;
 	float           			m_fRoll = 0.0f;
 
+	XMFLOAT3					m_xmf3Shift = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3					m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3     				m_xmf3Gravity = XMFLOAT3(0.0f, -0.981f, 0.0f);
 	float           			m_fMaxVelocityXZ = 20.0f;

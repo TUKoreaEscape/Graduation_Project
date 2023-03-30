@@ -18,30 +18,35 @@ void CommonMovement::update(float elapsedTime)
 			//std::cout << "w키" << std::endl;
 			dwDirection |= DIR_FORWARD;
 			gameObject->SetTrackAnimationSet(0, 1);
+			Input::GetInstance()->m_pPlayer->SetDirection(DIR_FORWARD);
 		}
 		if (keyBuffer['s'] & 0xF0 || keyBuffer['S'] & 0xF0)
 		{
 			//std::cout << "s키" << std::endl;
 			dwDirection |= DIR_BACKWARD;
 			gameObject->SetTrackAnimationSet(0, 2);
+			Input::GetInstance()->m_pPlayer->SetDirection(DIR_BACKWARD);
 		}
 		if (keyBuffer['a'] & 0xF0 || keyBuffer['A'] & 0xF0)
 		{
 			//std::cout << "a키" << std::endl;
 			dwDirection |= DIR_LEFT;
 			gameObject->SetTrackAnimationSet(0, 3);
+			Input::GetInstance()->m_pPlayer->SetDirection(DIR_LEFT);
 		}
 		if (keyBuffer['d'] & 0xF0 || keyBuffer['D'] & 0xF0)
 		{
 			//std::cout << "d키" << std::endl;
 			dwDirection |= DIR_RIGHT;
 			gameObject->SetTrackAnimationSet(0, 4);
+			Input::GetInstance()->m_pPlayer->SetDirection(DIR_RIGHT);
 		}
 		if (keyBuffer[VK_SPACE] & 0xF0)
 		{
 			//std::cout << "스페이스바" << std::endl;
 			dwDirection |= DIR_UP;
 			gameObject->SetTrackAnimationSet(0, 5);
+			Input::GetInstance()->m_pPlayer->SetDirection(DIR_UP);
 		}
 		if (dwDirection)
 		{
@@ -56,6 +61,7 @@ void CommonMovement::update(float elapsedTime)
 
 		if (m_emptyKey)
 		{
-			gameObject->SetTrackAnimationSet(0,0);
+			gameObject->SetTrackAnimationSet(0, 0);
+			Input::GetInstance()->m_pPlayer->SetDirection(DIR_NOT_FB);
 		}
 }

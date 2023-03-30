@@ -109,7 +109,7 @@ struct cs_packet_move { // 이동관련 데이터
 	unsigned char	input_key;
 	DirectX::XMFLOAT3	velocity;
 	DirectX::XMFLOAT3	xmf3Shift;
-	float				yaw;
+	float				yaw; // 이거뺴고
 };
 
 struct cs_packet_voice {

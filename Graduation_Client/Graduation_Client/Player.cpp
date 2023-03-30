@@ -65,20 +65,21 @@ void Player::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
 #endif
 #if USE_NETWORK
-		if (m_xmf3Velocity.x != 0 || m_xmf3Velocity.y != 0 || m_xmf3Velocity.z != 0) {
-			if (xmf3Shift.x < 1 && xmf3Shift.x > -1 && xmf3Shift.y < 1 && xmf3Shift.y > -1 && xmf3Shift.z > -1 && xmf3Shift.z < 1)
-			{
-				Network& server = *Network::GetInstance();
-				cs_packet_move packet;
-				packet.size = sizeof(packet);
-				packet.type = CS_PACKET::CS_MOVE;
-				packet.velocity = m_xmf3Velocity;
-				packet.xmf3Shift = xmf3Shift;
-				packet.yaw = m_fYaw;
-				packet.input_key = m_direction;
-				server.send_packet(&packet);
-			}
-		}
+		//if (m_xmf3Velocity.x != 0 || m_xmf3Velocity.y != 0 || m_xmf3Velocity.z != 0) {
+		//	if (xmf3Shift.x < 1 && xmf3Shift.x > -1 && xmf3Shift.y < 1 && xmf3Shift.y > -1 && xmf3Shift.z > -1 && xmf3Shift.z < 1)
+		//	{
+		//		Network& server = *Network::GetInstance();
+		//		cs_packet_move packet;
+		//		packet.size = sizeof(packet);
+		//		packet.type = CS_PACKET::CS_MOVE;
+		//		packet.velocity = m_xmf3Velocity;
+		//		packet.xmf3Shift = xmf3Shift;
+		//		packet.yaw = m_fYaw;
+		//		packet.input_key = m_direction;
+		//		server.send_packet(&packet);
+		//	}
+		//}
+		m_xmf3Shift = xmf3Shift;
 #endif
 		m_pCamera->Move(xmf3Shift);
 	}
@@ -178,9 +179,6 @@ void Player::Rotate(float x, float y, float z)
 	rotate_packet.xmf3Look = m_xmf3Look;
 	rotate_packet.m_xmf3Up = m_xmf3Up;
 	rotate_packet.xmf3Right = m_xmf3Right;
-	
-
-	std::cout << "Player look  : " << m_xmf3Look.x << ", " << m_xmf3Look.y << ", " << m_xmf3Look.z << std::endl;
 	server.send_packet(&rotate_packet);
 }
 

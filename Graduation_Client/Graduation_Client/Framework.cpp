@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Framework.h"
 
-const float SEND_TIME = 0.03f;
+const float SEND_TIME = 0.0016f;
 
 Framework::Framework()
 {
@@ -275,7 +275,17 @@ void Framework::UpdateObjects()
 	timeToSend += fTimeElapsed;
 	scene->update(fTimeElapsed, m_pd3dDevice, m_pd3dCommandList);
 	if (timeToSend > SEND_TIME) {
-		// send packet here
+		Network& network = *Network::GetInstance();
+
+		cs_packet_move packet;
+		packet.size = sizeof(packet);
+		packet.type = CS_PACKET::CS_MOVE;
+		packet.velocity = Input::GetInstance()->m_pPlayer->GetVelocity();
+		packet.xmf3Shift = Input::GetInstance()->m_pPlayer->GetShift();
+		packet.input_key = Input::GetInstance()->m_pPlayer->GetDirection();
+		packet.yaw = Input::GetInstance()->m_pPlayer->GetYaw();
+
+		network.send_packet(&packet);
 		timeToSend -= SEND_TIME;
 	}
 }

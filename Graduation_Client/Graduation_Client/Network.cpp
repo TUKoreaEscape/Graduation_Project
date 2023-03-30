@@ -115,7 +115,7 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_MOVE:
 	{
 		sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(ptr);
-
+		
 		if (packet->id != m_pPlayer->GetID()) 
 		{
 			for (int i = 0; i < 5; ++i)
