@@ -57,8 +57,9 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 		m_ppPlayers[i]->SetChild(pPlayerModel->m_pModelRootObject, true);
 		m_ppPlayers[i]->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 1, pPlayerModel);
 		m_ppPlayers[i]->SetPosition(XMFLOAT3(0, 1.f, i * 3.f));
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	}
-	m_ppPlayers[0]->m_pSkinnedAnimationController->SetTrackSpeed(0, 0.5f); 
+	/*m_ppPlayers[0]->m_pSkinnedAnimationController->SetTrackSpeed(0, 0.5f); 
 	m_ppPlayers[0]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_ppPlayers[1]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.0f);
 	m_ppPlayers[1]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 1);
@@ -67,7 +68,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_ppPlayers[3]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.0f);
 	m_ppPlayers[3]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 3);
 	m_ppPlayers[4]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.0f);
-	m_ppPlayers[4]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 2);
+	m_ppPlayers[4]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 2);*/
 	
 	m_pPlayer = new Player();
 	m_pPlayer->SetChild(pPlayerModel->m_pModelRootObject, true);

@@ -41,6 +41,7 @@ private:
 	GameScene*		scene;
 	Time			time;
 
+	float           timeToSend;
 public:
 	Framework();
 	~Framework();

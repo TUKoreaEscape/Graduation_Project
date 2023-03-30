@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Framework.h"
 
+const float SEND_TIME = 0.03f;
+
 Framework::Framework()
 {
 	m_pdxgiFactory = NULL;
@@ -30,6 +32,8 @@ Framework::Framework()
 	m_nWndClientHeight = FRAME_BUFFER_HEIGHT;
 
 	scene = NULL;
+
+	timeToSend = 0.0f;
 }
 
 Framework::~Framework()
@@ -267,7 +271,13 @@ void Framework::ReleaseObjects()
 
 void Framework::UpdateObjects()
 {
-	scene->update(time.GetTimeElapsed(), m_pd3dDevice, m_pd3dCommandList);
+	float fTimeElapsed = time.GetTimeElapsed();
+	timeToSend += fTimeElapsed;
+	scene->update(fTimeElapsed, m_pd3dDevice, m_pd3dCommandList);
+	if (timeToSend > SEND_TIME) {
+		// send packet here
+		timeToSend -= SEND_TIME;
+	}
 }
 
 void Framework::FrameAdvance()
