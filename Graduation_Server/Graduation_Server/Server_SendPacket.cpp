@@ -156,7 +156,7 @@ void cGameServer::send_put_other_player(const unsigned int put_id, const unsigne
 	packet.data.id = put_id;
 	packet.data.position = m_clients[put_id].get_user_position();
 	packet.data.velocity = XMFLOAT3{ 0,0,0 };
-	packet.data.yaw = 0.0f;
+	packet.data.yaw = m_clients[put_id].get_user_yaw();
 #if PRINT
 	cout << "유저 정보를 보넀습니다." << endl;
 #endif

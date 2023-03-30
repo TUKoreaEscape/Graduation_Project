@@ -26,7 +26,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 
 	m_clients[user_id].set_user_velocity(packet->velocity);
 	m_clients[user_id].set_user_yaw(packet->yaw);
-
+	m_clients[user_id].update_rotation(packet->yaw);
 	Room& join_room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
 	XMFLOAT3 current_player_position = m_clients[user_id].get_user_position();
@@ -34,15 +34,13 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	XMFLOAT3 calculate_player_position = Add(current_player_position, current_shift);
 
 	m_clients[user_id].set_user_position(calculate_player_position);
-	m_clients[user_id].set_bounding_box(calculate_player_position, XMFLOAT3(0.37f, 0.37f, 0.37f), XMFLOAT4(0, 0, 0, 1));
+	m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 
-	//cout << "current client velocity  :" << m_clients[user_id].get_user_velocity().x << ", " << m_clients[user_id].get_user_velocity().y << ", " << m_clients[user_id].get_user_velocity().z << endl;
-	if (join_room.is_collision_player_to_player(user_id))
+	if (join_room.is_collision_player_to_player(user_id)) // 같은 방에 있는 사람만 충돌 체크를 합니다.
 	{
-		cout << "충돌하였습니다" << endl;
 		m_clients[user_id].set_user_position(current_player_position);
 		calculate_player_position = current_player_position;
-		m_clients[user_id].set_bounding_box(m_clients[user_id].get_user_position(), XMFLOAT3(0.37f, 0.37f, 0.37f), XMFLOAT4(0, 0, 0, 1));
+		m_clients[user_id].update_bounding_box_pos(current_player_position);
 		// 이쪽은 충돌 했을 경우 처리해야하는 부분입니다.
 	}
 
@@ -71,7 +69,6 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 
 	for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
 	{
-		cout << "send -> " << *ptr << endl;
 		send_move_packet(*ptr, user_id, *packet, current_player_position);
 	}
 
@@ -119,7 +116,7 @@ void cGameServer::Process_Create_Room(const unsigned int _user_id) // 요청받은 �
 	m_clients[_user_id]._state_lock.lock();
 	m_clients[_user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
 	m_clients[_user_id]._state_lock.unlock();
-	m_clients[_user_id].set_bounding_box(m_clients[_user_id].get_user_position(), XMFLOAT3(0.37f, 0.37f, 0.37f), XMFLOAT4(0, 0, 0, 1));
+	m_clients[_user_id].set_bounding_box(m_clients[_user_id].get_user_position(), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(0, 0, 0, 1));
 	send_create_room_ok_packet(_user_id, m_clients[_user_id].get_join_room_number());
 }
 
@@ -157,7 +154,7 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 					m_clients[rl.Get_Join_Member(i)]._room_list_lock.unlock();
 				}
 			}
-
+			m_clients[user_id].set_bounding_box(m_clients[user_id].get_user_position(), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(0, 0, 0, 1));
 			send_join_room_success_packet(user_id);
 			cout << "send_join_room_success_packet" << endl;
 		}

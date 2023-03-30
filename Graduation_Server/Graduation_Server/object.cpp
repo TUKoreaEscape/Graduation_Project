@@ -21,6 +21,21 @@ void GameObject::Set_BoundingBox(const BoundingOrientedBox& box)
 	m_bounding_box = box;
 }
 
+void GameObject::Update_bounding_box_pos(const XMFLOAT3 pos)
+{
+	m_bounding_box.Center = pos;
+}
+
+void GameObject::Update_bounding_box_rotate(const float yaw)
+{
+	float radian = XMConvertToRadians(yaw);
+
+	XMFLOAT4 calculate{};
+	XMStoreFloat4(&calculate, XMQuaternionRotationRollPitchYaw(0.f, radian, 0.f));
+
+	m_bounding_box.Orientation = calculate;
+}
+
 BoundingOrientedBox GameObject::Get_BoundingBox()
 {
 	return m_bounding_box;

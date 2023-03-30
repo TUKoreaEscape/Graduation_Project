@@ -28,6 +28,8 @@ public:
 	XMFLOAT3				Get_extents();
 	XMFLOAT4				Get_orientation();
 
+	void					Update_bounding_box_pos(const XMFLOAT3 pos);
+	void					Update_bounding_box_rotate(const float yaw);
 
 	virtual void			send_event(const unsigned int id) {};
 };
