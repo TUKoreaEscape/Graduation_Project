@@ -123,16 +123,37 @@ void Network::ProcessPacket(char* ptr)
 				if (m_ppOther[i]->GetID() == packet->id)
 				{
 					m_ppOther[i]->SetPosition(packet->pos, true);
-					if(packet->input_key == DIR_FORWARD)
+					if (packet->input_key == DIR_FORWARD)
+					{
+						m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 						m_ppOther[i]->SetTrackAnimationSet(0, 1);
+					}
 					if (packet->input_key == DIR_BACKWARD)
+					{
+						m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 						m_ppOther[i]->SetTrackAnimationSet(0, 2);
+					}
 					if (packet->input_key == DIR_LEFT)
+					{
+						m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 						m_ppOther[i]->SetTrackAnimationSet(0, 3);
+					}
 					if (packet->input_key == DIR_RIGHT)
+					{
+						m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 						m_ppOther[i]->SetTrackAnimationSet(0, 4);
+					}
 					if (packet->input_key == DIR_UP)
+					{
+						m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 						m_ppOther[i]->SetTrackAnimationSet(0, 5);
+					}
+
+					if (packet->input_key == DIR_EMPTY)
+					{
+						m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+						m_ppOther[i]->SetTrackAnimationSet(0, 0);
+					}
 					break;
 				}
 			}
@@ -140,8 +161,6 @@ void Network::ProcessPacket(char* ptr)
 
 		else
 		{
-			/*std::cout << "current velocity : " << m_pPlayer->GetVelocity().x << ", " << m_pPlayer->GetVelocity().y << ", " << m_pPlayer->GetVelocity().z << std::endl;
-			std::cout << "client pos : ( " << m_pPlayer->GetPosition().x << ", " << m_pPlayer->GetPosition().y << ", " << m_pPlayer->GetPosition().z << ")" << std::endl;*/
 			m_pPlayer->SetPosition(packet->pos, true);
 			// 회전각도 여기 추가해야할수도?
 		}

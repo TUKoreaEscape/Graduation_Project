@@ -62,6 +62,6 @@ void CommonMovement::update(float elapsedTime)
 		if (m_emptyKey)
 		{
 			gameObject->SetTrackAnimationSet(0, 0);
-			Input::GetInstance()->m_pPlayer->SetDirection(DIR_NOT_FB);
+			Input::GetInstance()->m_pPlayer->SetDirection(DIR_EMPTY);
 		}
 }

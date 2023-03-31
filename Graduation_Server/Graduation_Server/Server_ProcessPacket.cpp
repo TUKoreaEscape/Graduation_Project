@@ -38,6 +38,9 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 
 	if (join_room.is_collision_player_to_player(user_id)) // 같은 방에 있는 사람만 충돌 체크를 합니다.
 	{
+		XMFLOAT3 SlidingVector = XMFLOAT3(0.0f, 0.0f, 0.0f);
+		XMFLOAT3 NormalVector;
+		//GetCollisionInfo() <- 이함수를 통해 법선벡터를 구해올거임! + 슬라이딩 구해보자~
 		m_clients[user_id].set_user_position(current_player_position);
 		calculate_player_position = current_player_position;
 		m_clients[user_id].update_bounding_box_pos(current_player_position);

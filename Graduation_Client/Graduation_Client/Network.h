@@ -5,6 +5,8 @@
 #include "protocol.h"
 #include "Scene.h"
 
+#define  DIR_NO 100
+
 class Network {
 private:
 	static Network* NetworkInstance;

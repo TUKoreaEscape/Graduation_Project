@@ -13,6 +13,8 @@
 #define DIR_NOT_LR				0x0C
 #define DIR_NOT_FBLR				0x0F
 
+#define DIR_EMPTY					0x40
+
 class Player : public GameObject
 {
 public:

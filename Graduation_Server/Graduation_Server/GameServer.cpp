@@ -213,6 +213,87 @@ int cGameServer::get_new_id()
 	return -1;
 }
 
+CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& moved, const BoundingOrientedBox& other)
+{
+	CollisionInfo collisionInfo;
+	BoundingBox box;
+	float penetrationDepth = 0.0f;
+	XMFLOAT3 collisionNormal(0.0f, 0.0f, 0.0f);
+	XMFLOAT3 collisionPoint(0.0f, 0.0f, 0.0f);
+
+	XMFLOAT3 corners[8];
+	XMVECTOR OrientedWorldNormals[6];
+
+	other.GetCorners(corners);
+
+	// 각 면의 법선 벡터를 계산합니다.
+	OrientedWorldNormals[0] = XMVector3Normalize(XMVector3Cross(
+		XMLoadFloat3(&corners[1]) - XMLoadFloat3(&corners[0]),
+		XMLoadFloat3(&corners[3]) - XMLoadFloat3(&corners[0])
+	));
+	OrientedWorldNormals[1] = XMVector3Normalize(XMVector3Cross(
+		XMLoadFloat3(&corners[5]) - XMLoadFloat3(&corners[4]),
+		XMLoadFloat3(&corners[7]) - XMLoadFloat3(&corners[4])
+	));
+	OrientedWorldNormals[2] = XMVector3Normalize(XMVector3Cross(
+		XMLoadFloat3(&corners[3]) - XMLoadFloat3(&corners[0]),
+		XMLoadFloat3(&corners[4]) - XMLoadFloat3(&corners[0])
+	));
+	OrientedWorldNormals[3] = XMVector3Normalize(XMVector3Cross(
+		XMLoadFloat3(&corners[2]) - XMLoadFloat3(&corners[1]),
+		XMLoadFloat3(&corners[5]) - XMLoadFloat3(&corners[1])
+	));
+	OrientedWorldNormals[4] = XMVector3Normalize(XMVector3Cross(
+		XMLoadFloat3(&corners[6]) - XMLoadFloat3(&corners[2]),
+		XMLoadFloat3(&corners[7]) - XMLoadFloat3(&corners[2])
+	));
+	OrientedWorldNormals[5] = XMVector3Normalize(XMVector3Cross(
+		XMLoadFloat3(&corners[4]) - XMLoadFloat3(&corners[0]),
+		XMLoadFloat3(&corners[1]) - XMLoadFloat3(&corners[0])
+	));
+
+	if (moved.Intersects(other))
+	{
+		UINT collidedFaceIndex = 0;
+		float minPenetrationDepth = FLT_MAX;
+
+		for (UINT i = 0; i < 6; i++)
+		{
+			XMFLOAT3 faceNormal;
+			XMStoreFloat3(&faceNormal, OrientedWorldNormals[i]);
+			float distanceToPlane = DistanceToPlane(moved.Center, faceNormal, other.Center);
+			if (distanceToPlane > 0.0f)
+			{
+				float penetration = moved.Extents.x * abs(faceNormal.x) +
+					moved.Extents.y * abs(faceNormal.y) +
+					moved.Extents.z * abs(faceNormal.z) - distanceToPlane;
+
+				if (penetration < minPenetrationDepth)
+				{
+					collidedFaceIndex = i;
+					minPenetrationDepth = penetration;
+				}
+			}
+		}
+		XMFLOAT3 temp;
+		temp.x = other.Center.x - moved.Center.x;
+		temp.y = other.Center.y - moved.Center.y;
+		temp.z = other.Center.z - moved.Center.z;
+
+		XMStoreFloat3(&collisionNormal, OrientedWorldNormals[collidedFaceIndex]);
+		if (Dot(collisionNormal, temp) < 0.0f)
+		{
+			collisionNormal.x *= -1;
+			collisionNormal.y *= -1;
+			collisionNormal.z *= -1;
+		}
+	}
+
+	collisionInfo.CollisionNormal = collisionNormal;
+
+	return collisionInfo;
+}
+
 CLIENT* cGameServer::get_client_info(const int player_id)
 {
 	return &m_clients[player_id];

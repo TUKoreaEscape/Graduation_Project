@@ -57,6 +57,29 @@
 using namespace std;
 using namespace DirectX;
 
+struct CollisionInfo
+{
+	float PenetrationDepth; // 충돌 깊이
+	XMFLOAT3 CollisionNormal; // 충돌 면의 법선 벡터
+	XMFLOAT3 CollisionPoint; // 충돌 지점
+};
+
+inline float DistanceToPlane(XMFLOAT3 point, XMFLOAT3 normal, XMFLOAT3 planePoint)
+{
+	XMVECTOR pointVec = XMLoadFloat3(&point);
+	XMVECTOR normalVec = XMLoadFloat3(&normal);
+	XMVECTOR planePointVec = XMLoadFloat3(&planePoint);
+	return XMVectorGetX(XMPlaneDotCoord(XMPlaneFromPointNormal(planePointVec, normalVec), pointVec));
+
+}
+
+inline float Dot(XMFLOAT3 a, XMFLOAT3 b)
+{
+	XMVECTOR aVec = XMLoadFloat3(&a);
+	XMVECTOR bVec = XMLoadFloat3(&b);
+	return XMVectorGetX(XMVector3Dot(aVec, bVec));
+}
+
 inline XMFLOAT3 Add(const XMFLOAT3& xmf3Vector1, const XMFLOAT3& xmf3Vector2)
 {
 	XMFLOAT3 xmf3Result;
