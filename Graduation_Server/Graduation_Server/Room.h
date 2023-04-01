@@ -77,7 +77,7 @@ public:
 
 	bool	Is_Door_Open();
 	bool	is_collision_wall_to_player(const int player_id);
-	bool	is_collision_player_to_player(const int player_id);
+	int		is_collision_player_to_player(const int player_id);
 	bool	is_collision_player_to_object(const int player_id);
 
 	char*	Get_Room_Name(char room_name[], int size);

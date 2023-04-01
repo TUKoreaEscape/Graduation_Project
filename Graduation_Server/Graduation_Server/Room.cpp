@@ -208,7 +208,7 @@ bool Room::is_collision_player_to_object(const int player_id)
 	return false;
 }
 
-bool Room::is_collision_player_to_player(const int player_id)
+int Room::is_collision_player_to_player(const int player_id)
 {
 	cGameServer& server = cGameServer::GetInstance();
 	CLIENT& cl = *server.get_client_info(player_id);
@@ -221,10 +221,10 @@ bool Room::is_collision_player_to_player(const int player_id)
 			BoundingOrientedBox other_player_bounding_box = other_player.get_bounding_box();
 
 			if (player_bounding_box.Intersects(other_player_bounding_box))
-				return true;
+				return in_player[i];
 		}
 	}
-	return false;
+	return -1;
 }
 
 bool Room::is_collision_wall_to_player(const int player_id)
