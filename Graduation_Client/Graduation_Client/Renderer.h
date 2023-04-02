@@ -20,6 +20,7 @@ public:
 	Texture* FindReplicatedTexture(_TCHAR* pstrTextureName);
 
 	void SetMaterial(int nMaterial, Material* pMaterial);
+	void SetMaterial(Material* pMaterial);
 
 	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 		* pd3dCommandList) {}

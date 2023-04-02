@@ -28,6 +28,12 @@ void GameScene::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
 	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
+
+	for (int i = 0; i < m_nWalls; ++i)
+	{
+		if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
+	}
+
 	Scene::render(pd3dCommandList);
 }
 
@@ -92,6 +98,8 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 		AddPlayer(m_ppPlayers[i]);
 	}
 	AddPlayer(m_pPlayer);
+
+	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Models/Scene.bin");
 
 #if USE_NETWORK
 	m_network = Network::GetInstance();
@@ -370,4 +378,72 @@ void GameScene::CreateShaderResourceViews(ID3D12Device* pd3dDevice, Texture* pTe
 	int nRootParameters = pTexture->GetRootParameters();
 	for (int j = 0; j < nRootParameters; j++) pTexture->SetRootParameterIndex(j, nRootParameterStartIndex + j);
 
+}
+
+void GameScene::LoadSceneObjectsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName)
+{
+	FILE* pFile = NULL;
+	::fopen_s(&pFile, pstrFileName, "rb");
+	::rewind(pFile);
+
+	WallShader* pShader = new WallShader();
+	pShader->CreateShader(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+	pShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	char pstrToken[64] = { '\0' };
+	char pstrGameObjectName[64] = { '\0' };
+
+	UINT nReads = 0, nObjectNameLength = 0;
+	BYTE nStrLength = 0;
+
+	nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pFile);
+	nReads = (UINT)::fread(pstrToken, sizeof(char), 14, pFile); //"<GameObjects>:"
+	nReads = (UINT)::fread(&m_nWalls, sizeof(int), 1, pFile);
+
+	m_ppWalls = new GameObject * [m_nWalls];
+
+	GameObject* pGameObject = NULL;
+
+	for (int i = 0; i < m_nWalls; i++)
+	{
+		pGameObject = new GameObject();
+
+		nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pFile);
+		nReads = (UINT)::fread(pstrToken, sizeof(char), 13, pFile); //"<GameObject>:"
+		nReads = (UINT)::fread(&nObjectNameLength, sizeof(BYTE), 1, pFile);
+		//nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pFile);
+		nReads = (UINT)::fread(pstrGameObjectName, sizeof(char), nObjectNameLength, pFile);
+		nReads = (UINT)::fread(&pGameObject->m_xmf4x4World, sizeof(float), 16, pFile);
+
+		pstrGameObjectName[nObjectNameLength] = '\0';
+		strcpy_s(pGameObject->m_pstrFrameName, 64, pstrGameObjectName);
+
+		Mesh* pMesh = nullptr;
+		for (int j = 0; j < i; j++)
+		{
+			if (!strcmp(pstrGameObjectName, m_ppWalls[j]->m_pstrFrameName))
+			{
+				pMesh = m_ppWalls[j]->m_pMesh;
+				break;
+			}
+		}
+		if (!pMesh)
+		{
+			char pstrFilePath[64] = { '\0' };
+			strcpy_s(pstrFilePath, 64, "Models/");
+			strcpy_s(pstrFilePath + 7, 64 - 7, pstrGameObjectName);
+			strcpy_s(pstrFilePath + 7 + nObjectNameLength, 64 - 7 - nObjectNameLength, ".bin");
+			pMesh = new WallMesh(pd3dDevice, pd3dCommandList);
+			pMesh->LoadMeshFromFile(pd3dDevice, pd3dCommandList, pstrFilePath);
+		}
+		pGameObject->SetMesh(pMesh);
+
+		Material* pMaterial = new Material(1);
+		pMaterial->SetShader(pShader);
+		pGameObject->renderer->SetMaterial(pMaterial);
+
+		m_ppWalls[i] = pGameObject;
+	}
+
+	::fclose(pFile);
 }

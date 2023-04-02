@@ -30,6 +30,9 @@ public:
 	Network* m_network;
 	std::thread recv_thread;
 
+	int m_nWalls;
+	GameObject** m_ppWalls;
+
 protected:
 	static ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap;
 
@@ -73,4 +76,5 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUSrvDescriptorNextHandle() { return(m_d3dSrvCPUDescriptorNextHandle); }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUSrvDescriptorNextHandle() { return(m_d3dSrvGPUDescriptorNextHandle); }
 
+	void LoadSceneObjectsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName);
 };

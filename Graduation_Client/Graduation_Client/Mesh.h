@@ -86,6 +86,8 @@ public:
 	virtual void OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, int nSubSet = 0);
 	virtual void OnPostRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
+
+	virtual void LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName) {}
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -182,4 +184,28 @@ public:
 	virtual void ReleaseUploadBuffers();
 
 	virtual void OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+class WallMesh : public Mesh
+{
+public:
+	WallMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual ~WallMesh();
+
+protected:
+	XMFLOAT3* m_pxmf3Normals = nullptr;
+	XMFLOAT2* m_pxmf2TextureCoords0 = nullptr;
+
+	ID3D12Resource* m_pd3dTextureCoord0Buffer = nullptr;
+	ID3D12Resource* m_pd3dTextureCoord0UploadBuffer = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dTextureCoord0BufferView;
+
+	ID3D12Resource* m_pd3dNormalBuffer = nullptr;
+	ID3D12Resource* m_pd3dNormalUploadBuffer = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dNormalBufferView;
+
+public:
+	void LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName);
 };

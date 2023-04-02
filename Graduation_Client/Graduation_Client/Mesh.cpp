@@ -480,3 +480,98 @@ void SkinnedMesh::LoadSkinInfoFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 		}
 	}
 }
+
+WallMesh::WallMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) : Mesh(pd3dDevice, pd3dCommandList)
+{
+}
+
+WallMesh::~WallMesh()
+{
+	if (m_pd3dTextureCoord0Buffer) m_pd3dTextureCoord0Buffer->Release();
+	if (m_pd3dNormalBuffer) m_pd3dNormalBuffer->Release();
+
+	if (m_pxmf3Normals) delete[] m_pxmf3Normals;
+	if (m_pxmf2TextureCoords0) delete[] m_pxmf2TextureCoords0;
+}
+
+void WallMesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName)
+{
+	FILE* pFile = NULL;
+	::fopen_s(&pFile, pstrFileName, "rb");
+	::rewind(pFile);
+
+	char pstrToken[64] = { '\0' };
+
+	BYTE nStrLength = 0;
+	UINT nReads = 0;
+
+	nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pFile);
+	nReads = (UINT)::fread(pstrToken, sizeof(char), 14, pFile); //"<BoundingBox>:"
+	nReads = (UINT)::fread(&m_xmf3AABBCenter, sizeof(float), 3, pFile);
+	nReads = (UINT)::fread(&m_xmf3AABBExtents, sizeof(float), 3, pFile);
+
+	nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pFile);
+	nReads = (UINT)::fread(pstrToken, sizeof(char), 11, pFile); //"<Vertices>:"
+	nReads = (UINT)::fread(&m_nVertices, sizeof(int), 1, pFile);
+	m_pxmf3Positions = new XMFLOAT3[m_nVertices];
+	nReads = (UINT)::fread(m_pxmf3Positions, sizeof(float), 3 * m_nVertices, pFile);
+
+	m_pd3dPositionBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Positions, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
+
+	m_d3dPositionBufferView.BufferLocation = m_pd3dPositionBuffer->GetGPUVirtualAddress();
+	m_d3dPositionBufferView.StrideInBytes = sizeof(XMFLOAT3);
+	m_d3dPositionBufferView.SizeInBytes = sizeof(XMFLOAT3) * m_nVertices;
+
+	nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pFile);
+	nReads = (UINT)::fread(pstrToken, sizeof(char), 10, pFile); //"<Normals>:"
+	nReads = (UINT)::fread(&m_nVertices, sizeof(int), 1, pFile);
+	m_pxmf3Normals = new XMFLOAT3[m_nVertices];
+	nReads = (UINT)::fread(m_pxmf3Normals, sizeof(float), 3 * m_nVertices, pFile);
+
+	m_pd3dNormalBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Normals, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dNormalUploadBuffer);
+
+	m_d3dNormalBufferView.BufferLocation = m_pd3dNormalBuffer->GetGPUVirtualAddress();
+	m_d3dNormalBufferView.StrideInBytes = sizeof(XMFLOAT3);
+	m_d3dNormalBufferView.SizeInBytes = sizeof(XMFLOAT3) * m_nVertices;
+
+	//nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pFile);
+	//nReads = (UINT)::fread(pstrToken, sizeof(char), 16, pFile); //"<TextureCoords>:"
+	//nReads = (UINT)::fread(&m_nVertices, sizeof(int), 1, pFile);
+	//m_pxmf2TextureCoords0 = new XMFLOAT2[m_nVertices];
+	//nReads = (UINT)::fread(m_pxmf2TextureCoords0, sizeof(float), 2 * m_nVertices, pFile);
+
+	//m_pd3dTextureCoord0Buffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf2TextureCoords0, sizeof(XMFLOAT2) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dTextureCoord0UploadBuffer);
+
+	//m_d3dTextureCoord0BufferView.BufferLocation = m_pd3dTextureCoord0Buffer->GetGPUVirtualAddress();
+	//m_d3dTextureCoord0BufferView.StrideInBytes = sizeof(XMFLOAT2);
+	//m_d3dTextureCoord0BufferView.SizeInBytes = sizeof(XMFLOAT2) * m_nVertices;
+
+	m_nSubMeshes = 1;
+	m_pnSubSetIndices = new int[m_nSubMeshes];
+	m_ppnSubSetIndices = new UINT * [m_nSubMeshes];
+
+	m_ppd3dSubSetIndexBuffers = new ID3D12Resource * [m_nSubMeshes];
+	m_ppd3dSubSetIndexUploadBuffers = new ID3D12Resource * [m_nSubMeshes];
+	m_pd3dSubSetIndexBufferViews = new D3D12_INDEX_BUFFER_VIEW[m_nSubMeshes];
+
+	nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pFile);
+	nReads = (UINT)::fread(pstrToken, sizeof(char), 10, pFile); //"<Indices>:"
+	
+	nReads = (UINT)::fread(&(m_pnSubSetIndices[0]), sizeof(int), 1, pFile);
+	if (m_pnSubSetIndices[0] > 0)
+	{
+		m_ppnSubSetIndices[0] = new UINT[m_pnSubSetIndices[0]];
+		nReads = (UINT)::fread(m_ppnSubSetIndices[0], sizeof(UINT), m_pnSubSetIndices[0], pFile);
+
+		m_ppd3dSubSetIndexBuffers[0] = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_ppnSubSetIndices[0], sizeof(UINT) * m_pnSubSetIndices[0], D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_INDEX_BUFFER, &m_ppd3dSubSetIndexUploadBuffers[0]);
+
+		m_pd3dSubSetIndexBufferViews[0].BufferLocation = m_ppd3dSubSetIndexBuffers[0]->GetGPUVirtualAddress();
+		m_pd3dSubSetIndexBufferViews[0].Format = DXGI_FORMAT_R32_UINT;
+		m_pd3dSubSetIndexBufferViews[0].SizeInBytes = sizeof(UINT) * m_pnSubSetIndices[0];
+	}
+	else {
+		m_ppd3dSubSetIndexUploadBuffers = NULL;
+	}
+	
+	::fclose(pFile);
+}

@@ -232,3 +232,57 @@ float4 PSSkyBox(VS_SKYBOX_CUBEMAP_OUTPUT input) : SV_TARGET
 
 	return(cColor);
 }
+
+struct VS_WALL_INPUT
+{
+	float3		position : POSITION;
+	float3		normal : NORMAL;
+	float2		uv : TEXTURECOORD;
+};
+
+struct VS_WALL_OUTPUT
+{
+	float4		positionH : SV_POSITION;
+	float3		positionW : POSITION;
+	float3		normal : NORMAL0;
+	float3		normalW : NORMAL1;
+	float2		uv : TEXTURECOORD;
+
+	float4		color : COLOR;
+};
+
+VS_WALL_OUTPUT VSWall(VS_WALL_INPUT input)
+{
+	VS_WALL_OUTPUT output;
+
+	output.positionW = mul(float4(input.position, 1.0f), gmtxGameObject).xyz;
+	output.positionH = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+	output.normalW = mul(float4(input.normal, 0.0f), gmtxGameObject).xyz;
+	output.normal = input.normal;
+	output.uv = input.uv;
+
+	output.color = lerp(float4(normalize(output.positionW), 1.0f), float4(normalize(output.normalW), 1.0f), 0.5f);
+
+	return(output);
+}
+
+static float3 gf3AmbientLightColor = float3(0.15f, 0.15f, 0.15f);
+static float3 gf3AmbientSpecularColor = float3(0.15f, 0.15f, 0.15f);
+
+static float3 gf3LightDirection = float3(1.4142f, 1.4142f * 0.5f, 1.4142f * 0.5f);
+static float3 gf3LightColor = float3(0.65f, 0.55f, 0.65f);
+static float3 gf3SpecularColor = float3(0.75f, 0.75f, 0.75f);
+
+static float gfSpecular = 2.0f;
+static float gfGlossiness = 1.8f;
+static float gfSmoothness = 0.95f;
+static float gfOneMinusReflectivity = 0.5f;
+
+float4 PSWall(VS_WALL_OUTPUT input) : SV_TARGET
+{
+	float4 cColor = input.color;
+
+	cColor = float4(1.0f, 0.0f, 0.0f, 1.0f);
+
+	return(cColor);
+}

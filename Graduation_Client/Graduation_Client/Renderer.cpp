@@ -167,6 +167,14 @@ void StandardRenderer::SetMaterial(int nMaterial, Material* pMaterial)
 	if (m_ppMaterials[nMaterial]) m_ppMaterials[nMaterial]->AddRef();
 }
 
+void StandardRenderer::SetMaterial(Material* pMaterial)
+{
+	if (m_ppMaterials) return;
+	m_nMaterials = 1;
+	m_ppMaterials = new Material * [m_nMaterials];
+	m_ppMaterials[0] = pMaterial;
+}
+
 void StandardRenderer::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4X4* pxmf4x4World)
 {
 	XMFLOAT4X4 xmf4x4World;
