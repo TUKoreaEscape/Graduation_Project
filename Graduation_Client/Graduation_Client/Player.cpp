@@ -177,8 +177,9 @@ void Player::Rotate(float x, float y, float z)
 	rotate_packet.size = sizeof(rotate_packet);
 	rotate_packet.type = CS_PACKET::CS_ROTATE;
 	rotate_packet.xmf3Look = m_xmf3Look;
-	rotate_packet.m_xmf3Up = m_xmf3Up;
+	rotate_packet.xmf3Up = m_xmf3Up;
 	rotate_packet.xmf3Right = m_xmf3Right;
+	rotate_packet.yaw = m_fYaw;
 	server.send_packet(&rotate_packet);
 }
 

@@ -116,6 +116,11 @@ void CLIENT::update_bounding_box_pos(const XMFLOAT3 pos)
 	m_bounding_box.Center = pos;
 }
 
+void CLIENT::update_bounding_box_orientation(const XMFLOAT4 orientation)
+{
+	m_bounding_box.Orientation = orientation;
+}
+
 BoundingOrientedBox CLIENT::get_bounding_box()
 {
 	return m_bounding_box;

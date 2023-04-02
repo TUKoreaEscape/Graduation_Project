@@ -213,7 +213,7 @@ int cGameServer::get_new_id()
 	return -1;
 }
 
-CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& moved, const BoundingOrientedBox& other)
+CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& other, const BoundingOrientedBox& moved)
 {
 	CollisionInfo collisionInfo;
 	BoundingBox box;
@@ -252,7 +252,7 @@ CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& moved, co
 		XMLoadFloat3(&corners[1]) - XMLoadFloat3(&corners[0])
 	));
 
-	if (moved.Intersects(other))
+	if (other.Intersects(moved))
 	{
 		UINT collidedFaceIndex = 0;
 		float minPenetrationDepth = FLT_MAX;
@@ -261,7 +261,7 @@ CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& moved, co
 		{
 			XMFLOAT3 faceNormal;
 			XMStoreFloat3(&faceNormal, OrientedWorldNormals[i]);
-			float distanceToPlane = DistanceToPlane(moved.Center, faceNormal, other.Center);
+			float distanceToPlane = DistanceToPlane(other.Center, faceNormal, moved.Center);
 			if (distanceToPlane > 0.0f)
 			{
 				float penetration = moved.Extents.x * abs(faceNormal.x) +
@@ -276,9 +276,9 @@ CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& moved, co
 			}
 		}
 		XMFLOAT3 temp;
-		temp.x = other.Center.x - moved.Center.x;
-		temp.y = other.Center.y - moved.Center.y;
-		temp.z = other.Center.z - moved.Center.z;
+		temp.x = moved.Center.x - other.Center.x;
+		temp.y = moved.Center.y - other.Center.y;
+		temp.z = moved.Center.z - other.Center.z;
 
 		XMStoreFloat3(&collisionNormal, OrientedWorldNormals[collidedFaceIndex]);
 		if (Dot(collisionNormal, temp) < 0.0f)
@@ -312,8 +312,22 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 	// ¿©±â¼­ ÃÊ±âÈ­
 	if (cl.get_join_room_number() != -1) {
 		Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
+		for (int i = 0; i < 6; ++i)
+		{
+			if (rl.Get_Join_Member(i) != _user_id && rl.Get_Join_Member(i) != -1)
+			{
+				int rl_id = rl.Get_Join_Member(i);
+				m_clients[rl_id]._room_list_lock.lock();
+				m_clients[rl_id].room_list.erase(m_clients[rl_id].room_list.find(_user_id));
+				m_clients[rl_id]._room_list_lock.unlock();
+			}
+		}
 		rl.Exit_Player(_user_id);	
 	}
+	cl._room_list_lock.lock();
+	cl.room_list.clear();
+	cl._room_list_lock.unlock();
+
 	cl._state_lock.lock();
 	cl.set_state(CLIENT_STATE::ST_FREE);
 	cl.set_login_state(N_LOGIN);

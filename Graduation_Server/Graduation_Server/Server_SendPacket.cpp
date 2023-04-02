@@ -110,7 +110,7 @@ void cGameServer::send_rotate_packet(const unsigned int id, const unsigned int r
 	packet.type = SC_PACKET::SC_USER_ROTATE;
 	packet.id = rotate_id;
 
-	packet.m_xmf3Up = recv_packet.m_xmf3Up;
+	packet.m_xmf3Up = recv_packet.xmf3Up;
 	packet.xmf3Look = recv_packet.xmf3Look;
 	packet.xmf3Right = recv_packet.xmf3Right;
 
