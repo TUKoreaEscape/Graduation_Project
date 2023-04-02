@@ -16,6 +16,7 @@ private:
 
 	array<BoundingOrientedBox, 6>	in_player_bounding_box;
 	vector<GameObject>				m_game_object;
+	vector<GameObject>				m_game_wall_and_door;
 
 	chrono::system_clock::time_point start_time;
 	chrono::system_clock::time_point now_time;
@@ -76,7 +77,7 @@ public:
 	bool	All_Player_Loading();
 
 	bool	Is_Door_Open();
-	bool	is_collision_wall_to_player(const int player_id);
+	CollisionInfo	is_collision_wall_to_player(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift);
 	int		is_collision_player_to_player(const int player_id);
 	bool	is_collision_player_to_object(const int player_id);
 

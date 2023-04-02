@@ -59,9 +59,9 @@ using namespace DirectX;
 
 struct CollisionInfo
 {
-	float PenetrationDepth; // 충돌 깊이
+	bool	 is_collision;
 	XMFLOAT3 CollisionNormal; // 충돌 면의 법선 벡터
-	XMFLOAT3 CollisionPoint; // 충돌 지점
+	XMFLOAT3 SlidingVector;
 };
 
 inline float DistanceToPlane(XMFLOAT3 point, XMFLOAT3 normal, XMFLOAT3 planePoint)
