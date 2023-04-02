@@ -265,13 +265,12 @@ CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& other, co
 			if (distanceToPlane > 0.0f)
 			{
 				float penetration = moved.Extents.x * abs(faceNormal.x) +
-					other.Extents.y * abs(faceNormal.y) +
-					other.Extents.z * abs(faceNormal.z) - distanceToPlane;
+					moved.Extents.y * abs(faceNormal.y) +
+					moved.Extents.z * abs(faceNormal.z) - distanceToPlane;
 
 				if (penetration < minPenetrationDepth)
 				{
 					collidedFaceIndex = i;
-					cout << "Ãæµ¹¸é : " << collidedFaceIndex << endl;
 					minPenetrationDepth = penetration;
 				}
 			}
@@ -318,7 +317,9 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 			if (rl.Get_Join_Member(i) != _user_id && rl.Get_Join_Member(i) != -1)
 			{
 				int rl_id = rl.Get_Join_Member(i);
+				m_clients[rl_id]._room_list_lock.lock();
 				m_clients[rl_id].room_list.erase(m_clients[rl_id].room_list.find(_user_id));
+				m_clients[rl_id]._room_list_lock.unlock();
 			}
 		}
 		rl.Exit_Player(_user_id);	
