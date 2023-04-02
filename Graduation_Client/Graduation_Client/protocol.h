@@ -83,7 +83,8 @@ struct cs_packet_player_rotate {
 
 	DirectX::XMFLOAT3 xmf3Look;
 	DirectX::XMFLOAT3 xmf3Right;
-	DirectX::XMFLOAT3 m_xmf3Up;
+	DirectX::XMFLOAT3 xmf3Up;
+	float			  yaw;
 };
 
 struct cs_packet_create_id {
@@ -109,7 +110,7 @@ struct cs_packet_move { // 이동관련 데이터
 	unsigned char	input_key;
 	DirectX::XMFLOAT3	velocity;
 	DirectX::XMFLOAT3	xmf3Shift;
-	float				yaw; // 이거뺴고
+	float				yaw;
 };
 
 struct cs_packet_voice {

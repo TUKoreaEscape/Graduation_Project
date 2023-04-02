@@ -39,13 +39,12 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	if (join_room.is_collision_player_to_player(user_id) != -1) // 같은 방에 있는 사람만 충돌 체크를 합니다.
 	{
 		XMFLOAT3 SlidingVector = XMFLOAT3(0.0f, 0.0f, 0.0f);
-		XMFLOAT3 NormalVector;
 		//GetCollisionInfo() <- 이함수를 통해 법선벡터를 구해올거임! + 슬라이딩 구해보자~
 		m_clients[user_id].set_user_position(current_player_position);
 		calculate_player_position = current_player_position;
 		m_clients[user_id].update_bounding_box_pos(current_player_position);
 		int collision_id = join_room.is_collision_player_to_player(user_id);
-		CollisionInfo data = GetCollisionInfo(m_clients[user_id].get_bounding_box(), m_clients[collision_id].get_bounding_box());
+		CollisionInfo data = GetCollisionInfo(m_clients[collision_id].get_bounding_box(), m_clients[user_id].get_bounding_box());
 		
 		XMFLOAT3 MotionVector = packet->xmf3Shift;
 
@@ -102,6 +101,12 @@ void cGameServer::Process_Rotate(const int user_id, void* buff)
 {
 	cs_packet_player_rotate* packet = reinterpret_cast<cs_packet_player_rotate*>(buff);
 	
+	m_clients[user_id].set_user_yaw(packet->yaw);
+	float radian = XMConvertToRadians(packet->yaw);
+
+	XMFLOAT4 calculate;
+	XMStoreFloat4(&calculate, XMQuaternionRotationRollPitchYaw(0.0f, radian, 0.0f));
+	m_clients[user_id].update_bounding_box_orientation(calculate);
 	m_clients[user_id]._room_list_lock.lock();
 	for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
 	{

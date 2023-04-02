@@ -213,7 +213,7 @@ int cGameServer::get_new_id()
 	return -1;
 }
 
-CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& moved, const BoundingOrientedBox& other)
+CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& other, const BoundingOrientedBox& moved)
 {
 	CollisionInfo collisionInfo;
 	BoundingBox box;
@@ -252,7 +252,7 @@ CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& moved, co
 		XMLoadFloat3(&corners[1]) - XMLoadFloat3(&corners[0])
 	));
 
-	if (moved.Intersects(other))
+	if (other.Intersects(moved))
 	{
 		UINT collidedFaceIndex = 0;
 		float minPenetrationDepth = FLT_MAX;
@@ -261,24 +261,25 @@ CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& moved, co
 		{
 			XMFLOAT3 faceNormal;
 			XMStoreFloat3(&faceNormal, OrientedWorldNormals[i]);
-			float distanceToPlane = DistanceToPlane(moved.Center, faceNormal, other.Center);
+			float distanceToPlane = DistanceToPlane(other.Center, faceNormal, moved.Center);
 			if (distanceToPlane > 0.0f)
 			{
 				float penetration = moved.Extents.x * abs(faceNormal.x) +
-					moved.Extents.y * abs(faceNormal.y) +
-					moved.Extents.z * abs(faceNormal.z) - distanceToPlane;
+					other.Extents.y * abs(faceNormal.y) +
+					other.Extents.z * abs(faceNormal.z) - distanceToPlane;
 
 				if (penetration < minPenetrationDepth)
 				{
 					collidedFaceIndex = i;
+					cout << "Ãæµ¹¸é : " << collidedFaceIndex << endl;
 					minPenetrationDepth = penetration;
 				}
 			}
 		}
 		XMFLOAT3 temp;
-		temp.x = other.Center.x - moved.Center.x;
-		temp.y = other.Center.y - moved.Center.y;
-		temp.z = other.Center.z - moved.Center.z;
+		temp.x = moved.Center.x - other.Center.x;
+		temp.y = moved.Center.y - other.Center.y;
+		temp.z = moved.Center.z - other.Center.z;
 
 		XMStoreFloat3(&collisionNormal, OrientedWorldNormals[collidedFaceIndex]);
 		if (Dot(collisionNormal, temp) < 0.0f)

@@ -83,7 +83,8 @@ struct cs_packet_player_rotate {
 
 	DirectX::XMFLOAT3 xmf3Look;
 	DirectX::XMFLOAT3 xmf3Right;
-	DirectX::XMFLOAT3 m_xmf3Up;
+	DirectX::XMFLOAT3 xmf3Up;
+	float			  yaw;
 };
 
 struct cs_packet_create_id {
