@@ -313,8 +313,20 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 	// ¿©±â¼­ ÃÊ±âÈ­
 	if (cl.get_join_room_number() != -1) {
 		Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
+		for (int i = 0; i < 6; ++i)
+		{
+			if (rl.Get_Join_Member(i) != _user_id && rl.Get_Join_Member(i) != -1)
+			{
+				int rl_id = rl.Get_Join_Member(i);
+				m_clients[rl_id].room_list.erase(m_clients[rl_id].room_list.find(_user_id));
+			}
+		}
 		rl.Exit_Player(_user_id);	
 	}
+	cl._room_list_lock.lock();
+	cl.room_list.clear();
+	cl._room_list_lock.unlock();
+
 	cl._state_lock.lock();
 	cl.set_state(CLIENT_STATE::ST_FREE);
 	cl.set_login_state(N_LOGIN);
