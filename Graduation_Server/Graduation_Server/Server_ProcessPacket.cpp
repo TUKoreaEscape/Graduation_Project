@@ -35,19 +35,25 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 
 	m_clients[user_id].set_user_position(calculate_player_position);
 	m_clients[user_id].update_bounding_box_pos(calculate_player_position);
-
-	CollisionInfo check = join_room.is_collision_player_to_player(user_id, current_player_position, packet->xmf3Shift);
-	if (check.is_collision)
+	//cout << "적용전 캐릭터 좌표 : " << m_clients[user_id].get_user_position().x << ", " << m_clients[user_id].get_user_position().y << ", " << m_clients[user_id].get_user_position().z << endl;
+	CollisionInfo player_check = join_room.is_collision_player_to_player(user_id, current_player_position, packet->xmf3Shift);
+	if (player_check.is_collision)
 	{
-		calculate_player_position = Add(current_player_position, check.SlidingVector);
+		//cout << "슬라이딩벡터 : " << player_check.SlidingVector.x << ", " << player_check.SlidingVector.y << ", " << player_check.SlidingVector.z << endl;
+		cout << "캐릭터간충돌" << endl;
+		calculate_player_position = current_player_position;
+		calculate_player_position = Add(current_player_position, player_check.SlidingVector);
 		m_clients[user_id].set_user_position(calculate_player_position);
 		m_clients[user_id].update_bounding_box_pos(calculate_player_position);
+		//cout << "적용후 캐릭터 좌표 : " << m_clients[user_id].get_user_position().x << ", " << m_clients[user_id].get_user_position().y << ", " << m_clients[user_id].get_user_position().z << endl;
 	}
 
-	check = join_room.is_collision_wall_to_player(user_id, current_player_position, packet->xmf3Shift);
-	if (check.is_collision)
+	CollisionInfo wall_check = join_room.is_collision_wall_to_player(user_id, current_player_position, packet->xmf3Shift);
+	if (wall_check.is_collision)
 	{
-		calculate_player_position = Add(current_player_position, check.SlidingVector);
+		cout << "벽과충돌" << endl;
+		calculate_player_position = current_player_position;
+		calculate_player_position = Add(current_player_position, wall_check.SlidingVector);
 		m_clients[user_id].set_user_position(calculate_player_position);
 		m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 	}

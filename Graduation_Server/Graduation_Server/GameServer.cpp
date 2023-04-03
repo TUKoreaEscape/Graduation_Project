@@ -275,6 +275,7 @@ CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& other, co
 				}
 			}
 		}
+		cout << "Ãæµ¹¸é : " << collidedFaceIndex << endl;
 		XMFLOAT3 temp;
 		temp.x = moved.Center.x - other.Center.x;
 		temp.y = moved.Center.y - other.Center.y;

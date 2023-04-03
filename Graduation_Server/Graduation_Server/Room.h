@@ -50,6 +50,7 @@ public:
 
 	// 인게임 로딩 전 사용하는 함수
 	void	add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation);
+	void	add_game_walls(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents);
 	void	Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE room_state);
 	void	SetReady(const bool is_ready, const int user_id);
 	void	SetLoading(const bool is_loading, const int user_id);

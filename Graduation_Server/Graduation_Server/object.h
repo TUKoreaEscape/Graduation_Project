@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
-enum Object_Type{NONE, OB_PIANO, OB_DOOR, OB_DESK };
+enum Object_Type{NONE, OB_PIANO, OB_DOOR, OB_DESK, OB_WALL };
 
 class GameObject {
 protected:

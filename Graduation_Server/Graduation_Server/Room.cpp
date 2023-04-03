@@ -77,6 +77,11 @@ void Room::add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extent
 	m_game_object.emplace_back(GameObject(ob_type, center, extents, orientation));
 }
 
+void Room::add_game_walls(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents)
+{
+	m_game_wall_and_door.emplace_back(GameObject(ob_type, center, extents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)));
+}
+
 void Room::SetBoundingBox(XMFLOAT3 pos, XMFLOAT3 extents, XMFLOAT4 orientation)
 {
 	for (int i = 0; i < in_player_bounding_box.size(); ++i)
@@ -273,14 +278,14 @@ CollisionInfo Room::is_collision_wall_to_player(const int player_id, const XMFLO
 	cGameServer& server = cGameServer::GetInstance();
 	CLIENT& cl = *server.get_client_info(player_id);
 	CollisionInfo return_data;
-	cl.set_user_position(current_position);
-	cl.update_bounding_box_pos(current_position);
 
 	BoundingOrientedBox player_bounding_box = cl.get_bounding_box();
 	for (auto& object : m_game_wall_and_door)
 	{
 		if (player_bounding_box.Intersects(object.Get_BoundingBox()))
 		{
+			cl.set_user_position(current_position);
+			cl.update_bounding_box_pos(current_position);
 			CollisionInfo collision_data = server.GetCollisionInfo(object.Get_BoundingBox(), player_bounding_box);
 			XMFLOAT3 SlidingVector = XMFLOAT3(0.0f, 0.0f, 0.0f);
 			XMFLOAT3 current_player_position = current_position;
