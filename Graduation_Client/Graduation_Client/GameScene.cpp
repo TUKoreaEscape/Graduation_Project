@@ -99,7 +99,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	}
 	AddPlayer(m_pPlayer);
 
-	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Models/Scene.bin");
+	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene.bin");
 
 #if USE_NETWORK
 	m_network = Network::GetInstance();
@@ -430,9 +430,9 @@ void GameScene::LoadSceneObjectsFromFile(ID3D12Device* pd3dDevice, ID3D12Graphic
 		if (!pMesh)
 		{
 			char pstrFilePath[64] = { '\0' };
-			strcpy_s(pstrFilePath, 64, "Models/");
-			strcpy_s(pstrFilePath + 7, 64 - 7, pstrGameObjectName);
-			strcpy_s(pstrFilePath + 7 + nObjectNameLength, 64 - 7 - nObjectNameLength, ".bin");
+			strcpy_s(pstrFilePath, 64, "Walls/");
+			strcpy_s(pstrFilePath + 6, 64 - 6, pstrGameObjectName);
+			strcpy_s(pstrFilePath + 6 + nObjectNameLength, 64 - 6 - nObjectNameLength, ".bin");
 			pMesh = new WallMesh(pd3dDevice, pd3dCommandList);
 			pMesh->LoadMeshFromFile(pd3dDevice, pd3dCommandList, pstrFilePath);
 		}
