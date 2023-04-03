@@ -208,10 +208,15 @@ bool Room::is_collision_player_to_object(const int player_id)
 	return false;
 }
 
-int Room::is_collision_player_to_player(const int player_id)
+CollisionInfo Room::is_collision_player_to_player(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift)
 {
+	CollisionInfo return_data;
+
+	XMFLOAT3 calculate_position;
+	int collied_id = -1;
 	cGameServer& server = cGameServer::GetInstance();
 	CLIENT& cl = *server.get_client_info(player_id);
+
 	BoundingOrientedBox player_bounding_box = cl.get_bounding_box();
 	for (int i = 0; i < 6; ++i)
 	{
@@ -220,24 +225,63 @@ int Room::is_collision_player_to_player(const int player_id)
 			CLIENT& other_player = *server.get_client_info(in_player[i]);
 			BoundingOrientedBox other_player_bounding_box = other_player.get_bounding_box();
 
-			if (player_bounding_box.Intersects(other_player_bounding_box))
-				return in_player[i];
+			if (player_bounding_box.Intersects(other_player_bounding_box)) {
+				collied_id = in_player[i];
+				break;
+			}
 		}
 	}
-	return -1;
+
+	if (collied_id != -1)
+	{
+		XMFLOAT3 SlidingVector = XMFLOAT3(0.0f, 0.0f, 0.0f);
+		cl.set_user_position(current_position);
+		cl.update_bounding_box_pos(current_position);
+
+		CLIENT& other = *server.get_client_info(collied_id);
+		player_bounding_box = cl.get_bounding_box();
+		BoundingOrientedBox other_player_bounding_box = other.get_bounding_box();
+		CollisionInfo data = server.GetCollisionInfo(other_player_bounding_box, player_bounding_box);
+
+		XMFLOAT3 MotionVector = xmf3shift;
+		float DotProduct = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&MotionVector), XMLoadFloat3(&data.CollisionNormal)));
+		if (DotProduct < 0.0f)
+		{
+			XMFLOAT3 RejectionVector = XMFLOAT3(-DotProduct * data.CollisionNormal.x, -DotProduct * data.CollisionNormal.y, -DotProduct * data.CollisionNormal.z);
+			SlidingVector = XMFLOAT3(MotionVector.x + RejectionVector.x, MotionVector.y + RejectionVector.y, MotionVector.z + RejectionVector.z);
+		}
+		else
+		{
+			SlidingVector = MotionVector;
+		}
+		return_data.is_collision = true;
+		return_data.SlidingVector = SlidingVector;
+		return_data.CollisionNormal = data.CollisionNormal;
+	}
+	else
+	{
+		return_data.is_collision = false;
+		return_data.CollisionNormal = XMFLOAT3(0, 0, 0);
+		return_data.CollisionNormal = XMFLOAT3(0, 0, 0);
+	}
+	return return_data;
 }
+
 
 CollisionInfo Room::is_collision_wall_to_player(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift)
 {
 	cGameServer& server = cGameServer::GetInstance();
 	CLIENT& cl = *server.get_client_info(player_id);
 	CollisionInfo return_data;
+	cl.set_user_position(current_position);
+	cl.update_bounding_box_pos(current_position);
+
 	BoundingOrientedBox player_bounding_box = cl.get_bounding_box();
 	for (auto& object : m_game_wall_and_door)
 	{
 		if (player_bounding_box.Intersects(object.Get_BoundingBox()))
 		{
-			CollisionInfo collision_data = server.GetCollisionInfo(player_bounding_box, object.Get_BoundingBox());
+			CollisionInfo collision_data = server.GetCollisionInfo(object.Get_BoundingBox(), player_bounding_box);
 			XMFLOAT3 SlidingVector = XMFLOAT3(0.0f, 0.0f, 0.0f);
 			XMFLOAT3 current_player_position = current_position;
 			XMFLOAT3 MotionVector = xmf3shift;
@@ -267,3 +311,5 @@ CollisionInfo Room::is_collision_wall_to_player(const int player_id, const XMFLO
 	return_data.SlidingVector = XMFLOAT3(0, 0, 0);
 	return return_data;
 }
+
+

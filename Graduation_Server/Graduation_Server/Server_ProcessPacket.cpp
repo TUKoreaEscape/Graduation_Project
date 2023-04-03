@@ -36,34 +36,20 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	m_clients[user_id].set_user_position(calculate_player_position);
 	m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 
-	if (join_room.is_collision_player_to_player(user_id) != -1) // 같은 방에 있는 사람만 충돌 체크를 합니다.
+	CollisionInfo check = join_room.is_collision_player_to_player(user_id, current_player_position, packet->xmf3Shift);
+	if (check.is_collision)
 	{
-		XMFLOAT3 SlidingVector = XMFLOAT3(0.0f, 0.0f, 0.0f);
-		//GetCollisionInfo() <- 이함수를 통해 법선벡터를 구해올거임! + 슬라이딩 구해보자~
-		m_clients[user_id].set_user_position(current_player_position);
-		calculate_player_position = current_player_position;
-		m_clients[user_id].update_bounding_box_pos(current_player_position);
-		int collision_id = join_room.is_collision_player_to_player(user_id);
-		CollisionInfo data = GetCollisionInfo(m_clients[collision_id].get_bounding_box(), m_clients[user_id].get_bounding_box());
-		
-		XMFLOAT3 MotionVector = packet->xmf3Shift;
-
-		float DotProduct = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&MotionVector), XMLoadFloat3(&data.CollisionNormal)));
-
-		if (DotProduct < 0.0f)
-		{
-			XMFLOAT3 RejectionVector = XMFLOAT3(-DotProduct * data.CollisionNormal.x, -DotProduct * data.CollisionNormal.y, -DotProduct * data.CollisionNormal.z);
-			SlidingVector = XMFLOAT3(MotionVector.x + RejectionVector.x, MotionVector.y + RejectionVector.y, MotionVector.z + RejectionVector.z);
-		}
-		else
-		{
-			SlidingVector = MotionVector;
-		}
-
-		calculate_player_position = Add(current_player_position, SlidingVector);
+		calculate_player_position = Add(current_player_position, check.SlidingVector);
 		m_clients[user_id].set_user_position(calculate_player_position);
 		m_clients[user_id].update_bounding_box_pos(calculate_player_position);
-		// 이쪽은 충돌 했을 경우 처리해야하는 부분입니다.
+	}
+
+	check = join_room.is_collision_wall_to_player(user_id, current_player_position, packet->xmf3Shift);
+	if (check.is_collision)
+	{
+		calculate_player_position = Add(current_player_position, check.SlidingVector);
+		m_clients[user_id].set_user_position(calculate_player_position);
+		m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 	}
 
 	if (join_room.is_collision_player_to_object(user_id))
