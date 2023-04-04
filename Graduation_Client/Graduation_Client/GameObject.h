@@ -75,13 +75,13 @@ public:
 	XMFLOAT4X4 m_xmf4x4World;
 	XMFLOAT4X4 m_xmf4x4ToParent;
 
-	GameObject* m_pParent;
-	GameObject* m_pSibling;
-	GameObject* m_pChild;
+	GameObject* m_pParent = nullptr;
+	GameObject* m_pSibling = nullptr;
+	GameObject* m_pChild = nullptr;
 
-	Mesh* m_pMesh;
+	Mesh* m_pMesh = nullptr;
 
-	StandardRenderer* renderer; 
+	StandardRenderer* renderer = nullptr;
 
 public:
 	bool isNotDraw = false;

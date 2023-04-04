@@ -534,17 +534,17 @@ void WallMesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	m_d3dNormalBufferView.StrideInBytes = sizeof(XMFLOAT3);
 	m_d3dNormalBufferView.SizeInBytes = sizeof(XMFLOAT3) * m_nVertices;
 
-	//nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pFile);
-	//nReads = (UINT)::fread(pstrToken, sizeof(char), 16, pFile); //"<TextureCoords>:"
-	//nReads = (UINT)::fread(&m_nVertices, sizeof(int), 1, pFile);
-	//m_pxmf2TextureCoords0 = new XMFLOAT2[m_nVertices];
-	//nReads = (UINT)::fread(m_pxmf2TextureCoords0, sizeof(float), 2 * m_nVertices, pFile);
+	nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pFile);
+	nReads = (UINT)::fread(pstrToken, sizeof(char), nStrLength, pFile); //"<TextureCoords>:"
+	nReads = (UINT)::fread(&m_nVertices, sizeof(int), 1, pFile);
+	m_pxmf2TextureCoords0 = new XMFLOAT2[m_nVertices];
+	nReads = (UINT)::fread(m_pxmf2TextureCoords0, sizeof(float), 2 * m_nVertices, pFile);
 
-	//m_pd3dTextureCoord0Buffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf2TextureCoords0, sizeof(XMFLOAT2) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dTextureCoord0UploadBuffer);
+	m_pd3dTextureCoord0Buffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf2TextureCoords0, sizeof(XMFLOAT2) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dTextureCoord0UploadBuffer);
 
-	//m_d3dTextureCoord0BufferView.BufferLocation = m_pd3dTextureCoord0Buffer->GetGPUVirtualAddress();
-	//m_d3dTextureCoord0BufferView.StrideInBytes = sizeof(XMFLOAT2);
-	//m_d3dTextureCoord0BufferView.SizeInBytes = sizeof(XMFLOAT2) * m_nVertices;
+	m_d3dTextureCoord0BufferView.BufferLocation = m_pd3dTextureCoord0Buffer->GetGPUVirtualAddress();
+	m_d3dTextureCoord0BufferView.StrideInBytes = sizeof(XMFLOAT2);
+	m_d3dTextureCoord0BufferView.SizeInBytes = sizeof(XMFLOAT2) * m_nVertices;
 
 	m_nSubMeshes = 1;
 	m_pnSubSetIndices = new int[m_nSubMeshes];
@@ -574,4 +574,10 @@ void WallMesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	}
 	
 	::fclose(pFile);
+}
+
+void WallMesh::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
+{
+	D3D12_VERTEX_BUFFER_VIEW pVertexBufferViews[3] = { m_d3dPositionBufferView, m_d3dNormalBufferView, m_d3dTextureCoord0BufferView};
+	pd3dCommandList->IASetVertexBuffers(m_nSlot, 3, pVertexBufferViews);
 }

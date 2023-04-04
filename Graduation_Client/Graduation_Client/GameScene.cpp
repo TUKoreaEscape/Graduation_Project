@@ -83,6 +83,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.0f);
 	m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
 
+	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene.bin");
 	
 	if (pPlayerModel) delete pPlayerModel;
 
@@ -99,7 +100,6 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	}
 	AddPlayer(m_pPlayer);
 
-	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene.bin");
 
 #if USE_NETWORK
 	m_network = Network::GetInstance();
@@ -438,8 +438,14 @@ void GameScene::LoadSceneObjectsFromFile(ID3D12Device* pd3dDevice, ID3D12Graphic
 		}
 		pGameObject->SetMesh(pMesh);
 
-		Material* pMaterial = new Material(1);
+		Material* pMaterial = new Material(7);
+		pMaterial->m_ppTextures[0] = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
+		pMaterial->m_ppTextures[0]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Walls/stones.dds", RESOURCE_TEXTURE2D, 0);
+
+		CreateShaderResourceViews(pd3dDevice, pMaterial->m_ppTextures[0], 0, 3);
+
 		pMaterial->SetShader(pShader);
+		pMaterial->SetMaterialType(MATERIAL_ALBEDO_MAP);
 		pGameObject->renderer->SetMaterial(pMaterial);
 
 		m_ppWalls[i] = pGameObject;
