@@ -40,7 +40,6 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	if (player_check.is_collision)
 	{
 		//cout << "슬라이딩벡터 : " << player_check.SlidingVector.x << ", " << player_check.SlidingVector.y << ", " << player_check.SlidingVector.z << endl;
-		cout << "캐릭터간충돌" << endl;
 		calculate_player_position = current_player_position;
 		calculate_player_position = Add(current_player_position, player_check.SlidingVector);
 		m_clients[user_id].set_user_position(calculate_player_position);
@@ -51,7 +50,6 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	CollisionInfo wall_check = join_room.is_collision_wall_to_player(user_id, current_player_position, packet->xmf3Shift);
 	if (wall_check.is_collision)
 	{
-		cout << "벽과충돌" << endl;
 		calculate_player_position = current_player_position;
 		calculate_player_position = Add(current_player_position, wall_check.SlidingVector);
 		m_clients[user_id].set_user_position(calculate_player_position);

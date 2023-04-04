@@ -123,9 +123,10 @@ void Network::ProcessPacket(char* ptr)
 				if (m_ppOther[i]->GetID() == packet->id)
 				{
 					m_ppOther[i]->SetPosition(packet->pos, true);
-					m_ppOther[i]->m_xmf3Look = packet->xmf3Look;
-					m_ppOther[i]->m_xmf3Right = packet->xmf3Right;
-					m_ppOther[i]->m_xmf3Up = packet->m_xmf3Up;
+					m_ppOther[i]->m_xmf3Look = XMFLOAT3(static_cast<float>(packet->look[0]) / 100, static_cast<float>(packet->look[1]) / 100, static_cast<float>(packet->look[2]) / 100);
+					m_ppOther[i]->m_xmf3Right = XMFLOAT3(static_cast<float>(packet->right[0]) / 100, static_cast<float>(packet->right[1]) / 100, static_cast<float>(packet->right[2]) / 100);
+					m_ppOther[i]->m_xmf3Up = XMFLOAT3(static_cast<float>(packet->up[0]) / 100, static_cast<float>(packet->up[1]) / 100, static_cast<float>(packet->up[2]) / 100);
+					std::cout << "»ó´ë¹æ look : " << m_ppOther[i]->m_xmf3Look.x << ", " << m_ppOther[i]->m_xmf3Look.y << ", " << m_ppOther[i]->m_xmf3Look.z << std::endl;
 					if (packet->input_key == DIR_FORWARD)
 					{
 						m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);

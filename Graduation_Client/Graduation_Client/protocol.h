@@ -109,11 +109,13 @@ struct cs_packet_move { // 이동관련 데이터
 
 	unsigned char	input_key;
 	float	yaw;
+
+	short pos[3];
+	short look[3];
+	short right[3];
+	short up[3];
 	DirectX::XMFLOAT3	velocity;
 	DirectX::XMFLOAT3	xmf3Shift;
-	DirectX::XMFLOAT3	xmf3Look;
-	DirectX::XMFLOAT3	xmf3Right;
-	DirectX::XMFLOAT3	m_xmf3Up;
 };
 
 struct cs_packet_voice {
@@ -316,9 +318,10 @@ struct sc_packet_move {
 	unsigned short	id;
 
 	unsigned char	input_key;
+
+	short look[3];
+	short right[3];
+	short up[3];
 	DirectX::XMFLOAT3	pos;
-	DirectX::XMFLOAT3	xmf3Look;
-	DirectX::XMFLOAT3	xmf3Right;
-	DirectX::XMFLOAT3	m_xmf3Up;
 };
 #pragma pack(pop)
