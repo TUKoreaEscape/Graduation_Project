@@ -264,9 +264,9 @@ CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& other, co
 			float distanceToPlane = DistanceToPlane(other.Center, faceNormal, moved.Center);
 			if (distanceToPlane > 0.0f)
 			{
-				float penetration = moved.Extents.x * abs(faceNormal.x) +
-					moved.Extents.y * abs(faceNormal.y) +
-					moved.Extents.z * abs(faceNormal.z) - distanceToPlane;
+				float penetration = other.Extents.x * abs(faceNormal.x) +
+					other.Extents.y * abs(faceNormal.y) +
+					other.Extents.z * abs(faceNormal.z) - distanceToPlane;
 
 				if (penetration < minPenetrationDepth)
 				{
