@@ -283,8 +283,10 @@ void Framework::UpdateObjects()
 		packet.velocity = Input::GetInstance()->m_pPlayer->GetVelocity();
 		packet.xmf3Shift = Input::GetInstance()->m_pPlayer->GetShift();
 		packet.input_key = Input::GetInstance()->m_pPlayer->GetDirection();
+		packet.m_xmf3Up = Input::GetInstance()->m_pPlayer->GetUpVector();
+		packet.xmf3Look = Input::GetInstance()->m_pPlayer->GetLookVector();
+		packet.xmf3Right = Input::GetInstance()->m_pPlayer->GetRightVector();
 		packet.yaw = Input::GetInstance()->m_pPlayer->GetYaw();
-
 		network.send_packet(&packet);
 		timeToSend -= SEND_TIME;
 	}

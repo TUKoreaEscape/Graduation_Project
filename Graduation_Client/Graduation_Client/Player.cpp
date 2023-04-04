@@ -172,7 +172,7 @@ void Player::Rotate(float x, float y, float z)
 	m_xmf3Right = Vector3::CrossProduct(m_xmf3Up, m_xmf3Look, true);
 	m_xmf3Up = Vector3::CrossProduct(m_xmf3Look, m_xmf3Right, true);
 
-	Network& server = *Network::GetInstance();
+	/*Network& server = *Network::GetInstance();
 	cs_packet_player_rotate rotate_packet;
 	rotate_packet.size = sizeof(rotate_packet);
 	rotate_packet.type = CS_PACKET::CS_ROTATE;
@@ -180,7 +180,7 @@ void Player::Rotate(float x, float y, float z)
 	rotate_packet.xmf3Up = m_xmf3Up;
 	rotate_packet.xmf3Right = m_xmf3Right;
 	rotate_packet.yaw = m_fYaw;
-	server.send_packet(&rotate_packet);
+	server.send_packet(&rotate_packet);*/
 }
 
 void Player::update(float fTimeElapsed)

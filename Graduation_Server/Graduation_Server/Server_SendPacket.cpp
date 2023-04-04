@@ -96,9 +96,11 @@ void cGameServer::send_move_packet(const unsigned int id, const unsigned int mov
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_MOVE;
 	packet.pos = calculate_pos;
-	packet.yaw;
 	packet.id = moved_id;
 	packet.input_key = recv_packet.input_key;
+	packet.xmf3Look = recv_packet.xmf3Look;
+	packet.xmf3Right = recv_packet.xmf3Right;
+	packet.m_xmf3Up = recv_packet.m_xmf3Up;
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 

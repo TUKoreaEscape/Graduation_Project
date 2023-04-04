@@ -123,6 +123,9 @@ void Network::ProcessPacket(char* ptr)
 				if (m_ppOther[i]->GetID() == packet->id)
 				{
 					m_ppOther[i]->SetPosition(packet->pos, true);
+					m_ppOther[i]->m_xmf3Look = packet->xmf3Look;
+					m_ppOther[i]->m_xmf3Right = packet->xmf3Right;
+					m_ppOther[i]->m_xmf3Up = packet->m_xmf3Up;
 					if (packet->input_key == DIR_FORWARD)
 					{
 						m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
