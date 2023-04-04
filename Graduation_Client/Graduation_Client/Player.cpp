@@ -79,7 +79,9 @@ void Player::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 		//		server.send_packet(&packet);
 		//	}
 		//}
+		m_position_lock.lock();
 		m_xmf3Shift = xmf3Shift;
+		m_position_lock.unlock();
 #endif
 		m_pCamera->Move(xmf3Shift);
 	}
@@ -165,13 +167,16 @@ void Player::Rotate(float x, float y, float z)
 	if (y != 0.0f)
 	{
 		XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(y));
+		m_position_lock.lock();
 		m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
 		m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
+		m_position_lock.unlock();
 	}
+	m_position_lock.lock();
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
 	m_xmf3Right = Vector3::CrossProduct(m_xmf3Up, m_xmf3Look, true);
 	m_xmf3Up = Vector3::CrossProduct(m_xmf3Look, m_xmf3Right, true);
-
+	m_position_lock.unlock();
 	/*Network& server = *Network::GetInstance();
 	cs_packet_player_rotate rotate_packet;
 	rotate_packet.size = sizeof(rotate_packet);
@@ -185,8 +190,9 @@ void Player::Rotate(float x, float y, float z)
 
 void Player::update(float fTimeElapsed)
 {
-	update
+	m_position_lock.lock();
 	OnPrepareRender();
+	m_position_lock.unlock();
 
 	GameObject::update(fTimeElapsed);
 	if (m_xmf3Position.y >= 0.0f)
@@ -197,14 +203,16 @@ void Player::update(float fTimeElapsed)
 	}
 	else if (m_xmf3Position.y < 0.0f)
 	{
-		m_xmf3Position.y = 0;
+		//m_xmf3Position.y = 0;
 	}
 	float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
 	float fMaxVelocityXZ = m_fMaxVelocityXZ;
 	if (fLength > m_fMaxVelocityXZ)
 	{
+		m_position_lock.lock();
 		m_xmf3Velocity.x *= (fMaxVelocityXZ / fLength);
 		m_xmf3Velocity.z *= (fMaxVelocityXZ / fLength);
+		m_position_lock.unlock();
 	}
 	float fMaxVelocityY = m_fMaxVelocityY;
 	fLength = sqrtf(m_xmf3Velocity.y * m_xmf3Velocity.y);
@@ -223,7 +231,9 @@ void Player::update(float fTimeElapsed)
 	fLength = Vector3::Length(m_xmf3Velocity);
 	float fDeceleration = (m_fFriction * fTimeElapsed);
 	if (fDeceleration > fLength) fDeceleration = fLength;
+	m_position_lock.lock();
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
+	m_position_lock.unlock();
 }
 
 void Player::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)

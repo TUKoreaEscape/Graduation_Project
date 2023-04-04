@@ -276,7 +276,7 @@ void Framework::UpdateObjects()
 	scene->update(fTimeElapsed, m_pd3dDevice, m_pd3dCommandList);
 	if (timeToSend > SEND_TIME) {
 		Network& network = *Network::GetInstance();
-
+		Input::GetInstance()->m_pPlayer->m_position_lock.lock();
 		cs_packet_move packet;
 		packet.size = sizeof(packet);
 		packet.type = CS_PACKET::CS_MOVE;
@@ -293,6 +293,7 @@ void Framework::UpdateObjects()
 		packet.right[2] = Input::GetInstance()->m_pPlayer->GetRightVector().z * 100;
 
 		packet.yaw = Input::GetInstance()->m_pPlayer->GetYaw();
+		Input::GetInstance()->m_pPlayer->m_position_lock.unlock();
 		network.send_packet(&packet);
 		timeToSend -= SEND_TIME;
 	}
