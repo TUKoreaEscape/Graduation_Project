@@ -96,6 +96,7 @@ void CLIENT::set_user_yaw(float yaw)
 
 void CLIENT::set_bounding_box(XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation)
 {
+	center.y += 0.5f;
 	m_bounding_box = BoundingOrientedBox{ center, extents, orientation }; // 임시값으로 오브젝트별 값을 따로 불러와서 적용 예정
 }
 
@@ -114,6 +115,7 @@ void CLIENT::update_rotation(float yaw)
 void CLIENT::update_bounding_box_pos(const XMFLOAT3 pos)
 {
 	m_bounding_box.Center = pos;
+	m_bounding_box.Center.y += 0.5f;
 }
 
 void CLIENT::update_bounding_box_orientation(const XMFLOAT4 orientation)
