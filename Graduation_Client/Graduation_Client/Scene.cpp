@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Scene.h"
 
 Scene* Scene::scene{ nullptr };
@@ -5,6 +6,10 @@ Scene* Scene::scene{ nullptr };
 Scene::Scene()
 {
 	scene = this;
+//	m_pd3dDevice = pd3dDevice;
+	//pd3dDevice->AddRef();
+	//m_pd3dCommandList = pd3dCommandList;
+	//pd3dCommandList->AddRef();
 }
 
 GameObject* Scene::CreateEmpty()
@@ -12,18 +17,21 @@ GameObject* Scene::CreateEmpty()
 	return new GameObject();
 }
 
-void Scene::update(float elapsedTime)
+void Scene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	m_fElapsedTime = elapsedTime;
 	while (!creationQueue.empty())
 	{
 		auto gameObject = creationQueue.front();
-		gameObject->start();
+		gameObject->start(pd3dDevice, pd3dCommandList);
 		gameObjects.push_back(gameObject);
 		creationQueue.pop();
 	}
 
-	for (auto gameObject : gameObjects)
+	for (auto& gameObject : gameObjects) {
 		gameObject->update(elapsedTime);
+		//gameObject->UpdateTransform(nullptr);
+	}
 
 	auto t = deletionQueue;
 	while (!deletionQueue.empty())
@@ -38,7 +46,14 @@ void Scene::update(float elapsedTime)
 
 void Scene::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	pd3dCommandList->DrawInstanced(3, 1, 0, 0);
-	/*for (auto object : Scene::scene->gameObjects)
-		object->render();*/
+	for (auto& object : gameObjects) {
+		object->OnPrepareRender();
+		object->Animate(m_fElapsedTime);
+		object->render(pd3dCommandList);
+	}
+}
+
+void Scene::AddPlayer(GameObject* player)
+{
+	creationQueue.push(player);
 }

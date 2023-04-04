@@ -16,9 +16,6 @@
     <Filter Include="Client\Component">
       <UniqueIdentifier>{255a505b-638d-406a-a17a-3b9abc1fc88d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Client\GameObjects">
-      <UniqueIdentifier>{4fbf0c34-6af3-4e24-878b-d5d52e21b03d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Client\Scene">
       <UniqueIdentifier>{3c0cc299-b31e-4193-9038-ea396a60828e}</UniqueIdentifier>
     </Filter>
@@ -33,6 +30,12 @@
     </Filter>
     <Filter Include="Engine\Shader">
       <UniqueIdentifier>{2e496cfb-0032-4d37-9c04-227629dff23f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Client\GameObjects">
+      <UniqueIdentifier>{4fbf0c34-6af3-4e24-878b-d5d52e21b03d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Client\Network">
+      <UniqueIdentifier>{7ffd88b5-8cb1-451c-98d6-caf81b302046}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -60,9 +63,6 @@
     <ClInclude Include="Player.h">
       <Filter>Client\GameObjects</Filter>
     </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>Client\Component</Filter>
-    </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>Engine\Framework</Filter>
     </ClInclude>
@@ -77,6 +77,51 @@
     </ClInclude>
     <ClInclude Include="GameScene.h">
       <Filter>Client\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="DDSTextureLoader12.h">
+      <Filter>Engine\System</Filter>
+    </ClInclude>
+    <ClInclude Include="WICTextureLoader12.h">
+      <Filter>Engine\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Client\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Client\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Engine\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Engine\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Engine\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dx12.h">
+      <Filter>Engine\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Client\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Client\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Client\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Engine\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="EXP_OVER.h">
+      <Filter>Client\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Network.h">
+      <Filter>Client\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="protocol.h">
+      <Filter>Client\Network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -98,9 +143,6 @@
     <ClCompile Include="Player.cpp">
       <Filter>Client\GameObjects</Filter>
     </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>Client\Component</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Engine\Framework</Filter>
     </ClCompile>
@@ -115,6 +157,45 @@
     </ClCompile>
     <ClCompile Include="GameScene.cpp">
       <Filter>Client\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="DDSTextureLoader12.cpp">
+      <Filter>Engine\System</Filter>
+    </ClCompile>
+    <ClCompile Include="WICTextureLoader12.cpp">
+      <Filter>Engine\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Client\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Client\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Engine\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Engine\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Engine\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Client\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Client\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Client\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Engine\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="EXP_OVER.cpp">
+      <Filter>Client\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Network.cpp">
+      <Filter>Client\Network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -132,6 +213,9 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders.hlsl">
+      <Filter>Engine\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Light.hlsl">
       <Filter>Engine\Shader</Filter>
     </FxCompile>
   </ItemGroup>

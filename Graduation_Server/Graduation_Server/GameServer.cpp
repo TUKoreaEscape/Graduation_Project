@@ -39,6 +39,10 @@ void cGameServer::StartServer()
 {
 	C_IOCP::Start_server();
 
+	for (auto& player : m_clients)
+	{
+		player.set_user_position({ 0,0,0 });
+	}
 	// 이쪽은 이제 맵 로드할 부분
 	for (int i = 0; i < 12; ++i)
 		m_worker_threads.emplace_back(std::thread(&cGameServer::WorkerThread, this));
@@ -46,11 +50,9 @@ void cGameServer::StartServer()
 	m_timer_thread.emplace_back(std::thread(&cGameServer::Update_Session, this));
 	for (auto& worker : m_worker_threads)
 		worker.join();
-
+	
 	for (auto& timer_worker : m_timer_thread)
 		timer_worker.join();
-
-	cout << "이쪽 넘어옴" << endl;
 }
 
 void cGameServer::WorkerThread()
@@ -117,7 +119,7 @@ void cGameServer::WorkerThread()
 void cGameServer::Accept(EXP_OVER* exp_over)
 {
 #if DEBUG
-	std::cout << "Accept Completed \n";
+		std::cout << "Accept Completed \n";
 #endif
 	unsigned int new_id = get_new_id();
 	if (-1 == new_id) {}
@@ -211,6 +213,76 @@ int cGameServer::get_new_id()
 	return -1;
 }
 
+CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& other, const BoundingOrientedBox& moved)
+{
+	CollisionInfo collisionInfo;
+	float penetrationDepth = 0.0f;
+	XMFLOAT3 collisionNormal(0.0f, 0.0f, 0.0f);
+	XMFLOAT3 collisionPoint(0.0f, 0.0f, 0.0f);
+
+	XMVECTOR OrientedWorldNormals[6];
+	XMVECTOR normals[6];
+	normals[0] = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f); // x-axis
+	normals[1] = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f); // y-axis
+	normals[2] = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f); // z-axis
+	normals[3] = XMVectorSet(-1.0f, 0.0f, 0.0f, 0.0f); // -x-axis
+	normals[4] = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f); // -y-axis
+	normals[5] = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f); // -z-axis
+
+	OrientedWorldNormals[0] = normals[0];
+	OrientedWorldNormals[1] = normals[1];
+	OrientedWorldNormals[2] = normals[2];
+	OrientedWorldNormals[3] = normals[3];
+	OrientedWorldNormals[4] = normals[4];
+	OrientedWorldNormals[5] = normals[5];
+	for (int i = 0; i < 6; ++i)
+	{
+		XMFLOAT3 tp;
+		XMStoreFloat3(&tp, OrientedWorldNormals[i]);
+	}
+
+	if (other.Intersects(moved))
+	{
+		UINT collidedFaceIndex = 0;
+		float minPenetrationDepth = FLT_MAX;
+
+		for (UINT i = 0; i < 6; i++)
+		{
+			XMFLOAT3 faceNormal;
+			XMStoreFloat3(&faceNormal, OrientedWorldNormals[i]);
+			float distanceToPlane = DistanceToPlane(other.Center, faceNormal, moved.Center);
+			if (distanceToPlane > 0.0f)
+			{
+				float penetration = ((other.Extents.x * abs(faceNormal.x)) +
+					(other.Extents.y * abs(faceNormal.y)) +
+					(other.Extents.z * abs(faceNormal.z))) - distanceToPlane;
+
+				if (penetration < minPenetrationDepth)
+				{
+					collidedFaceIndex = i;
+					minPenetrationDepth = penetration;
+				}
+			}
+		}
+		XMFLOAT3 temp;
+		temp.x = moved.Center.x - other.Center.x;
+		temp.y = moved.Center.y - other.Center.y;
+		temp.z = moved.Center.z - other.Center.z;
+
+		XMStoreFloat3(&collisionNormal, OrientedWorldNormals[collidedFaceIndex]);
+		if (Dot(collisionNormal, temp) < 0.0f)
+		{
+			collisionNormal.x *= -1;
+			collisionNormal.y *= -1;
+			collisionNormal.z *= -1;
+		}
+	}
+
+	collisionInfo.CollisionNormal = collisionNormal;
+
+	return collisionInfo;
+}
+
 CLIENT* cGameServer::get_client_info(const int player_id)
 {
 	return &m_clients[player_id];
@@ -224,18 +296,35 @@ void cGameServer::Send(EXP_OVER* exp_over)
 void cGameServer::Disconnect(const unsigned int _user_id) // 클라이언트 연결을 풀어줌(비정상 접속해제 or 정상종료시 사용)
 {
 	CLIENT& cl = m_clients[_user_id];
-
+	
 
 	// 여기서 초기화
 	if (cl.get_join_room_number() != -1) {
 		Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
-		rl.Exit_Player(_user_id);
+		for (int i = 0; i < 6; ++i)
+		{
+			if (rl.Get_Join_Member(i) != _user_id && rl.Get_Join_Member(i) != -1)
+			{
+				int rl_id = rl.Get_Join_Member(i);
+				m_clients[rl_id]._room_list_lock.lock();
+				m_clients[rl_id].room_list.erase(m_clients[rl_id].room_list.find(_user_id));
+				m_clients[rl_id]._room_list_lock.unlock();
+			}
+		}
+		rl.Exit_Player(_user_id);	
 	}
+	cl._room_list_lock.lock();
+	cl.room_list.clear();
+	cl._room_list_lock.unlock();
+
 	cl._state_lock.lock();
 	cl.set_state(CLIENT_STATE::ST_FREE);
 	cl.set_login_state(N_LOGIN);
 	cl.set_id(-1);
 	cl._state_lock.unlock();
+	cl.set_user_position({ 0,0,0 });
+	cl.set_user_velocity({ 0,0,0 });
+	cl.set_user_yaw(0);
 	closesocket(cl._socket);
 }
 
@@ -263,10 +352,13 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_MOVE:
 	{
-#if !DEBUG
-		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_INGAME)
-#endif
-			Process_Move(user_id, p);
+		Process_Move(user_id, p);
+		break;
+	}
+
+	case CS_PACKET::CS_ROTATE:
+	{
+		Process_Rotate(user_id, p);	
 		break;
 	}
 
@@ -293,7 +385,8 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 #if !DEBUG
 			if (m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY)
 #endif
-				Process_Join_Room(user_id, p);
+		cout << "recv Join Room" << endl;
+		Process_Join_Room(user_id, p);
 		break;
 	}
 
@@ -305,7 +398,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 			Process_Ready(user_id, p);
 		break;
 	}
-
+	
 	case CS_PACKET::CS_PACKET_EXIT_ROOM:
 	{
 #if !DEBUG

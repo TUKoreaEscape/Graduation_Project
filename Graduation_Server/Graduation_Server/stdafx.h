@@ -57,3 +57,53 @@
 using namespace std;
 using namespace DirectX;
 
+struct CollisionInfo
+{
+	bool	 is_collision;
+	XMFLOAT3 CollisionNormal; // 충돌 면의 법선 벡터
+	XMFLOAT3 SlidingVector;
+};
+
+inline float DistanceToPlane(XMFLOAT3 point, XMFLOAT3 normal, XMFLOAT3 planePoint)
+{
+	XMVECTOR pointVec = XMLoadFloat3(&point);
+	XMVECTOR normalVec = XMLoadFloat3(&normal);
+	XMVECTOR planePointVec = XMLoadFloat3(&planePoint);
+	return XMVectorGetX(XMPlaneDotCoord(XMPlaneFromPointNormal(planePointVec, normalVec), pointVec));
+
+}
+
+inline float Dot(XMFLOAT3 a, XMFLOAT3 b)
+{
+	XMVECTOR aVec = XMLoadFloat3(&a);
+	XMVECTOR bVec = XMLoadFloat3(&b);
+	return XMVectorGetX(XMVector3Dot(aVec, bVec));
+}
+
+inline XMFLOAT3 Add(const XMFLOAT3& xmf3Vector1, const XMFLOAT3& xmf3Vector2)
+{
+	XMFLOAT3 xmf3Result;
+	XMStoreFloat3(&xmf3Result, XMLoadFloat3(&xmf3Vector1) + XMLoadFloat3(&xmf3Vector2));
+	return(xmf3Result);
+}
+
+inline XMFLOAT3 Add(XMFLOAT3& xmf3Vector1, XMFLOAT3& xmf3Vector2, float fScalar)
+{
+	XMFLOAT3 xmf3Result;
+	XMStoreFloat3(&xmf3Result, XMLoadFloat3(&xmf3Vector1) + (XMLoadFloat3(&xmf3Vector2) * fScalar));
+	return(xmf3Result);
+}
+
+inline XMFLOAT3 Subtract(XMFLOAT3& xmf3Vector1, XMFLOAT3& xmf3Vector2)
+{
+	XMFLOAT3 xmf3Result;
+	XMStoreFloat3(&xmf3Result, XMLoadFloat3(&xmf3Vector1) - XMLoadFloat3(&xmf3Vector2));
+	return(xmf3Result);
+}
+
+inline XMFLOAT4 Multiply(float fScalar, XMFLOAT4& xmf4Vector)
+{
+	XMFLOAT4 xmf4Result;
+	XMStoreFloat4(&xmf4Result, fScalar * XMLoadFloat4(&xmf4Vector));
+	return(xmf4Result);
+}

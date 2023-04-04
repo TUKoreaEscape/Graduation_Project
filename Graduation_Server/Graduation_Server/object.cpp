@@ -12,13 +12,28 @@ GameObject::GameObject(Object_Type type, XMFLOAT3 center, XMFLOAT3 extents, XMFL
 	m_center = center;
 	m_extents = extents;
 	m_orientation = orientation;
-	BoundingOrientedBox bounding_box{ center, extents,orientation };
+	BoundingOrientedBox bounding_box(center, extents, orientation);
 	Set_BoundingBox(bounding_box);
 }
 
 void GameObject::Set_BoundingBox(const BoundingOrientedBox& box)
 {
 	m_bounding_box = box;
+}
+
+void GameObject::Update_bounding_box_pos(const XMFLOAT3 pos)
+{
+	m_bounding_box.Center = pos;
+}
+
+void GameObject::Update_bounding_box_rotate(const float yaw)
+{
+	float radian = XMConvertToRadians(yaw);
+
+	XMFLOAT4 calculate{};
+	XMStoreFloat4(&calculate, XMQuaternionRotationRollPitchYaw(0.f, radian, 0.f));
+
+	m_bounding_box.Orientation = calculate;
 }
 
 BoundingOrientedBox GameObject::Get_BoundingBox()

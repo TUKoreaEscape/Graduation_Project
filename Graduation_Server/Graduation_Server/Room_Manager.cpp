@@ -45,13 +45,50 @@ void RoomManager::init_object()
 		}
 	}
 	cout << "All room object init!!!" << endl;
+
+	FILE* pFile = nullptr;
+	fopen_s(&pFile, "walls/WallBounding.bin", "rb");
+	if (pFile)
+		rewind(pFile);
+
+	unsigned int nReads = 0;
+	unsigned char nStrLength = 0;
+	char pstrToken[64] = { '\0' };
+	char pstrGameObjectName[64] = { '\0' };
+
+	for (int i = 0; i < 16; ++i) 
+	{
+
+		nReads = (unsigned int)fread(&nStrLength, sizeof(unsigned char), 1, pFile);
+		nReads = (unsigned int)fread(&pstrToken, sizeof(char), nStrLength, pFile); // <Wall>:
+		nReads = (unsigned int)fread(&nStrLength, sizeof(unsigned char), 1, pFile);
+		nReads = (unsigned int)fread(&pstrGameObjectName, sizeof(char), nStrLength, pFile);
+
+		pstrGameObjectName[nStrLength] = '\0';
+
+		float AABBCenter[3]{};
+		float AABBExtents[3]{};
+
+		nReads = (unsigned int)fread(&nStrLength, sizeof(unsigned char), 1, pFile);
+		nReads = (unsigned int)fread(pstrToken, sizeof(char), nStrLength, pFile); //"<BoundingBox>:"
+		nReads = (unsigned int)fread(AABBCenter, sizeof(float), 3, pFile);
+		nReads = (unsigned int)fread(AABBExtents, sizeof(float), 3, pFile);
+
+		for (auto& _room : a_in_game_room) {
+			_room.add_game_walls(Object_Type::OB_WALL, XMFLOAT3(AABBCenter[0], AABBCenter[1], AABBCenter[2]), XMFLOAT3(AABBExtents[0], AABBExtents[1], AABBExtents[2]));
+			//cout << "Wall - " << i + 1 << " - " << pstrGameObjectName << " Center - (" << AABBCenter[0] << ", " << AABBCenter[1] << ", " << AABBCenter[2] << "), Extents - (" << AABBExtents[0] << ", " << AABBExtents[1] << ", " << AABBExtents[2] << ")" << endl;
+
+		}
+	}
+
+
 }
 
 int RoomManager::Create_room(int user_id)
 {
 	int return_create_room_number = -1;
 	for (int i = 0; i < a_in_game_room.size(); ++i)
-	{
+	{ 
 		a_in_game_room[i]._room_state_lock.lock();
 		if (a_in_game_room[i]._room_state == GAME_ROOM_STATE::FREE)
 		{
