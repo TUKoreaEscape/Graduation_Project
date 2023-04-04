@@ -21,10 +21,17 @@ public:
 	int m_nPlayers = 0;
 	Player** m_ppPlayers = nullptr;
 
-	//GameObject*						m_pCamera = NULL;
 	GameObject* m_pNPC = nullptr;
 	GameObject* m_pLight = nullptr;
-	//HeightMapTerrain*		m_pTerrain = NULL;
+	GameObject* m_pSkybox = nullptr;
+
+	GameObject* m_pPianoTerrain = nullptr;
+	GameObject* m_pMainTerrain = nullptr;
+	GameObject* m_pBroadcastTerrain = nullptr;
+	GameObject* m_pClassroomTerrain = nullptr;
+	GameObject* m_pForestTerrain = nullptr;
+	GameObject* m_pCubeTerrain = nullptr;
+
 	ID3D12RootSignature*	m_pd3dGraphicsRootSignature = NULL; //루트 시그너쳐를 나타내는 인터페이스 포인터이다.
 
 	Network* m_network;

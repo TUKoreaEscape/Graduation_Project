@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "GameObject.h"
 #include "Renderer.h"
+#include "Input.h"
 
 void StandardRenderer::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
@@ -193,4 +194,18 @@ void StandardRenderer::ReleaseUploadBuffers()
 UINT StandardRenderer::GetMeshType()
 {
 	return((gameObject->m_pMesh) ? gameObject->m_pMesh->GetType() : 0x00);
+}
+
+void SkyboxRenderer::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	m_nMaterials = 1;
+	m_ppMaterials = new Material * [m_nMaterials];
+	m_ppMaterials[0] = new Material(0);
+}
+
+void SkyboxRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	gameObject->SetPosition(Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition());
+
+	StandardRenderer::render(pd3dCommandList);
 }

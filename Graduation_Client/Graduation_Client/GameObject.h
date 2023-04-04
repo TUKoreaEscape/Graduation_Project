@@ -17,6 +17,7 @@ public:
 
 public:
 	GameObject();
+	GameObject(int nMaterials);
 	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 	{
 		for (auto& component : components)
@@ -68,6 +69,9 @@ public:
 	XMFLOAT3 GetLookVector() { return(m_xmf3Look); }
 	XMFLOAT3 GetUpVector() { return(m_xmf3Up); }
 	XMFLOAT3 GetRightVector() { return(m_xmf3Right); }
+
+	virtual void SetPosition(float x, float y, float z);
+	virtual void SetPosition(XMFLOAT3 xmf3Position);
 
 public:
 	char m_pstrFrameName[64];

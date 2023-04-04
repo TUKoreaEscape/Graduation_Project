@@ -188,11 +188,15 @@ void Player::update(float fTimeElapsed)
 	OnPrepareRender();
 
 	GameObject::update(fTimeElapsed);
-	if (m_xmf3Position.y > 0.0f)
+	if (m_xmf3Position.y >= 0.0f)
 	{
 		//std::cout << "중력작용중" << std::endl;
 		//m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Gravity, fTimeElapsed, false));
 		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
+	}
+	else if (m_xmf3Position.y < 0.0f)
+	{
+		m_xmf3Position.y = 0;
 	}
 	float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
 	float fMaxVelocityXZ = m_fMaxVelocityXZ;
@@ -207,7 +211,6 @@ void Player::update(float fTimeElapsed)
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
 	Move(xmf3Velocity, false);
-
 
 	if (m_pPlayerUpdatedContext) OnPlayerUpdateCallback(fTimeElapsed);
 

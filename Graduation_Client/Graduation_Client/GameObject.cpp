@@ -112,6 +112,20 @@ void GameObject::ReleaseUploadBuffers()
 	if (m_pChild) m_pChild->ReleaseUploadBuffers();
 }
 
+void GameObject::SetPosition(float x, float y, float z)
+{
+	m_xmf4x4ToParent._41 = x;
+	m_xmf4x4ToParent._42 = y;
+	m_xmf4x4ToParent._43 = z;
+
+	UpdateTransform(NULL);
+}
+
+void GameObject::SetPosition(XMFLOAT3 xmf3Position)
+{
+	SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
+}
+
 void GameObject::SetNotDraw()
 {
 	isNotDraw = true;

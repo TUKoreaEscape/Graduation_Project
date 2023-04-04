@@ -33,7 +33,14 @@ public:
 	
 	UINT GetMeshType();
 
-private:
 	int m_nMaterials = 0;
 	Material** m_ppMaterials = nullptr;
+};
+
+class SkyboxRenderer : public StandardRenderer
+{
+public:
+	void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void update(float elapsedTime) {}
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
 };
