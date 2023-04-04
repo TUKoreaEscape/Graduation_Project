@@ -20,21 +20,10 @@ enum LOGIN_STATE {N_LOGIN, Y_LOGIN};
 class CLIENT {
 private:
 	char					m_name[MAX_NAME_SIZE]{};
-	char					m_name[MAX_NAME_SIZE]{};
 
 	LOGIN_STATE				m_login_state = N_LOGIN;
 	CLIENT_STATE::STATE		m_state = CLIENT_STATE::ST_FREE;
 	CLIENT_ROLE::STATE		m_role = CLIENT_ROLE::ROLE_NONE;
-
-	unsigned short			m_prev_size;
-	int						m_id;
-	int						m_join_room_number;
-
-	XMFLOAT3				m_pos{};
-	XMFLOAT3				m_velocity{};
-	float					m_yaw{};
-
-	BoundingOrientedBox		m_bounding_box{};
 
 	unsigned short			m_prev_size;
 	int						m_id;

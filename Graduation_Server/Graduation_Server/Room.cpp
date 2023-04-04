@@ -66,10 +66,6 @@ int Room::Get_Join_Member(int data)
 	return in_player[data];
 }
 
-int Room::Get_Join_Member(int data)
-{
-	return in_player[data];
-}
 
 char* Room::Get_Room_Name(char room_name[], int size)
 {

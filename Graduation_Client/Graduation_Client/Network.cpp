@@ -163,7 +163,9 @@ void Network::ProcessPacket(char* ptr)
 
 		else
 		{
+			m_pPlayer->m_position_lock.lock();
 			m_pPlayer->SetPosition(packet->pos, true);
+			m_pPlayer->m_position_lock.unlock();
 			// 회전각도 여기 추가해야할수도?
 		}
 

@@ -185,6 +185,7 @@ void Player::Rotate(float x, float y, float z)
 
 void Player::update(float fTimeElapsed)
 {
+	update
 	OnPrepareRender();
 
 	GameObject::update(fTimeElapsed);
