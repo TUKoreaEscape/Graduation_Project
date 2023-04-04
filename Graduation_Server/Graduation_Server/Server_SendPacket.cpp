@@ -103,10 +103,6 @@ void cGameServer::send_move_packet(const unsigned int id, const unsigned int mov
 	packet.look[1] = recv_packet.look[1];
 	packet.look[2] = recv_packet.look[2];
 
-	packet.up[0] = recv_packet.up[0];
-	packet.up[1] = recv_packet.up[1];
-	packet.up[2] = recv_packet.up[2];
-
 	packet.right[0] = recv_packet.right[0];
 	packet.right[1] = recv_packet.right[1];
 	packet.right[2] = recv_packet.right[2];

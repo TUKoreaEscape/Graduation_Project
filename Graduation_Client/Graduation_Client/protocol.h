@@ -109,11 +109,8 @@ struct cs_packet_move { // 이동관련 데이터
 
 	unsigned char	input_key;
 	float	yaw;
-
-	short pos[3];
 	short look[3];
 	short right[3];
-	short up[3];
 	DirectX::XMFLOAT3	velocity;
 	DirectX::XMFLOAT3	xmf3Shift;
 };
@@ -321,7 +318,6 @@ struct sc_packet_move {
 
 	short look[3];
 	short right[3];
-	short up[3];
 	DirectX::XMFLOAT3	pos;
 };
 #pragma pack(pop)
