@@ -11,8 +11,6 @@ const int  MAX_ROOM = 5000;
 const int  MAX_ROOM_INFO_SEND = 10;
 
 const int CHECK_MAX_PACKET_SIZE = 127;
-
-const int BUF_SIZE = 512;
 // ----- 클라이언트가 서버에게 보낼때 ------
 
 #define VOICE_ISSUER "작성해야됨"
@@ -49,7 +47,6 @@ namespace CS_PACKET
 		CS_CREATE_ID,
 		CS_LOGIN,
 		CS_MOVE,
-		CS_ROTATE,
 		CS_PACKET_CHAT,
 		CS_PACKET_CREATE_ROOM,
 		CS_PACKET_JOIN_ROOM,
@@ -70,6 +67,7 @@ struct UserData {
 	unsigned char		active; // 생명칩유무 :D
 };
 
+
 struct Roominfo_by10 {
 	unsigned short				room_number;
 	char						room_name[20];
@@ -77,15 +75,6 @@ struct Roominfo_by10 {
 	GAME_ROOM_STATE::TYPE		state;
 };
 
-struct cs_packet_player_rotate {
-	unsigned char	size;
-	unsigned char	type;
-
-	DirectX::XMFLOAT3 xmf3Look;
-	DirectX::XMFLOAT3 xmf3Right;
-	DirectX::XMFLOAT3 xmf3Up;
-	float			  yaw;
-};
 
 struct cs_packet_create_id {
 	unsigned char	size;
@@ -107,12 +96,8 @@ struct cs_packet_move { // 이동관련 데이터
 	unsigned char	size;
 	unsigned char	type;
 
-	unsigned char	input_key;
-	float	yaw;
-	short look[3];
-	short right[3];
-	DirectX::XMFLOAT3	velocity;
-	DirectX::XMFLOAT3	xmf3Shift;
+	DirectX::XMFLOAT3	position;
+	float				yaw;
 };
 
 struct cs_packet_voice {
@@ -188,7 +173,6 @@ namespace SC_PACKET
 		SC_CREATE_ID_FAIL,
 		SC_CREATE_ROOM_OK,
 		SC_USER_UPDATE,
-		SC_USER_ROTATE,
 		SC_PACKET_CHAT,
 		SC_PACKET_JOIN_ROOM_SUCCESS,
 		SC_PACKET_JOIN_ROOM_FAIL,
@@ -229,17 +213,6 @@ struct sc_update_user_packet {
 	unsigned char	type;
 
 	UserData		data;
-};
-
-struct sc_packet_player_rotate {
-	unsigned char	size;
-	unsigned char	type;
-
-	unsigned short	id;
-
-	DirectX::XMFLOAT3 xmf3Look;
-	DirectX::XMFLOAT3 xmf3Right;
-	DirectX::XMFLOAT3 m_xmf3Up;
 };
 
 struct sc_packet_request_room_info {
@@ -314,10 +287,7 @@ struct sc_packet_move {
 	unsigned char	type;
 	unsigned short	id;
 
-	unsigned char	input_key;
-
-	short look[3];
-	short right[3];
 	DirectX::XMFLOAT3	pos;
+	float				yaw;
 };
 #pragma pack(pop)

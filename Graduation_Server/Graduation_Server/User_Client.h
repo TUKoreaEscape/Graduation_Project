@@ -81,9 +81,6 @@ public:
 	void				set_user_velocity(XMFLOAT3 velocity);
 	void				set_user_yaw(float yaw);
 
-	void				update_rotation(float yaw);
-	void				update_bounding_box_pos(const XMFLOAT3 pos);
-	void				update_bounding_box_orientation(const XMFLOAT4 orientation);
 	void				error_display(int error_number);
 
 

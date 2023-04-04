@@ -43,8 +43,7 @@ public:
 	void	send_create_room_ok_packet(const unsigned int user_id, const int room_number);
 	void	send_join_room_success_packet(const unsigned int user_id);
 	void	send_join_room_fail_packet(const unsigned int user_id);
-	void	send_move_packet(const unsigned int id, const unsigned int moved_id, cs_packet_move recv_packet, XMFLOAT3 calculate_pos);
-	void	send_rotate_packet(const unsigned int id, const unsigned int rotate_id, cs_packet_player_rotate recv_packet);
+	void	send_move_packet(const unsigned int id, const unsigned int moved_id, XMFLOAT3 pos);
 	void	send_game_start_packet(const unsigned int id);
 	void	send_put_player_data(const unsigned int recv_id);
 	void	send_put_other_player(const unsigned int put_id, const unsigned int recv_id);
@@ -57,7 +56,6 @@ public:
 	void	Process_Create_ID(int c_id, void* buff);
 	void	Process_Create_Room(const unsigned int _user_id);
 	void	Process_Move(const int user_id, void* buff);
-	void	Process_Rotate(const int user_id, void* buff);
 	void	Process_Chat(const int user_id, void* buff);
 	void	Process_Request_Room_Info(const int user_id, void* buff);
 	void	Process_Join_Room(const int user_id, void* buff);
@@ -70,7 +68,6 @@ public:
 
 	int		get_new_id();
 	CLIENT* get_client_info(const int player_id);
-	CollisionInfo GetCollisionInfo(const BoundingOrientedBox& moved, const BoundingOrientedBox& other);
 
 	wstring stringToWstring(const std::string& t_str);
 

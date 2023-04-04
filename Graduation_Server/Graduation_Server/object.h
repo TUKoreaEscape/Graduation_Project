@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
-enum Object_Type { NONE, OB_PIANO, OB_DOOR, OB_DESK, OB_WALL };
+enum Object_Type { NONE, OB_PIANO, OB_DOOR, OB_DESK };
 
 class GameObject {
 protected:
@@ -28,8 +28,6 @@ public:
 	XMFLOAT3				Get_extents();
 	XMFLOAT4				Get_orientation();
 
-	void					Update_bounding_box_pos(const XMFLOAT3 pos);
-	void					Update_bounding_box_rotate(const float yaw);
 
 	virtual void			send_event(const unsigned int id) {};
 };
