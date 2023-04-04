@@ -216,41 +216,30 @@ int cGameServer::get_new_id()
 CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& other, const BoundingOrientedBox& moved)
 {
 	CollisionInfo collisionInfo;
-	BoundingBox box;
 	float penetrationDepth = 0.0f;
 	XMFLOAT3 collisionNormal(0.0f, 0.0f, 0.0f);
 	XMFLOAT3 collisionPoint(0.0f, 0.0f, 0.0f);
 
-	XMFLOAT3 corners[8];
 	XMVECTOR OrientedWorldNormals[6];
+	XMVECTOR normals[6];
+	normals[0] = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f); // x-axis
+	normals[1] = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f); // y-axis
+	normals[2] = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f); // z-axis
+	normals[3] = XMVectorSet(-1.0f, 0.0f, 0.0f, 0.0f); // -x-axis
+	normals[4] = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f); // -y-axis
+	normals[5] = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f); // -z-axis
 
-	other.GetCorners(corners);
-
-	// 각 면의 법선 벡터를 계산합니다.
-	OrientedWorldNormals[0] = XMVector3Normalize(XMVector3Cross(
-		XMLoadFloat3(&corners[1]) - XMLoadFloat3(&corners[0]),
-		XMLoadFloat3(&corners[3]) - XMLoadFloat3(&corners[0])
-	));
-	OrientedWorldNormals[1] = XMVector3Normalize(XMVector3Cross(
-		XMLoadFloat3(&corners[5]) - XMLoadFloat3(&corners[4]),
-		XMLoadFloat3(&corners[7]) - XMLoadFloat3(&corners[4])
-	));
-	OrientedWorldNormals[2] = XMVector3Normalize(XMVector3Cross(
-		XMLoadFloat3(&corners[3]) - XMLoadFloat3(&corners[0]),
-		XMLoadFloat3(&corners[4]) - XMLoadFloat3(&corners[0])
-	));
-	OrientedWorldNormals[3] = XMVector3Normalize(XMVector3Cross(
-		XMLoadFloat3(&corners[2]) - XMLoadFloat3(&corners[1]),
-		XMLoadFloat3(&corners[5]) - XMLoadFloat3(&corners[1])
-	));
-	OrientedWorldNormals[4] = XMVector3Normalize(XMVector3Cross(
-		XMLoadFloat3(&corners[6]) - XMLoadFloat3(&corners[2]),
-		XMLoadFloat3(&corners[7]) - XMLoadFloat3(&corners[2])
-	));
-	OrientedWorldNormals[5] = XMVector3Normalize(XMVector3Cross(
-		XMLoadFloat3(&corners[4]) - XMLoadFloat3(&corners[0]),
-		XMLoadFloat3(&corners[1]) - XMLoadFloat3(&corners[0])
-	));
+	OrientedWorldNormals[0] = normals[0];
+	OrientedWorldNormals[1] = normals[1];
+	OrientedWorldNormals[2] = normals[2];
+	OrientedWorldNormals[3] = normals[3];
+	OrientedWorldNormals[4] = normals[4];
+	OrientedWorldNormals[5] = normals[5];
+	for (int i = 0; i < 6; ++i)
+	{
+		XMFLOAT3 tp;
+		XMStoreFloat3(&tp, OrientedWorldNormals[i]);
+	}
 
 	if (other.Intersects(moved))
 	{
@@ -264,9 +253,9 @@ CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& other, co
 			float distanceToPlane = DistanceToPlane(other.Center, faceNormal, moved.Center);
 			if (distanceToPlane > 0.0f)
 			{
-				float penetration = other.Extents.x * abs(faceNormal.x) +
-					other.Extents.y * abs(faceNormal.y) +
-					other.Extents.z * abs(faceNormal.z) - distanceToPlane;
+				float penetration = ((other.Extents.x * abs(faceNormal.x)) +
+					(other.Extents.y * abs(faceNormal.y)) +
+					(other.Extents.z * abs(faceNormal.z))) - distanceToPlane;
 
 				if (penetration < minPenetrationDepth)
 				{
