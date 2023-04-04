@@ -11,11 +11,11 @@ namespace CLIENT_STATE
 namespace CLIENT_ROLE
 {
 	enum STATE {
-		ROLE_NONE, ROLE_RUNNER,  ROLE_TAGGER
+		ROLE_NONE, ROLE_RUNNER, ROLE_TAGGER
 	};
 }
 
-enum LOGIN_STATE {N_LOGIN, Y_LOGIN};
+enum LOGIN_STATE { N_LOGIN, Y_LOGIN };
 
 class CLIENT {
 private:
@@ -36,7 +36,7 @@ private:
 	BoundingOrientedBox		m_bounding_box{};
 
 public:
-	unordered_set <int> room_list; 
+	unordered_set <int> room_list;
 	unordered_set <int> view_list; // 현재는 사용하지 않지만 맵을 서버에 추가할 때 사용할 예정
 
 	mutex		_room_list_lock;
@@ -81,8 +81,11 @@ public:
 	void				set_user_velocity(XMFLOAT3 velocity);
 	void				set_user_yaw(float yaw);
 
+	void				update_rotation(float yaw);
+	void				update_bounding_box_pos(const XMFLOAT3 pos);
+	void				update_bounding_box_orientation(const XMFLOAT4 orientation);
 	void				error_display(int error_number);
-	
+
 
 	// 네트워크용 함수 2개
 	void				do_recv();

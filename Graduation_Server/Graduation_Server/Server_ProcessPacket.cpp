@@ -24,20 +24,42 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 {
 	cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(buff);
 
-	m_clients[user_id].set_user_position(packet->position);
+	m_clients[user_id].set_user_velocity(packet->velocity);
 	m_clients[user_id].set_user_yaw(packet->yaw);
-
+	m_clients[user_id].update_rotation(packet->yaw);
 	Room& join_room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
-	//if (join_room.is_collision_player_to_player(user_id))
-	//{
-	//	// 이쪽은 충돌 했을 경우 처리해야하는 부분입니다.
-	//}
+	XMFLOAT3 current_player_position = m_clients[user_id].get_user_position();
+	XMFLOAT3 current_shift = packet->xmf3Shift;
+	XMFLOAT3 calculate_player_position = Add(current_player_position, current_shift);
 
-	//if (join_room.is_collision_player_to_object(user_id))
-	//{
-	//	// 이쪽은 오브젝트와 충돌한것을 처리하는 부분입니다.
-	//}
+	m_clients[user_id].set_user_position(calculate_player_position);
+	m_clients[user_id].update_bounding_box_pos(calculate_player_position);
+	//cout << "적용전 캐릭터 좌표 : " << m_clients[user_id].get_user_position().x << ", " << m_clients[user_id].get_user_position().y << ", " << m_clients[user_id].get_user_position().z << endl;
+	CollisionInfo player_check = join_room.is_collision_player_to_player(user_id, current_player_position, packet->xmf3Shift);
+	if (player_check.is_collision)
+	{
+		//cout << "슬라이딩벡터 : " << player_check.SlidingVector.x << ", " << player_check.SlidingVector.y << ", " << player_check.SlidingVector.z << endl;
+		calculate_player_position = current_player_position;
+		calculate_player_position = Add(current_player_position, player_check.SlidingVector);
+		m_clients[user_id].set_user_position(calculate_player_position);
+		m_clients[user_id].update_bounding_box_pos(calculate_player_position);
+		//cout << "적용후 캐릭터 좌표 : " << m_clients[user_id].get_user_position().x << ", " << m_clients[user_id].get_user_position().y << ", " << m_clients[user_id].get_user_position().z << endl;
+	}
+
+	CollisionInfo wall_check = join_room.is_collision_wall_to_player(user_id, current_player_position, packet->xmf3Shift);
+	if (wall_check.is_collision)
+	{
+		calculate_player_position = current_player_position;
+		calculate_player_position = Add(current_player_position, wall_check.SlidingVector);
+		m_clients[user_id].set_user_position(calculate_player_position);
+		m_clients[user_id].update_bounding_box_pos(calculate_player_position);
+	}
+
+	if (join_room.is_collision_player_to_object(user_id))
+	{
+		// 이쪽은 오브젝트와 충돌한것을 처리하는 부분입니다.
+	}
 
 	//for (auto ptr = m_clients[user_id].view_list.begin(); ptr != m_clients[user_id].view_list.end(); ++ptr)
 	//	send_move_packet(*ptr, user_id, packet->position);
@@ -47,15 +69,40 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 #endif
 
 #if DEBUG
-	for (int i = 0; i < MAX_USER; ++i)
+	send_move_packet(user_id, user_id, *packet, current_player_position);
+	//for (int i = 0; i < MAX_USER; ++i)
+	//{
+	//	if (m_clients[i].get_id() != -1 && m_clients[i].get_id() != user_id)
+	//	{
+	//		cout << "send_move" << endl;
+	//		send_move_packet(i, user_id, calculate_player_position);
+	//	}
+	//}
+
+	for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
 	{
-		if (m_clients[i].get_id() != -1 && m_clients[i].get_id() != user_id)
-		{
-			cout << "send_move" << endl;
-			send_move_packet(i, user_id, packet->position);
-		}
+		send_move_packet(*ptr, user_id, *packet, current_player_position);
 	}
+
 #endif
+}
+
+void cGameServer::Process_Rotate(const int user_id, void* buff)
+{
+	cs_packet_player_rotate* packet = reinterpret_cast<cs_packet_player_rotate*>(buff);
+
+	m_clients[user_id].set_user_yaw(packet->yaw);
+	float radian = XMConvertToRadians(packet->yaw);
+
+	XMFLOAT4 calculate;
+	XMStoreFloat4(&calculate, XMQuaternionRotationRollPitchYaw(0.0f, radian, 0.0f));
+	m_clients[user_id].update_bounding_box_orientation(calculate);
+	m_clients[user_id]._room_list_lock.lock();
+	for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
+	{
+		send_rotate_packet(*ptr, user_id, *packet);
+	}
+	m_clients[user_id]._room_list_lock.unlock();
 }
 
 void cGameServer::Process_Chat(const int user_id, void* buff)
@@ -87,14 +134,14 @@ void cGameServer::Process_Create_Room(const unsigned int _user_id) // 요청받은 �
 	m_clients[_user_id]._state_lock.lock();
 	m_clients[_user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
 	m_clients[_user_id]._state_lock.unlock();
-
+	m_clients[_user_id].set_bounding_box(m_clients[_user_id].get_user_position(), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(0, 0, 0, 1));
 	send_create_room_ok_packet(_user_id, m_clients[_user_id].get_join_room_number());
 }
 
 void cGameServer::Process_Join_Room(const int user_id, void* buff)
 {
 	cs_packet_join_room* packet = reinterpret_cast<cs_packet_join_room*>(buff);
-
+	cout << "Process_Join_Room" << endl;
 
 	if (m_room_manager->Get_Room_Info(packet->room_number)->_room_state == GAME_ROOM_STATE::READY)
 	{
@@ -125,12 +172,18 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 					m_clients[rl.Get_Join_Member(i)]._room_list_lock.unlock();
 				}
 			}
-
+			m_clients[user_id].set_bounding_box(m_clients[user_id].get_user_position(), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(0, 0, 0, 1));
 			send_join_room_success_packet(user_id);
+			cout << "send_join_room_success_packet" << endl;
 		}
-		else
+		else {
 			send_join_room_fail_packet(user_id);
+			cout << "send_join_room_fail_packet" << endl;
+		}
 	}
+	else
+		send_join_room_fail_packet(user_id);
+
 }
 
 void cGameServer::Process_Exit_Room(const int user_id, void* buff)

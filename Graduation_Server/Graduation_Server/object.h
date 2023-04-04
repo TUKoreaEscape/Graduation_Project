@@ -1,13 +1,13 @@
 #pragma once
 #include "stdafx.h"
 
-enum Object_Type{NONE, OB_PIANO, OB_DOOR, OB_DESK };
+enum Object_Type { NONE, OB_PIANO, OB_DOOR, OB_DESK, OB_WALL };
 
 class GameObject {
 protected:
 	Object_Type				m_type = NONE;
-	XMFLOAT3				m_center = {0, 0, 0};
-	XMFLOAT3				m_extents = {0, 0, 0};
+	XMFLOAT3				m_center = { 0, 0, 0 };
+	XMFLOAT3				m_extents = { 0, 0, 0 };
 	XMFLOAT4				m_orientation = { 0, 0, 0, 0 };
 
 	XMFLOAT3				m_pos;
@@ -28,6 +28,8 @@ public:
 	XMFLOAT3				Get_extents();
 	XMFLOAT4				Get_orientation();
 
+	void					Update_bounding_box_pos(const XMFLOAT3 pos);
+	void					Update_bounding_box_rotate(const float yaw);
 
 	virtual void			send_event(const unsigned int id) {};
 };

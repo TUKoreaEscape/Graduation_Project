@@ -89,18 +89,39 @@ void cGameServer::send_game_start_packet(const unsigned int id)
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 
-void cGameServer::send_move_packet(const unsigned int id, const unsigned int moved_id, XMFLOAT3 pos)
+void cGameServer::send_move_packet(const unsigned int id, const unsigned int moved_id, cs_packet_move recv_packet, XMFLOAT3 calculate_pos)
 {
-	sc_update_user_packet packet;
+	sc_packet_move packet;
 
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_MOVE;
+	packet.pos = calculate_pos;
+	packet.id = moved_id;
+	packet.input_key = recv_packet.input_key;
 
-	packet.data.id = moved_id;
-	packet.data.position = m_clients[moved_id].get_user_position();
-	packet.data.velocity = m_clients[moved_id].get_user_velocity();
-	packet.data.yaw = m_clients[moved_id].get_user_yaw();
-	packet.data.active;
+	packet.look[0] = recv_packet.look[0];
+	packet.look[1] = recv_packet.look[1];
+	packet.look[2] = recv_packet.look[2];
+
+	packet.right[0] = recv_packet.right[0];
+	packet.right[1] = recv_packet.right[1];
+	packet.right[2] = recv_packet.right[2];
+
+	m_clients[id].do_send(sizeof(packet), &packet);
+}
+
+void cGameServer::send_rotate_packet(const unsigned int id, const unsigned int rotate_id, cs_packet_player_rotate recv_packet)
+{
+	sc_packet_player_rotate packet;
+
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_USER_ROTATE;
+	packet.id = rotate_id;
+
+	packet.m_xmf3Up = recv_packet.xmf3Up;
+	packet.xmf3Look = recv_packet.xmf3Look;
+	packet.xmf3Right = recv_packet.xmf3Right;
+
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 
@@ -141,9 +162,9 @@ void cGameServer::send_put_other_player(const unsigned int put_id, const unsigne
 	packet.type = SC_PACKET::SC_PACKET_PUT_OTHER_PLAYER;
 	packet.data.active = false;
 	packet.data.id = put_id;
-	packet.data.position = XMFLOAT3{ put_id * 1.0f, 0.0f, 0.0f };
+	packet.data.position = m_clients[put_id].get_user_position();
 	packet.data.velocity = XMFLOAT3{ 0,0,0 };
-	packet.data.yaw = 0.0f;
+	packet.data.yaw = m_clients[put_id].get_user_yaw();
 #if PRINT
 	cout << "유저 정보를 보넀습니다." << endl;
 #endif

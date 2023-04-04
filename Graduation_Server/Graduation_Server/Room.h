@@ -10,12 +10,13 @@ private:
 	int					room_number;
 	int					Number_of_users = 0;
 	int					remain_user = 6;
-	char				m_room_name[MAX_NAME_SIZE] {"test\0"};
+	char				m_room_name[MAX_NAME_SIZE]{ "test\0" };
 	int					m_tagger_id = -1;
 	long long			duration_time;
 
 	array<BoundingOrientedBox, 6>	in_player_bounding_box;
 	vector<GameObject>				m_game_object;
+	vector<GameObject>				m_game_wall_and_door;
 
 	chrono::system_clock::time_point start_time;
 	chrono::system_clock::time_point now_time;
@@ -49,6 +50,7 @@ public:
 
 	// 인게임 로딩 전 사용하는 함수
 	void	add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation);
+	void	add_game_walls(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents);
 	void	Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE room_state);
 	void	SetReady(const bool is_ready, const int user_id);
 	void	SetLoading(const bool is_loading, const int user_id);
@@ -66,7 +68,7 @@ public:
 	void	End_Game();
 private:
 	int		Select_Tagger();
-	
+
 public:
 	int		Get_Number_of_users();
 	int		Get_Join_Member(int data);
@@ -76,9 +78,9 @@ public:
 	bool	All_Player_Loading();
 
 	bool	Is_Door_Open();
-	bool	is_collision_wall_to_player(const int player_id);
-	bool	is_collision_player_to_player(const int player_id);
+	CollisionInfo	is_collision_wall_to_player(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift);
+	CollisionInfo	is_collision_player_to_player(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift);
 	bool	is_collision_player_to_object(const int player_id);
 
-	char*	Get_Room_Name(char room_name[], int size);
+	char* Get_Room_Name(char room_name[], int size);
 };
