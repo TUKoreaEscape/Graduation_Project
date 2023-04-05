@@ -14,7 +14,7 @@ private:
 	const char*		SERVER_ADDR = "172.30.1.50";
 public:
 	std::mutex pos_lock;
-	XMFLOAT3 m_pPlayer_Pos = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 m_pPlayer_Pos;
 	Player* m_pPlayer = nullptr;;
 	Player** m_ppOther = nullptr;
 
