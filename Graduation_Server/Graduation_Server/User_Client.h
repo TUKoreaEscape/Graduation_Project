@@ -32,7 +32,9 @@ private:
 	XMFLOAT3				m_pos{};
 	XMFLOAT3				m_velocity{};
 	float					m_yaw{};
-
+	short					m_look[3];
+	short					m_right[3];
+	unsigned char			m_input_key;
 	BoundingOrientedBox		m_bounding_box{};
 
 public:
@@ -41,6 +43,7 @@ public:
 
 	mutex		_room_list_lock;
 	mutex		_state_lock;
+	mutex		_update_lock;
 
 	SOCKET		_socket = NULL;
 	EXP_OVER	_recv_over;
@@ -67,6 +70,18 @@ public:
 	CLIENT_ROLE::STATE	get_role();
 	BoundingOrientedBox get_bounding_box();
 	void				get_client_name(char& name, int size);
+	
+	short				get_look_x() { return m_look[0]; }
+	short				get_look_y() { return m_look[1]; }
+	short				get_look_z() { return m_look[2]; }
+	short				get_right_x() { return m_right[0]; }
+	short				get_right_y() { return m_right[1]; }
+	short				get_right_z() { return m_right[2]; }
+	unsigned char		get_input_key() { return m_input_key; }
+
+	void				set_look(short look[]) { m_look[0] = look[0]; m_look[1] = look[1]; m_look[2] = look[2]; }
+	void				set_right(short right[]) { m_right[0] = right[0]; m_right[1] = right[1]; m_right[2] = right[2]; }
+	void				set_inputKey(unsigned char key) { m_input_key = key; }
 
 	void				set_login_state(LOGIN_STATE _state);
 	void				set_state(CLIENT_STATE::STATE state);

@@ -11,8 +11,10 @@ class Network {
 private:
 	static Network* NetworkInstance;
 	SOCKET			m_socket;
-	const char*		SERVER_ADDR = "172.30.1.4";
+	const char*		SERVER_ADDR = "172.30.1.50";
 public:
+	std::mutex pos_lock;
+	XMFLOAT3 m_pPlayer_Pos = XMFLOAT3(0, 0, 0);
 	Player* m_pPlayer = nullptr;;
 	Player** m_ppOther = nullptr;
 

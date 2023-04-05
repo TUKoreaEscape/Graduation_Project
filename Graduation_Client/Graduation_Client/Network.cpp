@@ -20,7 +20,12 @@ void Network::init_network()
 	if (WSAStartup(MAKEWORD(2, 2), &WSAdata) != 0) {
 
 	}
-
+	int option = TRUE;               //네이글 알고리즘 on/off
+	setsockopt(m_socket,             //해당 소켓
+		IPPROTO_TCP,          //소켓의 레벨
+		TCP_NODELAY,          //설정 옵션
+		(const char*)&option, // 옵션 포인터
+		sizeof(option));      //옵션 크기
 	m_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 
 	SOCKADDR_IN server_addr;
@@ -163,12 +168,20 @@ void Network::ProcessPacket(char* ptr)
 
 		else
 		{
-			m_pPlayer->m_position_lock.lock();
 			m_pPlayer->SetPosition(packet->pos, true);
-			m_pPlayer->m_position_lock.unlock();
 			// 회전각도 여기 추가해야할수도?
 		}
 
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_CALCULATE_MOVE:
+	{
+		sc_packet_calculate_move* packet = reinterpret_cast<sc_packet_calculate_move*>(ptr);
+		//m_pPlayer->SetPosition(packet->pos, true);
+		pos_lock.lock();
+		m_pPlayer_Pos = packet->pos;
+		pos_lock.unlock();
 		break;
 	}
 

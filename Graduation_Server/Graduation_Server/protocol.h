@@ -198,6 +198,7 @@ namespace SC_PACKET
 		SC_PACKET_PUT_PLAYER,
 		SC_PACKET_PUT_OTHER_PLAYER,
 		SC_PACKET_MOVE,
+		SC_PACKET_CALCULATE_MOVE,
 		SC_PACKET_ROOM_INFO,
 		SC_PACKET_VIVOX_DATA
 	};
@@ -321,5 +322,12 @@ struct sc_packet_move {
 	short look[3];
 	short right[3];
 	DirectX::XMFLOAT3	pos;
+};
+
+struct sc_packet_calculate_move {
+	unsigned char	size;
+	unsigned char	type;
+	
+	DirectX::XMFLOAT3 pos;
 };
 #pragma pack(pop)

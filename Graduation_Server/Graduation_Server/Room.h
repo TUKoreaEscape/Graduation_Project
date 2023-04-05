@@ -61,6 +61,7 @@ public:
 	void	SetBoundingBox(XMFLOAT3 pos, XMFLOAT3 extents, XMFLOAT4 orientation);
 	void	SetPlayerPos(CLIENT& player);
 	void	Update_room_time();
+	void	Update_Player_Position();
 
 public:
 	void	Reset_Room();

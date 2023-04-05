@@ -193,6 +193,11 @@ void Room::Update_room_time()
 	duration_time = std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count();
 }
 
+void Room::Update_Player_Position()
+{
+	cGameServer& server = cGameServer::GetInstance();
+}
+
 bool Room::Is_Door_Open()
 {
 	return true;
@@ -224,7 +229,7 @@ CollisionInfo Room::is_collision_player_to_player(const int player_id, const XMF
 	CLIENT& cl = *server.get_client_info(player_id);
 
 	BoundingOrientedBox player_bounding_box = cl.get_bounding_box();
-	for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < Number_of_users; ++i)
 	{
 		if (in_player[i] != player_id && in_player[i] != -1)
 		{

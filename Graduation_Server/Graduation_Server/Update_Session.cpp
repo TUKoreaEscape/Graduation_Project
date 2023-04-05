@@ -5,7 +5,7 @@ void cGameServer::Update_Session()
 {
 	while (true)
 	{
-		if (m_session_timer.Frame_Limit(30.f)) // 초당 1번 업데이트!
+		if (m_session_timer.Frame_Limit(60.f)) // 초당 1번 업데이트!
 		{
 			//cout << "Update Session!" << endl;
 			for (int i = 0; i < MAX_ROOM; ++i)
@@ -24,6 +24,9 @@ void cGameServer::Update_Session()
 				{
 					rl._room_state_lock.unlock();
 					rl.is_collision_player_to_object(rl.Get_Join_Member(0));
+#if DEBUG
+					//rl.Update_Player_Position();
+#endif
 					break;
 				}/**/
 
@@ -31,6 +34,7 @@ void cGameServer::Update_Session()
 				{
 					rl._room_state_lock.unlock();
 					rl.Update_room_time();
+					rl.Update_Player_Position();
 					break;
 				}
 

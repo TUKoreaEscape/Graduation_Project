@@ -110,6 +110,40 @@ void cGameServer::send_move_packet(const unsigned int id, const unsigned int mov
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 
+void cGameServer::send_move_packet(const unsigned int id, const unsigned int moved_id)
+{
+	sc_packet_move packet;
+
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_MOVE;
+	m_clients[moved_id]._update_lock.lock();
+	packet.pos = m_clients[moved_id].get_user_position();
+	packet.id = moved_id;
+	packet.input_key = m_clients[moved_id].get_input_key();
+
+	packet.look[0] = m_clients[moved_id].get_look_x();
+	packet.look[1] = m_clients[moved_id].get_look_y();
+	packet.look[2] = m_clients[moved_id].get_look_z();
+
+	packet.right[0] = m_clients[moved_id].get_right_x();
+	packet.right[1] = m_clients[moved_id].get_right_y();
+	packet.right[2] = m_clients[moved_id].get_right_z();
+	m_clients[moved_id]._update_lock.unlock();
+	m_clients[id].do_send(sizeof(packet), &packet);
+}
+
+void cGameServer::send_calculate_move_packet(const unsigned int id)
+{
+	sc_packet_calculate_move packet;
+
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_CALCULATE_MOVE;
+
+	packet.pos = m_clients[id].get_user_position();
+
+	m_clients[id].do_send(sizeof(packet), &packet);
+}
+
 void cGameServer::send_rotate_packet(const unsigned int id, const unsigned int rotate_id, cs_packet_player_rotate recv_packet)
 {
 	sc_packet_player_rotate packet;

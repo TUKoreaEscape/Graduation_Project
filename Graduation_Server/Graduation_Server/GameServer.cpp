@@ -352,7 +352,8 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_MOVE:
 	{
-		Process_Move(user_id, p);
+		if(m_clients[user_id].get_login_state() == Y_LOGIN && m_clients[user_id].get_join_room_number() != -1)
+			Process_Move(user_id, p);
 		break;
 	}
 
