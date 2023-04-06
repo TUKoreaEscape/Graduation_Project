@@ -117,66 +117,63 @@ void Network::ProcessPacket(char* ptr)
 		break;
 	}
 	case SC_PACKET::SC_PACKET_MOVE:
+
+		break;
+
+	case SC_PACKET::SC_PACKET_OTHER_PLAYER_UPDATE:
 	{
-		sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(ptr);
-		
-		if (packet->id != m_pPlayer->GetID()) 
+		sc_other_player_move* packet = reinterpret_cast<sc_other_player_move*>(ptr);
+		for (int i = 0; i < 5; ++i)
 		{
-			for (int i = 0; i < 5; ++i)
+			for (int j = 0; j < 5; ++j)
 			{
-				if (m_ppOther[i]->GetID() == packet->id)
+				if (packet->data[i].id == m_ppOther[j]->GetID())
 				{
-					XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->pos.x) / 100.f, static_cast<float>(packet->pos.y) / 100.f, static_cast<float>(packet->pos.z) / 100.f);
-					m_ppOther[i]->SetPosition(conversion_position, true);
-					m_ppOther[i]->m_xmf3Look = XMFLOAT3(static_cast<float>(packet->look.x) / 100, static_cast<float>(packet->look.y) / 100, static_cast<float>(packet->look.z) / 100);
-					m_ppOther[i]->m_xmf3Right = XMFLOAT3(static_cast<float>(packet->right.x) / 100, static_cast<float>(packet->right.y) / 100, static_cast<float>(packet->right.z) / 100);
-					if (packet->input_key == DIR_FORWARD)
+					XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->data[i].position.x) / 100.f, static_cast<float>(packet->data[i].position.y) / 100.f, static_cast<float>(packet->data[i].position.z) / 100.f);
+					XMFLOAT3 conversion_look = XMFLOAT3(static_cast<float>(packet->data[i].look.x) / 100.f, static_cast<float>(packet->data[i].look.y) / 100.f, static_cast<float>(packet->data[i].look.z) / 100.f);
+					XMFLOAT3 conversion_right = XMFLOAT3(static_cast<float>(packet->data[i].right.x) / 100.f, static_cast<float>(packet->data[i].right.y) / 100.f, static_cast<float>(packet->data[i].right.z) / 100.f);
+					m_ppOther[j]->SetPosition(conversion_position, true);
+					m_ppOther[j]->m_xmf3Look = conversion_look;
+					m_ppOther[j]->m_xmf3Right = conversion_right;
+					if (packet->data[i].input_key == DIR_FORWARD)
 					{
-						m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-						m_ppOther[i]->SetTrackAnimationSet(0, 1);
+						m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+						m_ppOther[j]->SetTrackAnimationSet(0, 1);
 					}
-					if (packet->input_key == DIR_BACKWARD)
+					if (packet->data[i].input_key == DIR_BACKWARD)
 					{
-						m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-						m_ppOther[i]->SetTrackAnimationSet(0, 2);
+						m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+						m_ppOther[j]->SetTrackAnimationSet(0, 2);
 					}
-					if (packet->input_key == DIR_LEFT)
+					if (packet->data[i].input_key == DIR_LEFT)
 					{
-						m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-						m_ppOther[i]->SetTrackAnimationSet(0, 3);
+						m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+						m_ppOther[j]->SetTrackAnimationSet(0, 3);
 					}
-					if (packet->input_key == DIR_RIGHT)
+					if (packet->data[i].input_key == DIR_RIGHT)
 					{
-						m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-						m_ppOther[i]->SetTrackAnimationSet(0, 4);
+						m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+						m_ppOther[j]->SetTrackAnimationSet(0, 4);
 					}
-					if (packet->input_key == DIR_UP)
+					if (packet->data[i].input_key == DIR_UP)
 					{
-						m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-						m_ppOther[i]->SetTrackAnimationSet(0, 5);
+						m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+						m_ppOther[j]->SetTrackAnimationSet(0, 5);
 					}
 
-					if (packet->input_key == DIR_EMPTY)
+					if (packet->data[i].input_key == DIR_EMPTY)
 					{
-						m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-						m_ppOther[i]->SetTrackAnimationSet(0, 0);
+						m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+						m_ppOther[j]->SetTrackAnimationSet(0, 0);
 					}
-					break;
 				}
+				else if (packet->data[i].id == -1)
+					continue;
 			}
-		}
-
-		else
-		{
-			pos_lock.lock();
-			XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->pos.x) / 100.f, static_cast<float>(packet->pos.y) / 100.f, static_cast<float>(packet->pos.z) / 100.f);
-			m_pPlayer_Pos = conversion_position;
-			pos_lock.unlock();
 		}
 
 		break;
 	}
-
 	case SC_PACKET::SC_PACKET_CALCULATE_MOVE:
 	{
 		sc_packet_calculate_move* packet = reinterpret_cast<sc_packet_calculate_move*>(ptr);
@@ -262,8 +259,7 @@ void Network::ProcessPacket(char* ptr)
 						break;
 					}
 				}
-			}
-		}*/
+			}*/
 		break;
 	}
 

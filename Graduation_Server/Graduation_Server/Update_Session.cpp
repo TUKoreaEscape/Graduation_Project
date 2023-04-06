@@ -5,7 +5,7 @@ void cGameServer::Update_Session()
 {
 	while (true)
 	{
-		if (m_session_timer.Frame_Limit(60.f)) // 초당 1번 업데이트!
+		if (m_session_timer.Frame_Limit(30.f)) // 초당 1번 업데이트!
 		{
 			//cout << "Update Session!" << endl;
 			for (int i = 0; i < MAX_ROOM; ++i)
@@ -24,32 +24,39 @@ void cGameServer::Update_Session()
 					rl._room_state_lock.unlock();
 					rl.is_collision_player_to_object(rl.Get_Join_Member(0));
 #if DEBUG
-				/*	for (int i = 0; i < 6; ++i)
+
+					for (int i = 0; i < 6; ++i)
 					{
 						if (rl.Get_Join_Member(i) != -1)
 						{
-							sc_update_user_packet packet;
-							packet.size = 127;
-							packet.type = SC_PACKET::SC_USER_UPDATE;
-							packet.sub_size_mul = sizeof(packet) / 127;
-							packet.sub_size_add = sizeof(packet) % 127;
-
-							for (int id = 0; id < 6; ++id)
+							sc_other_player_move packet;
+							packet.size = sizeof(packet);
+							packet.type = SC_PACKET::SC_PACKET_OTHER_PLAYER_UPDATE;
+							for (int in_id = 0; i < 6; ++i)
 							{
-								int t_id = rl.Get_Join_Member(id);
-								packet.data[id].id = t_id;
-								packet.data[id].input_key = m_clients[t_id].get_input_key();
-								packet.data[id].look[0] = m_clients[t_id].get_look_x();
-								packet.data[id].look[1] = m_clients[t_id].get_look_y();
-								packet.data[id].look[2] = m_clients[t_id].get_look_z();
-								packet.data[id].right[0] = m_clients[t_id].get_right_x();
-								packet.data[id].right[1] = m_clients[t_id].get_right_y();
-								packet.data[id].right[2] = m_clients[t_id].get_right_z();
-								packet.data[id].position = m_clients[t_id].get_user_position();
+								if (rl.Get_Join_Member(in_id) != -1)
+								{
+									int this_id = rl.Get_Join_Member(in_id);
+									packet.data[in_id].id = this_id;
+									packet.data[in_id].input_key = m_clients[this_id].get_input_key();
+									packet.data[in_id].look.x = m_clients[this_id].get_look_x();
+									packet.data[in_id].look.y = m_clients[this_id].get_look_y();
+									packet.data[in_id].look.z = m_clients[this_id].get_look_z();
+									packet.data[in_id].right.x = m_clients[this_id].get_right_x();
+									packet.data[in_id].right.y = m_clients[this_id].get_right_y();
+									packet.data[in_id].right.z = m_clients[this_id].get_right_z();
+									packet.data[in_id].position.x = m_clients[this_id].get_user_position().x * 100;
+									packet.data[in_id].position.y = m_clients[this_id].get_user_position().y * 100;
+									packet.data[in_id].position.z = m_clients[this_id].get_user_position().z * 100;
+									packet.data[in_id].active = true;
+								}
+								else
+									packet.data[in_id].id = -1;
 							}
 							m_clients[rl.Get_Join_Member(i)].do_send(sizeof(packet), &packet);
 						}
-					}*/
+
+					}
 #endif
 					break;
 				}/**/
