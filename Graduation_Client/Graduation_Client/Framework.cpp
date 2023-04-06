@@ -274,7 +274,7 @@ void Framework::UpdateObjects()
 	float fTimeElapsed = time.GetTimeElapsed();
 	timeToSend += fTimeElapsed;
 	scene->update(fTimeElapsed, m_pd3dDevice, m_pd3dCommandList);
-	if (timeToSend > SEND_TIME) {
+	if (timeToSend > SEND_TIME && Input::GetInstance()->m_pPlayer->GetID() != -1) {
 		Network& network = *Network::GetInstance();
 		cs_packet_move packet;
 		packet.size = sizeof(packet);

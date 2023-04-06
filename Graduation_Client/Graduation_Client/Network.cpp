@@ -52,7 +52,6 @@ void Network::AssemblyPacket(char* net_buf, size_t io_byte)
 				make_packet_size *= ptr[2];
 				make_packet_size += ptr[3];
 			}
-
 		}
 		if (io_byte + saved_packet_size >= make_packet_size) {
 			memcpy(packet_buffer + saved_packet_size, ptr, make_packet_size - saved_packet_size);
@@ -208,7 +207,9 @@ void Network::ProcessPacket(char* ptr)
 		sc_update_user_packet* packet = reinterpret_cast<sc_update_user_packet*>(ptr);
 		for (int i = 0; i < 6; ++i)
 		{
-			if (packet->data[i].id == m_pPlayer->GetID())
+			if (packet->data[i].id == -1)
+				;
+			else if (packet->data[i].id == m_pPlayer->GetID())
 			{
 				pos_lock.lock();
 				m_pPlayer_Pos = packet->data[i].position;
@@ -266,7 +267,7 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_PUT_PLAYER:
 	{
 		sc_put_player_packet* packet = reinterpret_cast<sc_put_player_packet*>(ptr);
-		m_pPlayer->SetPosition(packet->data.position);
+		m_pPlayer->SetPosition(packet->data.position, true);
 		m_pPlayer->SetID(packet->data.id);
 		m_pPlayer->SetVelocity(packet->data.velocity);
 		std::cout << "put player packet recv!" << std::endl;

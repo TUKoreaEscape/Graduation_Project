@@ -97,20 +97,11 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 
 #if DEBUG
 	Room& rl = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
-	//rl.Update_Player_Position();
-	send_move_packet(user_id, user_id, *packet, current_player_position);
-	////for (int i = 0; i < MAX_USER; ++i)
-	////{
-	////	if (m_clients[i].get_id() != -1 && m_clients[i].get_id() != user_id)
-	////	{
-	////		cout << "send_move" << endl;
-	////		send_move_packet(i, user_id, calculate_player_position);
-	////	}
-	////}
-
+	rl.Update_Player_Position();
+	send_move_packet(user_id, user_id, *packet, current_player_position); // -> 이동에 대한걸 처리하여 클라에게 보내줌
 	for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
 	{
-		send_move_packet(*ptr, user_id, *packet, current_player_position);
+		send_move_packet(*ptr, user_id, *packet, current_player_position); // 같은 방에 있는 플레이어에게도 보내줘야함!
 	}
 
 #endif

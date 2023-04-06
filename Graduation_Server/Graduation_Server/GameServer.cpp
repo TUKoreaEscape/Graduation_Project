@@ -44,7 +44,7 @@ void cGameServer::StartServer()
 		player.set_user_position({ 0,0,0 });
 	}
 	// 이쪽은 이제 맵 로드할 부분
-	for (int i = 0; i < 12; ++i)
+	for (int i = 0; i < 8; ++i)
 		m_worker_threads.emplace_back(std::thread(&cGameServer::WorkerThread, this));
 
 	m_timer_thread.emplace_back(std::thread(&cGameServer::Update_Session, this));
@@ -141,7 +141,6 @@ void cGameServer::Accept(EXP_OVER* exp_over)
 
 #if DEBUG // 테스트용으로 사용중입니다. 추후 제거해야하는 코드임!
 		send_put_player_data(new_id);
-
 		for (int i = 0; i < MAX_USER; ++i)
 		{
 			if (m_clients[i].get_id() == -1)
