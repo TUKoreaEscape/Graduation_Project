@@ -8,7 +8,7 @@ void cGameServer::Update_Session()
 		if (m_session_timer.Frame_Limit(30.f)) // 초당 1번 업데이트!
 		{
 			//cout << "Update Session!" << endl;
-			for (int i = 0; i < MAX_ROOM; ++i)
+			for (int i = 0; i < 1; ++i)
 			{
 				Room& rl = *m_room_manager->Get_Room_Info(i);
 				rl._room_state_lock.lock();
@@ -24,17 +24,16 @@ void cGameServer::Update_Session()
 					rl._room_state_lock.unlock();
 					rl.is_collision_player_to_object(rl.Get_Join_Member(0));
 #if DEBUG
-
-					for (int i = 0; i < 6; ++i)
+					for (int k = 0; k < 6; ++k)
 					{
-						if (rl.Get_Join_Member(i) != -1)
+						if (rl.Get_Join_Member(k) != -1)
 						{
 							sc_other_player_move packet;
 							packet.size = sizeof(packet);
 							packet.type = SC_PACKET::SC_PACKET_OTHER_PLAYER_UPDATE;
-							for (int in_id = 0; i < 6; ++i)
+							for (int in_id = 0; in_id < 6; ++in_id)
 							{
-								if (rl.Get_Join_Member(in_id) != -1)
+								if (rl.Get_Join_Member(in_id) != -1 && rl.Get_Join_Member(in_id) != rl.Get_Join_Member(k))
 								{
 									int this_id = rl.Get_Join_Member(in_id);
 									packet.data[in_id].id = this_id;
@@ -53,7 +52,7 @@ void cGameServer::Update_Session()
 								else
 									packet.data[in_id].id = -1;
 							}
-							m_clients[rl.Get_Join_Member(i)].do_send(sizeof(packet), &packet);
+							m_clients[rl.Get_Join_Member(k)].do_send(sizeof(packet), &packet);
 						}
 
 					}
