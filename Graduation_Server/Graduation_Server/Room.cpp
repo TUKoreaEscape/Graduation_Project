@@ -284,18 +284,23 @@ CollisionInfo Room::is_collision_wall_to_player(const int player_id, const XMFLO
 	cGameServer& server = cGameServer::GetInstance();
 	CLIENT& cl = *server.get_client_info(player_id);
 	CollisionInfo return_data;
-
+	return_data.is_collision = false;
+	return_data.CollisionNormal = XMFLOAT3(0, 0, 0);
+	return_data.SlidingVector = XMFLOAT3(0, 0, 0);
 	BoundingOrientedBox player_bounding_box = cl.get_bounding_box();
-	for (auto& object : m_game_wall_and_door)
+	XMFLOAT3 MotionVector = xmf3shift;
+	XMFLOAT3 tmp_position = current_position;
+	BoundingOrientedBox check_box = cl.get_bounding_box();
+	for (auto& object : m_game_wall_and_door) // 모든벽을 체크 후 값을 더해주는 방식이 좋아보임!
 	{
-		if (player_bounding_box.Intersects(object.Get_BoundingBox()))
+		if (check_box.Intersects(object.Get_BoundingBox()))
 		{
-			cl.set_user_position(current_position);
-			cl.update_bounding_box_pos(current_position);
+			cl.set_user_position(tmp_position);
+			cl.update_bounding_box_pos(tmp_position);
 			CollisionInfo collision_data = server.GetCollisionInfo(object.Get_BoundingBox(), player_bounding_box);
 			XMFLOAT3 SlidingVector = XMFLOAT3(0.0f, 0.0f, 0.0f);
-			XMFLOAT3 current_player_position = current_position;
-			XMFLOAT3 MotionVector = xmf3shift;
+			XMFLOAT3 current_player_position = tmp_position;
+
 
 			float DotProduct = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&MotionVector), XMLoadFloat3(&collision_data.CollisionNormal)));
 
@@ -312,14 +317,14 @@ CollisionInfo Room::is_collision_wall_to_player(const int player_id, const XMFLO
 			return_data.is_collision = true;
 			return_data.SlidingVector = SlidingVector;
 			return_data.CollisionNormal = collision_data.CollisionNormal;
+			MotionVector = SlidingVector;
+			tmp_position = Add(tmp_position, SlidingVector);
 
-			return return_data;
+			cl.set_user_position(current_position);
+			cl.update_bounding_box_pos(current_position);
+			check_box.Center = tmp_position;
 		}
 	}
-
-	return_data.is_collision = false;
-	return_data.CollisionNormal = XMFLOAT3(0, 0, 0);
-	return_data.SlidingVector = XMFLOAT3(0, 0, 0);
 	return return_data;
 }
 

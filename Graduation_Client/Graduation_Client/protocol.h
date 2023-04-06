@@ -64,6 +64,15 @@ namespace CS_PACKET
 #pragma pack (push, 1)
 struct UserData {
 	short				id;
+	unsigned char		input_key;
+	DirectX::XMFLOAT3	position;
+	short				look[3];
+	short				right[3];
+	unsigned char		active; // 생명칩유무 :D
+};
+
+struct PutData {
+	short				id;
 	DirectX::XMFLOAT3	position;
 	DirectX::XMFLOAT3	velocity;
 	float				yaw; // 각도
@@ -230,8 +239,16 @@ struct sc_packet_create_id_fail { // 아이디 생성 실패를 전송해줌 (사유코드와 함�
 struct sc_update_user_packet {
 	unsigned char	size;
 	unsigned char	type;
+	unsigned char	sub_size_mul;
+	unsigned char	sub_size_add;
+	UserData		data[6];
+};
 
-	UserData		data;
+struct sc_put_player_packet {
+	unsigned char	size;
+	unsigned char	type;
+
+	PutData		data;
 };
 
 struct sc_packet_player_rotate {

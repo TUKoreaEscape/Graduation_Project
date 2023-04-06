@@ -205,12 +205,67 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_USER_UPDATE:
 	{
+		sc_update_user_packet* packet = reinterpret_cast<sc_update_user_packet*>(ptr);
+		for (int i = 0; i < 6; ++i)
+		{
+			if (packet->data[i].id == m_pPlayer->GetID())
+			{
+				pos_lock.lock();
+				m_pPlayer_Pos = packet->data[i].position;
+				std::cout << m_pPlayer_Pos.x << ", " << m_pPlayer_Pos.y << ", " << m_pPlayer_Pos.z << std::endl;
+				pos_lock.unlock();
+			}
+			else if (packet->data[i].id)
+			{
+				for (int j = 0; j < 5; ++j)
+				{
+					if (m_ppOther[j]->GetID() == packet->data[i].id)
+					{
+						m_ppOther[j]->SetPosition(packet->data[i].position, true);
+						m_ppOther[j]->m_xmf3Look = XMFLOAT3(static_cast<float>(packet->data[i].look[0]) / 100, static_cast<float>(packet->data[i].look[1]) / 100, static_cast<float>(packet->data[i].look[2]) / 100);
+						m_ppOther[j]->m_xmf3Right = XMFLOAT3(static_cast<float>(packet->data[i].right[0]) / 100, static_cast<float>(packet->data[i].right[1]) / 100, static_cast<float>(packet->data[i].right[2]) / 100);
+						if (packet->data[i].input_key == DIR_FORWARD)
+						{
+							m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+							m_ppOther[j]->SetTrackAnimationSet(0, 1);
+						}
+						if (packet->data[i].input_key == DIR_BACKWARD)
+						{
+							m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+							m_ppOther[i]->SetTrackAnimationSet(0, 2);
+						}
+						if (packet->data[i].input_key == DIR_LEFT)
+						{
+							m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+							m_ppOther[i]->SetTrackAnimationSet(0, 3);
+						}
+						if (packet->data[i].input_key == DIR_RIGHT)
+						{
+							m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+							m_ppOther[i]->SetTrackAnimationSet(0, 4);
+						}
+						if (packet->data[i].input_key == DIR_UP)
+						{
+							m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+							m_ppOther[i]->SetTrackAnimationSet(0, 5);
+						}
+
+						if (packet->data[i].input_key == DIR_EMPTY)
+						{
+							m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+							m_ppOther[i]->SetTrackAnimationSet(0, 0);
+						}
+						break;
+					}
+				}
+			}
+		}
 		break;
 	}
 
 	case SC_PACKET::SC_PACKET_PUT_PLAYER:
 	{
-		sc_update_user_packet* packet = reinterpret_cast<sc_update_user_packet*>(ptr);
+		sc_put_player_packet* packet = reinterpret_cast<sc_put_player_packet*>(ptr);
 		m_pPlayer->SetPosition(packet->data.position);
 		m_pPlayer->SetID(packet->data.id);
 		m_pPlayer->SetVelocity(packet->data.velocity);
@@ -220,7 +275,7 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_PUT_OTHER_PLAYER:
 	{
-		sc_update_user_packet* packet = reinterpret_cast<sc_update_user_packet*>(ptr);
+		sc_put_player_packet* packet = reinterpret_cast<sc_put_player_packet*>(ptr);
 
 		for (int i = 0; i < 5; ++i)
 		{
