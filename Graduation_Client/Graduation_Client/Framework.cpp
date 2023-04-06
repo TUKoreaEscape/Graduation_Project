@@ -283,13 +283,13 @@ void Framework::UpdateObjects()
 		packet.xmf3Shift = Input::GetInstance()->m_pPlayer->GetShift();
 		packet.input_key = Input::GetInstance()->m_pPlayer->GetDirection();
 		
-		packet.look[0] = Input::GetInstance()->m_pPlayer->GetLookVector().x * 100;
-		packet.look[1] = Input::GetInstance()->m_pPlayer->GetLookVector().y * 100;
-		packet.look[2] = Input::GetInstance()->m_pPlayer->GetLookVector().z * 100;
+		packet.look.x = Input::GetInstance()->m_pPlayer->GetLookVector().x * 100;
+		packet.look.y = Input::GetInstance()->m_pPlayer->GetLookVector().y * 100;
+		packet.look.z = Input::GetInstance()->m_pPlayer->GetLookVector().z * 100;
 
-		packet.right[0] = Input::GetInstance()->m_pPlayer->GetRightVector().x * 100;
-		packet.right[1] = Input::GetInstance()->m_pPlayer->GetRightVector().y * 100;
-		packet.right[2] = Input::GetInstance()->m_pPlayer->GetRightVector().z * 100;
+		packet.right.x = Input::GetInstance()->m_pPlayer->GetRightVector().x * 100;
+		packet.right.y = Input::GetInstance()->m_pPlayer->GetRightVector().y * 100;
+		packet.right.z = Input::GetInstance()->m_pPlayer->GetRightVector().z * 100;
 
 		packet.yaw = Input::GetInstance()->m_pPlayer->GetYaw();
 		network.send_packet(&packet);

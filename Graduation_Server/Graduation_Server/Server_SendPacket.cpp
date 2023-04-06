@@ -95,17 +95,13 @@ void cGameServer::send_move_packet(const unsigned int id, const unsigned int mov
 
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_MOVE;
-	packet.pos = calculate_pos;
+	packet.pos.x = calculate_pos.x * 100;
+	packet.pos.y = calculate_pos.y * 100;
+	packet.pos.z = calculate_pos.z * 100;
 	packet.id = moved_id;
 	packet.input_key = recv_packet.input_key;
-
-	packet.look[0] = recv_packet.look[0];
-	packet.look[1] = recv_packet.look[1];
-	packet.look[2] = recv_packet.look[2];
-
-	packet.right[0] = recv_packet.right[0];
-	packet.right[1] = recv_packet.right[1];
-	packet.right[2] = recv_packet.right[2];
+	packet.look = recv_packet.look;
+	packet.right = recv_packet.right;
 
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
@@ -117,17 +113,19 @@ void cGameServer::send_move_packet(const unsigned int id, const unsigned int mov
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_MOVE;
 	m_clients[moved_id]._update_lock.lock();
-	packet.pos = m_clients[moved_id].get_user_position();
+	packet.pos.x = m_clients[moved_id].get_user_position().x * 100;
+	packet.pos.y = m_clients[moved_id].get_user_position().y * 100;
+	packet.pos.z = m_clients[moved_id].get_user_position().z * 100;
 	packet.id = moved_id;
 	packet.input_key = m_clients[moved_id].get_input_key();
 
-	packet.look[0] = m_clients[moved_id].get_look_x();
-	packet.look[1] = m_clients[moved_id].get_look_y();
-	packet.look[2] = m_clients[moved_id].get_look_z();
+	packet.look.x = m_clients[moved_id].get_look_x();
+	packet.look.y = m_clients[moved_id].get_look_y();
+	packet.look.z = m_clients[moved_id].get_look_z();
 
-	packet.right[0] = m_clients[moved_id].get_right_x();
-	packet.right[1] = m_clients[moved_id].get_right_y();
-	packet.right[2] = m_clients[moved_id].get_right_z();
+	packet.right.x = m_clients[moved_id].get_right_x();
+	packet.right.y = m_clients[moved_id].get_right_y();
+	packet.right.z = m_clients[moved_id].get_right_z();
 	m_clients[moved_id]._update_lock.unlock();
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
@@ -139,8 +137,9 @@ void cGameServer::send_calculate_move_packet(const unsigned int id)
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_CALCULATE_MOVE;
 
-	packet.pos = m_clients[id].get_user_position();
-
+	packet.pos.x = m_clients[id].get_user_position().x * 100;
+	packet.pos.y = m_clients[id].get_user_position().y * 100;
+	packet.pos.z = m_clients[id].get_user_position().z * 100;
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 

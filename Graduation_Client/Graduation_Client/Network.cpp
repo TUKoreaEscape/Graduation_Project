@@ -126,9 +126,10 @@ void Network::ProcessPacket(char* ptr)
 			{
 				if (m_ppOther[i]->GetID() == packet->id)
 				{
-					m_ppOther[i]->SetPosition(packet->pos, true);
-					m_ppOther[i]->m_xmf3Look = XMFLOAT3(static_cast<float>(packet->look[0]) / 100, static_cast<float>(packet->look[1]) / 100, static_cast<float>(packet->look[2]) / 100);
-					m_ppOther[i]->m_xmf3Right = XMFLOAT3(static_cast<float>(packet->right[0]) / 100, static_cast<float>(packet->right[1]) / 100, static_cast<float>(packet->right[2]) / 100);
+					XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->pos.x) / 100.f, static_cast<float>(packet->pos.y) / 100.f, static_cast<float>(packet->pos.z) / 100.f);
+					m_ppOther[i]->SetPosition(conversion_position, true);
+					m_ppOther[i]->m_xmf3Look = XMFLOAT3(static_cast<float>(packet->look.x) / 100, static_cast<float>(packet->look.y) / 100, static_cast<float>(packet->look.z) / 100);
+					m_ppOther[i]->m_xmf3Right = XMFLOAT3(static_cast<float>(packet->right.x) / 100, static_cast<float>(packet->right.y) / 100, static_cast<float>(packet->right.z) / 100);
 					if (packet->input_key == DIR_FORWARD)
 					{
 						m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
@@ -168,7 +169,8 @@ void Network::ProcessPacket(char* ptr)
 		else
 		{
 			pos_lock.lock();
-			m_pPlayer_Pos = packet->pos;
+			XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->pos.x) / 100.f, static_cast<float>(packet->pos.y) / 100.f, static_cast<float>(packet->pos.z) / 100.f);
+			m_pPlayer_Pos = conversion_position;
 			pos_lock.unlock();
 		}
 
@@ -179,8 +181,9 @@ void Network::ProcessPacket(char* ptr)
 	{
 		sc_packet_calculate_move* packet = reinterpret_cast<sc_packet_calculate_move*>(ptr);
 		//m_pPlayer->SetPosition(packet->pos, true);
+		XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->pos.x) / 100.f, static_cast<float>(packet->pos.y) / 100.f, static_cast<float>(packet->pos.z) / 100.f);
 		pos_lock.lock();
-		m_pPlayer_Pos = packet->pos;
+		m_pPlayer_Pos = conversion_position;
 		pos_lock.unlock();
 		break;
 	}
@@ -205,7 +208,7 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_USER_UPDATE:
 	{
 		sc_update_user_packet* packet = reinterpret_cast<sc_update_user_packet*>(ptr);
-		for (int i = 0; i < 6; ++i)
+		/*for (int i = 0; i < 6; ++i)
 		{
 			if (packet->data[i].id == -1)
 				;
@@ -260,7 +263,7 @@ void Network::ProcessPacket(char* ptr)
 					}
 				}
 			}
-		}
+		}*/
 		break;
 	}
 

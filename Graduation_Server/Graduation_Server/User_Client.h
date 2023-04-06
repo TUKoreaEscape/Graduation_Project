@@ -79,8 +79,8 @@ public:
 	short				get_right_z() { return m_right[2]; }
 	unsigned char		get_input_key() { return m_input_key; }
 
-	void				set_look(short look[]) { m_look[0] = look[0]; m_look[1] = look[1]; m_look[2] = look[2]; }
-	void				set_right(short right[]) { m_right[0] = right[0]; m_right[1] = right[1]; m_right[2] = right[2]; }
+	void				set_look(Look look) { m_look[0] = look.x; m_look[1] = look.y; m_look[2] = look.z; }
+	void				set_right(Right right) { m_right[0] = right.x; m_right[1] = right.y; m_right[2] = right.z; }
 	void				set_inputKey(unsigned char key) { m_input_key = key; }
 
 	void				set_login_state(LOGIN_STATE _state);

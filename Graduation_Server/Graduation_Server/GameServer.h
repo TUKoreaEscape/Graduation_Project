@@ -43,9 +43,11 @@ public:
 	void	send_create_room_ok_packet(const unsigned int user_id, const int room_number);
 	void	send_join_room_success_packet(const unsigned int user_id);
 	void	send_join_room_fail_packet(const unsigned int user_id);
-	void	send_move_packet(const unsigned int id, const unsigned int moved_id, cs_packet_move recv_packet, XMFLOAT3 calculate_pos);
-	void	send_move_packet(const unsigned int id, const unsigned int moved_id);
-	void	send_calculate_move_packet(const unsigned int id);
+
+	void	send_move_packet(const unsigned int id, const unsigned int moved_id, cs_packet_move recv_packet, XMFLOAT3 calculate_pos); // 한 클라이언트의 이동을 계산하여 다른 클라이언트에게 전송합니다.
+	void	send_move_packet(const unsigned int id, const unsigned int moved_id); // 현재는 사용하지 않습니다/
+	void	send_calculate_move_packet(const unsigned int id); // 이동을 요청한 클라이언트에게 좌표를 계산하여 넘겨줍니다.
+
 	void	send_rotate_packet(const unsigned int id, const unsigned int rotate_id, cs_packet_player_rotate recv_packet);
 	void	send_game_start_packet(const unsigned int id);
 	void	send_put_player_data(const unsigned int recv_id);

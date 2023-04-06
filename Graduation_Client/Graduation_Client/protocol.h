@@ -62,12 +62,30 @@ namespace CS_PACKET
 }
 
 #pragma pack (push, 1)
+struct Position {
+	short x;
+	short y;
+	short z;
+};
+
+struct Look {
+	short x;
+	short y;
+	short z;
+};
+
+struct Right {
+	short x;
+	short y;
+	short z;
+};
+
 struct UserData {
 	short				id;
 	unsigned char		input_key;
-	DirectX::XMFLOAT3	position;
-	short				look[3];
-	short				right[3];
+	Position			position;
+	Look				look;
+	Right				right;
 	unsigned char		active; // 생명칩유무 :D
 };
 
@@ -115,13 +133,13 @@ struct cs_packet_login { // 로그인 시도
 };
 
 struct cs_packet_move { // 이동관련 데이터
-	unsigned char	size;
-	unsigned char	type;
+	unsigned char		size;
+	unsigned char		type;
 
-	unsigned char	input_key;
-	float	yaw;
-	short look[3];
-	short right[3];
+	unsigned char		input_key;
+	float				yaw;
+	Look				look;
+	Right				right;
 	DirectX::XMFLOAT3	velocity;
 	DirectX::XMFLOAT3	xmf3Shift;
 };
@@ -336,15 +354,15 @@ struct sc_packet_move {
 
 	unsigned char	input_key;
 
-	short look[3];
-	short right[3];
-	DirectX::XMFLOAT3	pos;
+	Look		look;
+	Right		right;
+	Position	pos;
 };
 
 struct sc_packet_calculate_move {
 	unsigned char	size;
 	unsigned char	type;
 
-	DirectX::XMFLOAT3 pos;
+	Position		pos;
 };
 #pragma pack(pop)
