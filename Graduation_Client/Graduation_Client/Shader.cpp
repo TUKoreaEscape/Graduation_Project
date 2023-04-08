@@ -194,6 +194,11 @@ void Shader::CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_d3dPipelineStateDesc.SampleDesc.Count = 1;
 	m_d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
+	if (nPipelineState == 1) {
+		m_d3dPipelineStateDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+		m_d3dPipelineStateDesc.RasterizerState.CullMode = D3D12_CULL_MODE_FRONT;
+	}
+
 	HRESULT hResult = pd3dDevice->CreateGraphicsPipelineState(&m_d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_ppd3dPipelineStates[nPipelineState]);
 }
 
