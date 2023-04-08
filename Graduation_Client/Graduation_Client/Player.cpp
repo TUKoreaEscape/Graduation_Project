@@ -246,6 +246,15 @@ void Player::OnPrepareRender()
 	UpdateTransform(NULL);
 }
 
+void Player::render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipeline)
+{
+	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->UpdateShaderVariables(pd3dCommandList);
+
+	renderer->render(pd3dCommandList, nPipeline);
+	if (m_pSibling) m_pSibling->render(pd3dCommandList, nPipeline);
+	if (m_pChild) m_pChild->render(pd3dCommandList, nPipeline);
+}
+
 void Player::ReleaseShaderVariables()
 {
 	//if (m_pCamera) m_pCamera->ReleaseShaderVariables();

@@ -49,7 +49,7 @@ void Scene::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	for (auto& object : gameObjects) {
 		object->OnPrepareRender();
 		object->Animate(m_fElapsedTime);
-		object->render(pd3dCommandList);
+		object->render(pd3dCommandList, 1);
 	}
 }
 

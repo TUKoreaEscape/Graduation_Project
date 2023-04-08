@@ -63,6 +63,8 @@ public:
 
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(int nPipelineState = 0);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(int nPipelineState = 0);
+
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int nPipelineState = 0);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,6 +80,8 @@ public:
 
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(int nPipelineState = 0);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(int nPipelineState = 0);
+
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int nPipelineState = 0);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,6 +96,8 @@ public:
 
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(int nPipelineState = 0);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(int nPipelineState = 0);
+
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int nPipelineState = 0);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,15 +113,7 @@ public:
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(int nPipelineState = 0);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(int nPipelineState = 0);
 
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-class PlayerShader : public StandardShader
-{
-public:
-	PlayerShader();
-	virtual ~PlayerShader();
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int nPipelineState = 0);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,4 +127,23 @@ public:
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout(int nPipelineState = 0);
 
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(int nPipelineState = 0);
+
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int nPipelineState = 0);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+class PlayerShader : public SkinnedAnimationShader
+{
+public:
+	PlayerShader();
+	virtual ~PlayerShader();
+
+	virtual D3D12_RASTERIZER_DESC CreateRasterizerState(int nPipelineState = 0);
+	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState(int nPipelineState = 0);
+
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(int nPipelineState = 0);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(int nPipelineState = 0);
+
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int nPipelineState = 0);
 };

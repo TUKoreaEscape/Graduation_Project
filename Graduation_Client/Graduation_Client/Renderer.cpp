@@ -9,7 +9,7 @@ void StandardRenderer::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 }
 
-void StandardRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
+void StandardRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipeline)
 {
 	if (gameObject->m_pMesh)
 	{
@@ -21,7 +21,7 @@ void StandardRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
 			{
 				if (m_ppMaterials[i])
 				{
-					if (m_ppMaterials[i]->m_pShader) m_ppMaterials[i]->m_pShader->Render(pd3dCommandList);
+					if (m_ppMaterials[i]->m_pShader) m_ppMaterials[i]->m_pShader->Render(pd3dCommandList, nPipeline);
 					m_ppMaterials[i]->UpdateShaderVariables(pd3dCommandList);
 				}
 
@@ -65,7 +65,8 @@ void StandardRenderer::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12Gra
 				{
 					if (nMeshType & VERTEXT_BONE_INDEX_WEIGHT)
 					{
-						pMaterial->SetSkinnedAnimationShader();
+						//pMaterial->SetSkinnedAnimationShader();
+						pMaterial->SetPlayerShader();
 					}
 					else
 					{
@@ -203,9 +204,9 @@ void SkyboxRenderer::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	m_ppMaterials[0] = new Material(0);
 }
 
-void SkyboxRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
+void SkyboxRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipeline)
 {
 	gameObject->SetPosition(Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition());
 
-	StandardRenderer::render(pd3dCommandList);
+	StandardRenderer::render(pd3dCommandList, nPipeline);
 }
