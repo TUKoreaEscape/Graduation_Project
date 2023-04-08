@@ -12,7 +12,7 @@ class Network {
 private:
 	static Network* NetworkInstance;
 	SOCKET			m_socket;
-	const char*		SERVER_ADDR = "183.101.112.30";
+	const char*		SERVER_ADDR = "127.0.0.1";
 	Server_Timer	m_server_counter;
 public:
 	std::mutex pos_lock;
