@@ -61,7 +61,7 @@ void cGameServer::WorkerThread()
 	{
 		DWORD num_byte;
 		LONG64 iocp_key;
-		WSAOVERLAPPED* p_over;
+		WSAOVERLAPPED* p_over{};
 		BOOL ret = GetQueuedCompletionStatus(C_IOCP::m_h_iocp, &num_byte, (PULONG_PTR)&iocp_key, &p_over, INFINITE);
 
 		int client_id = static_cast<int>(iocp_key);
@@ -103,9 +103,9 @@ void cGameServer::WorkerThread()
 		case OP_SEND:
 			if (num_byte != exp_over->m_wsa_buf.len) {
 				std::cout << "send_error" << std::endl;
+				int WSAerror = WSAGetLastError();
 				Disconnect(client_id);
 				delete exp_over;
-				continue;
 			}
 			break;
 

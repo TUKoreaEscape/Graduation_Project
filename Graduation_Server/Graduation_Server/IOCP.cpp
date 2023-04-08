@@ -19,19 +19,6 @@ void C_IOCP::Close_server()
 
 void C_IOCP::Bind_Socket(short port_num)
 {
-	int option = TRUE;               //네이글 알고리즘 on/off
-	setsockopt(m_listen_socket,             //해당 소켓
-		IPPROTO_TCP,          //소켓의 레벨
-		TCP_NODELAY,          //설정 옵션
-		(const char*)&option, // 옵션 포인터
-		sizeof(option));
-
-	setsockopt(m_client_socket,             //해당 소켓
-		IPPROTO_TCP,          //소켓의 레벨
-		TCP_NODELAY,          //설정 옵션
-		(const char*)&option, // 옵션 포인터
-
-		sizeof(option));
 	m_listen_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 	
 	SOCKADDR_IN server_addr;

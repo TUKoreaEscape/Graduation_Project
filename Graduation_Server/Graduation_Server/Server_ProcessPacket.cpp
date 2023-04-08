@@ -23,14 +23,12 @@ void cGameServer::Process_Create_ID(int c_id, void* buff) // 요청받은 ID생성패킷
 void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터 이동을 처리
 {
 	cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(buff);
-	m_clients[user_id]._update_lock.lock();
 	m_clients[user_id].set_user_velocity(packet->velocity);
 	m_clients[user_id].set_user_yaw(packet->yaw);
 	m_clients[user_id].update_rotation(packet->yaw);
 	m_clients[user_id].set_look(packet->look);
 	m_clients[user_id].set_right(packet->right);
 	m_clients[user_id].set_inputKey(packet->input_key);
-	m_clients[user_id]._update_lock.unlock();
 	Room& join_room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
 	XMFLOAT3 current_player_position = m_clients[user_id].get_user_position();
@@ -38,7 +36,6 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	XMFLOAT3 current_shift = packet->xmf3Shift;
 	XMFLOAT3 calculate_player_position = Add(current_player_position, current_shift);
 
-	m_clients[user_id]._update_lock.lock();
 	m_clients[user_id].set_user_position(calculate_player_position);
 	m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 	if (m_clients[user_id].get_user_position().y < 0)
@@ -99,10 +96,11 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	Room& rl = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 	rl.Update_Player_Position();
 	send_calculate_move_packet(user_id); // -> 이동에 대한걸 처리하여 클라에게 보내줌
-	//for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
-	//{
-	//	send_move_packet(*ptr, user_id, *packet, current_player_position); // 같은 방에 있는 플레이어에게도 보내줘야함!
-	//}
+	for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
+	{
+		if(*ptr != -1)
+			send_move_packet(*ptr, user_id, *packet, current_player_position); // 같은 방에 있는 플레이어에게도 보내줘야함!
+	}
 
 #endif
 }

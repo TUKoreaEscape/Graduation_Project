@@ -52,7 +52,8 @@ void cGameServer::Update_Session()
 								else
 									packet.data[in_id].id = -1;
 							}
-							m_clients[rl.Get_Join_Member(k)].do_send(sizeof(packet), &packet);
+							if (rl.Get_Number_of_users() != 1);
+								//m_clients[rl.Get_Join_Member(k)].do_send(sizeof(packet), &packet);
 						}
 
 					}

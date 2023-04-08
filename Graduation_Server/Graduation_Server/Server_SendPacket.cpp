@@ -65,7 +65,6 @@ void cGameServer::send_join_room_success_packet(const unsigned int user_id)
 	sc_packet_join_room_success packet;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_JOIN_ROOM_SUCCESS;
-
 	packet.room_number = m_clients[user_id].get_join_room_number();
 
 	m_clients[user_id].do_send(sizeof(packet), &packet);
@@ -136,7 +135,7 @@ void cGameServer::send_calculate_move_packet(const unsigned int id)
 
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_CALCULATE_MOVE;
-
+	packet.id = id;
 	packet.pos.x = m_clients[id].get_user_position().x * 100;
 	packet.pos.y = m_clients[id].get_user_position().y * 100;
 	packet.pos.z = m_clients[id].get_user_position().z * 100;

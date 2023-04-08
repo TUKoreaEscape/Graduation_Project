@@ -20,12 +20,12 @@ void Network::init_network()
 	if (WSAStartup(MAKEWORD(2, 2), &WSAdata) != 0) {
 
 	}
-	int option = TRUE;               //네이글 알고리즘 on/off
-	setsockopt(m_socket,             //해당 소켓
-		IPPROTO_TCP,          //소켓의 레벨
-		TCP_NODELAY,          //설정 옵션
-		(const char*)&option, // 옵션 포인터
-		sizeof(option));      //옵션 크기
+	//int option = TRUE;               //네이글 알고리즘 on/off
+	//setsockopt(m_socket,             //해당 소켓
+	//	IPPROTO_TCP,          //소켓의 레벨
+	//	TCP_NODELAY,          //설정 옵션
+	//	(const char*)&option, // 옵션 포인터
+	//	sizeof(option));      //옵션 크기
 	m_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 
 	SOCKADDR_IN server_addr;
@@ -100,10 +100,16 @@ void Network::ProcessPacket(char* ptr)
 	{
 		std::cout << "recv login ok" << std::endl;
 		cs_packet_join_room packet;
-		packet.size = sizeof(packet);
+		packet.size = sizeof(cs_packet_join_room);
 		packet.type = CS_PACKET::CS_PACKET_JOIN_ROOM;
 		packet.room_number = 0;
 		send_packet(&packet);
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_JOIN_ROOM_SUCCESS:
+	{
+		std::cout << "방 접속 성공" << std::endl;
 		break;
 	}
 
@@ -305,11 +311,12 @@ void Network::send_packet(void* packet)
 	int ptype = reinterpret_cast<unsigned char*>(packet)[1];
 	EXP_OVER* over = new EXP_OVER;
 	over->m_comp_op = OP_SEND;
-	memcpy(over->m_buf, packet, psize);
+	
 	ZeroMemory(&over->m_wsa_over, sizeof(over->m_wsa_over));
-	over->m_wsa_buf.buf = reinterpret_cast<CHAR*>(over->m_buf);
+	over->m_wsa_buf.buf = reinterpret_cast<char*>(over->m_buf);
 	over->m_wsa_buf.len = psize;
-	int ret = WSASend(m_socket, &over->m_wsa_buf, 1, NULL, 0, &over->m_wsa_over, NULL);
+	memcpy(over->m_buf, packet, psize);
+	int ret = WSASend(m_socket, &over->m_wsa_buf, 1, 0, 0, &over->m_wsa_over, NULL);
 	if (0 != ret) {
 		int err_no = WSAGetLastError();
 		if (WSA_IO_PENDING != err_no)

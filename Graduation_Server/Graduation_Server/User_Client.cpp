@@ -42,7 +42,7 @@ void CLIENT::do_send(int num_byte, void* mess)
 			error_display(error_num);
 		}
 	}
-	delete ex_over;
+	//delete ex_over;
 }
 
 void CLIENT::set_name(char* name)
