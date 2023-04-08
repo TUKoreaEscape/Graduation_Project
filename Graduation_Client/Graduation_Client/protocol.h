@@ -363,7 +363,7 @@ struct sc_packet_move {
 struct sc_packet_calculate_move {
 	unsigned char	size;
 	unsigned char	type;
-
+	short			id;
 	Position		pos;
 };
 

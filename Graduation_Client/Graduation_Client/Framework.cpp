@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Framework.h"
 
-const float SEND_TIME = 0.0016f;
+const float SEND_TIME = 0.02f;
 
 Framework::Framework()
 {
@@ -273,8 +273,7 @@ void Framework::UpdateObjects()
 {
 	float fTimeElapsed = time.GetTimeElapsed();
 	timeToSend += fTimeElapsed;
-	scene->update(fTimeElapsed, m_pd3dDevice, m_pd3dCommandList);
-	if (timeToSend > SEND_TIME && Input::GetInstance()->m_pPlayer->GetID() != -1) {
+	if (Input::GetInstance()->m_pPlayer->GetID() != -1) {
 		Network& network = *Network::GetInstance();
 		cs_packet_move packet;
 		packet.size = sizeof(packet);
@@ -282,7 +281,7 @@ void Framework::UpdateObjects()
 		packet.velocity = Input::GetInstance()->m_pPlayer->GetVelocity();
 		packet.xmf3Shift = Input::GetInstance()->m_pPlayer->GetShift();
 		packet.input_key = Input::GetInstance()->m_pPlayer->GetDirection();
-		
+
 		packet.look.x = Input::GetInstance()->m_pPlayer->GetLookVector().x * 100;
 		packet.look.y = Input::GetInstance()->m_pPlayer->GetLookVector().y * 100;
 		packet.look.z = Input::GetInstance()->m_pPlayer->GetLookVector().z * 100;
@@ -294,11 +293,12 @@ void Framework::UpdateObjects()
 		packet.yaw = Input::GetInstance()->m_pPlayer->GetYaw();
 		network.send_packet(&packet);
 
+		//while (!network.m_recv_move);
 		network.pos_lock.lock();
-		Input::GetInstance()->m_pPlayer->SetPosition(network.m_pPlayer_Pos, true);
+		Input::GetInstance()->m_pPlayer->SetPosition(network.m_pPlayer_Pos);
 		network.pos_lock.unlock();
-		timeToSend -= SEND_TIME;
 	}
+	scene->update(fTimeElapsed, m_pd3dDevice, m_pd3dCommandList);
 }
 
 void Framework::FrameAdvance()

@@ -65,25 +65,10 @@ void Player::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
 #endif
 #if USE_NETWORK
-		//if (m_xmf3Velocity.x != 0 || m_xmf3Velocity.y != 0 || m_xmf3Velocity.z != 0) {
-		//	if (xmf3Shift.x < 1 && xmf3Shift.x > -1 && xmf3Shift.y < 1 && xmf3Shift.y > -1 && xmf3Shift.z > -1 && xmf3Shift.z < 1)
-		//	{
-		//		Network& server = *Network::GetInstance();
-		//		cs_packet_move packet;
-		//		packet.size = sizeof(packet);
-		//		packet.type = CS_PACKET::CS_MOVE;
-		//		packet.velocity = m_xmf3Velocity;
-		//		packet.xmf3Shift = xmf3Shift;
-		//		packet.yaw = m_fYaw;
-		//		packet.input_key = m_direction;
-		//		server.send_packet(&packet);
-		//	}
-		//}
+		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
 		m_xmf3Shift = xmf3Shift;
-
-		//m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
 #endif
-		//m_pCamera->Move(xmf3Shift);
+		m_pCamera->Move(xmf3Shift);
 	}
 
 	//if (this == Input::GetInstance()->m_pPlayer)
@@ -211,8 +196,10 @@ void Player::update(float fTimeElapsed)
 	if (fLength > m_fMaxVelocityY) m_xmf3Velocity.y *= (fMaxVelocityY / fLength);
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false); // 이게 중요한듯?
-	Move(xmf3Velocity, false);
-
+	
+	//Move(xmf3Velocity, false);
+	Network& network = *Network::GetInstance();
+	m_xmf3Shift = xmf3Velocity;
 	if (m_pPlayerUpdatedContext) OnPlayerUpdateCallback(fTimeElapsed);
 
 	/*DWORD nCurrentCameraMode = m_pCamera->GetMode();

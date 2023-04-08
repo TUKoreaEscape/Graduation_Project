@@ -4,6 +4,7 @@
 #include "EXP_OVER.h"
 #include "protocol.h"
 #include "Scene.h"
+#include "Server_Timer.h"
 
 #define  DIR_NO 100
 
@@ -11,10 +12,14 @@ class Network {
 private:
 	static Network* NetworkInstance;
 	SOCKET			m_socket;
-	const char*		SERVER_ADDR = "172.30.1.50";
+	const char*		SERVER_ADDR = "183.101.112.30";
+	Server_Timer	m_server_counter;
 public:
 	std::mutex pos_lock;
-	XMFLOAT3 m_pPlayer_Pos = { 0.0f, 0.0f, 0.0f };
+	bool	m_recv_move = false;
+	int		m_my_id = -1;
+
+	XMFLOAT3 m_pPlayer_Pos{ 0,0,0 };
 	Player* m_pPlayer = nullptr;;
 	Player** m_ppOther = nullptr;
 
