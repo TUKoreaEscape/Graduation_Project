@@ -14,7 +14,7 @@ public:
 	void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void update(float elapsedTime) {}
 
-	void render(ID3D12GraphicsCommandList* pd3dCommandList);
+	void render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipeline = 0);
 
 	virtual void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, GameObject* pParent, FILE* pInFile, Shader* pShader);
 	Texture* FindReplicatedTexture(_TCHAR* pstrTextureName);
@@ -42,5 +42,5 @@ class SkyboxRenderer : public StandardRenderer
 public:
 	void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void update(float elapsedTime) {}
-	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipeline = 0);
 };
