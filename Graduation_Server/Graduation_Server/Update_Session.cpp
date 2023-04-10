@@ -1,14 +1,15 @@
 #include "GameServer.h"
 
 
-void cGameServer::Update_Session()
+void cGameServer::Update_Session(int thread_number)
 {
+	cout << "thread number : " << thread_number << endl;
 	while (true)
 	{
 		if (m_session_timer.Frame_Limit(30.f)) // 초당 1번 업데이트!
 		{
 			//cout << "Update Session!" << endl;
-			for (int i = 0; i < 1; ++i)
+			for (int i = thread_number; i < MAX_ROOM; i+=4)
 			{
 				Room& rl = *m_room_manager->Get_Room_Info(i);
 				rl._room_state_lock.lock();
@@ -49,11 +50,13 @@ void cGameServer::Update_Session()
 									packet.data[in_id].position.z = m_clients[this_id].get_user_position().z * 100;
 									packet.data[in_id].active = true;
 								}
+								//else if (rl.Get_Join_Member(in_id) == rl.Get_Join_Member(k))
+								//	send_calculate_move_packet(rl.Get_Join_Member(k));
 								else
 									packet.data[in_id].id = -1;
 							}
-							if (rl.Get_Number_of_users() != 1);
-								//m_clients[rl.Get_Join_Member(k)].do_send(sizeof(packet), &packet);
+							if (rl.Get_Number_of_users() != -1);
+								m_clients[rl.Get_Join_Member(k)].do_send(sizeof(packet), &packet);
 						}
 
 					}

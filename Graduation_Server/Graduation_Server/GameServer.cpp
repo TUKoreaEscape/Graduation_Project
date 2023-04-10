@@ -47,7 +47,8 @@ void cGameServer::StartServer()
 	for (int i = 0; i < 8; ++i)
 		m_worker_threads.emplace_back(std::thread(&cGameServer::WorkerThread, this));
 
-	m_timer_thread.emplace_back(std::thread(&cGameServer::Update_Session, this));
+	for(int i = 0; i < 4; ++i)
+		m_timer_thread.emplace_back(std::thread(&cGameServer::Update_Session,this, i));
 	for (auto& worker : m_worker_threads)
 		worker.join();
 	

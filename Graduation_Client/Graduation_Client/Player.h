@@ -90,7 +90,7 @@ protected:
 
 	XMFLOAT3					m_xmf3Shift = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3					m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	XMFLOAT3     				m_xmf3Gravity = XMFLOAT3(0.0f, -0.981f, 0.0f);
+	XMFLOAT3     				m_xmf3Gravity = XMFLOAT3(0.0f, -0.981f * 2, 0.0f);
 	float           			m_fMaxVelocityXZ = 20.f;
 	float           			m_fMaxVelocityY = 10.0f;
 	float           			m_fFriction = 100.0f;
