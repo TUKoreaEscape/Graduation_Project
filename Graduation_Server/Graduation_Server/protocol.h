@@ -218,6 +218,7 @@ namespace SC_PACKET
 		SC_CREATE_ROOM_OK,
 		SC_USER_UPDATE,
 		SC_PACKET_OTHER_PLAYER_UPDATE,
+		SC_PACKET_OTHER_PLAYER_DISCONNECT,
 		SC_USER_ROTATE,
 		SC_PACKET_CHAT,
 		SC_PACKET_JOIN_ROOM_SUCCESS,
@@ -371,5 +372,11 @@ struct sc_other_player_move {
 	unsigned char	size;
 	unsigned char	type;
 	UserData		data[5];
+};
+
+struct sc_other_player_disconnect {
+	unsigned char	size;
+	unsigned char	type;
+	short			id;
 };
 #pragma pack(pop)

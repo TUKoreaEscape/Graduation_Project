@@ -47,7 +47,7 @@ void cGameServer::StartServer()
 	for (int i = 0; i < 8; ++i)
 		m_worker_threads.emplace_back(std::thread(&cGameServer::WorkerThread, this));
 
-	for(int i = 0; i < 4; ++i)
+	for(int i = 0; i < 2; ++i)
 		m_timer_thread.emplace_back(std::thread(&cGameServer::Update_Session,this, i));
 	for (auto& worker : m_worker_threads)
 		worker.join();
@@ -313,6 +313,17 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 		}
 		rl.Exit_Player(_user_id);	
 	}
+
+	// ¿©±ä °°Àº ¹æ¿¡ ÀÖ´Â ÇÃ·¹ÀÌ¾î¿¡°Ô »ç¿ëÀÚ°¡ ¶°³ª¹ö¸²À» ¾Ë·ÁÁÜ
+	sc_other_player_disconnect packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_OTHER_PLAYER_DISCONNECT;
+	packet.id = _user_id;
+	for (auto p : cl.room_list)
+	{
+		m_clients[p].do_send(sizeof(packet), &packet);
+	}
+	//==============================================================
 	cl._room_list_lock.lock();
 	cl.room_list.clear();
 	cl._room_list_lock.unlock();
