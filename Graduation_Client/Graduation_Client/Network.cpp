@@ -187,7 +187,7 @@ void Network::ProcessPacket(char* ptr)
 		for (int i = 0; i < 5; ++i)
 		{
 			if (m_ppOther[i]->GetID() == packet->id)
-				m_ppOther[i]->SetPosition(XMFLOAT3(-100, -100, -100));
+				m_ppOther[i]->SetPosition(XMFLOAT3(-100, 100, -100));
 		}
 		break;
 	}

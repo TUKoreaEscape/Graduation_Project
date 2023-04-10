@@ -1,15 +1,14 @@
 #include "GameServer.h"
 
 
-void cGameServer::Update_Session(int thread_number)
+void cGameServer::Update_Session()
 {
-	cout << "thread number : " << thread_number << endl;
 	while (true)
 	{
 		if (m_session_timer.Frame_Limit(30.f)) // 초당 1번 업데이트!
 		{
 			//cout << "Update Session!" << endl;
-			for (int i = thread_number; i < MAX_ROOM; i+=2)
+			for (int i = 0; i < MAX_ROOM; i++)
 			{
 				Room& rl = *m_room_manager->Get_Room_Info(i);
 				rl._room_state_lock.lock();
