@@ -78,10 +78,11 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 				m_clients[user_id].set_user_position(calculate_player_position);
 				m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 			}
+			current_shift = wall_check.SlidingVector;
 		}
 
-		CollisionInfo object_check;
-		if (join_room.is_collision_player_to_object(user_id))
+		CollisionInfo object_check = join_room.is_collision_player_to_object(user_id, current_player_position, current_shift);
+		if (object_check.is_collision)
 		{
 			// 이쪽은 오브젝트와 충돌한것을 처리하는 부분입니다.
 		}
@@ -128,6 +129,7 @@ void cGameServer::Process_Create_Room(const unsigned int _user_id) // 요청받은 �
 	m_clients[_user_id]._state_lock.unlock();
 	m_clients[_user_id].set_bounding_box(m_clients[_user_id].get_user_position(), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(0, 0, 0, 1));
 	send_create_room_ok_packet(_user_id, m_clients[_user_id].get_join_room_number());
+	send_put_player_data(_user_id);
 }
 
 void cGameServer::Process_Join_Room(const int user_id, void* buff)
@@ -141,6 +143,7 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 		{
 			m_clients[user_id].set_join_room_number(packet->room_number);
 			m_clients[user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
+			send_put_player_data(user_id);
 			Room& rl = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
 			for (int i = 0; i < 6; ++i)
@@ -150,6 +153,7 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 					m_clients[user_id]._room_list_lock.lock();
 					m_clients[user_id].room_list.insert(rl.Get_Join_Member(i));
 					m_clients[user_id]._room_list_lock.unlock();
+					send_put_other_player(rl.Get_Join_Member(i), user_id);
 				}
 			}
 
@@ -162,6 +166,7 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 					m_clients[rl.Get_Join_Member(i)]._room_list_lock.lock();
 					m_clients[rl.Get_Join_Member(i)].room_list.insert(user_id);
 					m_clients[rl.Get_Join_Member(i)]._room_list_lock.unlock();
+					send_put_other_player(user_id, rl.Get_Join_Member(i));
 				}
 			}
 			m_clients[user_id].set_user_position(XMFLOAT3(0.0f, 0.0f, 0.0f));

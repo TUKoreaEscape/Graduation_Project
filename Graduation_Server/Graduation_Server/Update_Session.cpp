@@ -1,14 +1,15 @@
 #include "GameServer.h"
 
 
-void cGameServer::Update_Session()
+void cGameServer::Update_Session(int thread_number)
 {
+	int index = 0;
 	while (true)
 	{
 		if (m_session_timer.Frame_Limit(30.f)) // 초당 1번 업데이트!
 		{
 			//cout << "Update Session!" << endl;
-			for (int i = 0; i < MAX_ROOM; i++)
+			for (int i = thread_number; i < MAX_ROOM; i+=2)
 			{
 				Room& rl = *m_room_manager->Get_Room_Info(i);
 				rl._room_state_lock.lock();
@@ -30,30 +31,30 @@ void cGameServer::Update_Session()
 							sc_other_player_move packet;
 							packet.size = sizeof(packet);
 							packet.type = SC_PACKET::SC_PACKET_OTHER_PLAYER_UPDATE;
+							index = 0;
+							for (auto& temp : packet.data)
+								temp.id = -1;
 							for (int in_id = 0; in_id < 6; ++in_id)
 							{
 								if (rl.Get_Join_Member(in_id) != -1 && rl.Get_Join_Member(in_id) != rl.Get_Join_Member(k))
 								{
 									int this_id = rl.Get_Join_Member(in_id);
-									packet.data[in_id].id = this_id;
-									packet.data[in_id].input_key = m_clients[this_id].get_input_key();
-									packet.data[in_id].look.x = m_clients[this_id].get_look_x();
-									packet.data[in_id].look.y = m_clients[this_id].get_look_y();
-									packet.data[in_id].look.z = m_clients[this_id].get_look_z();
-									packet.data[in_id].right.x = m_clients[this_id].get_right_x();
-									packet.data[in_id].right.y = m_clients[this_id].get_right_y();
-									packet.data[in_id].right.z = m_clients[this_id].get_right_z();
-									packet.data[in_id].position.x = m_clients[this_id].get_user_position().x * 100;
-									packet.data[in_id].position.y = m_clients[this_id].get_user_position().y * 100;
-									packet.data[in_id].position.z = m_clients[this_id].get_user_position().z * 100;
-									packet.data[in_id].active = true;
+									packet.data[index].id = this_id;
+									packet.data[index].input_key = m_clients[this_id].get_input_key();
+									packet.data[index].look.x = m_clients[this_id].get_look_x();
+									packet.data[index].look.y = m_clients[this_id].get_look_y();
+									packet.data[index].look.z = m_clients[this_id].get_look_z();
+									packet.data[index].right.x = m_clients[this_id].get_right_x();
+									packet.data[index].right.y = m_clients[this_id].get_right_y();
+									packet.data[index].right.z = m_clients[this_id].get_right_z();
+									packet.data[index].position.x = m_clients[this_id].get_user_position().x * 100;
+									packet.data[index].position.y = m_clients[this_id].get_user_position().y * 100;
+									packet.data[index].position.z = m_clients[this_id].get_user_position().z * 100;
+									packet.data[index].active = true;
+									index++;
 								}
-								//else if (rl.Get_Join_Member(in_id) == rl.Get_Join_Member(k))
-								//	send_calculate_move_packet(rl.Get_Join_Member(k));
-								else
-									packet.data[in_id].id = -1;
 							}
-							if (rl.Get_Number_of_users() != -1);
+							if (rl.Get_Number_of_users() < 5);
 								m_clients[rl.Get_Join_Member(k)].do_send(sizeof(packet), &packet);
 						}
 

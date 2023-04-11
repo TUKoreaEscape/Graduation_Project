@@ -169,6 +169,7 @@ void cGameServer::send_put_player_data(const unsigned int recv_id)
 	packet.data.velocity = XMFLOAT3{ 0,0,0 };
 	packet.data.yaw = 0.0f;
 
+	m_clients[recv_id].set_user_position(XMFLOAT3(0, 0, 0)); // 이건 임시사용입니다.
 	m_clients[recv_id].do_send(sizeof(packet), &packet);
 }
 
@@ -180,10 +181,8 @@ void cGameServer::send_put_other_player(const unsigned int put_id, const unsigne
 	packet.data.active = false;
 	packet.data.id = put_id;
 	packet.data.position = m_clients[put_id].get_user_position();
-	//packet.data.velocity = XMFLOAT3{ 0,0,0 };
-	//packet.data.yaw = m_clients[put_id].get_user_yaw();
 #if PRINT
-	cout << "유저 정보를 보넀습니다." << endl;
+	cout << "유저 정보를 보넀습니다 : " << put_id << "->" << recv_id << endl;
 #endif
 	m_clients[recv_id].do_send(sizeof(packet), &packet);
 }

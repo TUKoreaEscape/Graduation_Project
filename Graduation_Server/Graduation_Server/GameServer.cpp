@@ -47,8 +47,8 @@ void cGameServer::StartServer()
 	for (int i = 0; i < 8; ++i)
 		m_worker_threads.emplace_back(std::thread(&cGameServer::WorkerThread, this));
 
-	for(int i = 0; i < 1; ++i)
-		m_timer_thread.emplace_back(std::thread(&cGameServer::Update_Session,this));
+	for(int i = 0; i < 2; ++i)
+		m_timer_thread.emplace_back(std::thread(&cGameServer::Update_Session,this, i));
 	for (auto& worker : m_worker_threads)
 		worker.join();
 	
@@ -139,21 +139,6 @@ void cGameServer::Accept(EXP_OVER* exp_over)
 		c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 		*(reinterpret_cast<SOCKET*>(exp_over->m_buf)) = c_socket;
 		AcceptEx(C_IOCP::m_listen_socket, c_socket, exp_over->m_buf + 8, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &exp_over->m_wsa_over);
-
-#if DEBUG // 테스트용으로 사용중입니다. 추후 제거해야하는 코드임!
-		send_put_player_data(new_id);
-		for (int i = 0; i < MAX_USER; ++i)
-		{
-			if (m_clients[i].get_id() == -1)
-				;
-
-			else if (new_id != i) {
-				send_put_other_player(new_id, i);
-				send_put_other_player(i, new_id);
-			}
-		}
-#endif
-
 	}
 }
 

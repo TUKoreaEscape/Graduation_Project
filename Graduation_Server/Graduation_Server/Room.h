@@ -16,7 +16,7 @@ private:
 
 	array<BoundingOrientedBox, 6>	in_player_bounding_box;
 	vector<GameObject>				m_game_object;
-	vector<GameObject>				m_game_wall_and_door;
+	vector<GameObject>				m_game_wall_and_door_and_fix_object;
 
 	chrono::system_clock::time_point start_time;
 	chrono::system_clock::time_point now_time;
@@ -81,7 +81,7 @@ public:
 	bool	Is_Door_Open();
 	CollisionInfo	is_collision_wall_to_player(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift);
 	CollisionInfo	is_collision_player_to_player(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift);
-	bool	is_collision_player_to_object(const int player_id);
+	CollisionInfo	is_collision_player_to_object(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift);
 
 	char*	Get_Room_Name(char room_name[], int size);
 };
