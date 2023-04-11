@@ -20,14 +20,9 @@ void Network::init_network()
 	if (WSAStartup(MAKEWORD(2, 2), &WSAdata) != 0) {
 
 	}
-	//int option = TRUE;               //네이글 알고리즘 on/off
-	//setsockopt(m_socket,             //해당 소켓
-	//	IPPROTO_TCP,          //소켓의 레벨
-	//	TCP_NODELAY,          //설정 옵션
-	//	(const char*)&option, // 옵션 포인터
-	//	sizeof(option));      //옵션 크기
 	m_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
-
+	int option = TRUE;
+	setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, (const char*)&option, sizeof(option));
 	SOCKADDR_IN server_addr;
 	ZeroMemory(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
@@ -122,9 +117,6 @@ void Network::ProcessPacket(char* ptr)
 		send_packet(&packet);
 		break;
 	}
-	case SC_PACKET::SC_PACKET_MOVE:
-
-		break;
 
 	case SC_PACKET::SC_PACKET_OTHER_PLAYER_UPDATE:
 	{
@@ -200,84 +192,6 @@ void Network::ProcessPacket(char* ptr)
 		pos_lock.lock();
 		m_pPlayer_Pos = conversion_position;
 		pos_lock.unlock();
-		break;
-	}
-
-	case SC_PACKET::SC_USER_ROTATE:
-	{
-		sc_packet_player_rotate* packet = reinterpret_cast<sc_packet_player_rotate*>(ptr);
-		for (int i = 0; i < 5; ++i)
-		{
-			if (m_ppOther[i]->GetID() == packet->id)
-			{
-				m_ppOther[i]->m_xmf3Look = packet->xmf3Look;
-				m_ppOther[i]->m_xmf3Right = packet->xmf3Right;
-				m_ppOther[i]->m_xmf3Up = packet->m_xmf3Up;
-				break;
-			}
-		}
-
-		break;
-	}
-
-	case SC_PACKET::SC_USER_UPDATE:
-	{
-		sc_update_user_packet* packet = reinterpret_cast<sc_update_user_packet*>(ptr);
-		/*for (int i = 0; i < 6; ++i)
-		{
-			if (packet->data[i].id == -1)
-				;
-			else if (packet->data[i].id == m_pPlayer->GetID())
-			{
-				pos_lock.lock();
-				m_pPlayer_Pos = packet->data[i].position;
-				std::cout << m_pPlayer_Pos.x << ", " << m_pPlayer_Pos.y << ", " << m_pPlayer_Pos.z << std::endl;
-				pos_lock.unlock();
-			}
-			else if (packet->data[i].id)
-			{
-				for (int j = 0; j < 5; ++j)
-				{
-					if (m_ppOther[j]->GetID() == packet->data[i].id)
-					{
-						m_ppOther[j]->SetPosition(packet->data[i].position, true);
-						m_ppOther[j]->m_xmf3Look = XMFLOAT3(static_cast<float>(packet->data[i].look[0]) / 100, static_cast<float>(packet->data[i].look[1]) / 100, static_cast<float>(packet->data[i].look[2]) / 100);
-						m_ppOther[j]->m_xmf3Right = XMFLOAT3(static_cast<float>(packet->data[i].right[0]) / 100, static_cast<float>(packet->data[i].right[1]) / 100, static_cast<float>(packet->data[i].right[2]) / 100);
-						if (packet->data[i].input_key == DIR_FORWARD)
-						{
-							m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-							m_ppOther[j]->SetTrackAnimationSet(0, 1);
-						}
-						if (packet->data[i].input_key == DIR_BACKWARD)
-						{
-							m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-							m_ppOther[i]->SetTrackAnimationSet(0, 2);
-						}
-						if (packet->data[i].input_key == DIR_LEFT)
-						{
-							m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-							m_ppOther[i]->SetTrackAnimationSet(0, 3);
-						}
-						if (packet->data[i].input_key == DIR_RIGHT)
-						{
-							m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-							m_ppOther[i]->SetTrackAnimationSet(0, 4);
-						}
-						if (packet->data[i].input_key == DIR_UP)
-						{
-							m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-							m_ppOther[i]->SetTrackAnimationSet(0, 5);
-						}
-
-						if (packet->data[i].input_key == DIR_EMPTY)
-						{
-							m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-							m_ppOther[i]->SetTrackAnimationSet(0, 0);
-						}
-						break;
-					}
-				}
-			}*/
 		break;
 	}
 

@@ -50,7 +50,6 @@ public:
 	void	send_move_packet(const unsigned int id, const unsigned int moved_id); // 현재는 사용하지 않습니다/
 	void	send_calculate_move_packet(const unsigned int id); // 이동을 요청한 클라이언트에게 좌표를 계산하여 넘겨줍니다.
 
-	void	send_rotate_packet(const unsigned int id, const unsigned int rotate_id, cs_packet_player_rotate recv_packet);
 	void	send_game_start_packet(const unsigned int id);
 	void	send_put_player_data(const unsigned int recv_id);
 	void	send_put_other_player(const unsigned int put_id, const unsigned int recv_id);
@@ -63,7 +62,6 @@ public:
 	void	Process_Create_ID(int c_id, void* buff);
 	void	Process_Create_Room(const unsigned int _user_id);
 	void	Process_Move(const int user_id, void* buff);
-	void	Process_Rotate(const int user_id, void* buff);
 	void	Process_Chat(const int user_id, void* buff);
 	void	Process_Request_Room_Info(const int user_id, void* buff);
 	void	Process_Join_Room(const int user_id, void* buff);

@@ -86,8 +86,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 			// 이쪽은 오브젝트와 충돌한것을 처리하는 부분입니다.
 		}
 	}
-	//for (auto ptr = m_clients[user_id].view_list.begin(); ptr != m_clients[user_id].view_list.end(); ++ptr)
-	//	send_move_packet(*ptr, user_id, packet->position);
+
 #if !DEBUG
 	for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
 		send_move_packet(*ptr, user_id, packet->position);
@@ -95,31 +94,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 
 #if DEBUG
 	send_calculate_move_packet(user_id); // -> 이동에 대한걸 처리하여 클라에게 보내줌
-	//for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
-	//{
-	//	if(*ptr != -1)
-	//		send_move_packet(*ptr, user_id, *packet, current_player_position); // 같은 방에 있는 플레이어에게도 보내줘야함!
-	//}
-
 #endif
-}
-
-void cGameServer::Process_Rotate(const int user_id, void* buff)
-{
-	cs_packet_player_rotate* packet = reinterpret_cast<cs_packet_player_rotate*>(buff);
-	
-	m_clients[user_id].set_user_yaw(packet->yaw);
-	float radian = XMConvertToRadians(packet->yaw);
-
-	XMFLOAT4 calculate;
-	XMStoreFloat4(&calculate, XMQuaternionRotationRollPitchYaw(0.0f, radian, 0.0f));
-	m_clients[user_id].update_bounding_box_orientation(calculate);
-	m_clients[user_id]._room_list_lock.lock();
-	for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
-	{
-		send_rotate_packet(*ptr, user_id, *packet);
-	}
-	m_clients[user_id]._room_list_lock.unlock();
 }
 
 void cGameServer::Process_Chat(const int user_id, void* buff)

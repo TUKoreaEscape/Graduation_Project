@@ -203,8 +203,10 @@ bool Room::Is_Door_Open()
 	return true;
 }
 
-bool Room::is_collision_player_to_object(const int player_id)
+CollisionInfo Room::is_collision_player_to_object(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift)
 {
+	CollisionInfo return_data;
+
 	cGameServer& server = cGameServer::GetInstance();
 	CLIENT& cl = *server.get_client_info(player_id);
 
@@ -214,16 +216,15 @@ bool Room::is_collision_player_to_object(const int player_id)
 		BoundingOrientedBox object_bounding_box = object.Get_BoundingBox();
 		// 여기서 충돌을 체크합니다.
 		if (player_bounding_box.Intersects(object_bounding_box))
-			return true;
+			return return_data;
 	}
-	return false;
+	return return_data;
 }
 
 CollisionInfo Room::is_collision_player_to_player(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift)
 {
 	CollisionInfo return_data;
 
-	XMFLOAT3 calculate_position;
 	int collied_id = -1;
 	cGameServer& server = cGameServer::GetInstance();
 	CLIENT& cl = *server.get_client_info(player_id);

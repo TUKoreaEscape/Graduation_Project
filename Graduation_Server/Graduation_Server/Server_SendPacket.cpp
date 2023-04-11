@@ -142,21 +142,6 @@ void cGameServer::send_calculate_move_packet(const unsigned int id)
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 
-void cGameServer::send_rotate_packet(const unsigned int id, const unsigned int rotate_id, cs_packet_player_rotate recv_packet)
-{
-	sc_packet_player_rotate packet;
-
-	packet.size = sizeof(packet);
-	packet.type = SC_PACKET::SC_USER_ROTATE;
-	packet.id = rotate_id;
-
-	packet.m_xmf3Up = recv_packet.xmf3Up;
-	packet.xmf3Look = recv_packet.xmf3Look;
-	packet.xmf3Right = recv_packet.xmf3Right;
-
-	m_clients[id].do_send(sizeof(packet), &packet);
-}
-
 void cGameServer::send_voice_data(const unsigned int id)
 {
 	sc_packet_voice_data packet;

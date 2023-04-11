@@ -368,12 +368,6 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		break;
 	}
 
-	case CS_PACKET::CS_ROTATE:
-	{
-		Process_Rotate(user_id, p);	
-		break;
-	}
-
 	case CS_PACKET::CS_PACKET_CHAT:
 	{
 		Process_Chat(user_id, p);
