@@ -133,7 +133,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	recv_thread = std::thread{ &Network::listen_thread, m_network };
 	cs_packet_login l_packet;
 	l_packet.size = sizeof(l_packet);
-	l_packet.type = CS_PACKET::CS_LOGIN;
+	l_packet.type = CS_PACKET::CS_PACKET_LOGIN;
 	strcpy_s(l_packet.id, sizeof("test1"), "test1");
 	strcpy_s(l_packet.pass_word, sizeof("test1"), "test1");
 	m_network->send_packet(&l_packet);

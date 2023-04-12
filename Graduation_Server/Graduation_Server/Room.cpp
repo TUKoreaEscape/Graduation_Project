@@ -178,6 +178,16 @@ void Room::Update_room_time()
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 60 && m_tagger_id == -1)
 	{
 		m_tagger_id = in_player[Select_Tagger()];
+		cGameServer& server = cGameServer::GetInstance();
+		CLIENT& cl = *server.get_client_info(m_tagger_id);
+
+		sc_packet_tagger_skill packet;
+		packet.size = sizeof(packet);
+		packet.type = SC_PACKET::SC_PACKET_TAGGER_SKILL;
+		packet.first_skill = m_first_skill_enable;
+		packet.second_skill = m_second_skill_enable;
+		packet.third_skill = m_third_skill_enable;
+		cl.do_send(sizeof(packet), &packet);
 	}
 
 	cGameServer& server = cGameServer::GetInstance();
@@ -188,16 +198,36 @@ void Room::Update_room_time()
 	{
 		m_first_skill_enable = true;
 		cl.set_first_skill_enable();
+		sc_packet_tagger_skill packet;
+		packet.size = sizeof(packet);
+		packet.type = SC_PACKET::SC_PACKET_TAGGER_SKILL;
+		packet.first_skill = m_first_skill_enable;
+		packet.second_skill = m_second_skill_enable;
+		packet.third_skill = m_third_skill_enable;
+		cl.do_send(sizeof(packet), &packet);
 	}
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 360 && false == m_second_skill_enable) // 술래 두번째 스킬 활성화
 	{
 		m_second_skill_enable = true;
 		cl.set_second_skill_enable();
+		sc_packet_tagger_skill packet;
+		packet.size = sizeof(packet);
+		packet.type = SC_PACKET::SC_PACKET_TAGGER_SKILL;
+		packet.first_skill = m_first_skill_enable;
+		packet.second_skill = m_second_skill_enable;
+		packet.third_skill = m_third_skill_enable;
 	}
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 540 && false == m_third_skill_enable) // 술래 세번째 스킬 활성화
 	{
 		m_third_skill_enable = true;
 		cl.set_third_skill_enable();
+		sc_packet_tagger_skill packet;
+		packet.size = sizeof(packet);
+		packet.type = SC_PACKET::SC_PACKET_TAGGER_SKILL;
+		packet.first_skill = m_first_skill_enable;
+		packet.second_skill = m_second_skill_enable;
+		packet.third_skill = m_third_skill_enable;
+		cl.do_send(sizeof(packet), &packet);
 	}
 
 
@@ -330,7 +360,6 @@ CollisionInfo Room::is_collision_player_to_player(const int player_id, const XMF
 	}
 	return return_data;
 }
-
 
 CollisionInfo Room::is_collision_wall_to_player(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift)
 {

@@ -46,9 +46,9 @@ namespace CS_PACKET
 	enum TYPE
 	{
 		NONE = 0,
-		CS_CREATE_ID,
-		CS_LOGIN,
-		CS_MOVE,
+		CS_PACKET_CREATE_ID,
+		CS_PACKET_LOGIN,
+		CS_PACKET_MOVE,
 		CS_PACKET_CHAT,
 		CS_PACKET_CREATE_ROOM,
 		CS_PACKET_JOIN_ROOM,
@@ -199,12 +199,12 @@ namespace SC_PACKET
 	enum TYPE
 	{
 		NONE = 0,
-		SC_LOGINOK,
-		SC_LOGINFAIL,
-		SC_CREATE_ID_OK,
-		SC_CREATE_ID_FAIL,
-		SC_CREATE_ROOM_OK,
-		SC_USER_UPDATE,
+		SC_PACKET_LOGINOK,
+		SC_PACKET_LOGINFAIL,
+		SC_PACKET_CREATE_ID_OK,
+		SC_PACKET_CREATE_ID_FAIL,
+		SC_PACKET_CREATE_ROOM_OK,
+		SC_PACKET_USER_UPDATE,
 		SC_PACKET_OTHER_PLAYER_UPDATE,
 		SC_PACKET_OTHER_PLAYER_DISCONNECT,
 		SC_PACKET_CHAT,
@@ -215,6 +215,7 @@ namespace SC_PACKET
 		SC_PACKET_PUT_OTHER_PLAYER,
 		SC_PACKET_MOVE,
 		SC_PACKET_CALCULATE_MOVE,
+		SC_PACKET_TAGGER_SKILL,
 		SC_PACKET_ROOM_INFO,
 		SC_PACKET_VIVOX_DATA
 	};
@@ -343,6 +344,16 @@ struct sc_packet_calculate_move {
 	short			id;
 	Position		pos;
 };
+
+struct sc_packet_tagger_skill {
+	unsigned char	size;
+	unsigned char	type;
+	
+	bool			first_skill;
+	bool			second_skill;
+	bool			third_skill;
+};
+
 
 struct sc_other_player_move {
 	unsigned char	size;

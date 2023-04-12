@@ -277,7 +277,7 @@ void Framework::UpdateObjects()
 		Network& network = *Network::GetInstance();
 		cs_packet_move packet;
 		packet.size = sizeof(packet);
-		packet.type = CS_PACKET::CS_MOVE;
+		packet.type = CS_PACKET::CS_PACKET_MOVE;
 		packet.velocity = Input::GetInstance()->m_pPlayer->GetVelocity();
 		packet.xmf3Shift = Input::GetInstance()->m_pPlayer->GetShift();
 		packet.input_key = Input::GetInstance()->m_pPlayer->GetDirection();

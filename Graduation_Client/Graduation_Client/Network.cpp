@@ -91,7 +91,7 @@ void Network::ProcessPacket(char* ptr)
 
 		break;
 
-	case SC_PACKET::SC_LOGINOK:
+	case SC_PACKET::SC_PACKET_LOGINOK:
 	{
 		std::cout << "recv login ok" << std::endl;
 		cs_packet_join_room packet;

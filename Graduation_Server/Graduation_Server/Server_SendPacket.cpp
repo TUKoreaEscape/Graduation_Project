@@ -15,7 +15,7 @@ void cGameServer::send_chat_packet(const unsigned int user_id, const unsigned in
 void cGameServer::send_login_fail_packet(const unsigned int user_id, LOGIN_FAIL_REASON::TYPE reason)
 {
 	sc_packet_login_fail packet;
-	packet.type = SC_PACKET::SC_LOGINFAIL;
+	packet.type = SC_PACKET::SC_PACKET_LOGINFAIL;
 	packet.size = sizeof(sc_packet_login_fail);
 	packet.reason = reason;
 	m_clients[user_id].do_send(sizeof(packet), &packet);
@@ -26,7 +26,7 @@ void cGameServer::send_login_ok_packet(const unsigned int user_id)
 	sc_packet_login_ok packet;
 	packet.id = user_id;
 	packet.size = sizeof(sc_packet_login_ok);
-	packet.type = SC_PACKET::SC_LOGINOK;
+	packet.type = SC_PACKET::SC_PACKET_LOGINOK;
 
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
@@ -35,7 +35,7 @@ void cGameServer::send_create_id_ok_packet(const unsigned int user_id)
 {
 	sc_packet_create_id_ok packet;
 	packet.size = sizeof(packet);
-	packet.type = SC_PACKET::SC_CREATE_ID_OK;
+	packet.type = SC_PACKET::SC_PACKET_CREATE_ID_OK;
 
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
@@ -44,7 +44,7 @@ void cGameServer::send_create_id_fail_packet(const unsigned int user_id, char re
 {
 	sc_packet_create_id_fail packet;
 	packet.size = sizeof(packet);
-	packet.type = SC_PACKET::SC_CREATE_ID_FAIL;
+	packet.type = SC_PACKET::SC_PACKET_CREATE_ID_FAIL;
 	packet.reason = reason;
 
 	m_clients[user_id].do_send(sizeof(packet), &packet);
@@ -54,7 +54,7 @@ void cGameServer::send_create_room_ok_packet(const unsigned int user_id, const i
 {
 	sc_packet_create_room packet;
 	packet.size = sizeof(packet);
-	packet.type = SC_PACKET::SC_CREATE_ROOM_OK;
+	packet.type = SC_PACKET::SC_PACKET_CREATE_ROOM_OK;
 	packet.room_number = room_number;
 
 	m_clients[user_id].do_send(sizeof(packet), &packet);

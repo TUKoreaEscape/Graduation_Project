@@ -333,20 +333,20 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	switch (packet_type) // 패킷 타입별로 처리할 공간
 	{
-	case CS_PACKET::CS_LOGIN:
+	case CS_PACKET::CS_PACKET_LOGIN:
 	{
 		// 로그인 처리
 		Process_User_Login(user_id, p);
 		break;
 	}
 
-	case CS_PACKET::CS_CREATE_ID:
+	case CS_PACKET::CS_PACKET_CREATE_ID:
 	{
 		Process_Create_ID(user_id, p);
 		break;
 	}
 
-	case CS_PACKET::CS_MOVE:
+	case CS_PACKET::CS_PACKET_MOVE:
 	{
 		if(m_clients[user_id].get_login_state() == Y_LOGIN && m_clients[user_id].get_join_room_number() != -1)
 			Process_Move(user_id, p);
