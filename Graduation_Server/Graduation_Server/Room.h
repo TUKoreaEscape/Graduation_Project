@@ -3,6 +3,7 @@
 #include "object.h"
 #include "User_Client.h"
 
+#define GAME_END_COLLECT_CHIP 12
 
 //class CLIENT;
 class Room {
@@ -20,6 +21,13 @@ private:
 
 	chrono::system_clock::time_point start_time;
 	chrono::system_clock::time_point now_time;
+
+private: // 여긴 인게임 플레이시 사용하는 변수
+	bool				m_first_skill_enable = false;
+	bool				m_second_skill_enable = false;
+	bool				m_third_skill_enable = false;
+
+	int					m_tagger_collect_chip = 0;
 
 public:
 	mutex					_room_state_lock;

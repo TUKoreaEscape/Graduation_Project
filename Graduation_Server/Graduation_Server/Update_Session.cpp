@@ -23,46 +23,11 @@ void cGameServer::Update_Session(int thread_number)
 				case GAME_ROOM_STATE::READY:
 				{
 					rl._room_state_lock.unlock();
-#if !DEBUG
-					for (int k = 0; k < 6; ++k)
-					{
-						if (rl.Get_Join_Member(k) != -1)
-						{
-							sc_other_player_move packet;
-							packet.size = sizeof(packet);
-							packet.type = SC_PACKET::SC_PACKET_OTHER_PLAYER_UPDATE;
-							index = 0;
-							for (auto& temp : packet.data)
-								temp.id = -1;
-							for (int in_id = 0; in_id < 6; ++in_id)
-							{
-								if (rl.Get_Join_Member(in_id) != -1 && rl.Get_Join_Member(in_id) != rl.Get_Join_Member(k))
-								{
-									int this_id = rl.Get_Join_Member(in_id);
-									packet.data[index].id = this_id;
-									packet.data[index].input_key = m_clients[this_id].get_input_key();
-									packet.data[index].look.x = m_clients[this_id].get_look_x();
-									packet.data[index].look.y = m_clients[this_id].get_look_y();
-									packet.data[index].look.z = m_clients[this_id].get_look_z();
-									packet.data[index].right.x = m_clients[this_id].get_right_x();
-									packet.data[index].right.y = m_clients[this_id].get_right_y();
-									packet.data[index].right.z = m_clients[this_id].get_right_z();
-									packet.data[index].position.x = m_clients[this_id].get_user_position().x * 100;
-									packet.data[index].position.y = m_clients[this_id].get_user_position().y * 100;
-									packet.data[index].position.z = m_clients[this_id].get_user_position().z * 100;
-									packet.data[index].active = true;
-									index++;
-								}
-							}
-							if (rl.Get_Number_of_users() < 5);
-								m_clients[rl.Get_Join_Member(k)].do_send(sizeof(packet), &packet);
-						}
-
-					}
-#endif				
+#if DEBUG
 					Update_OtherPlayer(i);
+#endif				
 					break;
-				}/**/
+				}
 
 				case GAME_ROOM_STATE::PLAYING:
 				{

@@ -37,6 +37,11 @@ private:
 	unsigned char			m_input_key;
 	BoundingOrientedBox		m_bounding_box{};
 
+private:
+	bool					m_first_skill_able = false;
+	bool					m_second_skill_able = false;
+	bool					m_third_skill_able = false;
+
 public:
 	unordered_set <int> room_list; 
 	unordered_set <int> view_list; // 현재는 사용하지 않지만 맵을 서버에 추가할 때 사용할 예정
@@ -105,5 +110,10 @@ public:
 	// 네트워크용 함수 2개
 	void				do_recv();
 	void				do_send(int num_byte, void* mess);
+
+public:
+	void				set_first_skill_enable() { m_first_skill_able = true; };
+	void				set_second_skill_enable() { m_second_skill_able = true; };
+	void				set_third_skill_enable() { m_third_skill_able = true; };
 
 };

@@ -174,20 +174,40 @@ void Room::End_Game()
 void Room::Update_room_time()
 {
 	now_time = chrono::system_clock::now();
-#if DEBUG
-	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() < 60)
-		cout << "술래가 " << 60 - std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() << "초 후에 결정됩니다." << endl;
-#endif
 
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 60 && m_tagger_id == -1)
 	{
 		m_tagger_id = in_player[Select_Tagger()];
-#if DEBUG
-		cout << "술래로 player [" << m_tagger_id << "]가 선정되었습니다." << endl;
-#endif
 	}
 
-	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 600)
+	cGameServer& server = cGameServer::GetInstance();
+	CLIENT& cl = *server.get_client_info(m_tagger_id);
+
+	
+	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 180 && false == m_first_skill_enable) // 술래 첫번째 스킬 활성화
+	{
+		m_first_skill_enable = true;
+		cl.set_first_skill_enable();
+	}
+	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 360 && false == m_second_skill_enable) // 술래 두번째 스킬 활성화
+	{
+		m_second_skill_enable = true;
+		cl.set_second_skill_enable();
+	}
+	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 540 && false == m_third_skill_enable) // 술래 세번째 스킬 활성화
+	{
+		m_third_skill_enable = true;
+		cl.set_third_skill_enable();
+	}
+
+
+	// 게임 종료를 확인하는 부분
+	if (m_tagger_collect_chip == GAME_END_COLLECT_CHIP) // 술래가 정해진 갯수의 생명칩을 수거한 경우
+	{
+		End_Game();
+	}
+
+	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 720) // 게임종료 확인(타임아웃)
 	{
 		End_Game();
 	}
