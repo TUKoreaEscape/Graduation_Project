@@ -13,7 +13,6 @@ void cGameServer::Process_Create_ID(int c_id, void* buff) // 夸没罐篮 ID积己菩哦
 	stringPW = packet->pass_word;
 	reason = m_database->create_id(stringToWstring(stringID), stringToWstring(stringPW));
 
-	cout << "reason : " << reason << endl;
 	if (reason == 1) // id 积己 己傍
 		send_create_id_ok_packet(c_id);
 	else // id 积己 角菩

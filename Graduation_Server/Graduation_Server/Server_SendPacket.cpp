@@ -129,7 +129,7 @@ void cGameServer::send_move_packet(const unsigned int id, const unsigned int mov
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 
-void cGameServer::send_calculate_move_packet(const unsigned int id)
+void cGameServer::send_calculate_move_packet(const unsigned int id) // 이동을 요청한 클라이언트 이동정보를 계산하여 좌표를 전해줌
 {
 	sc_packet_calculate_move packet;
 

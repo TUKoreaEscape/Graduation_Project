@@ -10,7 +10,7 @@ RoomManager::~RoomManager()
 
 }
 
-void RoomManager::init()
+void RoomManager::init() // 서버 시작 전 초기화해주는 함수입니다.
 {
 	// 서버 시작시 게임룸 초기화 장소
 	for (int i = 0; i < a_in_game_room.size(); ++i) {
@@ -19,32 +19,35 @@ void RoomManager::init()
 	}
 }
 
-void RoomManager::init_object()
+void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. (파일입출력 부분)
 {
-	ifstream in("GameObject\\object_data.txt");
+	ifstream in("");
 	if (!in)
 	{
 		std::cout << "object file read fail!" << std::endl;
 	}
-	int type;
-	XMFLOAT3 center;
-	XMFLOAT3 extents;
-	XMFLOAT4 orientation;
-
-	while (in)
+	else
 	{
-		in >> type >> center.x >> center.y >> center.z >> extents.x >> extents.y >> extents.z >> orientation.x >> orientation.y >> orientation.z >> orientation.w;
-		m_game_object.emplace_back(static_cast<Object_Type>(type), center, extents, orientation);
-	}
-	std::cout << "Game Object load success!!!" << std::endl;
+		int type;
+		XMFLOAT3 center;
+		XMFLOAT3 extents;
+		XMFLOAT4 orientation;
 
-	for (auto& p : m_game_object)
-	{
-		for (auto& _room : a_in_game_room) {
-			_room.add_game_object(p.Get_Object_Type(), p.Get_center(), p.Get_extents(), p.Get_orientation());
+		while (in)
+		{
+			in >> type >> center.x >> center.y >> center.z >> extents.x >> extents.y >> extents.z >> orientation.x >> orientation.y >> orientation.z >> orientation.w;
+			m_game_object.emplace_back(static_cast<Object_Type>(type), center, extents, orientation);
 		}
+		std::cout << "Game Object load success!!!" << std::endl;
+
+		for (auto& p : m_game_object)
+		{
+			for (auto& _room : a_in_game_room) {
+				_room.add_game_object(p.Get_Object_Type(), p.Get_center(), p.Get_extents(), p.Get_orientation());
+			}
+		}
+		cout << "All room object init!!!" << endl;
 	}
-	cout << "All room object init!!!" << endl;
 
 	FILE* pFile = nullptr;
 	fopen_s(&pFile, "walls/WallBounding.bin", "rb");
@@ -84,7 +87,7 @@ void RoomManager::init_object()
 
 }
 
-int RoomManager::Create_room(int user_id)
+int RoomManager::Create_room(int user_id) // 방생성을 요청받을경우 사용합니다. 
 {
 	int return_create_room_number = -1;
 	for (int i = 0; i < a_in_game_room.size(); ++i)
@@ -104,13 +107,13 @@ int RoomManager::Create_room(int user_id)
 	return return_create_room_number;
 }
 
-void RoomManager::Clean_room(int room_number)
+void RoomManager::Clean_room(int room_number) // 방에 아무도 없을경우 방이 존재할 이유가 없으므로 빈방으로 반환합니다.
 {
 	a_in_game_room[room_number]._room_state = GAME_ROOM_STATE::FREE;
 	a_in_game_room[room_number].Reset_Room();
 }
 
-bool RoomManager::Join_room(int user_id, int select_room_number)
+bool RoomManager::Join_room(int user_id, int select_room_number) // 방 접속을 시도합니다. 풀방인 경우 false를 리턴합니다.
 {
 	if (a_in_game_room[select_room_number].Join_Player(user_id))
 	{
@@ -119,17 +122,17 @@ bool RoomManager::Join_room(int user_id, int select_room_number)
 	return false;
 }
 
-bool RoomManager::collision_player_player(int user_id)
+bool RoomManager::collision_player_player(int user_id) // 추후 사용예정입니다.
 {
 	return true;
 }
 
-bool RoomManager::collision_wall_player(int user_id)
+bool RoomManager::collision_wall_player(int user_id) // 추후 사용 예정입니다.
 {
 	return true;
 }
 
-Room* RoomManager::Get_Room_Info(int room_number)
+Room* RoomManager::Get_Room_Info(int room_number) // 방 정보 전체를 일괄적으로 리턴합니다.
 {
 	return &a_in_game_room[room_number];
 }

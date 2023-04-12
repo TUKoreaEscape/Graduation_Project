@@ -20,6 +20,7 @@ public:
 	int		m_my_id = -1;
 
 	XMFLOAT3 m_pPlayer_Pos{ 0,0,0 };
+	XMFLOAT3 m_ppOther_Pos[5]{};
 	Player* m_pPlayer = nullptr;;
 	Player** m_ppOther = nullptr;
 
