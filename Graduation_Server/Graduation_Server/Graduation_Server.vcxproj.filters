@@ -87,6 +87,9 @@
     <ClInclude Include="Server_Timer.h">
       <Filter>소스 파일\00 Main\Session</Filter>
     </ClInclude>
+    <ClInclude Include="User_Custom.h">
+      <Filter>소스 파일\03 Client</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -130,6 +133,12 @@
     </ClCompile>
     <ClCompile Include="Server_ProcessPacket.cpp">
       <Filter>소스 파일\00 Main\Packet</Filter>
+    </ClCompile>
+    <ClCompile Include="Room_Update_Session.cpp">
+      <Filter>소스 파일\04 Room</Filter>
+    </ClCompile>
+    <ClCompile Include="User_Custom.cpp">
+      <Filter>소스 파일\03 Client</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

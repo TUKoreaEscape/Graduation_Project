@@ -9,6 +9,10 @@
 #include "DataBase.h"
 #include "Server_Timer.h"
 
+#define FIRST_SKILL_ENABLE_TIME 180
+#define SECOND_SKILL_ENABLE_TIME 360
+#define THIRD_SKILL_ENABLE_TIME 540
+
 class EXP_OVER;
 class CLIENT;
 class Voice_Chat;
@@ -79,6 +83,7 @@ public:
 	wstring stringToWstring(const std::string& t_str);
 protected:
 	std::array<CLIENT, MAX_USER>	m_clients;
+	DataBase* m_database = nullptr;
 
 private:
 	std::vector<std::thread>		m_worker_threads;
@@ -86,7 +91,6 @@ private:
 
 	Voice_Chat						*m_voice_chat = nullptr;
 	RoomManager						*m_room_manager = nullptr;
-	DataBase						*m_database = nullptr;
 	Server_Timer					m_PerformanceCounter;
 	Server_Timer					m_session_timer;
 };
