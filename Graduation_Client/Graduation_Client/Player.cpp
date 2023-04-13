@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "Input.h"
 #include "Player.h"
+#include "Object.h"
 #include "Network.h"
 
 Player::Player() : GameObject()
@@ -27,7 +28,7 @@ Player::Player() : GameObject()
 	m_fRoll = 0.0f;
 	m_fYaw = 0.0f;
 
-	m_pPlayerUpdatedContext = NULL;
+	//m_pPlayerUpdatedContext = NULL;
 	m_pCameraUpdatedContext = NULL;
 
 	Input::GetInstance()->m_pPlayer = this;
@@ -174,16 +175,17 @@ void Player::update(float fTimeElapsed)
 	OnPrepareRender();
 
 	GameObject::update(fTimeElapsed);
-	if (m_xmf3Position.y >= 0.0f)
-	{
-		//std::cout << "중력작용중" << std::endl;
-		//m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Gravity, fTimeElapsed, false));
-		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
-	}
-	else if (m_xmf3Position.y < 0.0f)
-	{
-		m_xmf3Position.y = 0;
-	}
+	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
+	//if (m_xmf3Position.y >= 0.0f)
+	//{
+	//	//std::cout << "중력작용중" << std::endl;
+	//	//m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Gravity, fTimeElapsed, false));
+	//	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
+	//}
+	//else if (m_xmf3Position.y < 0.0f)
+	//{
+	//	m_xmf3Position.y = 0;
+	//}
 	float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
 	float fMaxVelocityXZ = m_fMaxVelocityXZ;
 	if (fLength > m_fMaxVelocityXZ)
@@ -200,11 +202,11 @@ void Player::update(float fTimeElapsed)
 	//Move(xmf3Velocity, false);
 	Network& network = *Network::GetInstance();
 	m_xmf3Shift = xmf3Velocity;
-	if (m_pPlayerUpdatedContext) OnPlayerUpdateCallback(fTimeElapsed);
+	//if (m_pPlayerUpdatedContext[0]) OnPlayerUpdateCallback(fTimeElapsed);
 
 	/*DWORD nCurrentCameraMode = m_pCamera->GetMode();
-	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->update(fTimeElapsed);
 	if (m_pCameraUpdatedContext) OnCameraUpdateCallback(fTimeElapsed);
+	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->update(fTimeElapsed);
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);*/
 
 	fLength = Vector3::Length(m_xmf3Velocity);
@@ -245,4 +247,36 @@ void Player::render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipeline)
 void Player::ReleaseShaderVariables()
 {
 	//if (m_pCamera) m_pCamera->ReleaseShaderVariables();
+}
+
+void Player::OnPlayerUpdateCallback(float fTimeElapsed)
+{
+	for (int i = 0; i < ROOM_COUNT; ++i)
+	{
+		HeightMapTerrain* pTerrain = (HeightMapTerrain*)m_pPlayerUpdatedContext[i];
+		XMFLOAT3 xmf3Scale = pTerrain->GetScale();
+		XMFLOAT3 xmf3PlayerPosition = GetPosition();
+		int z = (int)(xmf3PlayerPosition.z / xmf3Scale.z);
+		bool bReverseQuad = ((z % 2) != 0);
+		float fHeight = pTerrain->GetHeight(xmf3PlayerPosition.x, xmf3PlayerPosition.z, bReverseQuad) + 0.0f;
+		if (xmf3PlayerPosition.y < fHeight)
+		{
+			XMFLOAT3 xmf3PlayerVelocity = GetVelocity();
+			xmf3PlayerVelocity.y = 0.0f;
+			SetVelocity(xmf3PlayerVelocity);
+			xmf3PlayerPosition.y = fHeight;
+			SetPosition(xmf3PlayerPosition);
+		}
+	}
+}
+
+void Player::SetPlayerUpdatedContext(LPVOID pContext[ROOM_COUNT])
+{
+	if (pContext)
+	{
+		for (int i = 0; i < ROOM_COUNT; ++i)
+		{
+			m_pPlayerUpdatedContext[i] = pContext[i];
+		}
+	}
 }

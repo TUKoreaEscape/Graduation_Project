@@ -15,6 +15,8 @@
 
 #define DIR_EMPTY					0x40
 
+#define ROOM_COUNT			6
+
 class Player : public GameObject
 {
 public:
@@ -53,8 +55,8 @@ public:
 	void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f) {};
 	void Rotate(float x, float y, float z);
 
-	virtual void OnPlayerUpdateCallback(float fTimeElapsed) { }
-	void SetPlayerUpdatedContext(LPVOID pContext) { m_pPlayerUpdatedContext = pContext; }
+	virtual void OnPlayerUpdateCallback(float fTimeElapsed);
+	void SetPlayerUpdatedContext(LPVOID pContext[ROOM_COUNT]);
 
 	virtual void OnCameraUpdateCallback(float fTimeElapsed) { }
 	void SetCameraUpdatedContext(LPVOID pContext) { m_pCameraUpdatedContext = pContext; }
@@ -97,7 +99,7 @@ protected:
 	float           			m_fMaxVelocityY = 10.0f;
 	float           			m_fFriction = 100.0f;
 
-	LPVOID						m_pPlayerUpdatedContext = NULL;
+	LPVOID						m_pPlayerUpdatedContext[ROOM_COUNT]{NULL};
 	LPVOID						m_pCameraUpdatedContext = NULL;
 
 	DWORD						m_direction;

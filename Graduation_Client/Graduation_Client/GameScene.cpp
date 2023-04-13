@@ -116,6 +116,9 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	xmf4Color = XMFLOAT4(0.f, 1.f, 1.f, 0.0f);
 	m_pClassroomTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), -20, -60, 81, 41, xmf3Scale, xmf4Color);
 
+	LPVOID m_pTerrain[ROOM_COUNT]{ m_pMainTerrain ,m_pPianoTerrain,m_pBroadcastTerrain, m_pCubeTerrain ,m_pForestTerrain,m_pClassroomTerrain };
+	m_pPlayer->SetPlayerUpdatedContext(m_pTerrain);
+
 	m_pPlayer->AddComponent<CommonMovement>(); 
 
 	AddPlayer(m_pNPC);
