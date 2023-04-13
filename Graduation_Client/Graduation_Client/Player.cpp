@@ -196,8 +196,9 @@ void Player::update(float fTimeElapsed)
 	if (fLength > m_fMaxVelocityY) m_xmf3Velocity.y *= (fMaxVelocityY / fLength);
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false); // 이게 중요한듯?
-	
-	//Move(xmf3Velocity, false);
+#if !USE_NETWORK
+	Move(xmf3Velocity, false);
+#endif
 	Network& network = *Network::GetInstance();
 	m_xmf3Shift = xmf3Velocity;
 	if (m_pPlayerUpdatedContext) OnPlayerUpdateCallback(fTimeElapsed);

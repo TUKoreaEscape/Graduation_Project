@@ -7,7 +7,7 @@ Customizing_Info::Customizing_Info()
 
 Customizing_Info::~Customizing_Info()
 {
-	
+	delete m_database;
 }
 
 void Customizing_Info::Load_Customizing_Data_To_DB(char* id)
