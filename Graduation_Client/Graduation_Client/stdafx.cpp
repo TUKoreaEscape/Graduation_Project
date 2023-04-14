@@ -3,6 +3,8 @@
 #include "DDSTextureLoader12.h"
 #include "WICTextureLoader12.h"
 
+#include <algorithm>
+
 UINT gnCbvSrvDescriptorIncrementSize = 0;
 UINT gnRtvDescriptorIncrementSize = 0;
 UINT gnDsvDescriptorIncrementSize = 0;
