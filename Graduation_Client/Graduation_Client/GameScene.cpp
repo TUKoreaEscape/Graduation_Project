@@ -94,7 +94,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	GameObject* pp = m_pPlayer->FindFrame("Bodies");
 	if (pp)
-		pp->FindCustomPart(Bodies[MAINBODY01].c_str());
+		pp->FindCustomPart(Bodies[MAINBODY06].c_str());
 	pp = m_pPlayer->FindFrame("Bodyparts");
 	if (pp)
 		pp->FindCustomPart(Bodyparts[BODYPART08].c_str());

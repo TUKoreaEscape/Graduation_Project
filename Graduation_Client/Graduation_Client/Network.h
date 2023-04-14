@@ -7,6 +7,10 @@
 #include "Server_Timer.h"
 
 #define  DIR_NO 100
+struct OtherPlayerPos {
+	short	id;
+	XMFLOAT3 Other_Pos;
+};
 
 class Network {
 private:
@@ -20,7 +24,7 @@ public:
 	int		m_my_id = -1;
 
 	XMFLOAT3 m_pPlayer_Pos{ 0,0,0 };
-	XMFLOAT3 m_ppOther_Pos[5]{};
+	OtherPlayerPos Other[5]{};
 	Player* m_pPlayer = nullptr;;
 	Player** m_ppOther = nullptr;
 

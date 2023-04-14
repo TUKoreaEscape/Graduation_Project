@@ -130,8 +130,8 @@ void Network::ProcessPacket(char* ptr)
 					XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->data[i].position.x) / 100.f, static_cast<float>(packet->data[i].position.y) / 100.f, static_cast<float>(packet->data[i].position.z) / 100.f);
 					XMFLOAT3 conversion_look = XMFLOAT3(static_cast<float>(packet->data[i].look.x) / 100.f, static_cast<float>(packet->data[i].look.y) / 100.f, static_cast<float>(packet->data[i].look.z) / 100.f);
 					XMFLOAT3 conversion_right = XMFLOAT3(static_cast<float>(packet->data[i].right.x) / 100.f, static_cast<float>(packet->data[i].right.y) / 100.f, static_cast<float>(packet->data[i].right.z) / 100.f);
-					//m_ppOther[j]->SetPosition(conversion_position, true);
-					m_ppOther_Pos[j] = conversion_position;
+					m_ppOther[j]->SetPosition(conversion_position, true);
+					Other[j].Other_Pos = conversion_position;
 					m_ppOther[j]->m_xmf3Look = conversion_look;
 					m_ppOther[j]->m_xmf3Right = conversion_right;
 					if (packet->data[i].input_key == DIR_FORWARD)
@@ -179,6 +179,8 @@ void Network::ProcessPacket(char* ptr)
 			if (m_ppOther[i]->GetID() == packet->id) {
 				m_ppOther[i]->SetPosition(XMFLOAT3(-100, 100, -100));
 				m_ppOther[i]->SetID(-1);
+				Other[i].id = -1;
+				Other[i].Other_Pos = XMFLOAT3(-100, 100, -100);
 			}
 		}
 		break;
@@ -215,6 +217,7 @@ void Network::ProcessPacket(char* ptr)
 			{
 				std::cout << i << "번째에 플레이어 할당" << std::endl;
 				m_ppOther[i]->SetID(packet->data.id);
+				Other[i].id = packet->data.id;
 				m_ppOther[i]->SetPosition(packet->data.position, true);
 				m_ppOther[i]->SetVelocity(packet->data.velocity);
 				break;
