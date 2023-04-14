@@ -92,6 +92,31 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.0f);
 	m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
 
+	GameObject* pp = m_pPlayer->FindFrame("Bodies");
+	if (pp)
+		pp->FindCustomPart(Bodies[MAINBODY01].c_str());
+	pp = m_pPlayer->FindFrame("Bodyparts");
+	if (pp)
+		pp->FindCustomPart(Bodyparts[BODYPART08].c_str());
+	pp = m_pPlayer->FindFrame("Eyes");
+	if (pp)
+		pp->FindCustomPart(Eyes[EYE09].c_str());
+	pp = m_pPlayer->FindFrame("Gloves");
+	if (pp)
+		pp->FindCustomPart(Gloves[GLOVE08].c_str());
+	pp = m_pPlayer->FindFrame("Headparts");
+	if (pp)
+		pp->FindCustomPart("MainBody04");
+	pp = m_pPlayer->FindFrame("MouthandNoses");
+	if (pp)
+		pp->FindCustomPart(MouthandNoses[MOUTH01].c_str());
+	pp = m_pPlayer->FindFrame("Tails");
+	if (pp)
+		pp->FindCustomPart("Tail05");
+	pp = m_pPlayer->FindFrame("head");
+	if (pp)
+		pp->FindCustomPart("Hat16");
+
 	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene.bin");
 	
 	if (pPlayerModel) delete pPlayerModel;
@@ -123,7 +148,6 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 		AddPlayer(m_ppPlayers[i]);
 	}
 	AddPlayer(m_pPlayer);
-
 
 #if USE_NETWORK
 	m_network = Network::GetInstance();

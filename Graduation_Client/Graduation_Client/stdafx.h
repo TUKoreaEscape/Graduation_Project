@@ -92,14 +92,57 @@ inline bool IsEqual(float fA, float fB, float fEpsilon) { return(::IsZero(fA - f
 inline float InverseSqrt(float fValue) { return 1.0f / sqrtf(fValue); }
 inline void Swap(float* pfS, float* pfT) { float fTemp = *pfS; *pfS = *pfT; *pfT = fTemp; }
 
-std::array<std::string, 6> Bodies{ "MainBody01","MainBody02", "MainBody03", "MainBody04", "MainBody05", "MainBody06" };
-std::array<std::string, 10> Bodyparts{ "Bodypart01","Bodypart02","Bodypart03","Bodypart04","Bodypart05","Bodypart06","Bodypart07","Bodypart08","Bodypart09","Bodypart10" };
-std::array<std::string, 11> Eyes{ "Eye01","Eye02","Eye04","Eye05","Eye06","Eye08", "Eye09","Eye10","Eye11","Eye12","Eye15" };
-std::array<std::string, 10> Gloves{ "Glove01","Glove02","Glove03","Glove04","Glove05","Glove06","Glove07","Glove08","Glove09","Glove10" };
-std::array<std::string, 4> Headparts{ "Ear01", "Hair07", "Hair08", "Hat18" }; 
-std::array<std::string, 15> MouthandNoses{ "Mouth01","Mouth02", "Mouth03", "Mouth04", "Mouth05", "Mouth06", "Mouth07", "Mouth08", "Mouth09", "Mouth15", "Nose10", "Nose11", "Nose12", "Nose13", "Nose14"};
-std::array<std::string, 8> Tails{ "Tails01","Tails02", "Tails03", "Tails04", "Tails05", "Tails06", "Tails07", "Tails08" };
-std::array<std::string, 22> Head{ "Comb14", "Ear02", "Ear03", "Ear04", "Ear05", "Eye03", "Eye07", "Eye13", "Eye14", "Grass15", "Hair06", "Hair09", "Hat16", "Hat17", "Hat19", "Hat20", "Hat20", "Hat21", "Horn10", "Horn11", "Horn12", "Horn13" };
+const std::string Bodies[6]{ "MainBody01","MainBody02", "MainBody03", "MainBody04", "MainBody05", "MainBody06" };
+const std::string Bodyparts[10]{ "Bodypart01","Bodypart02","Bodypart03","Bodypart04","Bodypart05","Bodypart06","Bodypart07","Bodypart08","Bodypart09","Bodypart10" };
+const std::string Eyes[11]{ "Eye01","Eye02","Eye04","Eye05","Eye06","Eye08", "Eye09","Eye10","Eye11","Eye12","Eye15" };
+const std::string Gloves[10]{ "Glove01","Glove02","Glove03","Glove04","Glove05","Glove06","Glove07","Glove08","Glove09","Glove10" };
+const std::string Headparts[4]{ "Ear01", "Hair07", "Hair08", "Hat18" };
+const std::string MouthandNoses[15]{ "Mouth01","Mouth02", "Mouth03", "Mouth04", "Mouth05", "Mouth06", "Mouth07", "Mouth08", "Mouth09", "Mouth15", "Nose10", "Nose11", "Nose12", "Nose13", "Nose14" };
+const std::string Tails[8]{ "Tails01","Tails02", "Tails03", "Tails04", "Tails05", "Tails06", "Tails07", "Tails08" };
+const std::string Head[21]{ "Comb14", "Ear02", "Ear03", "Ear04", "Ear05", "Eye03", "Eye07", "Eye13", "Eye14", "Grass15", "Hair06", "Hair09", "Hat16", "Hat17", "Hat19", "Hat20", "Hat21", "Horn10", "Horn11", "Horn12", "Horn13" };
+
+enum BODIES {
+	MAINBODY01 = 0, MAINBODY02,
+	MAINBODY03, MAINBODY04,
+	MAINBODY05, MAINBODY06
+};
+
+enum BODYPARTS {
+	BODYPART01 = 0, BODYPART02, BODYPART03, BODYPART04,
+	BODYPART05, BODYPART06, BODYPART07, BODYPART08,
+	BODYPART09, BODYPART10
+};
+
+enum EYES {
+	EYE01 = 0, EYE02, EYE04, EYE05, EYE06,
+	EYE08, EYE09, EYE10, EYE11, EYE12, EYE15
+};
+
+enum GLOVES {
+	GLOVE01 = 0, GLOVE02, GLOVE03, GLOVE04, GLOVE05,
+	GLOVE06, GLOVE07, GLOVE08, GLOVE09, GLOVE10
+};
+
+enum HEADPARTS {
+	EAR01 = 0, HAIR07, HAIR08, HAT18
+};
+
+enum MOUTHANDNOSES {
+	MOUTH01 = 0, MOUTH02, MOUTH03, MOUTH04, MOUTH05,
+	MOUTH06, MOUTH07, MOUTH08, MOUTH09, MOUTH15,
+	NOSES11, NOSES12, NOSES13, NOSES14, NOSES15
+};
+
+enum TAILS {
+	TAIL01 = 0, TAIL02, TAIL03, TAIL04,
+	TAIL05, TAIL06, TAIL07, TAIL08
+};
+
+enum HEADS {
+	COMB14 = 0, EAR02, EAR03, EAR04, EAR05, EYE03, EYE07,
+	EYE13, EYE14, GRASS15, HAIR06, HAIR09, HAT16, HAT17, HAT19,
+	HAT20, HAT21, HORN10, HORN11, HORN12, HORN13
+};
 
 namespace Vector3
 {

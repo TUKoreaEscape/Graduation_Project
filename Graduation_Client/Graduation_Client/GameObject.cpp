@@ -459,3 +459,15 @@ void GameObject::Animate(float fTimeElapsed)
 	if (m_pSibling) m_pSibling->Animate(fTimeElapsed);
 	if (m_pChild) m_pChild->Animate(fTimeElapsed);
 }
+
+void GameObject::FindCustomPart(const char* pstrFrameName)
+{
+	if (!m_pChild) return;
+	GameObject* pGameObject = m_pChild;
+	while (pGameObject) {
+		if (strncmp(pGameObject->m_pstrFrameName, pstrFrameName, strlen(pstrFrameName))) {
+			pGameObject->isNotDraw = true;
+		}
+		pGameObject = pGameObject->m_pSibling;
+	}
+}
