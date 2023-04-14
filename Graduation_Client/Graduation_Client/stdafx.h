@@ -48,6 +48,8 @@ using Microsoft::WRL::ComPtr;
 #include <MSWSock.h>
 #include <WinSock2.h>
 
+#include <array>
+
 #pragma comment(lib, "ws2_32.lib")
 //#define _WITH_DEBUG_FRAME_HIERARCHY
 
@@ -89,6 +91,15 @@ inline bool IsZero(float fValue, float fEpsilon) { return((fabsf(fValue) < fEpsi
 inline bool IsEqual(float fA, float fB, float fEpsilon) { return(::IsZero(fA - fB, fEpsilon)); }
 inline float InverseSqrt(float fValue) { return 1.0f / sqrtf(fValue); }
 inline void Swap(float* pfS, float* pfT) { float fTemp = *pfS; *pfS = *pfT; *pfT = fTemp; }
+
+std::array<std::string, 6> Bodies{ "MainBody01","MainBody02", "MainBody03", "MainBody04", "MainBody05", "MainBody06" };
+std::array<std::string, 10> Bodyparts{ "Bodypart01","Bodypart02","Bodypart03","Bodypart04","Bodypart05","Bodypart06","Bodypart07","Bodypart08","Bodypart09","Bodypart10" };
+std::array<std::string, 11> Eyes{ "Eye01","Eye02","Eye04","Eye05","Eye06","Eye08", "Eye09","Eye10","Eye11","Eye12","Eye15" };
+std::array<std::string, 10> Gloves{ "Glove01","Glove02","Glove03","Glove04","Glove05","Glove06","Glove07","Glove08","Glove09","Glove10" };
+std::array<std::string, 4> Headparts{ "Ear01", "Hair07", "Hair08", "Hat18" }; 
+std::array<std::string, 15> MouthandNoses{ "Mouth01","Mouth02", "Mouth03", "Mouth04", "Mouth05", "Mouth06", "Mouth07", "Mouth08", "Mouth09", "Mouth15", "Nose10", "Nose11", "Nose12", "Nose13", "Nose14"};
+std::array<std::string, 8> Tails{ "Tails01","Tails02", "Tails03", "Tails04", "Tails05", "Tails06", "Tails07", "Tails08" };
+std::array<std::string, 22> Head{ "Comb14", "Ear02", "Ear03", "Ear04", "Ear05", "Eye03", "Eye07", "Eye13", "Eye14", "Grass15", "Hair06", "Hair09", "Hat16", "Hat17", "Hat19", "Hat20", "Hat20", "Hat21", "Horn10", "Horn11", "Horn12", "Horn13" };
 
 namespace Vector3
 {
@@ -342,3 +353,4 @@ namespace Plane
 		return(xmf4Result);
 	}
 }
+
