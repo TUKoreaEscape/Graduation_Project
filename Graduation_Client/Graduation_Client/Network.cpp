@@ -244,6 +244,27 @@ void Network::ProcessPacket(char* ptr)
 				GameObject* pp = m_ppOther[i]->FindFrame("Bodies");
 				if (pp)
 					pp->FindCustomPart(Bodies[static_cast<BODIES>(packet->body)].c_str());
+				pp = m_ppOther[i]->FindFrame("Bodyparts");
+				if (pp)
+					pp->FindCustomPart(Bodyparts[static_cast<BODYPARTS>(packet->body_parts)].c_str());
+				pp = m_ppOther[i]->FindFrame("Eyes");
+				if (pp)
+					pp->FindCustomPart(Eyes[static_cast<EYES>(packet->eyes)].c_str());
+				pp = m_ppOther[i]->FindFrame("Gloves");
+				if (pp)
+					pp->FindCustomPart(Gloves[static_cast<GLOVES>(packet->gloves)].c_str());
+				pp = m_ppOther[i]->FindFrame("Headparts");
+				if (pp)
+					pp->FindCustomPart(Headparts[static_cast<HEADPARTS>(packet->head_parts)].c_str());
+				pp = m_ppOther[i]->FindFrame("MouthandNoses");
+				if (pp)
+					pp->FindCustomPart(MouthandNoses[static_cast<MOUTHANDNOSES>(packet->mouthandnoses)].c_str());
+				pp = m_ppOther[i]->FindFrame("Tails");
+				if (pp)
+					pp->FindCustomPart(Tails[static_cast<TAILS>(packet->tails)].c_str());
+				pp = m_ppOther[i]->FindFrame("head");
+				if (pp)
+					pp->FindCustomPart(Head[static_cast<HEADS>(packet->head)].c_str());
 			}
 		}
 
