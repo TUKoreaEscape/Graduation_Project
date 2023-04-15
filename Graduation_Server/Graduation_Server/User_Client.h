@@ -1,6 +1,6 @@
 #pragma once
 #include "stdafx.h"
-
+#include "User_Custom.h"
 namespace CLIENT_STATE
 {
 	enum STATE {
@@ -53,6 +53,7 @@ public:
 	SOCKET		_socket = NULL;
 	EXP_OVER	_recv_over;
 
+	Customizing_Info* m_customizing = nullptr;
 public:
 	CLIENT() : m_id(-1), m_state(CLIENT_STATE::ST_FREE), m_prev_size(0), m_login_state(N_LOGIN), m_join_room_number(-1)
 	{
@@ -91,7 +92,7 @@ public:
 	void				set_login_state(LOGIN_STATE _state);
 	void				set_state(CLIENT_STATE::STATE state);
 	void				set_role(CLIENT_ROLE::STATE role);
-	void				set_id(int id) { m_id = id; }
+	void				set_id(int id);
 	void				set_name(char* name);
 	void				set_recv_over(EXP_OVER& exp_over, SOCKET c_socket);
 	void				set_join_room_number(int room_number);

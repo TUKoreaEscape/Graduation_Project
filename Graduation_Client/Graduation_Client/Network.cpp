@@ -233,6 +233,23 @@ void Network::ProcessPacket(char* ptr)
 		break;
 	}
 
+	case SC_PACKET::SC_PACKET_CUSTOMIZING:
+	{
+		sc_packet_customizing_update* packet = reinterpret_cast<sc_packet_customizing_update*>(ptr);
+
+		for (int i = 0; i < 5; ++i)
+		{
+			if (m_ppOther[i]->GetID() == packet->id && packet->id != -1)
+			{
+				GameObject* pp = m_ppOther[i]->FindFrame("Bodies");
+				if (pp)
+					pp->FindCustomPart(Bodies[static_cast<BODIES>(packet->body)].c_str());
+			}
+		}
+
+		break;
+	}
+
 	default:
 
 		break;

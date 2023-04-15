@@ -56,7 +56,8 @@ namespace CS_PACKET
 		CS_PACKET_READY,
 		CS_PACKET_GAME_LOADING_SUCCESS,
 		CS_PACKET_REQUEST_ROOM_INFO,
-		CS_PACKET_REQUEST_VIVOX_DATA
+		CS_PACKET_REQUEST_VIVOX_DATA,
+		CS_PACKET_CUSTOMIZING
 	};
 }
 
@@ -192,6 +193,20 @@ struct cs_packet_request_vivox_data {
 	unsigned int	room_number;
 };
 
+struct cs_packet_customizing_update {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned char	head;
+	unsigned char	head_parts;
+	unsigned char	body;
+	unsigned char	body_parts;
+	unsigned char	eyes;
+	unsigned char	gloves;
+	unsigned char	mouthandnoses;
+	unsigned char	tails;
+};    
+
 // ----- 서버가 클라이언트에게 보낼때 -----
 
 namespace SC_PACKET
@@ -217,7 +232,8 @@ namespace SC_PACKET
 		SC_PACKET_CALCULATE_MOVE,
 		SC_PACKET_TAGGER_SKILL,
 		SC_PACKET_ROOM_INFO,
-		SC_PACKET_VIVOX_DATA
+		SC_PACKET_VIVOX_DATA,
+		SC_PACKET_CUSTOMIZING
 	};
 }
 
@@ -365,5 +381,20 @@ struct sc_other_player_disconnect {
 	unsigned char	size;
 	unsigned char	type;
 	short			id;
+};
+
+struct sc_packet_customizing_update {
+	unsigned char	size;
+	unsigned char	type;
+	short			id;
+
+	unsigned char	head;
+	unsigned char	head_parts;
+	unsigned char	body;
+	unsigned char	body_parts;
+	unsigned char	eyes;
+	unsigned char	gloves;
+	unsigned char	mouthandnoses;
+	unsigned char	tails;
 };
 #pragma pack(pop)

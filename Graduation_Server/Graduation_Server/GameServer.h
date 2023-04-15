@@ -58,6 +58,7 @@ public:
 	void	send_put_player_data(const unsigned int recv_id);
 	void	send_put_other_player(const unsigned int put_id, const unsigned int recv_id);
 	void	send_voice_data(const unsigned int id);
+	void	send_customizing_data(const unsigned int id);
 
 
 
@@ -72,6 +73,7 @@ public:
 	void	Process_Exit_Room(const int user_id, void* buff);
 	void	Process_Ready(const int user_id, void* buff);
 	void	Process_Game_Start(const int user_id);
+	void	Process_Customizing(const int user_id, void* buff);
 
 	// voice chat data를 전송하는 부분!
 	void	Process_Voice_Data(int user_id);

@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 class DataBase;
 
 const std::string Bodies[6]{ "MainBody01","MainBody02", "MainBody03", "MainBody04", "MainBody05", "MainBody06" };

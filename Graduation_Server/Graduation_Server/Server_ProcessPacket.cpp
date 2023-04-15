@@ -321,3 +321,17 @@ void cGameServer::Process_Voice_Data(int user_id)
 	// 여기서 토큰을 제작해주는게 좋아보임.
 	send_voice_data(user_id);
 }
+
+void cGameServer::Process_Customizing(const int user_id, void* buff)
+{
+	cs_packet_customizing_update* packet = reinterpret_cast<cs_packet_customizing_update*>(buff);
+
+	m_clients[user_id].m_customizing->Set_Body_Custom(static_cast<BODIES>(packet->body));
+	m_clients[user_id].m_customizing->Set_Body_Part_Custom(static_cast<BODYPARTS>(packet->body_parts));
+	m_clients[user_id].m_customizing->Set_Eyes_Custom(static_cast<EYES>(packet->eyes));
+	m_clients[user_id].m_customizing->Set_Gloves_Custom(static_cast<GLOVES>(packet->gloves));
+	m_clients[user_id].m_customizing->Set_Head_Custom(static_cast<HEADS>(packet->head));
+	m_clients[user_id].m_customizing->Set_Head_Part_Custom(static_cast<HEADPARTS>(packet->head_parts));
+	m_clients[user_id].m_customizing->Set_Mouthandnoses_Custom(static_cast<MOUTHANDNOSES>(packet->mouthandnoses));
+	m_clients[user_id].m_customizing->Set_Tail_Custom(static_cast<TAILS>(packet->tails));
+}

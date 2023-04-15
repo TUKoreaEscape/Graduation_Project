@@ -186,3 +186,25 @@ void cGameServer::send_put_other_player(const unsigned int put_id, const unsigne
 #endif
 	m_clients[recv_id].do_send(sizeof(packet), &packet);
 }
+
+void cGameServer::send_customizing_data(const unsigned int id)
+{
+	sc_packet_customizing_update packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_CUSTOMIZING;
+	packet.id = id;
+	packet.body = m_clients[id].m_customizing->Get_Body_Custom();
+	packet.body_parts = m_clients[id].m_customizing->Get_Body_Part_Custom();
+	packet.eyes = m_clients[id].m_customizing->Get_Eyes_Custom();
+	packet.gloves = m_clients[id].m_customizing->Get_Gloves_Custom();
+	packet.head = m_clients[id].m_customizing->Get_Head_Custom();
+	packet.head_parts = m_clients[id].m_customizing->Get_Head_Part_Custom();
+	packet.mouthandnoses = m_clients[id].m_customizing->Get_Mouthandnoses_Custom();
+
+	m_clients[id]._room_list_lock.lock();
+	for (auto p : m_clients[id].room_list)
+	{
+		m_clients[p].do_send(sizeof(packet), &packet);
+	}
+	m_clients[id]._room_list_lock.unlock();
+}
