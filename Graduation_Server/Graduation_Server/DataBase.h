@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include <stdio.h>
 #include <iostream>
-
+#include "User_Custom.h"
 #include <sqlext.h>
 
 constexpr auto NAMELEN = 40;
@@ -24,6 +24,9 @@ public:
 
 	int		check_login(std::wstring user_id, std::wstring user_pw);
 	int		create_id(std::wstring user_id, std::wstring user_pw);
+
+	Custom	Load_Customizing(std::wstring user_id);
+	int		Save_Customizing(std::wstring user_id, Custom& save_data);
 
 	void	show_error();
 

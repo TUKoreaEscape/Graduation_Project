@@ -50,7 +50,9 @@ void CLIENT::set_id(int id)
 	if (id == -1)
 	{
 		// set_id가 -1이 들어온경우는 접속을 종료했을 경우임!
-		m_customizing->Save_Customizing_Data_To_DB(m_name);
+		string stringID = m_name;
+		wstring convertID = stringToWstring(stringID);
+		m_customizing->Save_Customizing_Data_To_DB(convertID);
 		delete m_customizing;
 	}
 	m_id = id;
@@ -59,8 +61,10 @@ void CLIENT::set_id(int id)
 void CLIENT::set_name(char* name)
 {
 	strcpy_s(m_name, MAX_NAME_SIZE, name);
+	string stringID = m_name;
+	wstring convertID = stringToWstring(stringID);
 	m_customizing = new Customizing_Info;
-	m_customizing->Load_Customizing_Data_To_DB(m_name);
+	m_customizing->Load_Customizing_Data_To_DB(convertID);
 }
 
 void CLIENT::set_state(CLIENT_STATE::STATE state)

@@ -125,6 +125,27 @@ int DataBase::create_id(std::wstring user_id, std::wstring user_pw)
 	return 2; // 그냥 에러임
 }
 
+Custom DataBase::Load_Customizing(std::wstring user_id)
+{
+	std::wstring wp{};
+
+	Custom custom_data;
+	wp += L"EXEC Get_Custom ";
+	wp += user_id;
+
+	return custom_data;
+}
+
+int DataBase::Save_Customizing(std::wstring user_id, Custom& save_data)
+{
+	std::wstring wp{};
+
+	wp += L"EXEC Save_Custom ";
+	wp += user_id;
+
+	return 0;
+}
+
 void DataBase::show_error()
 {
 	std::cout << "Error!!! \n";

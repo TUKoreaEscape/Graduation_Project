@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+
 class DataBase;
 
 const std::string Bodies[6]{ "MainBody01","MainBody02", "MainBody03", "MainBody04", "MainBody05", "MainBody06" };
@@ -54,6 +55,17 @@ enum HEADS {
 	HAT20, HAT21, HORN10, HORN11, HORN12, HORN13
 };
 
+struct Custom{
+	HEADS			head;
+	HEADPARTS		head_parts;
+	BODIES			body;
+	BODYPARTS		body_parts;
+	EYES			eyes;
+	GLOVES			gloves;
+	MOUTHANDNOSES	mouthandnoses;
+	TAILS			tails;
+};
+
 class Customizing_Info {
 private:
 	HEADS			m_head;
@@ -70,8 +82,8 @@ public:
 	Customizing_Info();
 	~Customizing_Info();
 
-	void Load_Customizing_Data_To_DB(char* id);
-	void Save_Customizing_Data_To_DB(char* id);
+	void Load_Customizing_Data_To_DB(std::wstring id);
+	void Save_Customizing_Data_To_DB(std::wstring id);
 
 	void Set_Head_Custom(HEADS head) { m_head = head; }
 	void Set_Head_Part_Custom(HEADPARTS head_part) { m_head_parts = head_part; }

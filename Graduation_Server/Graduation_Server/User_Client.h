@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include <codecvt>
 #include "User_Custom.h"
 namespace CLIENT_STATE
 {
@@ -111,6 +112,14 @@ public:
 	// 네트워크용 함수 2개
 	void				do_recv();
 	void				do_send(int num_byte, void* mess);
+
+	wstring				stringToWstring(const std::string& t_str)
+	{
+		typedef codecvt_utf8<wchar_t>  convert_type;
+		wstring_convert<convert_type, wchar_t> converter;
+
+		return converter.from_bytes(t_str);
+	}
 
 public:
 	void				set_first_skill_enable() { m_first_skill_able = true; };
