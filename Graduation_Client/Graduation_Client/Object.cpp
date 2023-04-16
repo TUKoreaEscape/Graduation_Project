@@ -6,6 +6,7 @@ SkyBox::SkyBox(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	XMStoreFloat4x4(&m_xmf4x4ToParent, XMMatrixIdentity());
 	//Scene::scene->creationQueue.push(this);
 	renderer = new SkyboxRenderer();
+	renderer = static_cast<SkyboxRenderer*>(renderer);
 	renderer->gameObject = this;
 
 	SkyBoxMesh* pSkyBoxMesh = new SkyBoxMesh(pd3dDevice, pd3dCommandList);

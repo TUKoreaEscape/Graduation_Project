@@ -732,7 +732,7 @@ float HeightMapImage::GetHeight(float fx, float fz, bool bReverseQuad)
 	float fTopHeight = fTopLeft * (1 - fxPercent) + fTopRight * fxPercent;
 	float fBottomHeight = fBottomLeft * (1 - fxPercent) + fBottomRight * fxPercent;
 	float fHeight = fBottomHeight * (1 - fzPercent) + fTopHeight * fzPercent;
-
+	fHeight = 0; // 일단 하이트맵 
 	return(fHeight);
 }
 

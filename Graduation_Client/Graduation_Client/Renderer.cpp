@@ -207,6 +207,7 @@ void SkyboxRenderer::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 void SkyboxRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipeline)
 {
 	gameObject->SetPosition(Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition());
-
+	//std::cout << Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition().x << Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition().y
+	//	<< Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition().z << std::endl;
 	StandardRenderer::render(pd3dCommandList, nPipeline);
 }
