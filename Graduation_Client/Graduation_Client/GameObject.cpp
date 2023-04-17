@@ -126,6 +126,14 @@ void GameObject::SetPosition(XMFLOAT3 xmf3Position)
 	SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
 }
 
+void GameObject::SetScale(float x, float y, float z)
+{
+	XMMATRIX mtxScale = XMMatrixScaling(x, y, z);
+	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxScale, m_xmf4x4ToParent);
+
+	UpdateTransform(NULL);
+}
+
 void GameObject::SetNotDraw()
 {
 	isNotDraw = true;

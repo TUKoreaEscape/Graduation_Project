@@ -73,6 +73,8 @@ public:
 	virtual void SetPosition(float x, float y, float z);
 	virtual void SetPosition(XMFLOAT3 xmf3Position);
 
+	void SetScale(float x, float y, float z);
+
 public:
 	char m_pstrFrameName[64];
 

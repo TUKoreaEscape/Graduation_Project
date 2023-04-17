@@ -38,6 +38,11 @@ void GameScene::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pForestTerrain->render(pd3dCommandList);
 	m_pClassroomTerrain->render(pd3dCommandList);
 
+	m_pClass->UpdateTransform(nullptr);
+	m_pClass->render(pd3dCommandList);
+	m_pPiano->UpdateTransform(nullptr);
+	m_pPiano->render(pd3dCommandList);
+
 	for (int i = 0; i < m_nWalls; ++i)
 	{
 		if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
@@ -56,6 +61,16 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	LoadedModelInfo* pPlayerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/C30.bin", nullptr); 
 	//LoadedModelInfo* pPlayerModel2 = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", nullptr);
+
+	LoadedModelInfo* pClassModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InClassObject.bin", nullptr);
+	LoadedModelInfo* pPianoModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Piano.bin", nullptr);
+
+	m_pClass = new GameObject();
+	m_pClass->SetChild(pClassModel->m_pModelRootObject, true);
+
+	m_pPiano = new GameObject();
+	m_pPiano->SetChild(pPianoModel->m_pModelRootObject, true);
+	//m_pPiano->SetScale(1.0f, 1.0f, 1.0f);
 
 	m_pNPC = new GameObject();
 	m_pNPC->SetChild(pPlayerModel->m_pModelRootObject, true);
@@ -491,7 +506,7 @@ void GameScene::LoadSceneObjectsFromFile(ID3D12Device* pd3dDevice, ID3D12Graphic
 
 		Material* pMaterial = new Material(7);
 		pMaterial->m_ppTextures[0] = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
-		pMaterial->m_ppTextures[0]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Walls/stones.dds", RESOURCE_TEXTURE2D, 0);
+		pMaterial->m_ppTextures[0]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Model/Textures/WallTex.dds", RESOURCE_TEXTURE2D, 0);
 
 		CreateShaderResourceViews(pd3dDevice, pMaterial->m_ppTextures[0], 0, 3);
 
