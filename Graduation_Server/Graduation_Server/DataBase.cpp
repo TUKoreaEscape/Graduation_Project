@@ -129,9 +129,41 @@ Custom DataBase::Load_Customizing(std::wstring user_id)
 {
 	std::wstring wp{};
 
-	Custom custom_data;
+	Custom custom_data = {};
 	wp += L"EXEC Get_Custom ";
 	wp += user_id;
+
+	retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)wp.c_str(), SQL_NTS);
+
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+	{
+		retcode = SQLBindCol(hstmt, 1, SQL_C_LONG, &custom_head, 10, &cb_custom_head);
+		retcode = SQLBindCol(hstmt, 2, SQL_C_LONG, &custom_head_parts, 10, &cb_custom_head_parts);
+		retcode = SQLBindCol(hstmt, 3, SQL_C_LONG, &custom_body, 10, &cb_custom_body);
+		retcode = SQLBindCol(hstmt, 4, SQL_C_LONG, &custom_body_parts, 10, &cb_custom_body_parts);
+		retcode = SQLBindCol(hstmt, 5, SQL_C_LONG, &custom_eyes, 10, &cb_custom_eyes);
+		retcode = SQLBindCol(hstmt, 6, SQL_C_LONG, &custom_gloves, 10, &cb_custom_gloves);
+		retcode = SQLBindCol(hstmt, 7, SQL_C_LONG, &custom_mouthandnose, 10, &cb_custom_mouthandnose);
+		retcode = SQLBindCol(hstmt, 8, SQL_C_LONG, &custom_tails, 10, &cb_custom_tails);
+
+		retcode = SQLFetch(hstmt);
+
+		if (retcode == SQL_ERROR)
+			show_error();
+
+		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+		{
+			custom_data.head = static_cast<HEADS>(custom_head);
+			custom_data.head_parts = static_cast<HEADPARTS>(custom_head_parts);
+			custom_data.body = static_cast<BODIES>(custom_body);
+			custom_data.body_parts = static_cast<BODYPARTS>(custom_head_parts);
+			custom_data.eyes = static_cast<EYES>(custom_eyes);
+			custom_data.gloves = static_cast<GLOVES>(custom_gloves);
+			custom_data.mouthandnoses = static_cast<MOUTHANDNOSES>(custom_mouthandnose);
+			custom_data.tails = static_cast<TAILS>(custom_tails);
+		}
+	}
 
 	return custom_data;
 }
@@ -142,6 +174,24 @@ int DataBase::Save_Customizing(std::wstring user_id, Custom& save_data)
 
 	wp += L"EXEC Save_Custom ";
 	wp += user_id;
+	wp += L" ";
+	wp += save_data.head;
+	wp += L" ";
+	wp += save_data.head_parts;
+	wp += L" ";
+	wp += save_data.body;
+	wp += L" ";
+	wp += save_data.body_parts;
+	wp += L" ";
+	wp += save_data.eyes;
+	wp += L" ";
+	wp += save_data.gloves;
+	wp += L" ";
+	wp += save_data.mouthandnoses;
+	wp += L" ";
+	wp += save_data.tails;
+
+	retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 
 	return 0;
 }

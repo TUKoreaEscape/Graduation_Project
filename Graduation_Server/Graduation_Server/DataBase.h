@@ -39,6 +39,24 @@ private:
 	SQLWCHAR szID[NAMELEN];
 	SQLWCHAR szPW[NAMELEN];
 	
+	SQLINTEGER custom_head;
+	SQLINTEGER custom_head_parts;
+	SQLINTEGER custom_body;
+	SQLINTEGER custom_body_parts;
+	SQLINTEGER custom_eyes;
+	SQLINTEGER custom_gloves;
+	SQLINTEGER custom_mouthandnose;
+	SQLINTEGER custom_tails;
+
 	SQLLEN cbID = 0;
 	SQLLEN cbPW = 0;
+
+	SQLLEN cb_custom_head = 0;
+	SQLLEN cb_custom_head_parts = 0;
+	SQLLEN cb_custom_body = 0;
+	SQLLEN cb_custom_body_parts = 0;
+	SQLLEN cb_custom_eyes = 0;
+	SQLLEN cb_custom_gloves = 0;
+	SQLLEN cb_custom_mouthandnose = 0;
+	SQLLEN cb_custom_tails = 0;
 };
