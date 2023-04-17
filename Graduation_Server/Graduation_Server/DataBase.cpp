@@ -175,23 +175,24 @@ int DataBase::Save_Customizing(std::wstring user_id, Custom& save_data)
 	wp += L"EXEC Save_Custom ";
 	wp += user_id;
 	wp += L" ";
-	wp += save_data.head;
+	wp += std::to_wstring(save_data.head);
 	wp += L" ";
-	wp += save_data.head_parts;
+	wp += std::to_wstring(save_data.head_parts);
 	wp += L" ";
-	wp += save_data.body;
+	wp += std::to_wstring(save_data.body);
 	wp += L" ";
-	wp += save_data.body_parts;
+	wp += std::to_wstring(save_data.body_parts);
 	wp += L" ";
-	wp += save_data.eyes;
+	wp += std::to_wstring(save_data.eyes);
 	wp += L" ";
-	wp += save_data.gloves;
+	wp += std::to_wstring(save_data.gloves);
 	wp += L" ";
-	wp += save_data.mouthandnoses;
+	wp += std::to_wstring(save_data.mouthandnoses);
 	wp += L" ";
-	wp += save_data.tails;
+	wp += std::to_wstring(save_data.tails);
 
 	retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)wp.c_str(), SQL_NTS);
 
 	return 0;
 }
