@@ -28,6 +28,16 @@ void cGameServer::send_login_ok_packet(const unsigned int user_id)
 	packet.size = sizeof(sc_packet_login_ok);
 	packet.type = SC_PACKET::SC_PACKET_LOGINOK;
 
+	// 여긴 커마정보 로드된 이후에 전송됨
+	packet.body = m_clients[user_id].m_customizing->Get_Body_Custom();
+	packet.body_parts = m_clients[user_id].m_customizing->Get_Body_Part_Custom();
+	packet.eyes = m_clients[user_id].m_customizing->Get_Eyes_Custom();
+	packet.gloves = m_clients[user_id].m_customizing->Get_Gloves_Custom();
+	packet.head = m_clients[user_id].m_customizing->Get_Head_Custom();
+	packet.head_parts = m_clients[user_id].m_customizing->Get_Head_Part_Custom();
+	packet.mouthandnoses = m_clients[user_id].m_customizing->Get_Mouthandnoses_Custom();
+	packet.tails = m_clients[user_id].m_customizing->Get_Tails_Custom();
+
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 

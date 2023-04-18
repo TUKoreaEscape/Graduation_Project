@@ -282,7 +282,12 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 {
 	CLIENT& cl = m_clients[_user_id];
 	
+	string cl_name{};
 
+	char client_name[20];
+	cl.get_client_name(*client_name, sizeof(client_name));
+	cl_name = client_name;
+	cl.m_customizing->Save_Customizing_Data_To_DB(stringToWstring(cl_name));
 	// ¿©±â¼­ ÃÊ±âÈ­
 	if (cl.get_join_room_number() != -1) {
 		Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
@@ -413,6 +418,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_PACKET_CUSTOMIZING:
 	{
+		Process_Customizing(user_id, p);
 		break;
 	}
 

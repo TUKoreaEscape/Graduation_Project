@@ -41,12 +41,12 @@ void ProcessPacket(char* ptr)
 //	cout << "받음" << endl;
 	switch (ptr[1])
 	{
-	case SC_PACKET::SC_LOGINOK:
+	case SC_PACKET::SC_PACKET_LOGINOK:
 		cout << "로그인에 성공하였습니다!" << endl;
 		cout << "===============================================" << endl;
 		break;
 
-	case SC_PACKET::SC_LOGINFAIL:
+	case SC_PACKET::SC_PACKET_LOGINFAIL:
 		if (ptr[2] == LOGIN_FAIL_REASON::INVALID_ID)
 			cout << "로그인에 실패하였습니다. (사유 : 존재하지 않는 ID 입니다.)" << endl;
 		else if (ptr[2] == LOGIN_FAIL_REASON::WRONG_PW)
@@ -54,12 +54,12 @@ void ProcessPacket(char* ptr)
 		cout << "===============================================" << endl;
 		break;
 
-	case SC_PACKET::SC_CREATE_ID_OK:
+	case SC_PACKET::SC_PACKET_CREATE_ID_OK:
 		cout << "ID 생성에 성공하였습니다!" << endl;
 		cout << "===============================================" << endl;
 		break;
 
-	case SC_PACKET::SC_CREATE_ID_FAIL:
+	case SC_PACKET::SC_PACKET_CREATE_ID_FAIL:
 		if (ptr[2] == 0)
 			cout << "ID 생성에 실패하였습니다. (사유 : 이미 같은 ID가 존재합니다.)" << endl;
 		else if (ptr[2] == 2)
@@ -67,7 +67,7 @@ void ProcessPacket(char* ptr)
 		cout << "===============================================" << endl;
 		break;
 
-	case SC_PACKET::SC_CREATE_ROOM_OK:
+	case SC_PACKET::SC_PACKET_CREATE_ROOM_OK:
 	{
 		sc_packet_create_room* packet = reinterpret_cast<sc_packet_create_room*>(ptr);
 		cout << packet->room_number << "번방을 생성하였습니다. " << endl;
@@ -106,10 +106,10 @@ void ProcessPacket(char* ptr)
 		break;
 	}
 	
-	case SC_PACKET::SC_USER_UPDATE:
+	case SC_PACKET::SC_PACKET_USER_UPDATE:
 	{
 		sc_update_user_packet* packet = reinterpret_cast<sc_update_user_packet*>(ptr);
-		cout << packet->data.id << "가 이동 pos : (" << packet->data.position.x << ", " << packet->data.yaw << ", " << packet->data.position.z << ") || vel : (" << packet->data.velocity.x << ", " << packet->data.velocity.y << ", " << packet->data.velocity.z << ") || yaw : " << packet->data.yaw << endl;
+		//cout << packet->data.id << "가 이동 pos : (" << packet->data.position.x << ", " << packet->data.yaw << ", " << packet->data.position.z << ") || vel : (" << packet->data.velocity.x << ", " << packet->data.velocity.y << ", " << packet->data.velocity.z << ") || yaw : " << packet->data.yaw << endl;
 		break;
 	}
 
@@ -189,7 +189,7 @@ void Login_Test()
 
 	cout << "PW 입력 : ";
 	cin >> packet.pass_word;
-	packet.type = CS_PACKET::CS_LOGIN;
+	packet.type = CS_PACKET::CS_PACKET_LOGIN;
 	packet.size = sizeof(packet);
 
 	SendPacket(&packet);
@@ -206,7 +206,7 @@ void CreateID_Test()
 	cin >> packet.pass_word;
 
 	packet.size = sizeof(packet);
-	packet.type = CS_PACKET::CS_CREATE_ID;
+	packet.type = CS_PACKET::CS_PACKET_CREATE_ID;
 
 	SendPacket(&packet);
 }
@@ -272,8 +272,7 @@ void Move_Test()
 	cs_packet_move packet;
 	
 	packet.size = sizeof(packet);
-	packet.type = CS_PACKET::CS_MOVE;
-	packet.position = { 0,0,0 };
+	packet.type = CS_PACKET::CS_PACKET_MOVE;
 	packet.velocity = { 1,1,1 };
 	packet.yaw = 0.3f;
 
@@ -298,8 +297,7 @@ void Stress_Test()
 		cs_packet_move packet;
 
 		packet.size = sizeof(packet);
-		packet.type = CS_PACKET::CS_MOVE;
-		packet.position = { 0,0,0 };
+		packet.type = CS_PACKET::CS_PACKET_MOVE;
 		packet.velocity = { 1,1,1 };
 		packet.yaw = 0.3f;
 

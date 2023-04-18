@@ -80,7 +80,7 @@ int DataBase::create_id(std::wstring user_id, std::wstring user_pw)
 {
 
 	std::wstring wp{};
-
+	
 	wp += L"EXEC Get_PW ";
 	wp += user_id;
 	UserData_ID_PW* check_data = new UserData_ID_PW;
@@ -108,12 +108,39 @@ int DataBase::create_id(std::wstring user_id, std::wstring user_pw)
 		SQLCancel(hstmt);
 	}
 
-
+	std::cout << "ID가 없는것을 확인! 삽입을 시도합니다." << std::endl;
 	std::wstring insert_query{};
+	Custom init_data;
+	init_data.body = MAINBODY01;
+	init_data.body_parts = BODYPART01;
+	init_data.eyes = EYE01;
+	init_data.gloves = GLOVE01;
+	init_data.head = COMB14;
+	init_data.head_parts = EAR01;
+	init_data.mouthandnoses = MOUTH01;
+	init_data.tails = TAIL01;
+
+
 	insert_query += L"EXEC Insert_id ";
 	insert_query += user_id;
 	insert_query += L", ";
 	insert_query += user_pw;
+	insert_query += L", ";
+	insert_query += std::to_wstring(init_data.head);
+	insert_query += L", ";
+	insert_query += std::to_wstring(init_data.head_parts);
+	insert_query += L", ";
+	insert_query += std::to_wstring(init_data.body);
+	insert_query += L", ";
+	insert_query += std::to_wstring(init_data.body_parts);
+	insert_query += L", ";
+	insert_query += std::to_wstring(init_data.eyes);
+	insert_query += L", ";
+	insert_query += std::to_wstring(init_data.gloves);
+	insert_query += L", ";
+	insert_query += std::to_wstring(init_data.mouthandnoses);
+	insert_query += L", ";
+	insert_query += std::to_wstring(init_data.tails);
 
 	retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)insert_query.c_str(), SQL_NTS);
@@ -174,27 +201,29 @@ int DataBase::Save_Customizing(std::wstring user_id, Custom& save_data)
 
 	wp += L"EXEC Save_Custom ";
 	wp += user_id;
-	wp += L" ";
+	wp += L", ";
 	wp += std::to_wstring(save_data.head);
-	wp += L" ";
+	wp += L", ";
 	wp += std::to_wstring(save_data.head_parts);
-	wp += L" ";
+	wp += L", ";
 	wp += std::to_wstring(save_data.body);
-	wp += L" ";
+	wp += L", ";
 	wp += std::to_wstring(save_data.body_parts);
-	wp += L" ";
+	wp += L", ";
 	wp += std::to_wstring(save_data.eyes);
-	wp += L" ";
+	wp += L", ";
 	wp += std::to_wstring(save_data.gloves);
-	wp += L" ";
+	wp += L", ";
 	wp += std::to_wstring(save_data.mouthandnoses);
-	wp += L" ";
+	wp += L", ";
 	wp += std::to_wstring(save_data.tails);
 
 	retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)wp.c_str(), SQL_NTS);
 
-	return 0;
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+		return 0;
+	return 1;
 }
 
 void DataBase::show_error()

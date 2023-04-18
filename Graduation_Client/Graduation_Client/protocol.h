@@ -237,10 +237,19 @@ namespace SC_PACKET
 	};
 }
 
-struct sc_packet_login_ok { // 로그인 성공을 클라에게 전송
+struct sc_packet_login_ok { // 로그인 성공을 클라에게 전송 + 커마정보도 일괄 전송
 	unsigned char	size;
 	unsigned char	type;
 	unsigned int	id;
+
+	unsigned char	head;
+	unsigned char	head_parts;
+	unsigned char	body;
+	unsigned char	body_parts;
+	unsigned char	eyes;
+	unsigned char	gloves;
+	unsigned char	mouthandnoses;
+	unsigned char	tails;
 };
 
 struct sc_packet_login_fail { // 로그인 실패를 클라에게 전송

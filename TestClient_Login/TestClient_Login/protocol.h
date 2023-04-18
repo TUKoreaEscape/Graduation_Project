@@ -9,9 +9,16 @@ const int  MAX_NAME_SIZE = 20;
 const int  MAX_ROOM = 5000;
 
 const int  MAX_ROOM_INFO_SEND = 10;
+
+const int CHECK_MAX_PACKET_SIZE = 127;
+
+const int BUF_SIZE = 512;
 // ----- 클라이언트가 서버에게 보낼때 ------
 
-
+#define VOICE_ISSUER "작성해야됨"
+#define VOICE_DOMAIN "작성해야됨"
+#define VOICE_KEY "작성해야됨"
+#define VOICE_API "작성해야됨"
 
 namespace GAME_ROOM_STATE
 {
@@ -20,7 +27,8 @@ namespace GAME_ROOM_STATE
 		NONE = 0,
 		FREE,
 		READY,
-		PLAYING
+		PLAYING,
+		END
 	};
 }
 
@@ -38,26 +46,55 @@ namespace CS_PACKET
 	enum TYPE
 	{
 		NONE = 0,
-		CS_CREATE_ID,
-		CS_LOGIN,
-		CS_MOVE,
+		CS_PACKET_CREATE_ID,
+		CS_PACKET_LOGIN,
+		CS_PACKET_MOVE,
 		CS_PACKET_CHAT,
 		CS_PACKET_CREATE_ROOM,
 		CS_PACKET_JOIN_ROOM,
 		CS_PACKET_EXIT_ROOM,
 		CS_PACKET_READY,
 		CS_PACKET_GAME_LOADING_SUCCESS,
-		CS_PACKET_REQUEST_ROOM_INFO
+		CS_PACKET_REQUEST_ROOM_INFO,
+		CS_PACKET_REQUEST_VIVOX_DATA,
+		CS_PACKET_CUSTOMIZING
 	};
 }
 
 #pragma pack (push, 1)
+struct Position {
+	short x;
+	short y;
+	short z;
+};
+
+struct Look {
+	short x;
+	short y;
+	short z;
+};
+
+struct Right {
+	short x;
+	short y;
+	short z;
+};
+
 struct UserData {
-	int					id;
+	short				id;
+	unsigned char		input_key;
+	Position			position;
+	Look				look;
+	Right				right;
+	unsigned char		active; // 생명칩유무 :D
+};
+
+struct PutData {
+	short				id;
 	DirectX::XMFLOAT3	position;
 	DirectX::XMFLOAT3	velocity;
-	float				yaw;
-	unsigned char		active;
+	float				yaw; // 각도
+	unsigned char		active; // 생명칩유무 :D
 };
 
 
@@ -67,7 +104,6 @@ struct Roominfo_by10 {
 	unsigned short				join_member;
 	GAME_ROOM_STATE::TYPE		state;
 };
-
 
 struct cs_packet_create_id {
 	unsigned char	size;
@@ -86,12 +122,15 @@ struct cs_packet_login { // 로그인 시도
 };
 
 struct cs_packet_move { // 이동관련 데이터
-	unsigned char	size;
-	unsigned char	type;
+	unsigned char		size;
+	unsigned char		type;
 
-	DirectX::XMFLOAT3 position;
-	DirectX::XMFLOAT3 velocity;
-	float			yaw;
+	unsigned char		input_key;
+	float				yaw;
+	Look				look;
+	Right				right;
+	DirectX::XMFLOAT3	velocity;
+	DirectX::XMFLOAT3	xmf3Shift;
 };
 
 struct cs_packet_voice {
@@ -147,6 +186,27 @@ struct cs_packet_request_all_room_info {
 	unsigned char   request_page;
 };
 
+struct cs_packet_request_vivox_data {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned int	room_number;
+};
+
+struct cs_packet_customizing_update {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned char	head;
+	unsigned char	head_parts;
+	unsigned char	body;
+	unsigned char	body_parts;
+	unsigned char	eyes;
+	unsigned char	gloves;
+	unsigned char	mouthandnoses;
+	unsigned char	tails;
+};
+
 // ----- 서버가 클라이언트에게 보낼때 -----
 
 namespace SC_PACKET
@@ -154,24 +214,42 @@ namespace SC_PACKET
 	enum TYPE
 	{
 		NONE = 0,
-		SC_LOGINOK,
-		SC_LOGINFAIL,
-		SC_CREATE_ID_OK,
-		SC_CREATE_ID_FAIL,
-		SC_CREATE_ROOM_OK,
-		SC_USER_UPDATE,
+		SC_PACKET_LOGINOK,
+		SC_PACKET_LOGINFAIL,
+		SC_PACKET_CREATE_ID_OK,
+		SC_PACKET_CREATE_ID_FAIL,
+		SC_PACKET_CREATE_ROOM_OK,
+		SC_PACKET_USER_UPDATE,
+		SC_PACKET_OTHER_PLAYER_UPDATE,
+		SC_PACKET_OTHER_PLAYER_DISCONNECT,
 		SC_PACKET_CHAT,
 		SC_PACKET_JOIN_ROOM_SUCCESS,
 		SC_PACKET_JOIN_ROOM_FAIL,
 		SC_PACKET_GAME_START,
-		SC_PACKET_ROOM_INFO
+		SC_PACKET_PUT_PLAYER,
+		SC_PACKET_PUT_OTHER_PLAYER,
+		SC_PACKET_MOVE,
+		SC_PACKET_CALCULATE_MOVE,
+		SC_PACKET_TAGGER_SKILL,
+		SC_PACKET_ROOM_INFO,
+		SC_PACKET_VIVOX_DATA,
+		SC_PACKET_CUSTOMIZING
 	};
 }
 
-struct sc_packet_login_ok { // 로그인 성공을 클라에게 전송
+struct sc_packet_login_ok { // 로그인 성공을 클라에게 전송 + 커마정보도 일괄 전송
 	unsigned char	size;
 	unsigned char	type;
 	unsigned int	id;
+
+	unsigned char	head;
+	unsigned char	head_parts;
+	unsigned char	body;
+	unsigned char	body_parts;
+	unsigned char	eyes;
+	unsigned char	gloves;
+	unsigned char	mouthandnoses;
+	unsigned char	tails;
 };
 
 struct sc_packet_login_fail { // 로그인 실패를 클라에게 전송
@@ -194,8 +272,16 @@ struct sc_packet_create_id_fail { // 아이디 생성 실패를 전송해줌 (사유코드와 함�
 struct sc_update_user_packet {
 	unsigned char	size;
 	unsigned char	type;
+	unsigned char	sub_size_mul;
+	unsigned char	sub_size_add;
+	UserData		data[6];
+};
 
-	UserData		data;
+struct sc_put_player_packet {
+	unsigned char	size;
+	unsigned char	type;
+
+	PutData		data;
 };
 
 struct sc_packet_request_room_info {
@@ -237,16 +323,87 @@ struct sc_packet_chat { // 유저간 채팅
 };
 
 struct sc_packet_put_other_client {
-	unsigned char	size;
-	unsigned char	type;
-	unsigned int	user_id;
+	unsigned char		size;
+	unsigned char		type;
+	unsigned int		user_id;
 
-	char			id[MAX_NAME_SIZE];
-	float			yaw;
+	char				id[MAX_NAME_SIZE];
+	DirectX::XMFLOAT3	position;
+	float				yaw;
 };
 
 struct sc_packet_game_start { // 게임 시작을 방에 있는 플레이어에게 알려줌
 	unsigned char	size;
 	unsigned char	type;
+};
+
+
+
+struct sc_packet_voice_data {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned int	join_room_number;
+
+	char			issuer[20];
+	char			domain[15];
+	char			key[8];
+	char			api[33];
+};
+
+struct sc_packet_move {
+	unsigned char	size;
+	unsigned char	type;
+	unsigned short	id;
+
+	unsigned char	input_key;
+
+	Look		look;
+	Right		right;
+	Position	pos;
+};
+
+struct sc_packet_calculate_move {
+	unsigned char	size;
+	unsigned char	type;
+	short			id;
+	Position		pos;
+};
+
+struct sc_packet_tagger_skill {
+	unsigned char	size;
+	unsigned char	type;
+
+	bool			first_skill;
+	bool			second_skill;
+	bool			third_skill;
+};
+
+
+struct sc_other_player_move {
+	unsigned char	size;
+	unsigned char	type;
+	UserData		data[5];
+};
+
+struct sc_other_player_disconnect {
+	unsigned char	size;
+	unsigned char	type;
+	short			id;
+};
+
+struct sc_packet_customizing_update {
+	unsigned char	size;
+	unsigned char	type;
+	short			id;
+
+	unsigned char	head;
+	unsigned char	head_parts;
+	unsigned char	body;
+	unsigned char	body_parts;
+	unsigned char	eyes;
+	unsigned char	gloves;
+	unsigned char	mouthandnoses;
+	unsigned char	tails;
 };
 #pragma pack(pop)
