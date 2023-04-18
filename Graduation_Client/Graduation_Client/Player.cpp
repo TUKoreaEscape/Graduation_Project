@@ -235,9 +235,9 @@ void Player::OnPrepareRender()
 
 	UpdateTransform(NULL);
 
-	//SetDraw();
+	SetDraw();
 
-/*	if (PlayerNum == 0) {
+	if (PlayerNum == 0) {
 		GameObject* pp = FindFrame("Bodies");
 		if (pp)
 			pp->FindCustomPart(PlayerParts[0].c_str());
@@ -250,20 +250,14 @@ void Player::OnPrepareRender()
 		pp = FindFrame("Gloves");
 		if (pp)
 			pp->FindCustomPart(PlayerParts[3].c_str());
-		pp = FindFrame("Headparts");
-		if (pp)
-			pp->FindCustomPart(PlayerParts[4].c_str());
 		pp = FindFrame("MouthandNoses");
 		if (pp)
-			pp->FindCustomPart(PlayerParts[5].c_str());
-		pp = FindFrame("Tails");
-		if (pp)
-			pp->FindCustomPart(PlayerParts[6].c_str());
+			pp->FindCustomPart(PlayerParts[4].c_str());
 		pp = FindFrame("head");
 		if (pp)
-			pp->FindCustomPart(PlayerParts[7].c_str());
-	}*/
-	/*else if (PlayerNum != -1) {
+			pp->FindCustomPart(PlayerParts[5].c_str());
+	}
+	else if (PlayerNum != -1) {
 		GameObject* pp = FindFrame("Bodies");
 		if (pp)
 			pp->FindCustomPart(OthersParts[PlayerNum - 1][0].c_str());
@@ -276,19 +270,13 @@ void Player::OnPrepareRender()
 		pp = FindFrame("Gloves");
 		if (pp)
 			pp->FindCustomPart(OthersParts[PlayerNum - 1][3].c_str());
-		pp = FindFrame("Headparts");
-		if (pp)
-			pp->FindCustomPart(OthersParts[PlayerNum - 1][4].c_str());
 		pp = FindFrame("MouthandNoses");
 		if (pp)
-			pp->FindCustomPart(OthersParts[PlayerNum - 1][5].c_str());
-		pp = FindFrame("Tails");
-		if (pp)
-			pp->FindCustomPart(OthersParts[PlayerNum - 1][6].c_str());
+			pp->FindCustomPart(OthersParts[PlayerNum - 1][4].c_str());
 		pp = FindFrame("head");
 		if (pp)
-			pp->FindCustomPart(OthersParts[PlayerNum - 1][7].c_str());
-	}*/
+			pp->FindCustomPart(OthersParts[PlayerNum - 1][5].c_str());
+	}
 }
 
 void Player::render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipeline)

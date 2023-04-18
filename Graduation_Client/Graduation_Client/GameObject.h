@@ -97,8 +97,8 @@ public:
 
 	static void SetParts(int player, int index, int partsNum);
 
-	static std::string PlayerParts[8];
-	static std::string OthersParts[5][8];
+	static std::string PlayerParts[6];
+	static std::string OthersParts[5][6];
 public:
 	AnimationController* m_pSkinnedAnimationController = nullptr;
 

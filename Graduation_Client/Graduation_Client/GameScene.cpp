@@ -59,7 +59,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
-	LoadedModelInfo* pPlayerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/C30.bin", nullptr); 
+	LoadedModelInfo* pPlayerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/C29.bin", nullptr); 
 	//LoadedModelInfo* pPlayerModel2 = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", nullptr);
 
 	LoadedModelInfo* pClassModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InClassObject.bin", nullptr);
@@ -88,7 +88,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 		m_ppPlayers[i]->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 1, pPlayerModel);
 		m_ppPlayers[i]->SetPosition(XMFLOAT3(0, 5.f, i * 3.f));
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-		for (int j=0;j<8;++j)
+		for (int j=0;j<6;++j)
 			GameObject::SetParts(i + 1, j, 0);
 		m_ppPlayers[i]->PlayerNum = i + 1;
 	}
@@ -109,35 +109,10 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.0f);
 	m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
-	for (int j = 0; j < 8; ++j)
-		GameObject::SetParts(0, j, 1);
-	GameObject::SetParts(0, 7, 2);
+	for (int j = 0; j < 6; ++j)
+		GameObject::SetParts(0, j, 0);
+	GameObject::SetParts(0, 0, 4);
 	m_pPlayer->PlayerNum = 0;
-
-	GameObject* pp = m_pPlayer->FindFrame("Bodies");
-	if (pp)
-		pp->FindCustomPart(GameObject::PlayerParts[0].c_str());
-	pp = m_pPlayer->FindFrame("Bodyparts");
-	if (pp)
-		pp->FindCustomPart(GameObject::PlayerParts[1].c_str());
-	pp = m_pPlayer->FindFrame("Eyes");
-	if (pp)
-		pp->FindCustomPart(GameObject::PlayerParts[2].c_str());
-	pp = m_pPlayer->FindFrame("Gloves");
-	if (pp)
-		pp->FindCustomPart(GameObject::PlayerParts[3].c_str());
-	pp = m_pPlayer->FindFrame("Headparts");
-	if (pp)
-		pp->FindCustomPart(GameObject::PlayerParts[4].c_str());
-	pp = m_pPlayer->FindFrame("MouthandNoses");
-	if (pp)
-		pp->FindCustomPart(GameObject::PlayerParts[5].c_str());
-	pp = m_pPlayer->FindFrame("Tails");
-	if (pp)
-		pp->FindCustomPart(GameObject::PlayerParts[6].c_str());
-	pp = m_pPlayer->FindFrame("head");
-	if (pp)
-		pp->FindCustomPart(GameObject::PlayerParts[7].c_str());
 
 	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene.bin");
 	
@@ -168,11 +143,12 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	m_pPlayer->AddComponent<CommonMovement>(); 
 	
-	AddPlayer(m_pNPC);
+	
 	for (int i = 0; i < m_nPlayers; ++i) {
 		AddPlayer(m_ppPlayers[i]);
 	}
-	AddPlayer(m_pPlayer);
+	AddPlayer(m_pPlayer); 
+	AddPlayer(m_pNPC);
 	
 
 #if USE_NETWORK

@@ -3,8 +3,8 @@
 #include "Scene.h"
 #include "GameObject.h"
 
-std::string GameObject::OthersParts[5][8];
-std::string GameObject::PlayerParts[8];
+std::string GameObject::OthersParts[5][6];
+std::string GameObject::PlayerParts[6];
 
 int ReadIntegerFromFile(FILE* pInFile)
 {
@@ -161,15 +161,9 @@ void GameObject::SetParts(int player, int index, int partsNum)
 			PlayerParts[index] = Gloves[partsNum];
 			break;
 		case 4:
-			PlayerParts[index] = Headparts[partsNum];
-			break;
-		case 5:
 			PlayerParts[index] = MouthandNoses[partsNum];
 			break;
-		case 6:
-			PlayerParts[index] = Tails[partsNum];
-			break;
-		case 7:
+		case 5:
 			PlayerParts[index] = Head[partsNum];
 			break;
 		default:
@@ -191,15 +185,9 @@ void GameObject::SetParts(int player, int index, int partsNum)
 			OthersParts[player - 1][index] = Gloves[partsNum];
 			break;
 		case 4:
-			OthersParts[player - 1][index] = Headparts[partsNum];
-			break;
-		case 5:
 			OthersParts[player - 1][index] = MouthandNoses[partsNum];
 			break;
-		case 6:
-			OthersParts[player - 1][index] = Tails[partsNum];
-			break;
-		case 7:
+		case 5:
 			OthersParts[player - 1][index] = Head[partsNum];
 			break;
 		default:

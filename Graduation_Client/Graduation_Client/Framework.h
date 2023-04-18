@@ -42,6 +42,8 @@ private:
 	Time			time;
 
 	float           timeToSend;
+
+	_TCHAR						m_pszFrameRate[70];
 public:
 	Framework();
 	~Framework();

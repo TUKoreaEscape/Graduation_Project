@@ -253,15 +253,9 @@ void Network::ProcessPacket(char* ptr)
 				pp = m_ppOther[i]->FindFrame("Gloves");
 				if (pp)
 					pp->FindCustomPart(Gloves[static_cast<GLOVES>(packet->gloves)].c_str());
-				pp = m_ppOther[i]->FindFrame("Headparts");
-				if (pp)
-					pp->FindCustomPart(Headparts[static_cast<HEADPARTS>(packet->head_parts)].c_str());
 				pp = m_ppOther[i]->FindFrame("MouthandNoses");
 				if (pp)
 					pp->FindCustomPart(MouthandNoses[static_cast<MOUTHANDNOSES>(packet->mouthandnoses)].c_str());
-				pp = m_ppOther[i]->FindFrame("Tails");
-				if (pp)
-					pp->FindCustomPart(Tails[static_cast<TAILS>(packet->tails)].c_str());
 				pp = m_ppOther[i]->FindFrame("head");
 				if (pp)
 					pp->FindCustomPart(Head[static_cast<HEADS>(packet->head)].c_str());
