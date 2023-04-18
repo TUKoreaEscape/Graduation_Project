@@ -115,10 +115,8 @@ int DataBase::create_id(std::wstring user_id, std::wstring user_pw)
 	init_data.body_parts = BODYPART01;
 	init_data.eyes = EYE01;
 	init_data.gloves = GLOVE01;
-	init_data.head = COMB14;
-	init_data.head_parts = EAR01;
+	init_data.head = HEAD01;
 	init_data.mouthandnoses = MOUTH01;
-	init_data.tails = TAIL01;
 
 
 	insert_query += L"EXEC Insert_id ";
@@ -128,7 +126,7 @@ int DataBase::create_id(std::wstring user_id, std::wstring user_pw)
 	insert_query += L", ";
 	insert_query += std::to_wstring(init_data.head);
 	insert_query += L", ";
-	insert_query += std::to_wstring(init_data.head_parts);
+	insert_query += std::to_wstring(0);
 	insert_query += L", ";
 	insert_query += std::to_wstring(init_data.body);
 	insert_query += L", ";
@@ -140,7 +138,7 @@ int DataBase::create_id(std::wstring user_id, std::wstring user_pw)
 	insert_query += L", ";
 	insert_query += std::to_wstring(init_data.mouthandnoses);
 	insert_query += L", ";
-	insert_query += std::to_wstring(init_data.tails);
+	insert_query += std::to_wstring(0);
 
 	retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)insert_query.c_str(), SQL_NTS);
@@ -182,13 +180,11 @@ Custom DataBase::Load_Customizing(std::wstring user_id)
 		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 		{
 			custom_data.head = static_cast<HEADS>(custom_head);
-			custom_data.head_parts = static_cast<HEADPARTS>(custom_head_parts);
 			custom_data.body = static_cast<BODIES>(custom_body);
 			custom_data.body_parts = static_cast<BODYPARTS>(custom_head_parts);
 			custom_data.eyes = static_cast<EYES>(custom_eyes);
 			custom_data.gloves = static_cast<GLOVES>(custom_gloves);
 			custom_data.mouthandnoses = static_cast<MOUTHANDNOSES>(custom_mouthandnose);
-			custom_data.tails = static_cast<TAILS>(custom_tails);
 		}
 	}
 
@@ -204,7 +200,7 @@ int DataBase::Save_Customizing(std::wstring user_id, Custom& save_data)
 	wp += L", ";
 	wp += std::to_wstring(save_data.head);
 	wp += L", ";
-	wp += std::to_wstring(save_data.head_parts);
+	wp += std::to_wstring(0);
 	wp += L", ";
 	wp += std::to_wstring(save_data.body);
 	wp += L", ";
@@ -216,7 +212,7 @@ int DataBase::Save_Customizing(std::wstring user_id, Custom& save_data)
 	wp += L", ";
 	wp += std::to_wstring(save_data.mouthandnoses);
 	wp += L", ";
-	wp += std::to_wstring(save_data.tails);
+	wp += std::to_wstring(0);
 
 	retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)wp.c_str(), SQL_NTS);

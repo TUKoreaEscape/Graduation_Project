@@ -78,9 +78,9 @@ void cGameServer::Update_OtherPlayer(int room_number)
 					packet.data[index].right.x = m_clients[this_id].get_right_x();
 					packet.data[index].right.y = m_clients[this_id].get_right_y();
 					packet.data[index].right.z = m_clients[this_id].get_right_z();
-					packet.data[index].position.x = static_cast<short>(m_clients[this_id].get_user_position().x) * 100;
-					packet.data[index].position.y = static_cast<short>(m_clients[this_id].get_user_position().y) * 100;
-					packet.data[index].position.z = static_cast<short>(m_clients[this_id].get_user_position().z) * 100;
+					packet.data[index].position.x = (m_clients[this_id].get_user_position().x) * 100;
+					packet.data[index].position.y = (m_clients[this_id].get_user_position().y) * 100;
+					packet.data[index].position.z = (m_clients[this_id].get_user_position().z) * 100;
 					packet.data[index].active = true;
 					index++;
 				}

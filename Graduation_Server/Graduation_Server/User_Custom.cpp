@@ -20,9 +20,7 @@ void Customizing_Info::Load_Customizing_Data_To_DB(std::wstring id)
 	m_eyes = load_custom.eyes;
 	m_gloves = load_custom.gloves;
 	m_head = load_custom.head;
-	m_head_parts = load_custom.head_parts;
 	m_mouthandnoses = load_custom.mouthandnoses;
-	m_tails = load_custom.tails;
 }
 
 void Customizing_Info::Save_Customizing_Data_To_DB(std::wstring id)
@@ -34,9 +32,7 @@ void Customizing_Info::Save_Customizing_Data_To_DB(std::wstring id)
 	save_custom.eyes = m_eyes;
 	save_custom.gloves = m_gloves;
 	save_custom.head = m_head;
-	save_custom.head_parts = m_head_parts;
 	save_custom.mouthandnoses = m_mouthandnoses;
-	save_custom.tails = m_tails;
 
 	m_database->Save_Customizing(id, save_custom);
 	// 이쪽에서 db함수 로드

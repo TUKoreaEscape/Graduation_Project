@@ -306,7 +306,7 @@ void Framework::UpdateObjects()
 
 void Framework::FrameAdvance()
 {
-	time.Tick(60.0);
+	time.Tick(0.0);
 	input->Update(m_hWnd);
 	
 	UpdateObjects();

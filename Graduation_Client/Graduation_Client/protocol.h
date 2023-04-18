@@ -198,13 +198,11 @@ struct cs_packet_customizing_update {
 	unsigned char	type;
 
 	unsigned char	head;
-	unsigned char	head_parts;
 	unsigned char	body;
 	unsigned char	body_parts;
 	unsigned char	eyes;
 	unsigned char	gloves;
 	unsigned char	mouthandnoses;
-	unsigned char	tails;
 };
 
 // ----- 서버가 클라이언트에게 보낼때 -----
@@ -398,12 +396,10 @@ struct sc_packet_customizing_update {
 	short			id;
 
 	unsigned char	head;
-	unsigned char	head_parts;
 	unsigned char	body;
 	unsigned char	body_parts;
 	unsigned char	eyes;
 	unsigned char	gloves;
 	unsigned char	mouthandnoses;
-	unsigned char	tails;
 };
 #pragma pack(pop)

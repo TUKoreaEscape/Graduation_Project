@@ -157,6 +157,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_network->m_pPlayer = m_pPlayer;
 	m_network->m_ppOther = m_ppPlayers;
 	recv_thread = std::thread{ &Network::listen_thread, m_network };
+	send_thread = std::thread{ &Network::Debug_send_thread, m_network };
 	cs_packet_login l_packet;
 	l_packet.size = sizeof(l_packet);
 	l_packet.type = CS_PACKET::CS_PACKET_LOGIN;

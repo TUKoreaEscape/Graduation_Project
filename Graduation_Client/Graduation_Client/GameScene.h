@@ -39,7 +39,7 @@ public:
 
 	Network* m_network;
 	std::thread recv_thread;
-
+	std::thread send_thread;
 	int m_nWalls;
 	GameObject** m_ppWalls;
 

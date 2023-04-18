@@ -331,9 +331,7 @@ void cGameServer::Process_Customizing(const int user_id, void* buff)
 	m_clients[user_id].m_customizing->Set_Eyes_Custom(static_cast<EYES>(packet->eyes));
 	m_clients[user_id].m_customizing->Set_Gloves_Custom(static_cast<GLOVES>(packet->gloves));
 	m_clients[user_id].m_customizing->Set_Head_Custom(static_cast<HEADS>(packet->head));
-	m_clients[user_id].m_customizing->Set_Head_Part_Custom(static_cast<HEADPARTS>(packet->head_parts));
 	m_clients[user_id].m_customizing->Set_Mouthandnoses_Custom(static_cast<MOUTHANDNOSES>(packet->mouthandnoses));
-	m_clients[user_id].m_customizing->Set_Tail_Custom(static_cast<TAILS>(packet->tails));
 
 
 	sc_packet_customizing_update send_packet;
@@ -342,13 +340,11 @@ void cGameServer::Process_Customizing(const int user_id, void* buff)
 	send_packet.id = user_id;
 
 	send_packet.head = packet->head;
-	send_packet.head_parts = packet->head_parts;
 	send_packet.body = packet->body;
 	send_packet.body_parts = packet->body_parts;
 	send_packet.eyes = packet->eyes;
 	send_packet.gloves = packet->gloves;
 	send_packet.mouthandnoses = packet->mouthandnoses;
-	send_packet.tails = packet->tails;
 
 	for (auto p : m_clients[user_id].room_list)
 	{

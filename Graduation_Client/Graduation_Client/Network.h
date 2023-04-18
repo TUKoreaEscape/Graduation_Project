@@ -7,6 +7,16 @@
 #include "Server_Timer.h"
 
 #define  DIR_NO 100
+
+struct Custom {
+	HEADS			head;
+	BODIES			body;
+	BODYPARTS		body_parts;
+	EYES			eyes;
+	GLOVES			gloves;
+	MOUTHANDNOSES	mouthandnoses;
+};
+
 struct OtherPlayerPos {
 	short	id;
 	XMFLOAT3 Other_Pos;
@@ -18,6 +28,7 @@ private:
 	SOCKET			m_socket;
 	const char*		SERVER_ADDR = "127.0.0.1";
 	Server_Timer	m_server_counter;
+	Custom			data;
 public:
 	std::mutex pos_lock;
 	bool	m_recv_move = false;
@@ -41,6 +52,8 @@ public:
 
 
 	void listen_thread();
+	void Debug_send_thread();
+	void Send_Customizing_Data();
 	void AssemblyPacket(char* netbuf, size_t io_byte);
 	void ProcessPacket(char* ptr);
 

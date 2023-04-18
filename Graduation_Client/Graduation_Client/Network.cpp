@@ -13,6 +13,107 @@ Network::~Network()
 
 }
 
+void Network::Send_Customizing_Data()
+{
+	cs_packet_customizing_update packet;
+
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_CUSTOMIZING;
+
+	packet.head;
+	packet.body;
+	packet.body_parts;
+	packet.eyes;
+	packet.gloves;
+	packet.mouthandnoses;
+
+	send_packet(&packet);
+}
+
+void Network::Debug_send_thread()
+{
+	while (true)
+	{
+		int code;
+		std::cout << "1. Head 변경 \n";
+		std::cout << "2. Head Part 변경 (쓰지마셈)\n";
+		std::cout << "3. Body 변경 \n";
+		std::cout << "4. Body Part 변경 \n";
+		std::cout << "5. Eye 변경 \n";
+		std::cout << "6. Glove 변경 \n";
+		std::cout << "7. Mouse and Nose 변경 \n";
+		std::cout << "8. Tail 변경 (쓰지마셈)\n";
+		std::cout << "명령어 입력 : ";
+		std::cin >> code;
+
+		int select;
+		switch (code)
+		{
+		case 1:
+		{
+			system("cls");
+			std::cout << "Head Select (0 ~ 20) : ";
+			std::cin >> select;
+
+			data.head = static_cast<HEADS>(select);
+			Send_Customizing_Data();
+			system("cls");
+			break;
+		}
+
+		case 3:
+			system("cls");
+			std::cout << "Body Select (0 ~ 5) : ";
+			std::cin >> select;
+
+			data.body = static_cast<BODIES>(select);
+			Send_Customizing_Data();
+			system("cls");
+			break;
+
+		case 4:
+			system("cls");
+			std::cout << "Body Parts Select (0 ~ 9) : ";
+			std::cin >> select;
+
+			data.body_parts = static_cast<BODYPARTS>(select);
+			Send_Customizing_Data();
+			system("cls");
+			break;
+
+		case 5:
+			system("cls");
+			std::cout << "Eyes Select (0 ~ 10) : ";
+			std::cin >> select;
+
+			data.eyes = static_cast<EYES>(select);
+			Send_Customizing_Data();
+			system("cls");
+			break;
+
+		case 6:
+			system("cls");
+			std::cout << "Gloves Select (0 ~ 9) : ";
+			std::cin >> select;
+
+			data.gloves = static_cast<GLOVES>(select);
+			Send_Customizing_Data();
+			system("cls");
+			break;
+
+		case 7:
+			system("cls");
+			std::cout << "Mouse And Nose Select (0 ~ 14) : ";
+			std::cin >> select;
+
+			data.mouthandnoses = static_cast<MOUTHANDNOSES>(select);
+			Send_Customizing_Data();
+			system("cls");
+			break;
+		}
+	}
+}
+
 void Network::init_network()
 {
 	WSADATA WSAdata;
@@ -29,7 +130,6 @@ void Network::init_network()
 	server_addr.sin_port = htons(SERVER_PORT);
 	inet_pton(AF_INET, SERVER_ADDR, &server_addr.sin_addr);
 	int status = connect(m_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
-	std::cout << status << "<<<" << std::endl;
 }
 
 void Network::AssemblyPacket(char* net_buf, size_t io_byte)
@@ -94,6 +194,16 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_LOGINOK:
 	{
 		std::cout << "recv login ok" << std::endl;
+		sc_packet_login_ok* recv_packet = reinterpret_cast<sc_packet_login_ok*>(ptr);
+		m_pPlayer->SetID(recv_packet->id);
+		//GameObject::SetParts(0, 0, recv_packet->body);
+		//GameObject::SetParts(0, 1, recv_packet->body_parts);
+		//GameObject::SetParts(0, 2, recv_packet->eyes);
+		//GameObject::SetParts(0, 3, recv_packet->gloves);
+		//GameObject::SetParts(0, 4, recv_packet->mouthandnoses);
+		//GameObject::SetParts(0, 5, recv_packet->head);
+		// 이 아래로는 서버에서 불러온 커마 정보를 넣어줘야합니다.
+
 		cs_packet_join_room packet;
 		packet.size = sizeof(cs_packet_join_room);
 		packet.type = CS_PACKET::CS_PACKET_JOIN_ROOM;
@@ -236,44 +346,34 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_CUSTOMIZING:
 	{
 		sc_packet_customizing_update* packet = reinterpret_cast<sc_packet_customizing_update*>(ptr);
+		//packet->body;
+
+		if (packet->id == m_pPlayer->GetID())
+		{
+			GameObject::SetParts(0, 0, packet->body);
+			GameObject::SetParts(0, 1, packet->body_parts);
+			GameObject::SetParts(0, 2, packet->eyes);
+			GameObject::SetParts(0, 3, packet->gloves);
+			GameObject::SetParts(0, 4, packet->mouthandnoses);
+			GameObject::SetParts(0, 5, packet->head);
+		}
 
 		for (int i = 0; i < 5; ++i)
 		{
-			if (m_ppOther[i]->GetID() == packet->id && packet->id != -1)
+			if (m_ppOther[i]->GetID() == packet->id)
 			{
-				GameObject* pp = m_ppOther[i]->FindFrame("Bodies");
-				if (pp)
-					pp->FindCustomPart(Bodies[static_cast<BODIES>(packet->body)].c_str());
-				pp = m_ppOther[i]->FindFrame("Bodyparts");
-				if (pp)
-					pp->FindCustomPart(Bodyparts[static_cast<BODYPARTS>(packet->body_parts)].c_str());
-				pp = m_ppOther[i]->FindFrame("Eyes");
-				if (pp)
-					pp->FindCustomPart(Eyes[static_cast<EYES>(packet->eyes)].c_str());
-				pp = m_ppOther[i]->FindFrame("Gloves");
-				if (pp)
-					pp->FindCustomPart(Gloves[static_cast<GLOVES>(packet->gloves)].c_str());
-				pp = m_ppOther[i]->FindFrame("Headparts");
-				if (pp)
-					pp->FindCustomPart(Headparts[static_cast<HEADPARTS>(packet->head_parts)].c_str());
-				pp = m_ppOther[i]->FindFrame("MouthandNoses");
-				if (pp)
-					pp->FindCustomPart(MouthandNoses[static_cast<MOUTHANDNOSES>(packet->mouthandnoses)].c_str());
-				pp = m_ppOther[i]->FindFrame("Tails");
-				if (pp)
-					pp->FindCustomPart(Tails[static_cast<TAILS>(packet->tails)].c_str());
-				pp = m_ppOther[i]->FindFrame("head");
-				if (pp)
-					pp->FindCustomPart(Head[static_cast<HEADS>(packet->head)].c_str());
+				GameObject::SetParts(i + 1, 0, packet->body);
+				GameObject::SetParts(i + 1, 1, packet->body_parts);
+				GameObject::SetParts(i + 1, 2, packet->eyes);
+				GameObject::SetParts(i + 1, 3, packet->gloves);
+				GameObject::SetParts(i + 1, 4, packet->mouthandnoses);
+				GameObject::SetParts(i + 1, 5, packet->head);
+
+				break;
 			}
 		}
-
 		break;
 	}
-
-	default:
-
-		break;
 	}
 }
 
@@ -292,6 +392,6 @@ void Network::send_packet(void* packet)
 	if (0 != ret) {
 		int err_no = WSAGetLastError();
 		if (WSA_IO_PENDING != err_no)
-			;
+			exit(0);
 	}
 }

@@ -34,9 +34,7 @@ void cGameServer::send_login_ok_packet(const unsigned int user_id)
 	packet.eyes = m_clients[user_id].m_customizing->Get_Eyes_Custom();
 	packet.gloves = m_clients[user_id].m_customizing->Get_Gloves_Custom();
 	packet.head = m_clients[user_id].m_customizing->Get_Head_Custom();
-	packet.head_parts = m_clients[user_id].m_customizing->Get_Head_Part_Custom();
 	packet.mouthandnoses = m_clients[user_id].m_customizing->Get_Mouthandnoses_Custom();
-	packet.tails = m_clients[user_id].m_customizing->Get_Tails_Custom();
 
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
@@ -104,9 +102,9 @@ void cGameServer::send_move_packet(const unsigned int id, const unsigned int mov
 
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_MOVE;
-	packet.pos.x = static_cast<short>(calculate_pos.x) * 100;
-	packet.pos.y = static_cast<short>(calculate_pos.y) * 100;
-	packet.pos.z = static_cast<short>(calculate_pos.z) * 100;
+	packet.pos.x = (calculate_pos.x) * 100;
+	packet.pos.y = (calculate_pos.y) * 100;
+	packet.pos.z = (calculate_pos.z) * 100;
 	packet.id = moved_id;
 	packet.input_key = recv_packet.input_key;
 	packet.look = recv_packet.look;
@@ -122,9 +120,9 @@ void cGameServer::send_move_packet(const unsigned int id, const unsigned int mov
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_MOVE;
 	m_clients[moved_id]._update_lock.lock();
-	packet.pos.x = static_cast<short>(m_clients[moved_id].get_user_position().x) * 100;
-	packet.pos.y = static_cast<short>(m_clients[moved_id].get_user_position().y) * 100;
-	packet.pos.z = static_cast<short>(m_clients[moved_id].get_user_position().z) * 100;
+	packet.pos.x = (m_clients[moved_id].get_user_position().x) * 100;
+	packet.pos.y = (m_clients[moved_id].get_user_position().y) * 100;
+	packet.pos.z = (m_clients[moved_id].get_user_position().z) * 100;
 	packet.id = moved_id;
 	packet.input_key = m_clients[moved_id].get_input_key();
 
@@ -146,9 +144,9 @@ void cGameServer::send_calculate_move_packet(const unsigned int id) // 이동을 요
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_CALCULATE_MOVE;
 	packet.id = id;
-	packet.pos.x = static_cast<short>(m_clients[id].get_user_position().x) * 100;
-	packet.pos.y = static_cast<short>(m_clients[id].get_user_position().y) * 100;
-	packet.pos.z = static_cast<short>(m_clients[id].get_user_position().z) * 100;
+	packet.pos.x = (m_clients[id].get_user_position().x) * 100;
+	packet.pos.y = (m_clients[id].get_user_position().y) * 100;
+	packet.pos.z = (m_clients[id].get_user_position().z) * 100;
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 
@@ -208,7 +206,6 @@ void cGameServer::send_customizing_data(const unsigned int id)
 	packet.eyes = m_clients[id].m_customizing->Get_Eyes_Custom();
 	packet.gloves = m_clients[id].m_customizing->Get_Gloves_Custom();
 	packet.head = m_clients[id].m_customizing->Get_Head_Custom();
-	packet.head_parts = m_clients[id].m_customizing->Get_Head_Part_Custom();
 	packet.mouthandnoses = m_clients[id].m_customizing->Get_Mouthandnoses_Custom();
 
 	m_clients[id]._room_list_lock.lock();
