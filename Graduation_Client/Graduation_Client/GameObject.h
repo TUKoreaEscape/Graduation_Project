@@ -89,11 +89,16 @@ public:
 
 	StandardRenderer* renderer = nullptr;
 
+	int PlayerNum = -1;
 public:
 	bool isNotDraw = false;
 
-	void SetNotDraw();
+	void SetDraw();
 
+	static void SetParts(int player, int index, int partsNum);
+
+	static std::string PlayerParts[6];
+	static std::string OthersParts[5][6];
 public:
 	AnimationController* m_pSkinnedAnimationController = nullptr;
 

@@ -3,6 +3,9 @@
 #include "Scene.h"
 #include "GameObject.h"
 
+std::string GameObject::OthersParts[5][6];
+std::string GameObject::PlayerParts[6];
+
 int ReadIntegerFromFile(FILE* pInFile)
 {
 	int nValue = 0;
@@ -134,11 +137,64 @@ void GameObject::SetScale(float x, float y, float z)
 	UpdateTransform(NULL);
 }
 
-void GameObject::SetNotDraw()
+void GameObject::SetDraw()
 {
-	isNotDraw = true;
-	if (m_pSibling) m_pSibling->SetNotDraw();
-	if (m_pChild) m_pChild->SetNotDraw();
+	isNotDraw = false;
+	if (m_pSibling) m_pSibling->SetDraw();
+	if (m_pChild) m_pChild->SetDraw();
+}
+
+void GameObject::SetParts(int player, int index, int partsNum)
+{
+	if (player == PLAYER) {
+		switch (index) {
+		case 0:
+			PlayerParts[index] = Bodies[partsNum];
+			break;
+		case 1:
+			PlayerParts[index] = Bodyparts[partsNum];
+			break;
+		case 2:
+			PlayerParts[index] = Eyes[partsNum];
+			break;
+		case 3:
+			PlayerParts[index] = Gloves[partsNum];
+			break;
+		case 4:
+			PlayerParts[index] = MouthandNoses[partsNum];
+			break;
+		case 5:
+			PlayerParts[index] = Head[partsNum];
+			break;
+		default:
+			break;
+		}
+	}
+	else {
+		switch (index) {
+		case 0:
+			OthersParts[player - 1][index] = Bodies[partsNum];
+			break;
+		case 1:
+			OthersParts[player - 1][index] = Bodyparts[partsNum];
+			break;
+		case 2:
+			OthersParts[player - 1][index] = Eyes[partsNum];
+			break;
+		case 3:
+			OthersParts[player - 1][index] = Gloves[partsNum];
+			break;
+		case 4:
+			OthersParts[player - 1][index] = MouthandNoses[partsNum];
+			break;
+		case 5:
+			OthersParts[player - 1][index] = Head[partsNum];
+			break;
+		default:
+			break;
+		}
+	}
+	
 }
 
 void GameObject::CacheSkinningBoneFrames(GameObject* pRootFrame)
@@ -460,7 +516,7 @@ LoadedModelInfo* GameObject::LoadGeometryAndAnimationFromFile(ID3D12Device* pd3d
 
 void GameObject::Animate(float fTimeElapsed)
 {
-	OnPrepareRender();
+	//OnPrepareRender();
 
 	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->AdvanceTime(fTimeElapsed, this);
 
