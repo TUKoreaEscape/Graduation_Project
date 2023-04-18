@@ -223,11 +223,9 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 		if (sizeof(send_packet) >= CHECK_MAX_PACKET_SIZE)
 		{
 			send_packet.size = CHECK_MAX_PACKET_SIZE;
-			send_packet.sub_size_mul = sizeof(sc_packet_request_room_info) / CHECK_MAX_PACKET_SIZE;
-			send_packet.sub_size_add = sizeof(sc_packet_request_room_info) % CHECK_MAX_PACKET_SIZE;
-		}
-		else
-			send_packet.size = sizeof(sc_packet_request_room_info);
+			send_packet.sub_size_mul = sizeof(send_packet) / CHECK_MAX_PACKET_SIZE;
+			send_packet.sub_size_add = sizeof(send_packet) % CHECK_MAX_PACKET_SIZE;
+		}/**/
 		send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
 		m_clients[user_id].do_send(sizeof(send_packet), &send_packet);
 	}
@@ -280,14 +278,12 @@ void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
 		get_room_info.Get_Room_Name(send_packet.room_info[i].room_name, 20);
 	}
 
-	if (sizeof(sc_packet_request_room_info) >= 127)
+	if (sizeof(send_packet) >= CHECK_MAX_PACKET_SIZE)
 	{
-		send_packet.size = 127;
-		send_packet.sub_size_mul = sizeof(sc_packet_request_room_info) / 127;
-		send_packet.sub_size_add = sizeof(sc_packet_request_room_info) % 127;
+		send_packet.size = CHECK_MAX_PACKET_SIZE;
+		send_packet.sub_size_mul = sizeof(send_packet) / CHECK_MAX_PACKET_SIZE;
+		send_packet.sub_size_add = sizeof(send_packet) % CHECK_MAX_PACKET_SIZE;
 	}
-	else
-		send_packet.size = sizeof(sc_packet_request_room_info);
 	send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
 	m_clients[user_id].do_send(sizeof(send_packet), &send_packet);
 }
@@ -338,4 +334,24 @@ void cGameServer::Process_Customizing(const int user_id, void* buff)
 	m_clients[user_id].m_customizing->Set_Head_Part_Custom(static_cast<HEADPARTS>(packet->head_parts));
 	m_clients[user_id].m_customizing->Set_Mouthandnoses_Custom(static_cast<MOUTHANDNOSES>(packet->mouthandnoses));
 	m_clients[user_id].m_customizing->Set_Tail_Custom(static_cast<TAILS>(packet->tails));
+
+
+	sc_packet_customizing_update send_packet;
+	send_packet.size = sizeof(packet);
+	send_packet.type = SC_PACKET::SC_PACKET_CUSTOMIZING;
+	send_packet.id = user_id;
+
+	send_packet.head = packet->head;
+	send_packet.head_parts = packet->head_parts;
+	send_packet.body = packet->body;
+	send_packet.body_parts = packet->body_parts;
+	send_packet.eyes = packet->eyes;
+	send_packet.gloves = packet->gloves;
+	send_packet.mouthandnoses = packet->mouthandnoses;
+	send_packet.tails = packet->tails;
+
+	for (auto p : m_clients[user_id].room_list)
+	{
+		m_clients[p].do_send(sizeof(send_packet), &send_packet);
+	}
 }

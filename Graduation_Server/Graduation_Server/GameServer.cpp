@@ -416,12 +416,11 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		break;
 	}
 
-	case CS_PACKET::CS_PACKET_CUSTOMIZING:
+	case CS_PACKET::CS_PACKET_CUSTOMIZING: // 커스터마이징 데이터를 처리합니다.
 	{
 		Process_Customizing(user_id, p);
 		break;
 	}
-
 	}
 }
 

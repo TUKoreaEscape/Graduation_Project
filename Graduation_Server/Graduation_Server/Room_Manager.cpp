@@ -49,6 +49,8 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 		cout << "All room object init!!!" << endl;
 	}
 
+
+	// 여긴 맵에 존재하는 벽 충돌 정보를 서버에 로드하는 공간입니다.
 	FILE* pFile = nullptr;
 	fopen_s(&pFile, "walls/WallBounding.bin", "rb");
 	if (pFile)
@@ -83,6 +85,8 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 
 		}
 	}
+
+	// 여긴 맵에 존재하는 고정된 오브젝트를 서버에 로드하는 공간입니다.
 
 
 }

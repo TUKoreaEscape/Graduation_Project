@@ -78,9 +78,9 @@ void cGameServer::Update_OtherPlayer(int room_number)
 					packet.data[index].right.x = m_clients[this_id].get_right_x();
 					packet.data[index].right.y = m_clients[this_id].get_right_y();
 					packet.data[index].right.z = m_clients[this_id].get_right_z();
-					packet.data[index].position.x = m_clients[this_id].get_user_position().x * 100;
-					packet.data[index].position.y = m_clients[this_id].get_user_position().y * 100;
-					packet.data[index].position.z = m_clients[this_id].get_user_position().z * 100;
+					packet.data[index].position.x = static_cast<short>(m_clients[this_id].get_user_position().x) * 100;
+					packet.data[index].position.y = static_cast<short>(m_clients[this_id].get_user_position().y) * 100;
+					packet.data[index].position.z = static_cast<short>(m_clients[this_id].get_user_position().z) * 100;
 					packet.data[index].active = true;
 					index++;
 				}
@@ -95,13 +95,13 @@ void cGameServer::Update_OtherPlayer(int room_number)
 					packet.data[index].right.y = 0;
 					packet.data[index].right.z = 0;
 					packet.data[index].position.x = -100 * 100;
-					packet.data[index].position.y = 1000 * 100;
+					packet.data[index].position.y = 1000 * 10;
 					packet.data[index].position.z = -100 * 100;
 					packet.data[index].active = false;
 					index++;
 				}
 			}
-			if (rl.Get_Number_of_users() < 5);
+			//if (rl.Get_Number_of_users() < 5);
 			m_clients[rl.Get_Join_Member(k)].do_send(sizeof(packet), &packet);
 		}
 

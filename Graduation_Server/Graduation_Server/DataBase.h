@@ -31,22 +31,22 @@ public:
 	void	show_error();
 
 private:
-	SQLHENV henv;
-	SQLHDBC hdbc;
+	SQLHENV henv{};
+	SQLHDBC hdbc{};
 	SQLHSTMT hstmt = 0;
-	SQLRETURN retcode;
+	SQLRETURN retcode = 0;
 
-	SQLWCHAR szID[NAMELEN];
-	SQLWCHAR szPW[NAMELEN];
+	SQLWCHAR szID[NAMELEN]{};
+	SQLWCHAR szPW[NAMELEN]{};
 	
-	SQLINTEGER custom_head;
-	SQLINTEGER custom_head_parts;
-	SQLINTEGER custom_body;
-	SQLINTEGER custom_body_parts;
-	SQLINTEGER custom_eyes;
-	SQLINTEGER custom_gloves;
-	SQLINTEGER custom_mouthandnose;
-	SQLINTEGER custom_tails;
+	SQLINTEGER custom_head = 0;
+	SQLINTEGER custom_head_parts = 0;
+	SQLINTEGER custom_body = 0;
+	SQLINTEGER custom_body_parts = 0;
+	SQLINTEGER custom_eyes = 0;
+	SQLINTEGER custom_gloves = 0;
+	SQLINTEGER custom_mouthandnose = 0;
+	SQLINTEGER custom_tails = 0;
 
 	SQLLEN cbID = 0;
 	SQLLEN cbPW = 0;

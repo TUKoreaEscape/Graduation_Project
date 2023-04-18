@@ -104,9 +104,9 @@ void cGameServer::send_move_packet(const unsigned int id, const unsigned int mov
 
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_MOVE;
-	packet.pos.x = calculate_pos.x * 100;
-	packet.pos.y = calculate_pos.y * 100;
-	packet.pos.z = calculate_pos.z * 100;
+	packet.pos.x = static_cast<short>(calculate_pos.x) * 100;
+	packet.pos.y = static_cast<short>(calculate_pos.y) * 100;
+	packet.pos.z = static_cast<short>(calculate_pos.z) * 100;
 	packet.id = moved_id;
 	packet.input_key = recv_packet.input_key;
 	packet.look = recv_packet.look;
@@ -122,9 +122,9 @@ void cGameServer::send_move_packet(const unsigned int id, const unsigned int mov
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_MOVE;
 	m_clients[moved_id]._update_lock.lock();
-	packet.pos.x = m_clients[moved_id].get_user_position().x * 100;
-	packet.pos.y = m_clients[moved_id].get_user_position().y * 100;
-	packet.pos.z = m_clients[moved_id].get_user_position().z * 100;
+	packet.pos.x = static_cast<short>(m_clients[moved_id].get_user_position().x) * 100;
+	packet.pos.y = static_cast<short>(m_clients[moved_id].get_user_position().y) * 100;
+	packet.pos.z = static_cast<short>(m_clients[moved_id].get_user_position().z) * 100;
 	packet.id = moved_id;
 	packet.input_key = m_clients[moved_id].get_input_key();
 
@@ -146,9 +146,9 @@ void cGameServer::send_calculate_move_packet(const unsigned int id) // 이동을 요
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_CALCULATE_MOVE;
 	packet.id = id;
-	packet.pos.x = m_clients[id].get_user_position().x * 100;
-	packet.pos.y = m_clients[id].get_user_position().y * 100;
-	packet.pos.z = m_clients[id].get_user_position().z * 100;
+	packet.pos.x = static_cast<short>(m_clients[id].get_user_position().x) * 100;
+	packet.pos.y = static_cast<short>(m_clients[id].get_user_position().y) * 100;
+	packet.pos.z = static_cast<short>(m_clients[id].get_user_position().z) * 100;
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 
