@@ -101,6 +101,10 @@ const std::string MouthandNoses[15]{ "Mouth01","Mouth02", "Mouth03", "Mouth04", 
 const std::string Tails[8]{ "Tails01","Tails02", "Tails03", "Tails04", "Tails05", "Tails06", "Tails07", "Tails08" };
 const std::string Head[21]{ "Comb14", "Ear02", "Ear03", "Ear04", "Ear05", "Eye03", "Eye07", "Eye13", "Eye14", "Grass15", "Hair06", "Hair09", "Hat16", "Hat17", "Hat19", "Hat20", "Hat21", "Horn10", "Horn11", "Horn12", "Horn13" };
 
+enum PLAYERPARTS {
+	PLAYER = 0, OTHER1, OTHER2, OTHER3, OTHER4, OTHER5
+};
+
 enum BODIES {
 	MAINBODY01 = 0, MAINBODY02,
 	MAINBODY03, MAINBODY04,
