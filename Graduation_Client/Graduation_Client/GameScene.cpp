@@ -148,7 +148,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 		AddPlayer(m_ppPlayers[i]);
 	}
 	AddPlayer(m_pPlayer); 
-	AddPlayer(m_pNPC);
+	//AddPlayer(m_pNPC);
 	
 
 #if USE_NETWORK

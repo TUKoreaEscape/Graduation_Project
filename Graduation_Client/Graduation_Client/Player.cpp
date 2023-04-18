@@ -176,16 +176,16 @@ void Player::update(float fTimeElapsed)
 
 	GameObject::update(fTimeElapsed);
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
-	//if (m_xmf3Position.y >= 0.0f)
-	//{
-	//	//std::cout << "중력작용중" << std::endl;
-	//	//m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Gravity, fTimeElapsed, false));
-	//	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
-	//}
-	//else if (m_xmf3Position.y < 0.0f)
-	//{
-	//	m_xmf3Position.y = 0;
-	//}
+	if (m_xmf3Position.y >= 0.0f)
+	{
+		//std::cout << "중력작용중" << std::endl;
+		//m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Gravity, fTimeElapsed, false));
+		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
+	}
+	else if (m_xmf3Position.y < 0.0f)
+	{
+		m_xmf3Position.y = 0;
+	}
 	float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
 	float fMaxVelocityXZ = m_fMaxVelocityXZ;
 	if (fLength > m_fMaxVelocityXZ)
@@ -233,7 +233,7 @@ void Player::OnPrepareRender()
 	m_xmf4x4ToParent._41 = m_xmf3Position.x; m_xmf4x4ToParent._42 = m_xmf3Position.y; m_xmf4x4ToParent._43 = m_xmf3Position.z;
 	m_xmf4x4ToParent = Matrix4x4::Multiply(XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z), m_xmf4x4ToParent);
 
-	UpdateTransform(NULL);
+	//UpdateTransform(NULL);
 
 	SetDraw();
 
@@ -281,7 +281,7 @@ void Player::OnPrepareRender()
 
 void Player::render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipeline)
 {
-	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->UpdateShaderVariables(pd3dCommandList);
+	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->UpdateShaderVariables(pd3dCommandList, PlayerNum);
 
 	renderer->render(pd3dCommandList, nPipeline);
 	if (m_pSibling) m_pSibling->render(pd3dCommandList, nPipeline);

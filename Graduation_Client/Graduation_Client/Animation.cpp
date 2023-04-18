@@ -224,10 +224,29 @@ AnimationController::~AnimationController()
 
 }
 
-void AnimationController::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+void AnimationController::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, int player)
 {
 	for (int i = 0; i < m_nSkinnedMeshes; i++)
 	{
+		bool isNotUpdate = true;
+		if (player == 0) {
+			for (auto& str : GameObject::PlayerParts) {
+				if (!strcmp(str.c_str(), m_ppSkinnedMeshes[i]->m_pstrMeshName)) {
+					isNotUpdate = false;
+					break;
+				}
+			}
+		}
+		else if (player != -1) {
+			for (auto& str : GameObject::OthersParts[player - 1]) {
+				if (!strcmp(str.c_str(), m_ppSkinnedMeshes[i]->m_pstrMeshName)) {
+					isNotUpdate = false;
+					break;
+				}
+			}
+		}
+		if (isNotUpdate)
+			continue;
 		m_ppSkinnedMeshes[i]->m_pd3dcbBoneTransforms = m_ppd3dcbSkinningBoneTransforms[i];
 		m_ppSkinnedMeshes[i]->m_pcbxmf4x4BoneTransforms = m_ppcbxmf4x4MappedSkinningBoneTransforms[i];
 	}
@@ -273,7 +292,7 @@ void AnimationController::SetAnimationCallbackHandler(int nSkinnedMesh, int nAni
 	if (m_ppAnimationSets && m_ppAnimationSets[nSkinnedMesh]) m_ppAnimationSets[nSkinnedMesh]->SetAnimationCallbackHandler(nAnimationSet, pCallbackHandler);
 }
 
-void AnimationController::AdvanceTime(float fTimeElapsed, GameObject* pRootGameObject)
+void AnimationController::AdvanceTime(float fTimeElapsed, GameObject* pRootGameObject, int player)
 {
 	m_fTime += fTimeElapsed;
 	if (m_pAnimationTracks)
@@ -282,6 +301,25 @@ void AnimationController::AdvanceTime(float fTimeElapsed, GameObject* pRootGameO
 
 		for (int i = 0; i < m_nSkinnedMeshes; i++)
 		{
+			bool isNotUpdate = true;
+			if (player == 0) {
+				for (const std::string& str : GameObject::PlayerParts) {
+					if (!strcmp(str.c_str(), m_ppSkinnedMeshes[i]->m_pstrMeshName)) {
+						isNotUpdate = false;
+						break;
+					}
+				}
+			}
+			else if (player != -1) {
+				for (const std::string& str : GameObject::OthersParts[player + 1]) {
+					if (!strcmp(str.c_str(), m_ppSkinnedMeshes[i]->m_pstrMeshName)) {
+						isNotUpdate = false;
+						break;
+					}
+				}
+			}
+			if (isNotUpdate)
+				continue;
 			for (int j = 0; j < m_pnAnimatedBoneFrames[i]; j++)
 			{
 				XMFLOAT4X4 xmf4x4Transform = Matrix4x4::Zero();

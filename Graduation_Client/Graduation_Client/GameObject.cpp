@@ -514,14 +514,14 @@ LoadedModelInfo* GameObject::LoadGeometryAndAnimationFromFile(ID3D12Device* pd3d
 	return(pLoadedModel);
 }
 
-void GameObject::Animate(float fTimeElapsed)
+void GameObject::Animate(float fTimeElapsed, int player)
 {
 	//OnPrepareRender();
 
-	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->AdvanceTime(fTimeElapsed, this);
+	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->AdvanceTime(fTimeElapsed, this, player);
 
-	if (m_pSibling) m_pSibling->Animate(fTimeElapsed);
-	if (m_pChild) m_pChild->Animate(fTimeElapsed);
+	if (m_pSibling) m_pSibling->Animate(fTimeElapsed, player);
+	if (m_pChild) m_pChild->Animate(fTimeElapsed, player);
 }
 
 void GameObject::FindCustomPart(const char* pstrFrameName)

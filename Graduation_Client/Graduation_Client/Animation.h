@@ -162,7 +162,7 @@ public:
 	XMFLOAT4X4** m_ppcbxmf4x4MappedSkinningBoneTransforms = NULL;
 
 public:
-	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, int player = -1);
 
 	void SetTrackAnimationSet(int nAnimationTrack, int nAnimationSet);
 	void SetTrackEnable(int nAnimationTrack, bool bEnable);
@@ -174,5 +174,5 @@ public:
 	void SetCallbackKey(int nSkinnedMesh, int nAnimationSet, int nKeyIndex, float fTime, void* pData);
 	void SetAnimationCallbackHandler(int nSkinnedMesh, int nAnimationSet, AnimationCallbackHandler* pCallbackHandler);
 
-	void AdvanceTime(float fElapsedTime, GameObject* pRootGameObject);
+	void AdvanceTime(float fElapsedTime, GameObject* pRootGameObject, int player = -1);
 };
