@@ -7,8 +7,9 @@ using namespace std;
 
 void C_IOCP::Start_server()
 {
+	int retcode = 0;
 	WSADATA wsa;
-	WSAStartup(MAKEWORD(2, 2), &wsa);
+	retcode = WSAStartup(MAKEWORD(2, 2), &wsa);
 	this->Bind_Socket(SERVER_PORT);
 }
 

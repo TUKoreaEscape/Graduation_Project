@@ -27,15 +27,15 @@ private:
 	CLIENT_ROLE::STATE		m_role = CLIENT_ROLE::ROLE_NONE;
 
 	unsigned short			m_prev_size;
-	int						m_id;
-	int						m_join_room_number;
+	int						m_id{};
+	int						m_join_room_number{};
 
 	XMFLOAT3				m_pos{};
 	XMFLOAT3				m_velocity{};
 	float					m_yaw{};
-	short					m_look[3];
-	short					m_right[3];
-	unsigned char			m_input_key;
+	short					m_look[3]{0};
+	short					m_right[3]{0};
+	unsigned char			m_input_key{};
 	BoundingOrientedBox		m_bounding_box{};
 
 private:

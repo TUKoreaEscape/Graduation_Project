@@ -57,7 +57,7 @@ int DataBase::check_login(std::wstring user_id, std::wstring user_pw)
 			{
 				std::string debug_id;
 				debug_id.assign(user_id.begin(), user_id.end());
-				std::cout << "Login Success!! ID : " << debug_id << "\n";
+				//std::cout << "Login Success!! ID : " << debug_id << "\n";
 				SQLCancel(hstmt);
 				delete check_data;
 				return 1;
@@ -65,12 +65,12 @@ int DataBase::check_login(std::wstring user_id, std::wstring user_pw)
 
 			std::string debug_id;
 			debug_id.assign(user_id.begin(), user_id.end());
-			std::cout << "Login Fail!! ID : " << debug_id << "\n";
+			//std::cout << "Login Fail!! ID : " << debug_id << "\n";
 			SQLCancel(hstmt);
 			delete check_data;
 			return 2;
 		}
-		std::cout << "ID doesn't exist. \n";
+		//std::cout << "ID doesn't exist. \n";
 	}   
 	delete check_data;
 	return 0;
@@ -108,7 +108,7 @@ int DataBase::create_id(std::wstring user_id, std::wstring user_pw)
 		SQLCancel(hstmt);
 	}
 
-	std::cout << "ID가 없는것을 확인! 삽입을 시도합니다." << std::endl;
+	//std::cout << "ID가 없는것을 확인! 삽입을 시도합니다." << std::endl;
 	std::wstring insert_query{};
 	Custom init_data;
 	init_data.body = MAINBODY01;

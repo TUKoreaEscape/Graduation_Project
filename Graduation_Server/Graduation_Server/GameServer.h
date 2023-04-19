@@ -8,6 +8,7 @@
 #include "Room_Manager.h"
 #include "DataBase.h"
 #include "Server_Timer.h"
+#include <queue>
 
 #define FIRST_SKILL_ENABLE_TIME 180
 #define SECOND_SKILL_ENABLE_TIME 360
@@ -85,11 +86,13 @@ public:
 	wstring stringToWstring(const std::string& t_str);
 protected:
 	std::array<CLIENT, MAX_USER>	m_clients;
+	std::queue<CLIENT>				request_querry;
 	DataBase* m_database = nullptr;
 
 private:
 	std::vector<std::thread>		m_worker_threads;
 	std::vector<std::thread>		m_timer_thread;
+	std::vector<std::thread>		m_database_thread; // worker thread에서 쿼리 날리는건 손해다.
 
 	Voice_Chat						*m_voice_chat = nullptr;
 	RoomManager						*m_room_manager = nullptr;

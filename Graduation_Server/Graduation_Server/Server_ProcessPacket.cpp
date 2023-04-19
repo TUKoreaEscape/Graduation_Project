@@ -236,7 +236,9 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 	cs_packet_ready* packet = reinterpret_cast<cs_packet_ready*>(buff);
 
 	Room& rl = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+#if PRINT
 	cout << "id : " << user_id << "°¡ readyÇÔ" << endl;
+#endif
 	cout << rl.All_Player_Ready() << endl;
 	rl.SetReady(packet->ready_type, user_id);
 	if (rl.All_Player_Ready())
