@@ -40,8 +40,8 @@ void GameScene::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	m_pClass->UpdateTransform(nullptr);
 	m_pClass->render(pd3dCommandList);
-	m_pPiano->UpdateTransform(nullptr);
-	m_pPiano->render(pd3dCommandList);
+	m_pPianoClass->UpdateTransform(nullptr);
+	m_pPianoClass->render(pd3dCommandList);
 
 	for (int i = 0; i < m_nWalls; ++i)
 	{
@@ -63,13 +63,13 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	//LoadedModelInfo* pPlayerModel2 = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", nullptr);
 
 	LoadedModelInfo* pClassModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InClassObject.bin", nullptr);
-	LoadedModelInfo* pPianoModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Piano.bin", nullptr);
+	LoadedModelInfo* pPianoModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPianoRoom.bin", nullptr);
 
 	m_pClass = new GameObject();
 	m_pClass->SetChild(pClassModel->m_pModelRootObject, true);
 
-	m_pPiano = new GameObject();
-	m_pPiano->SetChild(pPianoModel->m_pModelRootObject, true);
+	m_pPianoClass = new GameObject();
+	m_pPianoClass->SetChild(pPianoModel->m_pModelRootObject, true);
 	//m_pPiano->SetScale(1.0f, 1.0f, 1.0f);
 
 	m_pNPC = new GameObject();
