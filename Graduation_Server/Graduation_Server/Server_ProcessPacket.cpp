@@ -335,7 +335,7 @@ void cGameServer::Process_Customizing(const int user_id, void* buff)
 
 
 	sc_packet_customizing_update send_packet;
-	send_packet.size = sizeof(packet);
+	send_packet.size = sizeof(send_packet);
 	send_packet.type = SC_PACKET::SC_PACKET_CUSTOMIZING;
 	send_packet.id = user_id;
 
@@ -346,8 +346,14 @@ void cGameServer::Process_Customizing(const int user_id, void* buff)
 	send_packet.gloves = packet->gloves;
 	send_packet.mouthandnoses = packet->mouthandnoses;
 
-	for (auto p : m_clients[user_id].room_list)
+
+	Room& rl = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+	for (int i = 0; i < 6; ++i)
 	{
-		m_clients[p].do_send(sizeof(send_packet), &send_packet);
+		if (rl.Get_Join_Member(i) != user_id && rl.Get_Join_Member(i) != -1)
+		{
+			m_clients[rl.Get_Join_Member(i)].do_send(sizeof(send_packet), &send_packet);
+		}
 	}
 }
