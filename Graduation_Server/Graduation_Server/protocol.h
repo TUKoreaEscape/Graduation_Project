@@ -203,7 +203,7 @@ struct cs_packet_customizing_update {
 	unsigned char	eyes;
 	unsigned char	gloves;
 	unsigned char	mouthandnoses;
-};    
+};
 
 // ----- 서버가 클라이언트에게 보낼때 -----
 
@@ -371,7 +371,7 @@ struct sc_packet_calculate_move {
 struct sc_packet_tagger_skill {
 	unsigned char	size;
 	unsigned char	type;
-	
+
 	bool			first_skill;
 	bool			second_skill;
 	bool			third_skill;

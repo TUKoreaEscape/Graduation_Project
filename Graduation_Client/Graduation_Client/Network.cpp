@@ -20,12 +20,12 @@ void Network::Send_Customizing_Data()
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET::CS_PACKET_CUSTOMIZING;
 
-	packet.head;
-	packet.body;
-	packet.body_parts;
-	packet.eyes;
-	packet.gloves;
-	packet.mouthandnoses;
+	packet.head = data.head;
+	packet.body = data.body;
+	packet.body_parts = data.body_parts;
+	packet.eyes = data.eyes;
+	packet.gloves = data.gloves;
+	packet.mouthandnoses = data.mouthandnoses;
 
 	send_packet(&packet);
 }
@@ -42,7 +42,7 @@ void Network::Debug_send_thread()
 		std::cout << "5. Eye 변경 \n";
 		std::cout << "6. Glove 변경 \n";
 		std::cout << "7. Mouse and Nose 변경 \n";
-		std::cout << "8. Tail 변경 (쓰지마셈)\n";
+		std::cout << "8. 무조건 한번 눌러요\n";
 		std::cout << "명령어 입력 : ";
 		std::cin >> code;
 
@@ -55,6 +55,7 @@ void Network::Debug_send_thread()
 			std::cout << "Head Select (0 ~ 20) : ";
 			std::cin >> select;
 
+			GameObject::SetParts(0, 5, select);
 			data.head = static_cast<HEADS>(select);
 			Send_Customizing_Data();
 			system("cls");
@@ -65,7 +66,7 @@ void Network::Debug_send_thread()
 			system("cls");
 			std::cout << "Body Select (0 ~ 5) : ";
 			std::cin >> select;
-
+			GameObject::SetParts(0, 0, select);
 			data.body = static_cast<BODIES>(select);
 			Send_Customizing_Data();
 			system("cls");
@@ -73,9 +74,9 @@ void Network::Debug_send_thread()
 
 		case 4:
 			system("cls");
-			std::cout << "Body Parts Select (0 ~ 9) : ";
+			std::cout << "Body Parts Select (0 ~ 5) : ";
 			std::cin >> select;
-
+			GameObject::SetParts(0, 1, select);
 			data.body_parts = static_cast<BODYPARTS>(select);
 			Send_Customizing_Data();
 			system("cls");
@@ -83,9 +84,10 @@ void Network::Debug_send_thread()
 
 		case 5:
 			system("cls");
-			std::cout << "Eyes Select (0 ~ 10) : ";
+			std::cout << "Eyes Select (0 ~ 6) : ";
 			std::cin >> select;
 
+			GameObject::SetParts(0, 2, select);
 			data.eyes = static_cast<EYES>(select);
 			Send_Customizing_Data();
 			system("cls");
@@ -93,22 +95,40 @@ void Network::Debug_send_thread()
 
 		case 6:
 			system("cls");
-			std::cout << "Gloves Select (0 ~ 9) : ";
+			std::cout << "Gloves Select (0 ~ 5) : ";
 			std::cin >> select;
-
+			
 			data.gloves = static_cast<GLOVES>(select);
+			GameObject::SetParts(0, 3, select);
 			Send_Customizing_Data();
 			system("cls");
 			break;
 
 		case 7:
 			system("cls");
-			std::cout << "Mouse And Nose Select (0 ~ 14) : ";
+			std::cout << "Mouse And Nose Select (0 ~ 6) : ";
 			std::cin >> select;
-
+			GameObject::SetParts(0, 4, select);
 			data.mouthandnoses = static_cast<MOUTHANDNOSES>(select);
 			Send_Customizing_Data();
 			system("cls");
+			break;
+
+		case 8:
+			GameObject::SetParts(0, 0, 0);
+			data.head = static_cast<HEADS>(0);
+			data.body_parts = static_cast<BODYPARTS>(0);
+			data.eyes = static_cast<EYES>(0);
+			data.gloves = static_cast<GLOVES>(0);
+			data.body = static_cast<BODIES>(0);
+			data.mouthandnoses = static_cast<MOUTHANDNOSES>(0);
+			GameObject::SetParts(0, 1, 0);
+			GameObject::SetParts(0, 2, 0);
+			GameObject::SetParts(0, 3, 0);
+			GameObject::SetParts(0, 4, 0);
+			GameObject::SetParts(0, 5, 0);
+
+			Send_Customizing_Data();
 			break;
 		}
 	}
@@ -193,7 +213,7 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_LOGINOK:
 	{
-		std::cout << "recv login ok" << std::endl;
+		//std::cout << "recv login ok" << std::endl;
 		sc_packet_login_ok* recv_packet = reinterpret_cast<sc_packet_login_ok*>(ptr);
 		m_pPlayer->SetID(recv_packet->id);
 		//GameObject::SetParts(0, 0, recv_packet->body);
@@ -214,13 +234,13 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_JOIN_ROOM_SUCCESS:
 	{
-		std::cout << "방 접속 성공" << std::endl;
+		//std::cout << "방 접속 성공" << std::endl;
 		break;
 	}
 
 	case SC_PACKET::SC_PACKET_JOIN_ROOM_FAIL:
 	{
-		std::cout << "recv SC_PACKET_JOIN_ROOM_FAIL" << std::endl;
+		//std::cout << "recv SC_PACKET_JOIN_ROOM_FAIL" << std::endl;
 		cs_packet_create_room packet;
 		packet.size = sizeof(packet);
 		packet.type = CS_PACKET::CS_PACKET_CREATE_ROOM;
@@ -313,7 +333,7 @@ void Network::ProcessPacket(char* ptr)
 		m_pPlayer->SetPosition(packet->data.position, true);
 		m_pPlayer->SetID(packet->data.id);
 		m_pPlayer->SetVelocity(packet->data.velocity);
-		std::cout << "put player packet recv!" << std::endl;
+		//std::cout << "put player packet recv!" << std::endl;
 		break;
 	}
 
@@ -325,7 +345,7 @@ void Network::ProcessPacket(char* ptr)
 		{
 			if (m_ppOther[i]->GetID() == -1)
 			{
-				std::cout << i << "번째에 플레이어 할당" << std::endl;
+				//std::cout << i << "번째에 플레이어 할당" << std::endl;
 				m_ppOther[i]->SetID(packet->data.id);
 				Other[i].id = packet->data.id;
 				m_ppOther[i]->SetPosition(packet->data.position, true);
@@ -333,13 +353,7 @@ void Network::ProcessPacket(char* ptr)
 				break;
 			}
 		}
-		std::cout << "put player_other packet recv!" << std::endl;
-
-		for (int i = 0; i < 5; ++i)
-		{
-			std::cout << m_ppOther[i]->GetID() << std::endl;
-		}
-		
+		//std::cout << "put player_other packet recv!" << std::endl;	
 		break;
 	}
 
@@ -347,7 +361,6 @@ void Network::ProcessPacket(char* ptr)
 	{
 		sc_packet_customizing_update* packet = reinterpret_cast<sc_packet_customizing_update*>(ptr);
 		//packet->body;
-
 		if (packet->id == m_pPlayer->GetID())
 		{
 			GameObject::SetParts(0, 0, packet->body);
@@ -362,14 +375,13 @@ void Network::ProcessPacket(char* ptr)
 		{
 			if (m_ppOther[i]->GetID() == packet->id)
 			{
-				GameObject::SetParts(i + 1, 0, packet->body);
-				GameObject::SetParts(i + 1, 1, packet->body_parts);
-				GameObject::SetParts(i + 1, 2, packet->eyes);
-				GameObject::SetParts(i + 1, 3, packet->gloves);
-				GameObject::SetParts(i + 1, 4, packet->mouthandnoses);
-				GameObject::SetParts(i + 1, 5, packet->head);
-
-				break;
+			
+				GameObject::SetParts(i + 1, 0, static_cast<int>(packet->body));
+				GameObject::SetParts(i + 1, 1, static_cast<int>(packet->body_parts));
+				GameObject::SetParts(i + 1, 2, static_cast<int>(packet->eyes));
+				GameObject::SetParts(i + 1, 3, static_cast<int>(packet->gloves));
+				GameObject::SetParts(i + 1, 4, static_cast<int>(packet->mouthandnoses));
+				GameObject::SetParts(i + 1, 5, static_cast<int>(packet->head));
 			}
 		}
 		break;
