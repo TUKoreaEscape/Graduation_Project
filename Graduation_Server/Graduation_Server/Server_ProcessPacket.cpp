@@ -11,6 +11,14 @@ void cGameServer::Process_Create_ID(int c_id, void* buff) // 요청받은 ID생성패킷
 
 	stringID = packet->id;
 	stringPW = packet->pass_word;
+
+	DB_Request request;
+	request.request_id = c_id;
+	request.request_name = stringID;
+	request.type = REQUEST_CREATE_ID;
+
+	m_database->insert_request(request);
+
 	reason = m_database->create_id(stringToWstring(stringID), stringToWstring(stringPW));
 
 	if (reason == 1) // id 생성 성공
@@ -300,6 +308,13 @@ void cGameServer::Process_User_Login(int c_id, void* buff) // 로그인 요청
 
 	stringID = packet->id;
 	stringPW = packet->pass_word;
+	DB_Request request;
+	request.request_id = c_id;
+	request.request_name = stringID;
+	request.type = REQUEST_LOGIN;
+
+	m_database->insert_request(request);
+
 	reason = m_database->check_login(stringToWstring(stringID), stringToWstring(stringPW));
 	if (reason == 1) // reason 0 : id가 존재하지 않음 / reason 1 : 성공 / reason 2 : pw가 틀림
 	{

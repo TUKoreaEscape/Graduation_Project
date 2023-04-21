@@ -227,6 +227,11 @@ void DataBase::show_error()
 	std::cout << "Error!!! \n";
 }
 
+void DataBase::insert_request(DB_Request& request)
+{
+	request_db_queue.emplace(request); // DB 요청을 여기에 추가합니다.
+}
+
 void DataBase::HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE retcode)
 {
 	SQLSMALLINT iRec = 0;

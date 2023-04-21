@@ -4,6 +4,7 @@
 #include <iostream>
 #include "User_Custom.h"
 #include <sqlext.h>
+#include <queue>
 
 constexpr auto NAMELEN = 40;
 
@@ -12,6 +13,14 @@ struct UserData_ID_PW {
 	SQLWCHAR user_pw[NAMELEN];
 	//std::wstring user_id;
 	//std::wstring user_pw;
+};
+
+enum REQUEST_TYPE {REQUEST_LOGIN = 0, REQUEST_CREATE_ID, REQUEST_LOAD_CUSTOMIZING, REQUEST_SAVE_CUSTOMIZING};
+
+struct DB_Request {
+	REQUEST_TYPE	type{};
+	std::string		request_name{};
+	int				request_id;
 };
 
 class DataBase
@@ -30,7 +39,11 @@ public:
 
 	void	show_error();
 
+	void	insert_request(DB_Request& request);
+
 private:
+	std::queue<DB_Request>	request_db_queue;
+
 	SQLHENV henv{};
 	SQLHDBC hdbc{};
 	SQLHSTMT hstmt = 0;
