@@ -1,5 +1,7 @@
+#include "GameServer.h"
 #include "DataBase.h"
 #include <string>
+
 
 DataBase::DataBase()
 {
@@ -230,6 +232,87 @@ void DataBase::show_error()
 void DataBase::insert_request(DB_Request& request)
 {
 	request_db_queue.emplace(request); // DB 요청을 여기에 추가합니다.
+}
+
+void DataBase::DataBaseThread()
+{
+	while (true)
+	{
+		if (!request_db_queue.empty())
+		{
+			DB_Request request = request_db_queue.front();
+			switch (request.type)
+			{
+			case REQUEST_LOGIN:
+			{
+				cGameServer& server = cGameServer::GetInstance();
+				int reason = 0;
+				reason = check_login(request.request_name, request.request_pw);
+
+				if (reason == 1) // reason 0 : id가 존재하지 않음 / reason 1 : 성공 / reason 2 : pw가 틀림
+				{		
+					server.m_clients[request.request_id].set_login_state(Y_LOGIN);
+					server.m_clients[request.request_id].set_state(CLIENT_STATE::ST_LOBBY);
+					server.m_clients[request.request_id].set_name(request.request_char_name);
+					
+					Custom data = Load_Customizing(request.request_name);
+					server.m_clients[request.request_id].m_customizing->Load_Customizing_Data_To_DB(data);
+					server.send_login_ok_packet(request.request_id);
+				}
+				else
+				{
+					if (reason == 0)
+						server.send_login_fail_packet(request.request_id, LOGIN_FAIL_REASON::INVALID_ID);
+					else
+						server.send_login_fail_packet(request.request_id, LOGIN_FAIL_REASON::WRONG_PW);
+				}
+				break;
+			}
+
+			case REQUEST_CREATE_ID:
+			{
+				cGameServer& server = cGameServer::GetInstance();
+				int reason = 0;
+				reason = create_id(request.request_name, request.request_pw);
+
+				if (reason == 1) // id 생성 성공
+				{
+					//m_database->Save_Customizing(stringToWstring(stringID), init_data);
+					server.send_create_id_ok_packet(request.request_id);
+				}
+				else // id 생성 실패
+					server.send_create_id_fail_packet(request.request_id, reason);
+				break;
+			}
+
+			case REQUEST_LOAD_CUSTOMIZING:
+			{
+				cGameServer& server = cGameServer::GetInstance();
+				Custom data = Load_Customizing(request.request_name);
+				server.m_clients[request.request_id].m_customizing->Load_Customizing_Data_To_DB(data);
+				//server.m_clients[request.request_id].m_customizing->Load_Customizing_Data_To_DB(request.request_name);
+				break;
+			}
+
+			case REQUEST_SAVE_CUSTOMIZING:
+			{
+				cGameServer& server = cGameServer::GetInstance();
+				Custom data;
+
+				data.body = server.m_clients[request.request_id].m_customizing->Get_Body_Custom();
+				data.body_parts = server.m_clients[request.request_id].m_customizing->Get_Body_Part_Custom();
+				data.eyes = server.m_clients[request.request_id].m_customizing->Get_Eyes_Custom();
+				data.gloves = server.m_clients[request.request_id].m_customizing->Get_Gloves_Custom();
+				data.head = server.m_clients[request.request_id].m_customizing->Get_Head_Custom();
+				data.mouthandnoses = server.m_clients[request.request_id].m_customizing->Get_Mouthandnoses_Custom();
+				Save_Customizing(request.request_name, data);
+				break;
+			}
+
+			}
+			request_db_queue.pop();
+		}
+	}
 }
 
 void DataBase::HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE retcode)

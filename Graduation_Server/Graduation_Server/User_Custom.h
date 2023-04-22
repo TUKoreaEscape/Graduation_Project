@@ -71,7 +71,7 @@ public:
 	Customizing_Info();
 	~Customizing_Info();
 
-	void Load_Customizing_Data_To_DB(std::wstring id);
+	void Load_Customizing_Data_To_DB(Custom& data);
 	void Save_Customizing_Data_To_DB(std::wstring id);
 
 	void Set_Head_Custom(HEADS head) { m_head = head; }

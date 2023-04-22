@@ -19,7 +19,9 @@ enum REQUEST_TYPE {REQUEST_LOGIN = 0, REQUEST_CREATE_ID, REQUEST_LOAD_CUSTOMIZIN
 
 struct DB_Request {
 	REQUEST_TYPE	type{};
-	std::string		request_name{};
+	std::wstring	request_name{};
+	char			request_char_name[20];
+	std::wstring	request_pw{};
 	int				request_id;
 };
 
@@ -40,6 +42,8 @@ public:
 	void	show_error();
 
 	void	insert_request(DB_Request& request);
+
+	void	DataBaseThread();
 
 private:
 	std::queue<DB_Request>	request_db_queue;

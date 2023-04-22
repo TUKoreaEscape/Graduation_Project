@@ -14,20 +14,20 @@ void cGameServer::Process_Create_ID(int c_id, void* buff) // 요청받은 ID생성패킷
 
 	DB_Request request;
 	request.request_id = c_id;
-	request.request_name = stringID;
+	request.request_name = stringToWstring(stringID);
+	request.request_pw = stringToWstring(stringPW);
 	request.type = REQUEST_CREATE_ID;
 
 	m_database->insert_request(request);
+	//reason = m_database->create_id(stringToWstring(stringID), stringToWstring(stringPW));
 
-	reason = m_database->create_id(stringToWstring(stringID), stringToWstring(stringPW));
-
-	if (reason == 1) // id 생성 성공
-	{
-		//m_database->Save_Customizing(stringToWstring(stringID), init_data);
-		send_create_id_ok_packet(c_id);
-	}
-	else // id 생성 실패
-		send_create_id_fail_packet(c_id, reason);
+	//if (reason == 1) // id 생성 성공
+	//{
+	//	//m_database->Save_Customizing(stringToWstring(stringID), init_data);
+	//	send_create_id_ok_packet(c_id);
+	//}
+	//else // id 생성 실패
+	//	send_create_id_fail_packet(c_id, reason);
 }
 
 void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터 이동을 처리
@@ -309,28 +309,29 @@ void cGameServer::Process_User_Login(int c_id, void* buff) // 로그인 요청
 	stringID = packet->id;
 	stringPW = packet->pass_word;
 	DB_Request request;
+	strcpy_s(request.request_char_name, sizeof(packet->id), packet->id);
 	request.request_id = c_id;
-	request.request_name = stringID;
+	request.request_name = stringToWstring(stringID);
+	request.request_pw = stringToWstring(stringPW);
 	request.type = REQUEST_LOGIN;
 
 	m_database->insert_request(request);
-
-	reason = m_database->check_login(stringToWstring(stringID), stringToWstring(stringPW));
-	if (reason == 1) // reason 0 : id가 존재하지 않음 / reason 1 : 성공 / reason 2 : pw가 틀림
-	{
-		m_clients[c_id].set_name(packet->id);
-		m_clients[c_id].set_login_state(Y_LOGIN);
-		m_clients[c_id].set_state(CLIENT_STATE::ST_LOBBY);
-		m_clients[c_id].m_customizing->Load_Customizing_Data_To_DB(stringToWstring(stringID));
-		send_login_ok_packet(c_id);
-	}
-	else
-	{
-		if (reason == 0)
-			send_login_fail_packet(c_id, LOGIN_FAIL_REASON::INVALID_ID);
-		else
-			send_login_fail_packet(c_id, LOGIN_FAIL_REASON::WRONG_PW);
-	}
+	//reason = m_database->check_login(stringToWstring(stringID), stringToWstring(stringPW));
+	//if (reason == 1) // reason 0 : id가 존재하지 않음 / reason 1 : 성공 / reason 2 : pw가 틀림
+	//{
+	//	m_clients[c_id].set_name(packet->id);
+	//	m_clients[c_id].set_login_state(Y_LOGIN);
+	//	m_clients[c_id].set_state(CLIENT_STATE::ST_LOBBY);
+	//	m_clients[c_id].m_customizing->Load_Customizing_Data_To_DB(stringToWstring(stringID));
+	//	send_login_ok_packet(c_id);
+	//}
+	//else
+	//{
+	//	if (reason == 0)
+	//		send_login_fail_packet(c_id, LOGIN_FAIL_REASON::INVALID_ID);
+	//	else
+	//		send_login_fail_packet(c_id, LOGIN_FAIL_REASON::WRONG_PW);
+	//}
 }
 
 void cGameServer::Process_Voice_Data(int user_id)

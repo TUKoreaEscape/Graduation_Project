@@ -64,7 +64,6 @@ void CLIENT::set_name(char* name)
 	string stringID = m_name;
 	wstring convertID = stringToWstring(stringID);
 	m_customizing = new Customizing_Info;
-	m_customizing->Load_Customizing_Data_To_DB(convertID);
 }
 
 void CLIENT::set_state(CLIENT_STATE::STATE state)

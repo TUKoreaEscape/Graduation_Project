@@ -2,25 +2,22 @@
 #include "DataBase.h"
 Customizing_Info::Customizing_Info()
 {
-	m_database = new DataBase;
+	//m_database = new DataBase;
 }
 
 Customizing_Info::~Customizing_Info()
 {
-	delete m_database;
+	//delete m_database;
 }
 
-void Customizing_Info::Load_Customizing_Data_To_DB(std::wstring id)
+void Customizing_Info::Load_Customizing_Data_To_DB(Custom& data)
 {
-	// 이쪽에서 db함수 로드
-	Custom load_custom = m_database->Load_Customizing(id);
-
-	m_body = load_custom.body;
-	m_body_parts = load_custom.body_parts;
-	m_eyes = load_custom.eyes;
-	m_gloves = load_custom.gloves;
-	m_head = load_custom.head;
-	m_mouthandnoses = load_custom.mouthandnoses;
+	m_body = data.body;
+	m_body_parts = data.body_parts;
+	m_eyes = data.eyes;
+	m_gloves = data.gloves;
+	m_head = data.head;
+	m_mouthandnoses = data.mouthandnoses;
 }
 
 void Customizing_Info::Save_Customizing_Data_To_DB(std::wstring id)

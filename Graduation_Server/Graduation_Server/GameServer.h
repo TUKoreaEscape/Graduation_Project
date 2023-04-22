@@ -84,8 +84,9 @@ public:
 	CollisionInfo GetCollisionInfo(const BoundingOrientedBox& moved, const BoundingOrientedBox& other);
 
 	wstring stringToWstring(const std::string& t_str);
-protected:
+
 	std::array<CLIENT, MAX_USER>	m_clients;
+protected:
 	std::queue<CLIENT>				request_querry;
 	DataBase* m_database = nullptr;
 
