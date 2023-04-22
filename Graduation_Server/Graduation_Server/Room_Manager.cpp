@@ -21,35 +21,6 @@ void RoomManager::init() // 서버 시작 전 초기화해주는 함수입니다.
 
 void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. (파일입출력 부분)
 {
-	ifstream in("");
-	if (!in)
-	{
-		std::cout << "object file read fail!" << std::endl;
-	}
-	else
-	{
-		int type;
-		XMFLOAT3 center;
-		XMFLOAT3 extents;
-		XMFLOAT4 orientation;
-
-		while (in)
-		{
-			in >> type >> center.x >> center.y >> center.z >> extents.x >> extents.y >> extents.z >> orientation.x >> orientation.y >> orientation.z >> orientation.w;
-			m_game_object.emplace_back(static_cast<Object_Type>(type), center, extents, orientation);
-		}
-		std::cout << "Game Object load success!!!" << std::endl;
-
-		for (auto& p : m_game_object)
-		{
-			for (auto& _room : a_in_game_room) {
-				_room.add_game_object(p.Get_Object_Type(), p.Get_center(), p.Get_extents(), p.Get_orientation());
-			}
-		}
-		cout << "All room object init!!!" << endl;
-	}
-
-
 	// 여긴 맵에 존재하는 벽, 고정된 오브젝트의 충돌 정보를 서버에 로드하는 공간입니다.
 	FILE* pFile = nullptr;
 	fopen_s(&pFile, "walls/FixedObjectsBounding.bin", "rb");
@@ -85,7 +56,7 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 
 		}
 	}
-
+	cout << "All Objects File Load Success!" << endl;
 	// 여긴 맵에 존재하는 고정된 오브젝트를 서버에 로드하는 공간입니다.
 
 

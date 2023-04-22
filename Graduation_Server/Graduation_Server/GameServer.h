@@ -86,9 +86,9 @@ public:
 	wstring stringToWstring(const std::string& t_str);
 
 	std::array<CLIENT, MAX_USER>	m_clients;
+	DataBase						*m_database = nullptr;
 protected:
 	std::queue<CLIENT>				request_querry;
-	DataBase* m_database = nullptr;
 
 private:
 	std::vector<std::thread>		m_worker_threads;

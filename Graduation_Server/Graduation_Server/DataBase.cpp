@@ -254,10 +254,12 @@ void DataBase::DataBaseThread()
 					server.m_clients[request.request_id].set_login_state(Y_LOGIN);
 					server.m_clients[request.request_id].set_state(CLIENT_STATE::ST_LOBBY);
 					server.m_clients[request.request_id].set_name(request.request_char_name);
-					
-					Custom data = Load_Customizing(request.request_name);
-					server.m_clients[request.request_id].m_customizing->Load_Customizing_Data_To_DB(data);
 					server.send_login_ok_packet(request.request_id);
+
+
+					DB_Request req = request;
+					req.type = REQUEST_LOAD_CUSTOMIZING;
+					request_db_queue.emplace(req);
 				}
 				else
 				{
@@ -277,8 +279,17 @@ void DataBase::DataBaseThread()
 
 				if (reason == 1) // id 생성 성공
 				{
+					Custom init_data;
+					init_data.body = MAINBODY01;
+					init_data.body_parts = BODYPART01;
+					init_data.eyes = EYE01;
+					init_data.gloves = GLOVE01;
+					init_data.head = HEAD01;
+					init_data.mouthandnoses = MOUTH01;
+
 					//m_database->Save_Customizing(stringToWstring(stringID), init_data);
 					server.send_create_id_ok_packet(request.request_id);
+					Save_Customizing(request.request_name, init_data);
 				}
 				else // id 생성 실패
 					server.send_create_id_fail_packet(request.request_id, reason);
@@ -291,21 +302,22 @@ void DataBase::DataBaseThread()
 				Custom data = Load_Customizing(request.request_name);
 				server.m_clients[request.request_id].m_customizing->Load_Customizing_Data_To_DB(data);
 				//server.m_clients[request.request_id].m_customizing->Load_Customizing_Data_To_DB(request.request_name);
+				cout << "커스터마이징 정보 로드 완료" << endl;
 				break;
 			}
 
 			case REQUEST_SAVE_CUSTOMIZING:
 			{
-				cGameServer& server = cGameServer::GetInstance();
 				Custom data;
 
-				data.body = server.m_clients[request.request_id].m_customizing->Get_Body_Custom();
-				data.body_parts = server.m_clients[request.request_id].m_customizing->Get_Body_Part_Custom();
-				data.eyes = server.m_clients[request.request_id].m_customizing->Get_Eyes_Custom();
-				data.gloves = server.m_clients[request.request_id].m_customizing->Get_Gloves_Custom();
-				data.head = server.m_clients[request.request_id].m_customizing->Get_Head_Custom();
-				data.mouthandnoses = server.m_clients[request.request_id].m_customizing->Get_Mouthandnoses_Custom();
+				data.body = request.request_custom_data.body;
+				data.body_parts = request.request_custom_data.body_parts;
+				data.eyes = request.request_custom_data.eyes;
+				data.gloves = request.request_custom_data.gloves;
+				data.head = request.request_custom_data.head;
+				data.mouthandnoses = request.request_custom_data.mouthandnoses;
 				Save_Customizing(request.request_name, data);
+				cout << "커스터마이징 정보 저장 완료" << endl;
 				break;
 			}
 

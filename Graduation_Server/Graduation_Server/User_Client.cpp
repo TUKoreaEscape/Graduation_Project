@@ -1,3 +1,4 @@
+#include "GameServer.h"
 #include "User_Client.h"
 
 void CLIENT::set_prev_size(int _size)
@@ -52,7 +53,26 @@ void CLIENT::set_id(int id)
 		// set_id가 -1이 들어온경우는 접속을 종료했을 경우임!
 		string stringID = m_name;
 		wstring convertID = stringToWstring(stringID);
-		m_customizing->Save_Customizing_Data_To_DB(convertID);
+		
+		cGameServer& server = cGameServer::GetInstance();
+
+		Custom custom_data;
+		custom_data.body = m_customizing->Get_Body_Custom();
+		custom_data.body_parts = m_customizing->Get_Body_Part_Custom();
+		custom_data.eyes = m_customizing->Get_Eyes_Custom();
+		custom_data.gloves = m_customizing->Get_Gloves_Custom();
+		custom_data.head = m_customizing->Get_Head_Custom();
+		custom_data.mouthandnoses = m_customizing->Get_Mouthandnoses_Custom();
+
+		string tmp_id = m_name;
+		DB_Request request;
+		request.type = REQUEST_SAVE_CUSTOMIZING;
+		strcpy_s(request.request_char_name, sizeof(m_name), m_name);
+		request.request_custom_data = custom_data;
+		request.request_id = m_id;
+		request.request_custom_data;
+		request.request_name = stringToWstring(tmp_id);
+		server.m_database->insert_request(request);
 		delete m_customizing;
 	}
 	m_id = id;

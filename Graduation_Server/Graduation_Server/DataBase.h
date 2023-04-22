@@ -23,6 +23,8 @@ struct DB_Request {
 	char			request_char_name[20];
 	std::wstring	request_pw{};
 	int				request_id;
+
+	Custom			request_custom_data;
 };
 
 class DataBase
