@@ -294,6 +294,23 @@ void cGameServer::Disconnect(const unsigned int _user_id) // ≈¨∂Û¿Ãæ∆Æ ø¨∞·¿ª «
 	char client_name[20];
 	cl.get_client_name(*client_name, sizeof(client_name));
 	cl_name = client_name;
+
+	wstring convertID = stringToWstring(cl_name);
+	Custom custom_data;
+	custom_data.body = cl.m_customizing->Get_Body_Custom();
+	custom_data.body_parts = cl.m_customizing->Get_Body_Part_Custom();
+	custom_data.eyes = cl.m_customizing->Get_Eyes_Custom();
+	custom_data.gloves = cl.m_customizing->Get_Gloves_Custom();
+	custom_data.head = cl.m_customizing->Get_Head_Custom();
+	custom_data.mouthandnoses = cl.m_customizing->Get_Mouthandnoses_Custom();
+
+	DB_Request request;
+	request.type = REQUEST_SAVE_CUSTOMIZING;
+	request.request_custom_data = custom_data;
+	request.request_id = _user_id;
+	request.request_custom_data;
+	request.request_name = convertID;
+	m_database->insert_request(request);
 	//cl.m_customizing->Save_Customizing_Data_To_DB(stringToWstring(cl_name));
 	// ø©±‚º≠ √ ±‚»≠
 	if (cl.get_join_room_number() != -1) {

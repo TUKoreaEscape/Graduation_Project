@@ -18,6 +18,14 @@ void Customizing_Info::Load_Customizing_Data_To_DB(Custom& data)
 	m_gloves = data.gloves;
 	m_head = data.head;
 	m_mouthandnoses = data.mouthandnoses;
+
+	std::cout << "m_body : " << m_body << std::endl;
+	std::cout << "m_body_parts : " << m_body_parts << std::endl;
+	std::cout << "m_eyes : " << m_eyes << std::endl;
+	std::cout << "m_gloves : " << m_gloves << std::endl;
+	std::cout << "m_head : " << m_head << std::endl;
+	std::cout << "m_mouthandnoses : " << m_mouthandnoses << std::endl;
+	std::cout << "커스터마이징 정보 로드 완료" << std::endl;
 }
 
 void Customizing_Info::Save_Customizing_Data_To_DB(std::wstring id)
