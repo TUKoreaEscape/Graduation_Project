@@ -300,13 +300,23 @@ void Framework::UpdateObjects()
 		network.pos_lock.lock();
 		Input::GetInstance()->m_pPlayer->SetPosition(network.m_pPlayer_Pos);
 		network.pos_lock.unlock();
+
+		for (int i = 0; i < 5; ++i)
+		{
+			if (network.m_ppOther[i]->GetID() != -1)
+			{
+				network.Other_Player_Pos[i].pos_lock.lock();
+				network.m_ppOther[i]->SetPosition(network.Other_Player_Pos[i].Other_Pos);
+				network.Other_Player_Pos[i].pos_lock.unlock();
+			}
+		}
 	}
 	scene->update(fTimeElapsed, m_pd3dDevice, m_pd3dCommandList);
 }
 
 void Framework::FrameAdvance()
 {
-	time.Tick(0.0);
+	time.Tick(60.0);
 	input->Update(m_hWnd);
 	
 	UpdateObjects();
