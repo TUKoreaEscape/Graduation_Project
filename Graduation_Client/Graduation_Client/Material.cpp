@@ -54,7 +54,7 @@ Shader* Material::m_pPlayerShader = nullptr;
 
 void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
-	m_pStandardShader = new StandardShader();
+	m_pStandardShader = new DeferredObjectsShader();
 	m_pStandardShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	m_pStandardShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
