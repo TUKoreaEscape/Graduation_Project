@@ -179,6 +179,20 @@ void cGameServer::send_put_player_data(const unsigned int recv_id)
 
 	m_clients[recv_id].set_user_position(XMFLOAT3(0, 0, 0)); // 이건 임시사용입니다.
 	m_clients[recv_id].do_send(sizeof(packet), &packet);
+
+	sc_packet_customizing_update customizing_packet;
+	customizing_packet.id = recv_id;
+	customizing_packet.size = sizeof(customizing_packet);
+	customizing_packet.type = SC_PACKET::SC_PACKET_CUSTOMIZING;
+
+	customizing_packet.body = static_cast<int>(m_clients[recv_id].m_customizing->Get_Body_Custom());
+	customizing_packet.body_parts = static_cast<int>(m_clients[recv_id].m_customizing->Get_Body_Part_Custom());
+	customizing_packet.eyes = static_cast<int>(m_clients[recv_id].m_customizing->Get_Eyes_Custom());
+	customizing_packet.gloves = static_cast<int>(m_clients[recv_id].m_customizing->Get_Gloves_Custom());
+	customizing_packet.head = static_cast<int>(m_clients[recv_id].m_customizing->Get_Head_Custom());
+	customizing_packet.mouthandnoses = static_cast<int>(m_clients[recv_id].m_customizing->Get_Mouthandnoses_Custom());
+
+	m_clients[recv_id].do_send(sizeof(customizing_packet), &customizing_packet);
 }
 
 void cGameServer::send_put_other_player(const unsigned int put_id, const unsigned int recv_id)
@@ -193,6 +207,20 @@ void cGameServer::send_put_other_player(const unsigned int put_id, const unsigne
 	cout << "유저 정보를 보넀습니다 : " << put_id << "->" << recv_id << endl;
 #endif
 	m_clients[recv_id].do_send(sizeof(packet), &packet);
+
+	sc_packet_customizing_update customizing_packet;
+	customizing_packet.id = put_id;
+	customizing_packet.size = sizeof(customizing_packet);
+	customizing_packet.type = SC_PACKET::SC_PACKET_CUSTOMIZING;
+
+	customizing_packet.body = static_cast<int>(m_clients[put_id].m_customizing->Get_Body_Custom());
+	customizing_packet.body_parts = static_cast<int>(m_clients[put_id].m_customizing->Get_Body_Part_Custom());
+	customizing_packet.eyes = static_cast<int>(m_clients[put_id].m_customizing->Get_Eyes_Custom());
+	customizing_packet.gloves = static_cast<int>(m_clients[put_id].m_customizing->Get_Gloves_Custom());
+	customizing_packet.head = static_cast<int>(m_clients[put_id].m_customizing->Get_Head_Custom());
+	customizing_packet.mouthandnoses = static_cast<int>(m_clients[put_id].m_customizing->Get_Mouthandnoses_Custom());
+
+	m_clients[recv_id].do_send(sizeof(customizing_packet), &customizing_packet);
 }
 
 void cGameServer::send_customizing_data(const unsigned int id)
@@ -201,12 +229,12 @@ void cGameServer::send_customizing_data(const unsigned int id)
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_CUSTOMIZING;
 	packet.id = id;
-	packet.body = m_clients[id].m_customizing->Get_Body_Custom();
-	packet.body_parts = m_clients[id].m_customizing->Get_Body_Part_Custom();
-	packet.eyes = m_clients[id].m_customizing->Get_Eyes_Custom();
-	packet.gloves = m_clients[id].m_customizing->Get_Gloves_Custom();
-	packet.head = m_clients[id].m_customizing->Get_Head_Custom();
-	packet.mouthandnoses = m_clients[id].m_customizing->Get_Mouthandnoses_Custom();
+	packet.body = static_cast<int>(m_clients[id].m_customizing->Get_Body_Custom());
+	packet.body_parts = static_cast<int>(m_clients[id].m_customizing->Get_Body_Part_Custom());
+	packet.eyes = static_cast<int>(m_clients[id].m_customizing->Get_Eyes_Custom());
+	packet.gloves = static_cast<int>(m_clients[id].m_customizing->Get_Gloves_Custom());
+	packet.head = static_cast<int>(m_clients[id].m_customizing->Get_Head_Custom());
+	packet.mouthandnoses = static_cast<int>(m_clients[id].m_customizing->Get_Mouthandnoses_Custom());
 
 	m_clients[id]._room_list_lock.lock();
 	for (auto p : m_clients[id].room_list)

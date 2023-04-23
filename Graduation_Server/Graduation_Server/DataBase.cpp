@@ -183,7 +183,7 @@ Custom DataBase::Load_Customizing(std::wstring user_id)
 		{
 			custom_data.head = static_cast<HEADS>(custom_head);
 			custom_data.body = static_cast<BODIES>(custom_body);
-			custom_data.body_parts = static_cast<BODYPARTS>(custom_head_parts);
+			custom_data.body_parts = static_cast<BODYPARTS>(custom_body_parts);
 			custom_data.eyes = static_cast<EYES>(custom_eyes);
 			custom_data.gloves = static_cast<GLOVES>(custom_gloves);
 			custom_data.mouthandnoses = static_cast<MOUTHANDNOSES>(custom_mouthandnose);
@@ -200,19 +200,19 @@ int DataBase::Save_Customizing(std::wstring user_id, Custom& save_data)
 	wp += L"EXEC Save_Custom ";
 	wp += user_id;
 	wp += L", ";
-	wp += std::to_wstring(save_data.head);
+	wp += std::to_wstring(static_cast<int>(save_data.head));
 	wp += L", ";
 	wp += std::to_wstring(0);
 	wp += L", ";
-	wp += std::to_wstring(save_data.body);
+	wp += std::to_wstring(static_cast<int>(save_data.body));
 	wp += L", ";
-	wp += std::to_wstring(save_data.body_parts);
+	wp += std::to_wstring(static_cast<int>(save_data.body_parts));
 	wp += L", ";
-	wp += std::to_wstring(save_data.eyes);
+	wp += std::to_wstring(static_cast<int>(save_data.eyes));
 	wp += L", ";
-	wp += std::to_wstring(save_data.gloves);
+	wp += std::to_wstring(static_cast<int>(save_data.gloves));
 	wp += L", ";
-	wp += std::to_wstring(save_data.mouthandnoses);
+	wp += std::to_wstring(static_cast<int>(save_data.mouthandnoses));
 	wp += L", ";
 	wp += std::to_wstring(0);
 
@@ -301,22 +301,24 @@ void DataBase::DataBaseThread()
 				cGameServer& server = cGameServer::GetInstance();
 				Custom data = Load_Customizing(request.request_name);
 				server.m_clients[request.request_id].m_customizing->Load_Customizing_Data_To_DB(data);
-				//server.m_clients[request.request_id].m_customizing->Load_Customizing_Data_To_DB(request.request_name);
-				cout << "커스터마이징 정보 로드 완료" << endl;
+				
+				//sc_packet_customizing_update packet;
+				//packet.size = sizeof(packet);
+				//packet.type = SC_PACKET::SC_PACKET_CUSTOMIZING;
+				//packet.id = request.request_id;
+				//packet.body = data.body;
+				//packet.body_parts = data.body_parts;
+				//packet.eyes = data.eyes;
+				//packet.gloves = data.gloves;
+				//packet.head = data.head;
+				//packet.mouthandnoses = data.mouthandnoses;
+				//server.m_clients[request.request_id].do_send(sizeof(packet), &packet);
 				break;
 			}
 
 			case REQUEST_SAVE_CUSTOMIZING:
 			{
-				Custom data;
-
-				data.body = request.request_custom_data.body;
-				data.body_parts = request.request_custom_data.body_parts;
-				data.eyes = request.request_custom_data.eyes;
-				data.gloves = request.request_custom_data.gloves;
-				data.head = request.request_custom_data.head;
-				data.mouthandnoses = request.request_custom_data.mouthandnoses;
-				Save_Customizing(request.request_name, data);
+				Save_Customizing(request.request_name, request.request_custom_data);
 				cout << "커스터마이징 정보 저장 완료" << endl;
 				break;
 			}
