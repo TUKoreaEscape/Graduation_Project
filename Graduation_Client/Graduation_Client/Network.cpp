@@ -371,13 +371,19 @@ void Network::ProcessPacket(char* ptr)
 			GameObject::SetParts(0, 3, packet->gloves);
 			GameObject::SetParts(0, 4, packet->mouthandnoses);
 			GameObject::SetParts(0, 5, packet->head);
+
+			data.body = static_cast<BODIES>(packet->body);
+			data.body_parts = static_cast<BODYPARTS>(packet->body_parts);
+			data.eyes = static_cast<EYES>(packet->eyes);
+			data.gloves = static_cast<GLOVES>(packet->gloves);
+			data.head = static_cast<HEADS>(packet->head);
+			data.mouthandnoses = static_cast<MOUTHANDNOSES>(packet->mouthandnoses);
 		}
 
 		for (int i = 0; i < 5; ++i)
 		{
 			if (m_ppOther[i]->GetID() == packet->id)
 			{
-			
 				GameObject::SetParts(i + 1, 0, static_cast<int>(packet->body));
 				GameObject::SetParts(i + 1, 1, static_cast<int>(packet->body_parts));
 				GameObject::SetParts(i + 1, 2, static_cast<int>(packet->eyes));
