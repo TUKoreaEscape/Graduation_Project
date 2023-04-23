@@ -20,6 +20,7 @@ struct Custom {
 struct OtherPlayerPos {
 	short	id;
 	XMFLOAT3 Other_Pos;
+	std::mutex pos_lock;
 };
 
 class Network {
@@ -35,7 +36,7 @@ public:
 	int		m_my_id = -1;
 
 	XMFLOAT3 m_pPlayer_Pos{ 0,0,0 };
-	OtherPlayerPos Other[5]{};
+	OtherPlayerPos Other_Player_Pos[5]{};
 	Player* m_pPlayer = nullptr;;
 	Player** m_ppOther = nullptr;
 
