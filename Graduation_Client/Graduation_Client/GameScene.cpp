@@ -152,6 +152,14 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	
 
 #if USE_NETWORK
+	char id[20]{};
+	char pw[20]{};
+
+	std::cout << "ID 입력: ";
+	std::cin >> id;
+	std::cout << "PW 입력: ";
+	std::cin >> pw;
+	system("cls");
 	m_network = Network::GetInstance();
 	m_network->init_network();
 	m_network->m_pPlayer = m_pPlayer;
@@ -161,8 +169,8 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	cs_packet_login l_packet;
 	l_packet.size = sizeof(l_packet);
 	l_packet.type = CS_PACKET::CS_PACKET_LOGIN;
-	strcpy_s(l_packet.id, sizeof("test2"), "test2");
-	strcpy_s(l_packet.pass_word, sizeof("test2"), "test2");
+	strcpy_s(l_packet.id, sizeof(id), id);
+	strcpy_s(l_packet.pass_word, sizeof(pw), pw);
 	m_network->send_packet(&l_packet);
 #endif
 }
