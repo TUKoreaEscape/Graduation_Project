@@ -76,7 +76,7 @@ public:
 	void SetID(const int id) { m_id = id; }
 	int GetID() const { return m_id; }
 
-	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipeline = 0);
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
 
 protected:
 	int							m_id = -1;

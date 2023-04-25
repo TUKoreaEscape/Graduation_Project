@@ -50,6 +50,8 @@ Texture2D gtxtDetailNormalTexture : register(t12);
 
 SamplerState gssWrap : register(s0);
 
+//SamplerState gssDefaultSamplerState : register(s0);//추가된 애
+
 struct VS_STANDARD_INPUT
 {
 	float3 position : POSITION;
@@ -344,4 +346,77 @@ float4 PSWall(VS_WALL_OUTPUT input) : SV_TARGET
 	//return cIllumination;
 	//returerp(cColor, cIllumination, 0.5f));
 	return cColor;
+}
+
+struct VS_TEXTURED_LIGHTING_INPUT
+{
+	float3 position : POSITION;
+	float3 normal : NORMAL;
+	float2 uv : TEXCOORD;
+};
+
+struct VS_TEXTURED_LIGHTING_OUTPUT
+{
+	float4 position : SV_POSITION;
+	float3 positionW : POSITION;
+	float3 normalW : NORMAL0;
+	float3 normalV : NORMAL1;
+	float2 uv : TEXCOORD;
+};
+
+VS_TEXTURED_LIGHTING_OUTPUT VSTexturedLighting(VS_TEXTURED_LIGHTING_INPUT input)
+{
+	VS_TEXTURED_LIGHTING_OUTPUT output;
+
+	output.normalW = mul(input.normal, (float3x3)gmtxGameObject);
+	output.normalV = mul(float4(output.normalW, 1.0f), gmtxView).xyz;
+	output.positionW = (float3)mul(float4(input.position, 1.0f), gmtxGameObject);
+	output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+	output.uv = input.uv;
+
+	return(output);
+}
+
+float4 PSTexturedLighting(VS_TEXTURED_LIGHTING_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID) : SV_TARGET0
+{
+	float3 uvw = float3(input.uv, nPrimitiveID / 2);
+	float4 cColor = gtxtAlbedoTexture.Sample(gssWrap, uvw);
+	input.normalW = normalize(input.normalW);
+	float4 cIllumination = Lighting(input.positionW, input.normalW);
+
+	return(cColor * cIllumination);
+}
+
+
+struct PS_MULTIPLE_RENDER_TARGETS_OUTPUT
+{
+	float4 f4Scene : SV_TARGET0; //Swap Chain Back Buffer
+
+	float4 f4Color : SV_TARGET1;
+	float4 f4Normal : SV_TARGET2;
+	float4 f4Texture : SV_TARGET3;
+	float4 f4Illumination : SV_TARGET4;
+	float2 f2ObjectIDzDepth : SV_TARGET5;
+	float4 f4CameraNormal : SV_TARGET6;
+};
+
+PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LIGHTING_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)
+{
+	PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
+
+	float3 uvw = float3(input.uv, nPrimitiveID / 2);
+	output.f4Texture = gtxtAlbedoTexture.Sample(gssWrap, uvw);// Texture2DArray gtxtTextureArray : register(t0); 정의해야함   또 원래는 gtxtTextureArray를 사용하고있었는데 임시로 알베도로 바꿔놓음
+
+	input.normalW = normalize(input.normalW);
+	output.f4Illumination = Lighting(input.positionW, input.normalW);
+
+	output.f4Scene = output.f4Color = output.f4Illumination * output.f4Texture;
+
+	output.f4Normal = float4(input.normalW.xyz * 0.5f + 0.5f, input.position.z);
+	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
+
+	output.f2ObjectIDzDepth.x = (float)1.0f;
+	output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
+
+	return(output);
 }

@@ -14,7 +14,7 @@ public:
 	void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void update(float elapsedTime) {}
 
-	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipeline = 0);
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, GameObject* pParent, FILE* pInFile, Shader* pShader);
 	Texture* FindReplicatedTexture(_TCHAR* pstrTextureName);
@@ -22,8 +22,7 @@ public:
 	void SetMaterial(int nMaterial, Material* pMaterial);
 	void SetMaterial(Material* pMaterial);
 
-	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
-		* pd3dCommandList) {}
+	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) {}
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList) {}
 	virtual void ReleaseShaderVariables() {}
 
@@ -42,5 +41,13 @@ class SkyboxRenderer : public StandardRenderer
 public:
 	void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void update(float elapsedTime) {}
-	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipeline = 0);
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
+};
+
+class DeferredRenderer : public StandardRenderer
+{
+public:
+	void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void update(float elapsedTime) {}
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
 };

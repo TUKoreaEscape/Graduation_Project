@@ -9,7 +9,7 @@ void StandardRenderer::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 }
 
-void StandardRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipeline)
+void StandardRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (gameObject->m_pMesh)
 	{
@@ -21,7 +21,7 @@ void StandardRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList, int nP
 			{
 				if (m_ppMaterials[i])
 				{
-					if (m_ppMaterials[i]->m_pShader) m_ppMaterials[i]->m_pShader->Render(pd3dCommandList, nPipeline);
+					if (m_ppMaterials[i]->m_pShader) m_ppMaterials[i]->m_pShader->Render(pd3dCommandList);
 					m_ppMaterials[i]->UpdateShaderVariables(pd3dCommandList);
 				}
 
@@ -204,10 +204,19 @@ void SkyboxRenderer::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	m_ppMaterials[0] = new Material(0);
 }
 
-void SkyboxRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipeline)
+void SkyboxRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	gameObject->SetPosition(Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition());
 	//std::cout << Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition().x << Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition().y
 	//	<< Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition().z << std::endl;
-	StandardRenderer::render(pd3dCommandList, nPipeline);
+	StandardRenderer::render(pd3dCommandList);
+}
+
+void DeferredRenderer::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void DeferredRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	StandardRenderer::render(pd3dCommandList);
 }

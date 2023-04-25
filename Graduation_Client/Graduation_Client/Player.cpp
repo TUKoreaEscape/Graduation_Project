@@ -279,13 +279,13 @@ void Player::OnPrepareRender()
 	}
 }
 
-void Player::render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipeline)
+void Player::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->UpdateShaderVariables(pd3dCommandList, PlayerNum);
 
-	renderer->render(pd3dCommandList, nPipeline);
-	if (m_pSibling) m_pSibling->render(pd3dCommandList, nPipeline);
-	if (m_pChild) m_pChild->render(pd3dCommandList, nPipeline);
+	renderer->render(pd3dCommandList);
+	if (m_pSibling) m_pSibling->render(pd3dCommandList);
+	if (m_pChild) m_pChild->render(pd3dCommandList);
 }
 
 void Player::ReleaseShaderVariables()

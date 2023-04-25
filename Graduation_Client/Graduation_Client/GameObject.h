@@ -33,7 +33,7 @@ public:
 			component->update(elapsedTime);
 	}
 
-	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipeline = 0);
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void OnPrepareRender() {}
 
 	template<typename T>
