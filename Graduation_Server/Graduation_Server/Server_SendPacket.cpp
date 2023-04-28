@@ -179,20 +179,6 @@ void cGameServer::send_put_player_data(const unsigned int recv_id)
 
 	m_clients[recv_id].set_user_position(XMFLOAT3(0, 0, 0)); // 이건 임시사용입니다.
 	m_clients[recv_id].do_send(sizeof(packet), &packet);
-
-	sc_packet_customizing_update customizing_packet;
-	customizing_packet.id = recv_id;
-	customizing_packet.size = sizeof(customizing_packet);
-	customizing_packet.type = SC_PACKET::SC_PACKET_CUSTOMIZING;
-
-	customizing_packet.body = static_cast<int>(m_clients[recv_id].m_customizing->Get_Body_Custom());
-	customizing_packet.body_parts = static_cast<int>(m_clients[recv_id].m_customizing->Get_Body_Part_Custom());
-	customizing_packet.eyes = static_cast<int>(m_clients[recv_id].m_customizing->Get_Eyes_Custom());
-	customizing_packet.gloves = static_cast<int>(m_clients[recv_id].m_customizing->Get_Gloves_Custom());
-	customizing_packet.head = static_cast<int>(m_clients[recv_id].m_customizing->Get_Head_Custom());
-	customizing_packet.mouthandnoses = static_cast<int>(m_clients[recv_id].m_customizing->Get_Mouthandnoses_Custom());
-
-	m_clients[recv_id].do_send(sizeof(customizing_packet), &customizing_packet);
 }
 
 void cGameServer::send_put_other_player(const unsigned int put_id, const unsigned int recv_id)

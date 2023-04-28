@@ -295,23 +295,24 @@ void cGameServer::Disconnect(const unsigned int _user_id) // ≈¨∂Û¿Ãæ∆Æ ø¨∞·¿ª «
 	cl.get_client_name(*client_name, sizeof(client_name));
 	cl_name = client_name;
 
-	wstring convertID = stringToWstring(cl_name);
-	Custom custom_data;
-	custom_data.body = cl.m_customizing->Get_Body_Custom();
-	custom_data.body_parts = cl.m_customizing->Get_Body_Part_Custom();
-	custom_data.eyes = cl.m_customizing->Get_Eyes_Custom();
-	custom_data.gloves = cl.m_customizing->Get_Gloves_Custom();
-	custom_data.head = cl.m_customizing->Get_Head_Custom();
-	custom_data.mouthandnoses = cl.m_customizing->Get_Mouthandnoses_Custom();
+	if (!cl_name.empty()) {
+		wstring convertID = stringToWstring(cl_name);
+		Custom custom_data;
+		custom_data.body = cl.m_customizing->Get_Body_Custom();
+		custom_data.body_parts = cl.m_customizing->Get_Body_Part_Custom();
+		custom_data.eyes = cl.m_customizing->Get_Eyes_Custom();
+		custom_data.gloves = cl.m_customizing->Get_Gloves_Custom();
+		custom_data.head = cl.m_customizing->Get_Head_Custom();
+		custom_data.mouthandnoses = cl.m_customizing->Get_Mouthandnoses_Custom();
 
-	DB_Request request;
-	request.type = REQUEST_SAVE_CUSTOMIZING;
-	request.request_custom_data = custom_data;
-	request.request_id = _user_id;
-	request.request_custom_data;
-	request.request_name = convertID;
-	m_database->insert_request(request);
-	//cl.m_customizing->Save_Customizing_Data_To_DB(stringToWstring(cl_name));
+		DB_Request request;
+		request.type = REQUEST_SAVE_CUSTOMIZING;
+		request.request_custom_data = custom_data;
+		request.request_id = _user_id;
+		request.request_custom_data;
+		request.request_name = convertID;
+		m_database->insert_request(request);
+	}
 	// ø©±‚º≠ √ ±‚»≠
 	if (cl.get_join_room_number() != -1) {
 		Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
@@ -345,6 +346,8 @@ void cGameServer::Disconnect(const unsigned int _user_id) // ≈¨∂Û¿Ãæ∆Æ ø¨∞·¿ª «
 	cl._state_lock.lock();
 	cl.set_state(CLIENT_STATE::ST_FREE);
 	cl.set_login_state(N_LOGIN);
+	char reset_name[20] = {};
+	cl.set_name(reset_name);
 	cl.set_id(-1);
 	cl._state_lock.unlock();
 	cl.set_user_position({ 0,0,0 });

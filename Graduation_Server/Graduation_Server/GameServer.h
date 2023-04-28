@@ -81,7 +81,7 @@ public:
 
 	int		get_new_id();
 	CLIENT*	get_client_info(const int player_id);
-	CollisionInfo GetCollisionInfo(const BoundingOrientedBox& moved, const BoundingOrientedBox& other);
+	CollisionInfo GetCollisionInfo(const BoundingOrientedBox& other, const BoundingOrientedBox& moved);
 
 	wstring stringToWstring(const std::string& t_str);
 

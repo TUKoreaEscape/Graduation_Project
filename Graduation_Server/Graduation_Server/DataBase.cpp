@@ -302,17 +302,17 @@ void DataBase::DataBaseThread()
 				Custom data = Load_Customizing(request.request_name);
 				server.m_clients[request.request_id].m_customizing->Load_Customizing_Data_To_DB(data);
 				
-				//sc_packet_customizing_update packet;
-				//packet.size = sizeof(packet);
-				//packet.type = SC_PACKET::SC_PACKET_CUSTOMIZING;
-				//packet.id = request.request_id;
-				//packet.body = data.body;
-				//packet.body_parts = data.body_parts;
-				//packet.eyes = data.eyes;
-				//packet.gloves = data.gloves;
-				//packet.head = data.head;
-				//packet.mouthandnoses = data.mouthandnoses;
-				//server.m_clients[request.request_id].do_send(sizeof(packet), &packet);
+				sc_packet_customizing_update packet;
+				packet.size = sizeof(packet);
+				packet.type = SC_PACKET::SC_PACKET_CUSTOMIZING;
+				packet.id = request.request_id;
+				packet.body = data.body;
+				packet.body_parts = data.body_parts;
+				packet.eyes = data.eyes;
+				packet.gloves = data.gloves;
+				packet.head = data.head;
+				packet.mouthandnoses = data.mouthandnoses;
+				server.m_clients[request.request_id].do_send(sizeof(packet), &packet);
 				break;
 			}
 
