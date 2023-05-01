@@ -35,6 +35,7 @@ public:
 	bool	m_recv_move = false;
 	int		m_my_id = -1;
 
+	bool    m_login = false;
 	XMFLOAT3 m_pPlayer_Pos{ 0,0,0 };
 	OtherPlayerPos Other_Player_Pos[5]{};
 	Player* m_pPlayer = nullptr;;

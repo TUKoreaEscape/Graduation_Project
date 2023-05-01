@@ -154,24 +154,57 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 #if USE_NETWORK
 	char id[20]{};
 	char pw[20]{};
-
-	std::cout << "ID 입력: ";
-	std::cin >> id;
-	std::cout << "PW 입력: ";
-	std::cin >> pw;
-	system("cls");
+	int select;
+	
 	m_network = Network::GetInstance();
 	m_network->init_network();
 	m_network->m_pPlayer = m_pPlayer;
 	m_network->m_ppOther = m_ppPlayers;
 	recv_thread = std::thread{ &Network::listen_thread, m_network };
+	while (m_network->m_login == false)
+	{
+		system("cls");
+		std::cout << "1. 로그인" << std::endl;
+		std::cout << "2. ID생성" << std::endl;
+		std::cout << "선택 : ";
+		std::cin >> select;
+		system("cls");
+		switch (select)
+		{
+		case 1:
+		{
+			std::cout << "ID 입력: ";
+			std::cin >> id;
+			std::cout << "PW 입력: ";
+			std::cin >> pw;
+			system("cls");
+			cs_packet_login l_packet;
+			l_packet.size = sizeof(l_packet);
+			l_packet.type = CS_PACKET::CS_PACKET_LOGIN;
+			strcpy_s(l_packet.id, sizeof(id), id);
+			strcpy_s(l_packet.pass_word, sizeof(pw), pw);
+			m_network->send_packet(&l_packet);
+			break;
+		}
+		case 2:
+			std::cout << "ID 입력: ";
+			std::cin >> id;
+			std::cout << "PW 입력: ";
+			std::cin >> pw;
+			system("cls");
+
+			cs_packet_create_id l_packet;
+			l_packet.size = sizeof(l_packet);
+			l_packet.type = CS_PACKET::CS_PACKET_CREATE_ID;
+			strcpy_s(l_packet.id, sizeof(id), id);
+			strcpy_s(l_packet.pass_word, sizeof(pw), pw);
+			m_network->send_packet(&l_packet);
+			break;
+		}
+		std::this_thread::sleep_for(std::chrono::seconds(2));
+	}
+
 	send_thread = std::thread{ &Network::Debug_send_thread, m_network };
-	cs_packet_login l_packet;
-	l_packet.size = sizeof(l_packet);
-	l_packet.type = CS_PACKET::CS_PACKET_LOGIN;
-	strcpy_s(l_packet.id, sizeof(id), id);
-	strcpy_s(l_packet.pass_word, sizeof(pw), pw);
-	m_network->send_packet(&l_packet);
 #endif
 }
 

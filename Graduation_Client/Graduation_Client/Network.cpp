@@ -210,6 +210,14 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::NONE:
 
 		break;
+		
+	case SC_PACKET::SC_PACKET_LOGINFAIL:
+	{
+		std::cout << "========================================" << std::endl;
+		std::cout << ">>>>>> 로그인에 실패하였습니다@ <<<<<" << std::endl;
+		std::cout << "========================================" << std::endl;
+		break;
+	}
 
 	case SC_PACKET::SC_PACKET_LOGINOK:
 	{
@@ -223,12 +231,31 @@ void Network::ProcessPacket(char* ptr)
 		//GameObject::SetParts(0, 4, recv_packet->mouthandnoses);
 		//GameObject::SetParts(0, 5, recv_packet->head);
 		// 이 아래로는 서버에서 불러온 커마 정보를 넣어줘야합니다.
-
+		m_login = true;
+		std::cout << "========================================" << std::endl;
+		std::cout << ">>>>>> 로그인에 성공하였습니다! <<<<<" << std::endl;
+		std::cout << "========================================" << std::endl;
 		cs_packet_join_room packet;
 		packet.size = sizeof(cs_packet_join_room);
 		packet.type = CS_PACKET::CS_PACKET_JOIN_ROOM;
 		packet.room_number = 0;
 		send_packet(&packet);
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_CREATE_ID_OK:
+	{
+		std::cout << "========================================" << std::endl;
+		std::cout << ">>>>>> 아이디 생성에 성공하였습니다! <<<<<" << std::endl;
+		std::cout << "========================================" << std::endl;
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_CREATE_ID_FAIL:
+	{
+		std::cout << "========================================" << std::endl;
+		std::cout << ">>>>>> 아이디 생성에 실패하였습니다! <<<<<" << std::endl;
+		std::cout << "========================================" << std::endl;
 		break;
 	}
 
