@@ -10,6 +10,7 @@ Network::Network()
 
 Network::~Network()
 {
+	m_shutdown = true;
 	TerminateProcess(info.hProcess, 1);
 }
 
@@ -32,7 +33,7 @@ void Network::Send_Customizing_Data()
 
 void Network::Debug_send_thread()
 {
-	while (true)
+	while (m_shutdown == false)
 	{
 		int code;
 		std::cout << "1. Head 변경 \n";
@@ -43,6 +44,7 @@ void Network::Debug_send_thread()
 		std::cout << "6. Glove 변경 \n";
 		std::cout << "7. Mouse and Nose 변경 \n";
 		std::cout << "8. 무조건 한번 눌러요\n";
+		std::cout << "9. 프로그램 전체 종료 \n";
 		std::cout << "명령어 입력 : ";
 		std::cin >> code;
 
@@ -194,7 +196,7 @@ void Network::AssemblyPacket(char* net_buf, size_t io_byte)
 
 void Network::listen_thread()
 {
-	while (true)
+	while (false == m_shutdown)
 	{
 		char buf[BUF_SIZE] = { 0 };
 		WSABUF wsabuf{ BUF_SIZE, buf };

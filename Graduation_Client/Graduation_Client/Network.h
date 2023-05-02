@@ -19,7 +19,7 @@ struct Custom {
 
 struct OtherPlayerPos {
 	short	id;
-	XMFLOAT3 Other_Pos;
+	XMFLOAT3 Other_Pos{};
 	std::mutex pos_lock;
 };
 
@@ -33,6 +33,7 @@ private:
 
 	SHELLEXECUTEINFO	info;
 	HWND				hwnd_ExtMixerWin;
+	bool				m_shutdown = false;
 public:
 	std::mutex pos_lock;
 	bool	m_recv_move = false;
