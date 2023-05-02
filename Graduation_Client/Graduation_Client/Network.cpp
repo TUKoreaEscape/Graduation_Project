@@ -262,7 +262,19 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_JOIN_ROOM_SUCCESS:
 	{
 		//std::cout << "规 立加 己傍" << std::endl;
-		ShellExecute(NULL, L"open", L"voice\Voice.exe", NULL, NULL, SW_SHOWMINIMIZED);
+		info.cbSize = sizeof(SHELLEXECUTEINFO);
+		info.fMask = SEE_MASK_NOCLOSEPROCESS;
+		info.hwnd = NULL;
+		info.lpVerb = L"open";
+		info.lpFile = L"voice\\Voice.exe";
+		info.lpParameters = NULL;
+		info.lpDirectory = NULL;
+		info.nShow = SW_SHOWMINIMIZED;
+		info.hInstApp = NULL;
+
+		ShellExecuteEx(&info); // start process
+
+		GetProcessId(info.hProcess); // retrieve PID
 		break;
 	}
 
