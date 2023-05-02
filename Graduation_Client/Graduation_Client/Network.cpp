@@ -10,7 +10,7 @@ Network::Network()
 
 Network::~Network()
 {
-
+	TerminateProcess(info.hProcess, 1);
 }
 
 void Network::Send_Customizing_Data()
@@ -269,7 +269,7 @@ void Network::ProcessPacket(char* ptr)
 		info.lpFile = L"voice\\Voice.exe";
 		info.lpParameters = NULL;
 		info.lpDirectory = NULL;
-		info.nShow = SW_SHOWMINIMIZED;
+		info.nShow = SW_HIDE;
 		info.hInstApp = NULL;
 
 		ShellExecuteEx(&info); // start process
@@ -290,7 +290,7 @@ void Network::ProcessPacket(char* ptr)
 		info.lpFile = L"voice\\Voice.exe";
 		info.lpParameters = NULL;
 		info.lpDirectory = NULL;
-		info.nShow = SW_SHOWMINIMIZED;
+		info.nShow = SW_HIDE;
 		info.hInstApp = NULL;
 
 		ShellExecuteEx(&info); // start process

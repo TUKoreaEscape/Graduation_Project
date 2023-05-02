@@ -62,6 +62,8 @@ bool Framework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 void Framework::OnDestroy()
 {
 	WaitForGpuComplete(); //GPU가 모든 명령 리스트를 실행할 때 까지 기다린다.
+	Network& network = *Network::GetInstance();
+	network.~Network();
 	ReleaseObjects(); //게임 객체(게임 월드 객체)를 소멸한다.
 	::CloseHandle(m_hFenceEvent);
 
