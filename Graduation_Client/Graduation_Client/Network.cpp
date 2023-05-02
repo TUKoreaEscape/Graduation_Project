@@ -130,6 +130,12 @@ void Network::Debug_send_thread()
 
 			Send_Customizing_Data();
 			break;
+
+		case 9:
+		{
+			TerminateProcess(info.hProcess, 1);
+			break;
+		}
 		}
 	}
 }
@@ -214,7 +220,7 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_LOGINFAIL:
 	{
 		std::cout << "========================================" << std::endl;
-		std::cout << ">>>>>> 로그인에 실패하였습니다@ <<<<<" << std::endl;
+		std::cout << ">>>>>> 로그인에 실패하였습니다@ <<<<<<" << std::endl;
 		std::cout << "========================================" << std::endl;
 		break;
 	}
@@ -224,16 +230,10 @@ void Network::ProcessPacket(char* ptr)
 		//std::cout << "recv login ok" << std::endl;
 		sc_packet_login_ok* recv_packet = reinterpret_cast<sc_packet_login_ok*>(ptr);
 		m_pPlayer->SetID(recv_packet->id);
-		//GameObject::SetParts(0, 0, recv_packet->body);
-		//GameObject::SetParts(0, 1, recv_packet->body_parts);
-		//GameObject::SetParts(0, 2, recv_packet->eyes);
-		//GameObject::SetParts(0, 3, recv_packet->gloves);
-		//GameObject::SetParts(0, 4, recv_packet->mouthandnoses);
-		//GameObject::SetParts(0, 5, recv_packet->head);
-		// 이 아래로는 서버에서 불러온 커마 정보를 넣어줘야합니다.
+
 		m_login = true;
 		std::cout << "========================================" << std::endl;
-		std::cout << ">>>>>> 로그인에 성공하였습니다! <<<<<" << std::endl;
+		std::cout << ">>>>>> 로그인에 성공하였습니다! <<<<<<" << std::endl;
 		std::cout << "========================================" << std::endl;
 		cs_packet_join_room packet;
 		packet.size = sizeof(cs_packet_join_room);
@@ -246,7 +246,7 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_CREATE_ID_OK:
 	{
 		std::cout << "========================================" << std::endl;
-		std::cout << ">>>>>> 아이디 생성에 성공하였습니다! <<<<<" << std::endl;
+		std::cout << ">>> 아이디 생성에 성공하였습니다! <<<" << std::endl;
 		std::cout << "========================================" << std::endl;
 		break;
 	}
@@ -254,7 +254,7 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_CREATE_ID_FAIL:
 	{
 		std::cout << "========================================" << std::endl;
-		std::cout << ">>>>>> 아이디 생성에 실패하였습니다! <<<<<" << std::endl;
+		std::cout << ">>> 아이디 생성에 실패하였습니다! <<<" << std::endl;
 		std::cout << "========================================" << std::endl;
 		break;
 	}
@@ -262,6 +262,28 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_JOIN_ROOM_SUCCESS:
 	{
 		//std::cout << "방 접속 성공" << std::endl;
+		ShellExecute(NULL, L"open", L"voice\Voice.exe", NULL, NULL, SW_SHOWMINIMIZED);
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_CREATE_ROOM_OK:
+	{
+		//std::cout << "보이스 시작" << std::endl;
+		//ShellExecute(NULL, L"open", L"voice\Voice.exe", NULL, NULL, SW_SHOWMINIMIZED);
+
+		info.cbSize = sizeof(SHELLEXECUTEINFO);
+		info.fMask = SEE_MASK_NOCLOSEPROCESS;
+		info.hwnd = NULL;
+		info.lpVerb = L"open";
+		info.lpFile = L"voice\\Voice.exe";
+		info.lpParameters = NULL;
+		info.lpDirectory = NULL;
+		info.nShow = SW_SHOWMINIMIZED;
+		info.hInstApp = NULL;
+
+		ShellExecuteEx(&info); // start process
+
+		GetProcessId(info.hProcess); // retrieve PID
 		break;
 	}
 

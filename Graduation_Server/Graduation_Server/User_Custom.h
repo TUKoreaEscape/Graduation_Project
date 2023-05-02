@@ -55,6 +55,18 @@ struct Custom {
 	EYES			eyes;
 	GLOVES			gloves;
 	MOUTHANDNOSES	mouthandnoses;
+
+	Custom& operator=(Custom& ref)
+	{
+		head = ref.head;
+		body = ref.body;
+		body_parts = ref.body_parts;
+		eyes = ref.eyes;
+		gloves = ref.gloves;
+		mouthandnoses = ref.mouthandnoses;
+
+		return ref;
+	}
 };
 
 class Customizing_Info {

@@ -30,6 +30,9 @@ private:
 	const char*		SERVER_ADDR = "127.0.0.1";
 	Server_Timer	m_server_counter;
 	Custom			data;
+
+	SHELLEXECUTEINFO	info;
+	HWND				hwnd_ExtMixerWin;
 public:
 	std::mutex pos_lock;
 	bool	m_recv_move = false;
