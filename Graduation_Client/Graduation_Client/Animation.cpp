@@ -311,7 +311,7 @@ void AnimationController::AdvanceTime(float fTimeElapsed, GameObject* pRootGameO
 				}
 			}
 			else if (player != -1) {
-				for (const std::string& str : GameObject::OthersParts[player + 1]) {
+				for (const std::string& str : GameObject::OthersParts[player - 1]) {
 					if (!strcmp(str.c_str(), m_ppSkinnedMeshes[i]->m_pstrMeshName)) {
 						isNotUpdate = false;
 						break;

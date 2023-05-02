@@ -57,7 +57,7 @@ void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	m_pStandardShader = new DeferredObjectsShader();
 	//m_pStandardShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	DXGI_FORMAT pdxgiRtvFormats[7] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
-	m_pStandardShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 7, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
+	m_pStandardShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 7, pdxgiRtvFormats, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	m_pStandardShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 	m_pSkinnedAnimationShader = new SkinnedAnimationShader();
@@ -109,7 +109,7 @@ void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 		size_t nConverted = 0;
 		mbstowcs_s(&nConverted, pwstrTextureName, 64, pstrFilePath, _TRUNCATE);
-		#define _WITH_DISPLAY_TEXTURE_NAME
+		//#define _WITH_DISPLAY_TEXTURE_NAME
 
 #ifdef _WITH_DISPLAY_TEXTURE_NAME
 		static int nTextures = 0, nRepeatedTextures = 0;
