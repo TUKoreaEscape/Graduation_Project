@@ -61,13 +61,15 @@ public:
 	GameScene();
 	~GameScene() {}
 
-	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void defrender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void forrender(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void ReleaseObjects();
 
 	ID3D12RootSignature* CreateGraphicsRootSignature(ID3D12Device* pd3dDevice); //루트 시그너쳐를 생성한다.
+	ID3D12RootSignature* GetGraphicsRootSignature() { return(m_pd3dGraphicsRootSignature); }
 
 	void ReleaseUploadBuffers();
 

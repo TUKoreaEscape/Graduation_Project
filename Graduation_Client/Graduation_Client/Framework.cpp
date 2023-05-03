@@ -53,6 +53,7 @@ bool Framework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	CreateCommandQueueAndList();
 	CreateRtvAndDsvDescriptorHeaps();
 	CreateSwapChain();
+	CreateSwapChainRenderTargetViews();
 	CreateDepthStencilView(); //Direct3D 디바이스, 명령 큐와 명령 리스트, 스왑 체인 등을 생성하는 함수를 호출한다.
 	BuildObjects(); //렌더링할 게임 객체를 생성한다.
 
@@ -108,12 +109,11 @@ void Framework::CreateSwapChain()
 	dxgiSwapChainDesc.SampleDesc.Quality = (m_bMsaa4xEnable) ? (m_nMsaa4xQualityLevels - 1) : 0;
 	dxgiSwapChainDesc.Windowed = TRUE; //전체화면 모드에서 바탕화면의 해상도를 스왑체인(후면버퍼)의 크기에 맞게 변경한다.
 	dxgiSwapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-	HRESULT hResult = m_pdxgiFactory->CreateSwapChain(m_pd3dCommandQueue,
-		&dxgiSwapChainDesc, (IDXGISwapChain**)&m_pdxgiSwapChain);
+	HRESULT hResult = m_pdxgiFactory->CreateSwapChain(m_pd3dCommandQueue, &dxgiSwapChainDesc, (IDXGISwapChain**)&m_pdxgiSwapChain);
 	m_nSwapChainBufferIndex = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
 	hResult = m_pdxgiFactory->MakeWindowAssociation(m_hWnd, DXGI_MWA_NO_ALT_ENTER);
 #ifndef _WITH_SWAPCHAIN_FULLSCREEN_STATE
-	CreateRenderTargetViews();
+	//CreateRenderTargetViews();
 #endif
 }
 
@@ -121,7 +121,7 @@ void Framework::CreateRtvAndDsvDescriptorHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC d3dDescriptorHeapDesc;
 	::ZeroMemory(&d3dDescriptorHeapDesc, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
-	d3dDescriptorHeapDesc.NumDescriptors = m_nSwapChainBuffers;
+	d3dDescriptorHeapDesc.NumDescriptors = m_nSwapChainBuffers + 6;
 	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	d3dDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	d3dDescriptorHeapDesc.NodeMask = 0;
@@ -150,21 +150,18 @@ void Framework::CreateDirect3DDevice()
 	hResult = ::CreateDXGIFactory2(nDXGIFactoryFlags, __uuidof(IDXGIFactory4), (void
 		**)&m_pdxgiFactory);
 	IDXGIAdapter1* pd3dAdapter = NULL;
-	for (UINT i = 0; DXGI_ERROR_NOT_FOUND != m_pdxgiFactory->EnumAdapters1(i,
-		&pd3dAdapter); i++)
+	for (UINT i = 0; DXGI_ERROR_NOT_FOUND != m_pdxgiFactory->EnumAdapters1(i,&pd3dAdapter); i++)
 	{
 		DXGI_ADAPTER_DESC1 dxgiAdapterDesc;
 		pd3dAdapter->GetDesc1(&dxgiAdapterDesc);
 		if (dxgiAdapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) continue;
-		if (SUCCEEDED(D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_12_0,
-			_uuidof(ID3D12Device), (void**)&m_pd3dDevice))) break;
+		if (SUCCEEDED(D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_12_0,_uuidof(ID3D12Device), (void**)&m_pd3dDevice))) break;
 	} //모든 하드웨어 어댑터 대하여 특성 레벨 12.0을 지원하는 하드웨어 디바이스를 생성한다.
 
 	if (!pd3dAdapter)
 	{
 		m_pdxgiFactory->EnumWarpAdapter(_uuidof(IDXGIAdapter1), (void**)&pd3dAdapter);
-		D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), (void
-			**)&m_pd3dDevice);
+		D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), (void**)&m_pd3dDevice);
 	}//특성 레벨 12.0을 지원하는 하드웨어 디바이스를 생성할 수 없으면 WARP 디바이스를 생성한다.
 	D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS d3dMsaaQualityLevels;
 	d3dMsaaQualityLevels.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -193,14 +190,11 @@ void Framework::CreateCommandQueueAndList()
 	d3dCommandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	d3dCommandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
-	HRESULT hResult = m_pd3dDevice->CreateCommandQueue(&d3dCommandQueueDesc, _uuidof(ID3D12CommandQueue),
-		(void**)&m_pd3dCommandQueue);//직접(Direct) 명령 큐를 생성한다.
+	HRESULT hResult = m_pd3dDevice->CreateCommandQueue(&d3dCommandQueueDesc, _uuidof(ID3D12CommandQueue), (void**)&m_pd3dCommandQueue);//직접(Direct) 명령 큐를 생성한다.
 
-	hResult = m_pd3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator),
-		(void**)&m_pd3dCommandAllocator); //직접(Direct) 명령 할당자를 생성한다.
+	hResult = m_pd3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)&m_pd3dCommandAllocator); //직접(Direct) 명령 할당자를 생성한다.
 
-	hResult = m_pd3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, 
-	m_pd3dCommandAllocator, NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_pd3dCommandList); //직접(Direct) 명령 리스트를 생성한다.
+	hResult = m_pd3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT,  m_pd3dCommandAllocator, NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_pd3dCommandList); //직접(Direct) 명령 리스트를 생성한다.
 
 	hResult = m_pd3dCommandList->Close(); //명령 리스트는 생성되면 열린(Open) 상태이므로 닫힌(Closed) 상태로 만든다.
 }
@@ -225,7 +219,7 @@ void Framework::CreateDepthStencilView()
 	d3dResourceDesc.Height = m_nWndClientHeight;
 	d3dResourceDesc.DepthOrArraySize = 1;
 	d3dResourceDesc.MipLevels = 1;
-	d3dResourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	d3dResourceDesc.Format = DXGI_FORMAT_D32_FLOAT; // 후처리 기술을 사용할때 문제가 생긴다면 이부분도 봐야함 DXGI_FORMAT_D32_FLOAT
 	d3dResourceDesc.SampleDesc.Count = (m_bMsaa4xEnable) ? 4 : 1;
 	d3dResourceDesc.SampleDesc.Quality = (m_bMsaa4xEnable) ? (m_nMsaa4xQualityLevels - 1) : 0;
 	d3dResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
@@ -238,14 +232,32 @@ void Framework::CreateDepthStencilView()
 	d3dHeapProperties.CreationNodeMask = 1;
 	d3dHeapProperties.VisibleNodeMask = 1;
 	D3D12_CLEAR_VALUE d3dClearValue;
-	d3dClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	d3dClearValue.Format = DXGI_FORMAT_D32_FLOAT;
 	d3dClearValue.DepthStencil.Depth = 1.0f;
 	d3dClearValue.DepthStencil.Stencil = 0;
 	m_pd3dDevice->CreateCommittedResource(&d3dHeapProperties, D3D12_HEAP_FLAG_NONE, &d3dResourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE,
 		&d3dClearValue, __uuidof(ID3D12Resource), (void**)&m_pd3dDepthStencilBuffer); //깊이-스텐실 버퍼를 생성한다.
 
-	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	m_pd3dDevice->CreateDepthStencilView(m_pd3dDepthStencilBuffer, NULL,d3dDsvCPUDescriptorHandle); //깊이-스텐실 버퍼 뷰를 생성한다.
+	m_d3dDsvDescriptorCPUHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	m_pd3dDevice->CreateDepthStencilView(m_pd3dDepthStencilBuffer, NULL, m_d3dDsvDescriptorCPUHandle); //깊이-스텐실 버퍼 뷰를 생성한다.
+}
+
+void Framework::CreateSwapChainRenderTargetViews()
+{
+	D3D12_RENDER_TARGET_VIEW_DESC d3dRenderTargetViewDesc;
+	d3dRenderTargetViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	d3dRenderTargetViewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+	d3dRenderTargetViewDesc.Texture2D.MipSlice = 0;
+	d3dRenderTargetViewDesc.Texture2D.PlaneSlice = 0;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	for (UINT i = 0; i < m_nSwapChainBuffers; i++)
+	{
+		m_pdxgiSwapChain->GetBuffer(i, __uuidof(ID3D12Resource), (void**)&m_ppd3dRenderTargetBuffers[i]);
+		m_pd3dDevice->CreateRenderTargetView(m_ppd3dRenderTargetBuffers[i], &d3dRenderTargetViewDesc, d3dRtvCPUDescriptorHandle);
+		m_pd3dSwapChainBackBufferRTVCPUHandles[i] = d3dRtvCPUDescriptorHandle;
+		d3dRtvCPUDescriptorHandle.ptr += ::gnRtvDescriptorIncrementSize;
+	}
 }
 
 void Framework::BuildObjects()
@@ -254,6 +266,19 @@ void Framework::BuildObjects()
 	input = Input::GetInstance();
 	scene = new GameScene();
 	scene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+
+	m_pLaplacianEdgeDetectionShader = new LaplacianEdgeShader();
+	m_pLaplacianEdgeDetectionShader->CreateShader(m_pd3dDevice, scene->GetGraphicsRootSignature(), 1, NULL, DXGI_FORMAT_D32_FLOAT);
+	//m_pLaplacianEdgeDetectionShader->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	d3dRtvCPUDescriptorHandle.ptr += (::gnRtvDescriptorIncrementSize * m_nSwapChainBuffers);
+
+	DXGI_FORMAT pdxgiResourceFormats[6] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
+	m_pLaplacianEdgeDetectionShader->CreateResourcesAndViews(m_pd3dDevice, 6, pdxgiResourceFormats, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, d3dRtvCPUDescriptorHandle, 6 + 1); //SRV to (Render Targets) + (Depth Buffer)
+
+	DXGI_FORMAT pdxgiDepthSrvFormats[1] = { DXGI_FORMAT_R32_FLOAT };
+	m_pLaplacianEdgeDetectionShader->CreateShaderResourceViews(m_pd3dDevice, 1, &m_pd3dDepthStencilBuffer, pdxgiDepthSrvFormats);
 
 	m_pd3dCommandList->Close();
 	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
@@ -331,18 +356,27 @@ void Framework::FrameAdvance()
 	//m_pd3dCommandList->RSSetViewports(1, &m_d3dViewport);
 	//m_pd3dCommandList->RSSetScissorRects(1, &m_d3dScissorRect); //뷰포트와 씨저 사각형을 설정한다.
 
-	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle =  m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * ::gnRtvDescriptorIncrementSize); //현재의 렌더 타겟에 해당하는 서술자의 CPU 주소(핸들)를 계산한다.
-
-	float pfClearColor[4] = { 0.0f, 0.3f, 0.3f, 1.0f };
-	m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor/*Colors::Azure*/, 0, NULL); //원하는 색상으로 렌더 타겟(뷰)을 지운다.
-	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(); //깊이-스텐실 서술자의 CPU 주소를 계산한다.
-	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL); //원하는 값으로 깊이-스텐실(뷰)을 지운다.
-	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle); //렌더 타겟 뷰(서술자)와 깊이-스텐실 뷰(서술자)를 출력-병합 단계(OM)에 연결한다.
+	//D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle =  m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	//d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * ::gnRtvDescriptorIncrementSize); //현재의 렌더 타겟에 해당하는 서술자의 CPU 주소(핸들)를 계산한다.
+	//
+	//float pfClearColor[4] = { 0.0f, 0.3f, 0.3f, 1.0f };
+	//m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor/*Colors::Azure*/, 0, NULL); //원하는 색상으로 렌더 타겟(뷰)을 지운다.
+	//D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(); //깊이-스텐실 서술자의 CPU 주소를 계산한다.
+	//m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL); //원하는 값으로 깊이-스텐실(뷰)을 지운다.
+	//m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle); //렌더 타겟 뷰(서술자)와 깊이-스텐실 뷰(서술자)를 출력-병합 단계(OM)에 연결한다.
 	
+	m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 	//렌더링 코드는 여기에 추가될 것이다.
+	
+	m_pLaplacianEdgeDetectionShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+	
+	if(scene) scene->defrender(m_pd3dCommandList);
 
-	if(scene) scene->render(m_pd3dCommandList);
+	m_pLaplacianEdgeDetectionShader->OnPostRenderTarget(m_pd3dCommandList);
+
+	m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
+	//if (scene) scene->forrender(m_pd3dCommandList);
+	//m_pLaplacianEdgeDetectionShader->Render(m_pd3dCommandList);
 
 
 	::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
