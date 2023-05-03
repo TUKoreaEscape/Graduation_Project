@@ -120,7 +120,7 @@ void cGameServer::Process_Create_Room(const unsigned int _user_id) // ø‰√ªπﬁ¿∫ ª
 	m_clients[_user_id]._state_lock.lock();
 	m_clients[_user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
 	m_clients[_user_id]._state_lock.unlock();
-	m_clients[_user_id].set_bounding_box(m_clients[_user_id].get_user_position(), XMFLOAT3(0.5f, 1.0f, 0.5f), XMFLOAT4(0, 0, 0, 1));
+	m_clients[_user_id].set_bounding_box(m_clients[_user_id].get_user_position(), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(0, 0, 0, 1));
 	send_create_room_ok_packet(_user_id, m_clients[_user_id].get_join_room_number());
 	send_put_player_data(_user_id);
 }
