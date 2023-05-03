@@ -375,7 +375,7 @@ void Framework::FrameAdvance()
 	m_pLaplacianEdgeDetectionShader->OnPostRenderTarget(m_pd3dCommandList);
 
 	m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
-	//if (scene) scene->forrender(m_pd3dCommandList);
+	if (scene) scene->forrender(m_pd3dCommandList);
 	//m_pLaplacianEdgeDetectionShader->Render(m_pd3dCommandList);
 
 
