@@ -23,7 +23,7 @@ GameScene::GameScene() : Scene()
 
 void GameScene::forrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	//m_pSkybox->render(pd3dCommandList);
+	m_pSkybox->render(pd3dCommandList);
 	
 	m_pMainTerrain->render(pd3dCommandList);
 	m_pPianoTerrain->render(pd3dCommandList);

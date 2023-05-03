@@ -425,7 +425,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 	output.f2ObjectIDzDepth.x = (float)1.0f;
 	output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
 	//output.f4Scene = output.f4Texture;
-	output.f4Scene = float4(1, 1, 1, 1);
+	//output.f4Scene = float4(1,1,1,1);
 	return(output);
 }
 
@@ -434,26 +434,27 @@ struct VS_SCREEN_RECT_TEXTURED_OUTPUT
 	float4 position : SV_POSITION;
 	float2 uv : TEXCOORD0;
 	float3 viewSpaceDir : TEXCOORD1;
+	uint screenNum : NUMBER;
 };
 
 VS_SCREEN_RECT_TEXTURED_OUTPUT VSScreenRectSamplingTextured(uint nVertexID : SV_VertexID)
 {
 	VS_SCREEN_RECT_TEXTURED_OUTPUT output = (VS_SCREEN_RECT_TEXTURED_OUTPUT)0;
 
-	if (nVertexID == 0) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
-	else if (nVertexID == 1) { output.position = float4(+1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 0.0f); }
-	else if (nVertexID == 2) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
-	else if (nVertexID == 3) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
-	else if (nVertexID == 4) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
-	else if (nVertexID == 5) { output.position = float4(-1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 1.0f); }
+	//if (nVertexID == 0) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
+	//else if (nVertexID == 1) { output.position = float4(+1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 0.0f); }
+	//else if (nVertexID == 2) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
+	//else if (nVertexID == 3) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
+	//else if (nVertexID == 4) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
+	//else if (nVertexID == 5) { output.position = float4(-1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 1.0f); }
 
-	//int screen = nVertexID/6;
-	//if (nVertexID % 6 == 0)		{ output.position = float4((0.5 * screen) - 1.0f,			+1.0f, 0.0f, 1.0f);		output.uv = float2(0.0f, 0.0f); }
-	//else if (nVertexID%6 == 1)	{ output.position = float4((0.5*(screen+1)) - 1.0f,		+1.0f, 0.0f, 1.0f);		output.uv = float2(1.0f, 0.0f); }
-	//else if (nVertexID%6 == 2)	{ output.position = float4((0.5 * (screen + 1)) - 1.0f,	+0.5f, 0.0f, 1.0f);		output.uv = float2(1.0f, 1.0f); }
-	//else if (nVertexID%6 == 3)	{ output.position = float4((0.5*screen) - 1.0f,			+1.0f, 0.0f, 1.0f);		output.uv = float2(0.0f, 0.0f); }
-	//else if (nVertexID%6 == 4)	{ output.position = float4((0.5 *(screen+1.0f)) - 1.0f,	+0.5f, 0.0f, 1.0f);		output.uv = float2(1.0f, 1.0f); }
-	//else if (nVertexID%6 == 5)	{ output.position = float4((0.5 * screen)-1.0f,			+0.5f, 0.0f, 1.0f);		output.uv = float2(0.0f, 1.0f); }
+	int screen = nVertexID/6;
+	if (nVertexID % 6 == 0)	{ output.position = float4((0.5 * screen) - 1.0f,			+1.0f, 0.0f, 1.0f);		output.uv = float2(0.0f, 0.0f); output.screenNum = screen;}
+	else if (nVertexID%6 == 1)	{ output.position = float4((0.5*(screen+1)) - 1.0f,		+1.0f, 0.0f, 1.0f);		output.uv = float2(1.0f, 0.0f); output.screenNum = screen;}
+	else if (nVertexID%6 == 2)	{ output.position = float4((0.5 * (screen + 1)) - 1.0f,	+0.5f, 0.0f, 1.0f);		output.uv = float2(1.0f, 1.0f); output.screenNum = 6;}
+	else if (nVertexID%6 == 3)	{ output.position = float4((0.5*screen) - 1.0f,			+1.0f, 0.0f, 1.0f);		output.uv = float2(0.0f, 0.0f); output.screenNum = screen;}
+	else if (nVertexID%6 == 4)	{ output.position = float4((0.5 *(screen+1.0f)) - 1.0f,	+0.5f, 0.0f, 1.0f);		output.uv = float2(1.0f, 1.0f); output.screenNum = screen;}
+	else if (nVertexID%6 == 5)	{ output.position = float4((0.5 * screen)-1.0f,			+0.5f, 0.0f, 1.0f);		output.uv = float2(0.0f, 1.0f); output.screenNum = screen;}
 
 	//output.viewSpaceDir = mul(output.position, gmtxInverseProjection).xyz;
 	return(output);
@@ -577,8 +578,8 @@ float4 Outline(VS_SCREEN_RECT_TEXTURED_OUTPUT input)
 float4 PSScreenRectSamplingTextured(VS_SCREEN_RECT_TEXTURED_OUTPUT input) : SV_Target
 {
 	float4 cColor = float4(1.0f, 1.0f, 0.0f, 0.1f);
-	cColor = gtxtInputTextures[2][int2(input.position.xy)];
-	
+	//cColor = gtxtInputTextures[3].Sample(gssWrap, input.uv);
+	cColor = gtxtInputTextures[input.screenNum][int2(input.position.xy)];
 	// 
 	//cColor = LaplacianEdge(input.position);
 	//cColor = Outline(input.position);
