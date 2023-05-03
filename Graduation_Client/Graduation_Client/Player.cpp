@@ -32,8 +32,8 @@ Player::Player() : GameObject()
 	m_pCameraUpdatedContext = NULL;
 
 	Input::GetInstance()->m_pPlayer = this;
-	AddComponent<ThirdPersonCamera>();
-	m_pCamera = GetComponent<ThirdPersonCamera>();
+	AddComponent<FirstPersonCamera>();
+	m_pCamera = GetComponent<FirstPersonCamera>();
 	m_pCamera->m_pPlayer = this;
 }
 
@@ -205,10 +205,12 @@ void Player::update(float fTimeElapsed)
 	m_xmf3Shift = xmf3Velocity;
 	if (m_pPlayerUpdatedContext[0]) OnPlayerUpdateCallback(fTimeElapsed);
 
+	m_pCamera->SetPosition(Vector3::Add(m_xmf3Position, m_pCamera->GetOffset()));
 	/*DWORD nCurrentCameraMode = m_pCamera->GetMode();
 	if (m_pCameraUpdatedContext) OnCameraUpdateCallback(fTimeElapsed);
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->update(fTimeElapsed);
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);*/
+	m_pCamera->RegenerateViewMatrix();
 
 	fLength = Vector3::Length(m_xmf3Velocity);
 	float fDeceleration = (m_fFriction * fTimeElapsed);
@@ -283,9 +285,15 @@ void Player::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->UpdateShaderVariables(pd3dCommandList, PlayerNum);
 
-	renderer->render(pd3dCommandList);
-	if (m_pSibling) m_pSibling->render(pd3dCommandList);
-	if (m_pChild) m_pChild->render(pd3dCommandList);
+	if (PlayerNum == 0) {
+		GameObject* Hand = FindFrame("Gloves");
+		Hand->m_pChild->render(pd3dCommandList);
+	}
+	else {
+		renderer->render(pd3dCommandList);
+		if (m_pSibling) m_pSibling->render(pd3dCommandList);
+		if (m_pChild) m_pChild->render(pd3dCommandList);
+	}
 }
 
 void Player::ReleaseShaderVariables()

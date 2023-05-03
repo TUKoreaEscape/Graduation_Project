@@ -56,6 +56,15 @@ GameObject::GameObject()
 	renderer->gameObject = this;
 }
 
+GameObject::~GameObject()
+{
+	if (m_pMesh) m_pMesh->Release();
+
+	if (renderer) renderer->Release();
+
+	if (m_pSkinnedAnimationController) delete m_pSkinnedAnimationController;
+}
+
 void GameObject::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->UpdateShaderVariables(pd3dCommandList);

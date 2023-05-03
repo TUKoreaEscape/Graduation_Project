@@ -18,6 +18,7 @@ public:
 public:
 	GameObject();
 	GameObject(int nMaterials);
+	virtual ~GameObject();
 	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 	{
 		for (auto& component : components)

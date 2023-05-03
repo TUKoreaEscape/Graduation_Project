@@ -175,6 +175,7 @@ void StandardRenderer::SetMaterial(Material* pMaterial)
 	m_nMaterials = 1;
 	m_ppMaterials = new Material * [m_nMaterials];
 	m_ppMaterials[0] = pMaterial;
+	pMaterial->AddRef();
 }
 
 void StandardRenderer::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4X4* pxmf4x4World)
@@ -190,6 +191,18 @@ void StandardRenderer::ReleaseUploadBuffers()
 	{
 		if (m_ppMaterials[i]) m_ppMaterials[i]->ReleaseUploadBuffers();
 	}
+}
+
+void StandardRenderer::Release()
+{
+	if (m_nMaterials > 0)
+	{
+		for (int i = 0; i < m_nMaterials; i++)
+		{
+			if (m_ppMaterials[i]) m_ppMaterials[i]->Release();
+		}
+	}
+	if (m_ppMaterials) delete[] m_ppMaterials;
 }
 
 UINT StandardRenderer::GetMeshType()

@@ -251,10 +251,12 @@ void FirstPersonCamera::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	m_xmf3Right = Vector3::Normalize(m_xmf3Right);
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
 	m_pPlayer = Input::GetInstance()->m_pPlayer;
-	SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
-	GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
+	SetOffset(XMFLOAT3(0.0f, 1.5f, 0.0f));
+	GenerateProjectionMatrix(0.2f, 5000.0f, ASPECT_RATIO, 60.0f);
 	SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 	SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+
+	SetPosition(Vector3::Add(m_xmf3Position, m_xmf3Offset));
 }
 
 void FirstPersonCamera::Rotate(float x, float y, float z)

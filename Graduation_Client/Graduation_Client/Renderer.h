@@ -28,7 +28,9 @@ public:
 
 	virtual void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4X4* pxmf4x4World);
 
-	void ReleaseUploadBuffers();
+	virtual void ReleaseUploadBuffers();
+
+	virtual void Release();
 	
 	UINT GetMeshType();
 

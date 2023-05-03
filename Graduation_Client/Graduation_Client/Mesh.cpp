@@ -301,7 +301,7 @@ SkinnedMesh::~SkinnedMesh()
 	if (m_pxmu4BoneIndices) delete[] m_pxmu4BoneIndices;
 	if (m_pxmf4BoneWeights) delete[] m_pxmf4BoneWeights;
 
-	if (m_pxmf4x4BindPoseBoneOffsets) delete[] m_pxmf4x4BindPoseBoneOffsets;
+	if (m_ppSkinningBoneFrameCaches) delete[] m_ppSkinningBoneFrameCaches;
 	if (m_ppstrSkinningBoneNames) delete[] m_ppstrSkinningBoneNames;
 	
 	if (m_pxmf4x4BindPoseBoneOffsets) delete[] m_pxmf4x4BindPoseBoneOffsets;

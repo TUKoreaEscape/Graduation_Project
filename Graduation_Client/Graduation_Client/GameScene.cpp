@@ -63,7 +63,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	//LoadedModelInfo* pPlayerModel2 = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", nullptr);
 
 	LoadedModelInfo* pClassModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InClassObject.bin", nullptr);
-	LoadedModelInfo* pPianoModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Piano.bin", nullptr);
+	LoadedModelInfo* pPianoModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPianoRoom.bin", nullptr);
 
 	m_pClass = new GameObject();
 	m_pClass->SetChild(pClassModel->m_pModelRootObject, true);
@@ -114,7 +114,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	GameObject::SetParts(0, 0, 4);
 	m_pPlayer->PlayerNum = 0;
 
-	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene.bin");
+	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/CubeRoomWithWall.bin");
 	
 	if (pPlayerModel) delete pPlayerModel;
 	
@@ -211,6 +211,26 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 void GameScene::ReleaseObjects()
 {
 	if (m_pd3dGraphicsRootSignature) m_pd3dGraphicsRootSignature->Release();
+
+	if (m_ppWalls) {
+		for (int i = 0; i < m_nWalls; ++i) {
+			if (m_ppWalls[i]) m_ppWalls[i]->Release();
+		}
+		delete[] m_ppWalls;
+	}
+	if (m_pNPC) m_pNPC->Release();
+	if (m_pLight) m_pLight->Release();
+	if (m_pSkybox) m_pSkybox->Release();
+
+	if (m_pPianoTerrain) m_pPianoTerrain->Release();
+	if (m_pMainTerrain) m_pMainTerrain->Release();
+	if (m_pBroadcastTerrain) m_pBroadcastTerrain->Release();
+	if (m_pClassroomTerrain) m_pClassroomTerrain->Release();
+	if (m_pForestTerrain) m_pForestTerrain->Release();
+	if (m_pCubeTerrain) m_pCubeTerrain->Release();
+
+	if (m_pClass) m_pClass->Release();
+	if (m_pPiano) m_pPiano->Release();
 }
 
 ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
@@ -415,6 +435,29 @@ ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDe
 void GameScene::ReleaseUploadBuffers()
 {
 	if (m_pPlayer) m_pPlayer->ReleaseUploadBuffers();
+	if (m_ppPlayers) {
+		for (int i = 0; i < m_nPlayers; ++i) {
+			if (m_ppPlayers[i]) m_ppPlayers[i]->ReleaseUploadBuffers();
+		}
+	}
+	if (m_ppWalls) {
+		for (int i = 0; i < m_nWalls; ++i) {
+			if (m_ppWalls[i]) m_ppWalls[i]->ReleaseUploadBuffers();
+		}
+	}
+	if (m_pNPC) m_pNPC->ReleaseUploadBuffers();
+	if (m_pLight) m_pLight->ReleaseUploadBuffers();
+	if (m_pSkybox) m_pSkybox->ReleaseUploadBuffers();
+
+	if (m_pPianoTerrain) m_pPianoTerrain->ReleaseUploadBuffers();
+	if (m_pMainTerrain) m_pMainTerrain->ReleaseUploadBuffers();
+	if (m_pBroadcastTerrain) m_pBroadcastTerrain->ReleaseUploadBuffers();
+	if (m_pClassroomTerrain) m_pClassroomTerrain->ReleaseUploadBuffers();
+	if (m_pForestTerrain) m_pForestTerrain->ReleaseUploadBuffers();
+	if (m_pCubeTerrain) m_pCubeTerrain->ReleaseUploadBuffers();
+
+	if (m_pClass) m_pClass->ReleaseUploadBuffers();
+	if (m_pPiano) m_pPiano->ReleaseUploadBuffers();
 }
 
 void GameScene::CreateCbvSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nConstantBufferViews, int nShaderResourceViews)
@@ -495,7 +538,14 @@ void GameScene::LoadSceneObjectsFromFile(ID3D12Device* pd3dDevice, ID3D12Graphic
 	m_ppWalls = new GameObject * [m_nWalls];
 
 	GameObject* pGameObject = NULL;
+	Material* pMaterial = new Material(7);
+	pMaterial->m_ppTextures[0] = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pMaterial->m_ppTextures[0]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Model/Textures/WallTex.dds", RESOURCE_TEXTURE2D, 0);
 
+	CreateShaderResourceViews(pd3dDevice, pMaterial->m_ppTextures[0], 0, 3);
+
+	pMaterial->SetShader(pShader);
+	pMaterial->SetMaterialType(MATERIAL_ALBEDO_MAP);
 	for (int i = 0; i < m_nWalls; i++)
 	{
 		pGameObject = new GameObject();
@@ -530,14 +580,6 @@ void GameScene::LoadSceneObjectsFromFile(ID3D12Device* pd3dDevice, ID3D12Graphic
 		}
 		pGameObject->SetMesh(pMesh);
 
-		Material* pMaterial = new Material(7);
-		pMaterial->m_ppTextures[0] = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
-		pMaterial->m_ppTextures[0]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Model/Textures/WallTex.dds", RESOURCE_TEXTURE2D, 0);
-
-		CreateShaderResourceViews(pd3dDevice, pMaterial->m_ppTextures[0], 0, 3);
-
-		pMaterial->SetShader(pShader);
-		pMaterial->SetMaterialType(MATERIAL_ALBEDO_MAP);
 		pGameObject->renderer->SetMaterial(pMaterial);
 
 		m_ppWalls[i] = pGameObject;

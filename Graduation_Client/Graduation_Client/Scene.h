@@ -26,8 +26,9 @@ public:
 	Scene();
 	virtual ~Scene()
 	{
-		for (auto& object : gameObjects)
-			delete object;
+		for (auto& object : gameObjects) {
+			object->Release();
+		}
 		gameObjects.clear();
 	}
 	virtual void update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);

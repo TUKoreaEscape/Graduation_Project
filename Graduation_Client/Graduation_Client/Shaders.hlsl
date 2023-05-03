@@ -344,15 +344,17 @@ float4 PSWall(VS_WALL_OUTPUT input) : SV_TARGET
 
 	float4 cIllumination = Lighting(input.positionW, normalW);
 	//return cIllumination;
-	//returerp(cColor, cIllumination, 0.5f));
-	return cColor;
+	return (lerp(cColor, cIllumination, 0.5f));
+	//return cColor;
 }
 
 struct VS_TEXTURED_LIGHTING_INPUT
 {
 	float3 position : POSITION;
-	float3 normal : NORMAL;
 	float2 uv : TEXCOORD;
+	float3 normal : NORMAL;
+	float3 tangent : TANGENT;
+	float3 bitangent : BITANGENT;
 };
 
 struct VS_TEXTURED_LIGHTING_OUTPUT
@@ -404,6 +406,19 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 {
 	PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
 
+
+	float4 cAlbedoColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	if (gnTexturesMask & MATERIAL_ALBEDO_MAP) cAlbedoColor = gtxtAlbedoTexture.Sample(gssWrap, input.uv);
+	float4 cSpecularColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	if (gnTexturesMask & MATERIAL_SPECULAR_MAP) cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uv);
+	float4 cNormalColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	if (gnTexturesMask & MATERIAL_NORMAL_MAP) cNormalColor = gtxtNormalTexture.Sample(gssWrap, input.uv);
+	float4 cMetallicColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	if (gnTexturesMask & MATERIAL_METALLIC_MAP) cMetallicColor = gtxtMetallicTexture.Sample(gssWrap, input.uv);
+	float4 cEmissionColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	if (gnTexturesMask & MATERIAL_EMISSION_MAP) cEmissionColor = gtxtEmissionTexture.Sample(gssWrap, input.uv);
+	float4 cColor = cAlbedoColor + cSpecularColor + cMetallicColor + cEmissionColor;
+
 	float3 uvw = float3(input.uv, nPrimitiveID / 2);
 	output.f4Texture = gtxtAlbedoTexture.Sample(gssWrap, uvw);// Texture2DArray gtxtTextureArray : register(t0); 정의해야함   또 원래는 gtxtTextureArray를 사용하고있었는데 임시로 알베도로 바꿔놓음
 
@@ -417,6 +432,8 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 
 	output.f2ObjectIDzDepth.x = (float)1.0f;
 	output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
+
+	output.f4Scene = output.f4Color = lerp(cColor, output.f4Illumination,0.3f);
 
 	return(output);
 }
