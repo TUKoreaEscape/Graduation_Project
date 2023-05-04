@@ -449,14 +449,14 @@ VS_SCREEN_RECT_TEXTURED_OUTPUT VSScreenRectSamplingTextured(uint nVertexID : SV_
 	//else if (nVertexID == 5) { output.position = float4(-1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 1.0f); }
 
 	int screen = nVertexID/6;
-	if (nVertexID % 6 == 0)	{ output.position = float4((0.5 * screen) - 1.0f,			+1.0f, 0.0f, 1.0f);		output.uv = float2(0.0f, 0.0f); output.screenNum = screen;}
+	if (nVertexID % 6 == 0)	{ output.position = float4((0.5 * screen) - 1.0f,			+1.0f, 0.0f, 1.0f);		output.uv = float2(0.0f, 0.0f);		output.screenNum = screen;}
 	else if (nVertexID%6 == 1)	{ output.position = float4((0.5*(screen+1)) - 1.0f,		+1.0f, 0.0f, 1.0f);		output.uv = float2(1.0f, 0.0f); output.screenNum = screen;}
 	else if (nVertexID%6 == 2)	{ output.position = float4((0.5 * (screen + 1)) - 1.0f,	+0.5f, 0.0f, 1.0f);		output.uv = float2(1.0f, 1.0f); output.screenNum = 6;}
 	else if (nVertexID%6 == 3)	{ output.position = float4((0.5*screen) - 1.0f,			+1.0f, 0.0f, 1.0f);		output.uv = float2(0.0f, 0.0f); output.screenNum = screen;}
 	else if (nVertexID%6 == 4)	{ output.position = float4((0.5 *(screen+1.0f)) - 1.0f,	+0.5f, 0.0f, 1.0f);		output.uv = float2(1.0f, 1.0f); output.screenNum = screen;}
 	else if (nVertexID%6 == 5)	{ output.position = float4((0.5 * screen)-1.0f,			+0.5f, 0.0f, 1.0f);		output.uv = float2(0.0f, 1.0f); output.screenNum = screen;}
 
-	//output.viewSpaceDir = mul(output.position, gmtxInverseProjection).xyz;
+	output.viewSpaceDir = mul(output.position, gmtxInverseProjection).xyz;
 	return(output);
 }
 
@@ -532,47 +532,47 @@ float4 AlphaBlend(float4 top, float4 bottom)
 
 float4 Outline(VS_SCREEN_RECT_TEXTURED_OUTPUT input)
 {
-	//float fHalfScaleFloor = floor(1.0f * 0.5f);
-	//float fHalfScaleCeil = ceil(1.0f * 0.5f);
+	float fHalfScaleFloor = floor(1.0f * 0.5f);
+	float fHalfScaleCeil = ceil(1.0f * 0.5f);
 
-	//float2 f2BottomLeftUV = input.uv - float2((1.0f / gtxtInputTextures[0].Length.x), (1.0f / gtxtInputTextures[0].Length.y)) * fHalfScaleFloor;
-	//float2 f2TopRightUV = input.uv + float2((1.0f / gtxtInputTextures[0].Length.x), (1.0f / gtxtInputTextures[0].Length.y)) * fHalfScaleCeil;
-	//float2 f2BottomRightUV = input.uv + float2((1.0f / gtxtInputTextures[0].Length.x) * fHalfScaleCeil, -(1.0f / gtxtInputTextures[0].Length.y * fHalfScaleFloor));
-	//float2 f2TopLeftUV = input.uv + float2(-(1.0f / gtxtInputTextures[0].Length.x) * fHalfScaleFloor, (1.0f / gtxtInputTextures[0].Length.y) * fHalfScaleCeil);
+	float2 f2BottomLeftUV = input.uv - float2((1.0f / gtxtInputTextures[0].Length.x), (1.0f / gtxtInputTextures[0].Length.y)) * fHalfScaleFloor;
+	float2 f2TopRightUV = input.uv + float2((1.0f / gtxtInputTextures[0].Length.x), (1.0f / gtxtInputTextures[0].Length.y)) * fHalfScaleCeil;
+	float2 f2BottomRightUV = input.uv + float2((1.0f / gtxtInputTextures[0].Length.x) * fHalfScaleCeil, -(1.0f / gtxtInputTextures[0].Length.y * fHalfScaleFloor));
+	float2 f2TopLeftUV = input.uv + float2(-(1.0f / gtxtInputTextures[0].Length.x) * fHalfScaleFloor, (1.0f / gtxtInputTextures[0].Length.y) * fHalfScaleCeil);
 
-	//float3 f3NormalV0 = gtxtInputTextures[5].Sample(gssWrap, f2BottomLeftUV).rgb;
-	//float3 f3NormalV1 = gtxtInputTextures[5].Sample(gssWrap, f2TopRightUV).rgb;
-	//float3 f3NormalV2 = gtxtInputTextures[5].Sample(gssWrap, f2BottomRightUV).rgb;
-	//float3 f3NormalV3 = gtxtInputTextures[5].Sample(gssWrap, f2TopLeftUV).rgb;
+	float3 f3NormalV0 = gtxtInputTextures[5].Sample(gssWrap, f2BottomLeftUV).rgb;
+	float3 f3NormalV1 = gtxtInputTextures[5].Sample(gssWrap, f2TopRightUV).rgb;
+	float3 f3NormalV2 = gtxtInputTextures[5].Sample(gssWrap, f2BottomRightUV).rgb;
+	float3 f3NormalV3 = gtxtInputTextures[5].Sample(gssWrap, f2TopLeftUV).rgb;
 
-	//float fDepth0 = gtxtInputTextures[6].Sample(gssWrap, f2BottomLeftUV).r;
-	//float fDepth1 = gtxtInputTextures[6].Sample(gssWrap, f2TopRightUV).r;
-	//float fDepth2 = gtxtInputTextures[6].Sample(gssWrap, f2BottomRightUV).r;
-	//float fDepth3 = gtxtInputTextures[6].Sample(gssWrap, f2TopLeftUV).r;
+	float fDepth0 = gtxtInputTextures[6].Sample(gssWrap, f2BottomLeftUV).r;
+	float fDepth1 = gtxtInputTextures[6].Sample(gssWrap, f2TopRightUV).r;
+	float fDepth2 = gtxtInputTextures[6].Sample(gssWrap, f2BottomRightUV).r;
+	float fDepth3 = gtxtInputTextures[6].Sample(gssWrap, f2TopLeftUV).r;
 
-	//float3 f3NormalV = f3NormalV0 * 2.0f - 1.0f;
-	//float fNdotV = 1.0f - dot(f3NormalV, -input.viewSpaceDir);
+	float3 f3NormalV = f3NormalV0 * 2.0f - 1.0f;
+	float fNdotV = 1.0f - dot(f3NormalV, -input.viewSpaceDir);
 
-	//float fNormalThreshold01 = saturate((fNdotV - 0.5f) / (1.0f - 0.5f));
-	//float fNormalThreshold = (fNormalThreshold01 * 7.0f) + 1.0f;
+	float fNormalThreshold01 = saturate((fNdotV - 0.5f) / (1.0f - 0.5f));
+	float fNormalThreshold = (fNormalThreshold01 * 7.0f) + 1.0f;
 
-	//float fDepthThreshold = 1.5f * fDepth0 * fNormalThreshold;
+	float fDepthThreshold = 1.5f * fDepth0 * fNormalThreshold;
 
-	//float fDepthDifference0 = fDepth1 - fDepth0;
-	//float fDepthDifference1 = fDepth3 - fDepth2;
-	//float fDdgeDepth = sqrt(pow(fDepthDifference0, 2) + pow(fDepthDifference1, 2)) * 100.0f;
-	//fDdgeDepth = (fDdgeDepth > 1.5f) ? 1.0f : 0.0f;
+	float fDepthDifference0 = fDepth1 - fDepth0;
+	float fDepthDifference1 = fDepth3 - fDepth2;
+	float fDdgeDepth = sqrt(pow(fDepthDifference0, 2) + pow(fDepthDifference1, 2)) * 100.0f;
+	fDdgeDepth = (fDdgeDepth > 1.5f) ? 1.0f : 0.0f;
 
-	//float3 fNormalDifference0 = f3NormalV1 - f3NormalV0;
-	//float3 fNormalDifference1 = f3NormalV3 - f3NormalV2;
-	//float fEdgeNormal = sqrt(dot(fNormalDifference0, fNormalDifference0) + dot(fNormalDifference1, fNormalDifference1));
-	//fEdgeNormal = (fEdgeNormal > 0.4f) ? 1.0f : 0.0f;
+	float3 fNormalDifference0 = f3NormalV1 - f3NormalV0;
+	float3 fNormalDifference1 = f3NormalV3 - f3NormalV2;
+	float fEdgeNormal = sqrt(dot(fNormalDifference0, fNormalDifference0) + dot(fNormalDifference1, fNormalDifference1));
+	fEdgeNormal = (fEdgeNormal > 0.4f) ? 1.0f : 0.0f;
 
-	//float fEdge = max(fDdgeDepth, fEdgeNormal);
-	//float4 f4EdgeColor = float4(1.0f, 1.0f, 1.0f, 1.0f * fEdge);
+	float fEdge = max(fDdgeDepth, fEdgeNormal);
+	float4 f4EdgeColor = float4(1.0f, 1.0f, 1.0f, 1.0f * fEdge);
 
-	//float4 f4Color = gtxtInputTextures[0].Sample(gssWrap, input.uv);
-	//return(AlphaBlend(f4EdgeColor, f4Color));
+	float4 f4Color = gtxtInputTextures[0].Sample(gssWrap, input.uv);
+	return(AlphaBlend(f4EdgeColor, f4Color));
 }
 
 float4 PSScreenRectSamplingTextured(VS_SCREEN_RECT_TEXTURED_OUTPUT input) : SV_Target
@@ -580,9 +580,11 @@ float4 PSScreenRectSamplingTextured(VS_SCREEN_RECT_TEXTURED_OUTPUT input) : SV_T
 	float4 cColor = float4(1.0f, 1.0f, 0.0f, 0.1f);
 	//cColor = gtxtInputTextures[3].Sample(gssWrap, input.uv);
 	cColor = gtxtInputTextures[input.screenNum][int2(input.position.xy)];
-	// 
+	//cColor = gtxtInputTextures[input.screenNum].Sample(gssWrap, input.uv);
 	//cColor = LaplacianEdge(input.position);
-	//cColor = Outline(input.position);
+	//cColor = Outline(input);
+
+
 	//switch (gvDrawOptions.x)
 	//{
 	//	case 84: //'T'

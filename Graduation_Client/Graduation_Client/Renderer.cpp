@@ -11,6 +11,7 @@ void StandardRenderer::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 void StandardRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+
 	if (gameObject->m_pMesh)
 	{
 		UpdateShaderVariable(pd3dCommandList, &gameObject->m_xmf4x4World);
