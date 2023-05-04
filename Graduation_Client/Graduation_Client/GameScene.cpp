@@ -201,7 +201,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 			m_network->send_packet(&l_packet);
 			break;
 		}
-		std::this_thread::sleep_for(std::chrono::seconds(2));
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 
 	send_thread = std::thread{ &Network::Debug_send_thread, m_network };

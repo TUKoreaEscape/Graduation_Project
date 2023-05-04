@@ -12,7 +12,7 @@ const int  MAX_ROOM_INFO_SEND = 10;
 
 const int CHECK_MAX_PACKET_SIZE = 127;
 
-const int BUF_SIZE = 512;
+const int BUF_SIZE = 1024;
 // ----- 클라이언트가 서버에게 보낼때 ------
 
 #define VOICE_ISSUER "작성해야됨"
@@ -63,9 +63,9 @@ namespace CS_PACKET
 
 #pragma pack (push, 1)
 struct Position {
-	short x;
-	short y;
-	short z;
+	int x;
+	int y;
+	int z;
 };
 
 struct Look {

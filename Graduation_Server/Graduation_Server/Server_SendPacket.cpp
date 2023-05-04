@@ -144,9 +144,9 @@ void cGameServer::send_calculate_move_packet(const unsigned int id) // 이동을 요
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_CALCULATE_MOVE;
 	packet.id = id;
-	packet.pos.x = static_cast<short>(m_clients[id].get_user_position().x * 100);
-	packet.pos.y = static_cast<short>(m_clients[id].get_user_position().y * 100);
-	packet.pos.z = static_cast<short>(m_clients[id].get_user_position().z * 100);
+	packet.pos.x = static_cast<int>(m_clients[id].get_user_position().x * 10000);
+	packet.pos.y = static_cast<int>(m_clients[id].get_user_position().y * 10000);
+	packet.pos.z = static_cast<int>(m_clients[id].get_user_position().z * 10000);
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 

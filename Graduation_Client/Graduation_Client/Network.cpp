@@ -167,14 +167,17 @@ void Network::AssemblyPacket(char* net_buf, size_t io_byte)
 	static size_t saved_packet_size = 0;
 	static char packet_buffer[BUF_SIZE];
 
+	unsigned char make_size;
 	while (io_byte != 0) {
 		if (make_packet_size == 0) {
-			make_packet_size = ptr[0];
-			if (make_packet_size == 127)
+			make_size = ptr[0];
+			make_packet_size = make_size;
+			//std::cout << "packet size : " << make_packet_size << std::endl;
+			/*if (make_packet_size == 127)
 			{
 				make_packet_size *= ptr[2];
 				make_packet_size += ptr[3];
-			}
+			}*/
 		}
 		if (io_byte + saved_packet_size >= make_packet_size) {
 			memcpy(packet_buffer + saved_packet_size, ptr, make_packet_size - saved_packet_size);
@@ -203,7 +206,11 @@ void Network::listen_thread()
 		DWORD recv_byte{ 0 }, recv_flag{ 0 };
 
 		if (WSARecv(m_socket, &wsabuf, 1, &recv_byte, &recv_flag, nullptr, nullptr) == SOCKET_ERROR)
-			;
+		{
+			std::cout << "Socket Error Exit" << std::endl;
+			TerminateProcess(info.hProcess, 1);
+			exit(0);
+		}
 
 		if (recv_byte > 0) {
 			AssemblyPacket(wsabuf.buf, recv_byte);
@@ -320,10 +327,10 @@ void Network::ProcessPacket(char* ptr)
 			{
 				if (packet->data[i].id == m_ppOther[j]->GetID())
 				{
-					XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->data[i].position.x) / 100.f, static_cast<float>(packet->data[i].position.y) / 100.f, static_cast<float>(packet->data[i].position.z) / 100.f);
+					XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->data[i].position.x) / 10000.f, static_cast<float>(packet->data[i].position.y) / 10000.f, static_cast<float>(packet->data[i].position.z) / 10000.f);
 					XMFLOAT3 conversion_look = XMFLOAT3(static_cast<float>(packet->data[i].look.x) / 100.f, static_cast<float>(packet->data[i].look.y) / 100.f, static_cast<float>(packet->data[i].look.z) / 100.f);
 					XMFLOAT3 conversion_right = XMFLOAT3(static_cast<float>(packet->data[i].right.x) / 100.f, static_cast<float>(packet->data[i].right.y) / 100.f, static_cast<float>(packet->data[i].right.z) / 100.f);
-					//m_ppOther[j]->SetPosition(conversion_position);
+					//m_ppOther[j]->SetPosition(conversion_position)
 					Other_Player_Pos[j].pos_lock.lock();
 					Other_Player_Pos[j].Other_Pos = conversion_position;
 					Other_Player_Pos[j].pos_lock.unlock();
@@ -385,7 +392,7 @@ void Network::ProcessPacket(char* ptr)
 	{
 		sc_packet_calculate_move* packet = reinterpret_cast<sc_packet_calculate_move*>(ptr);
 		//m_pPlayer->SetPosition(packet->pos, true);
-		XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->pos.x) / 100.f, static_cast<float>(packet->pos.y) / 100.f, static_cast<float>(packet->pos.z) / 100.f);
+		XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->pos.x) / 10000.f, static_cast<float>(packet->pos.y) / 10000.f, static_cast<float>(packet->pos.z) / 10000.f);
 		pos_lock.lock();
 		m_pPlayer_Pos = conversion_position;
 		pos_lock.unlock();
