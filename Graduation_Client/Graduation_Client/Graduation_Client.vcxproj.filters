@@ -123,6 +123,9 @@
     <ClInclude Include="protocol.h">
       <Filter>Client\Network</Filter>
     </ClInclude>
+    <ClInclude Include="Server_Timer.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -195,6 +198,9 @@
       <Filter>Client\Network</Filter>
     </ClCompile>
     <ClCompile Include="Network.cpp">
+      <Filter>Client\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Process_Packet.cpp">
       <Filter>Client\Network</Filter>
     </ClCompile>
   </ItemGroup>

@@ -58,11 +58,13 @@ void Room::Update_room_time()
 
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 180 && false == m_first_skill_enable) // 술래 첫번째 스킬 활성화
 	{
-		m_first_skill_enable = true;
+		m_first_skill_enable = false;
+		m_second_skill_enable = false;
+		m_third_skill_enable = false;
 		cl.set_first_skill_enable();
-		sc_packet_tagger_skill packet;
+		sc_packet_select_tagger packet;
 		packet.size = sizeof(packet);
-		packet.type = SC_PACKET::SC_PACKET_TAGGER_SKILL;
+		packet.type = SC_PACKET::SC_PACKET_SELECT_TAGGER;
 		packet.first_skill = m_first_skill_enable;
 		packet.second_skill = m_second_skill_enable;
 		packet.third_skill = m_third_skill_enable;

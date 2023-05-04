@@ -59,9 +59,22 @@ public:
 
 	void listen_thread();
 	void Debug_send_thread();
-	void Send_Customizing_Data();
 	void AssemblyPacket(char* netbuf, size_t io_byte);
 	void ProcessPacket(char* ptr);
+
+	void Process_Player_Move(char* ptr);
+	void Process_Other_Player_Move(char* ptr);
+	void Process_Game_Start(char* ptr);
+
+	// 게임 시작 전 사용하는 함수들
+	void Send_Request_Room_Info(int page);
+	void Send_Customizing_Data();
+	void Send_Ready_Packet(bool is_ready);
+	void Send_Loading_Success_Packet();
+
+	// 게임 플레이시 사용하는 패킷전송 함수
+	void Send_Use_Tagger_Skill(int skill_type);
+	void Send_Picking_Object_Packet();
 
 	void send_packet(void* packet);
 };

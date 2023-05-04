@@ -66,7 +66,6 @@ int Room::Get_Join_Member(int data)
 	return in_player[data];
 }
 
-
 char* Room::Get_Room_Name(char room_name[], int size)
 {
 	strcpy_s(room_name, size, m_room_name);

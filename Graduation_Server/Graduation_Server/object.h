@@ -13,13 +13,16 @@ protected:
 	XMFLOAT3				m_pos;
 
 	BoundingOrientedBox		m_bounding_box;
+
+	int						m_section = -1;
 public:
 	GameObject();
 	GameObject(Object_Type type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation);
 	virtual ~GameObject() = default;
 
 	void					Set_BoundingBox(const BoundingOrientedBox& box);
-	void					Set_Position(XMFLOAT3 pos);
+	void					Set_Position(XMFLOAT3 pos) { m_pos = pos; }
+	void					Set_ObjectSection(int section) { m_section = section; }
 
 	BoundingOrientedBox		Get_BoundingBox();
 
@@ -27,6 +30,8 @@ public:
 	XMFLOAT3				Get_center();
 	XMFLOAT3				Get_extents();
 	XMFLOAT4				Get_orientation();
+
+	int						Get_Section() { return m_section; }
 
 	void					Update_bounding_box_pos(const XMFLOAT3 pos);
 	void					Update_bounding_box_rotate(const float yaw);

@@ -57,7 +57,10 @@ namespace CS_PACKET
 		CS_PACKET_GAME_LOADING_SUCCESS,
 		CS_PACKET_REQUEST_ROOM_INFO,
 		CS_PACKET_REQUEST_VIVOX_DATA,
-		CS_PACKET_CUSTOMIZING
+		CS_PACKET_CUSTOMIZING,
+		CS_PACKET_USE_FIRST_TAGGER_SKILL,
+		CS_PACKET_USE_SECOND_TAGGER_SKILL,
+		CS_PACKET_USE_THIRD_TAGGER_SKILL
 	};
 }
 
@@ -172,6 +175,11 @@ struct cs_packet_loading_success {
 	unsigned char	type;
 };
 
+struct cs_packet_use_tagger_skill {
+	unsigned char	size;
+	unsigned char	type;
+};
+
 struct cs_packet_request_exit_room {
 	unsigned char	size;
 	unsigned char	type;
@@ -228,6 +236,7 @@ namespace SC_PACKET
 		SC_PACKET_PUT_OTHER_PLAYER,
 		SC_PACKET_MOVE,
 		SC_PACKET_CALCULATE_MOVE,
+		SC_PACKET_SELECT_TAGGER,
 		SC_PACKET_TAGGER_SKILL,
 		SC_PACKET_ROOM_INFO,
 		SC_PACKET_VIVOX_DATA,
@@ -366,6 +375,15 @@ struct sc_packet_calculate_move {
 	unsigned char	type;
 	short			id;
 	Position		pos;
+};
+
+struct sc_packet_select_tagger {
+	unsigned char	size;
+	unsigned char	type;
+
+	bool			first_skill;
+	bool			second_skill;
+	bool			third_skill;
 };
 
 struct sc_packet_tagger_skill {

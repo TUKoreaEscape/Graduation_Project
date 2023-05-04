@@ -31,6 +31,66 @@ void Network::Send_Customizing_Data()
 	send_packet(&packet);
 }
 
+void Network::Send_Request_Room_Info(int page)
+{
+	cs_packet_request_all_room_info packet;
+
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_REQUEST_ROOM_INFO;
+	packet.request_page = page;
+
+	send_packet(&packet);
+}
+
+void Network::Send_Ready_Packet(bool is_ready)
+{
+	cs_packet_ready packet;
+
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_READY;
+	packet.ready_type = is_ready;
+
+	send_packet(&packet);
+}
+
+void Network::Send_Loading_Success_Packet()
+{
+	cs_packet_loading_success packet;
+	
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_GAME_LOADING_SUCCESS;
+
+	send_packet(&packet);
+}
+
+void Network::Send_Picking_Object_Packet()
+{
+	// 이쪽은 생명칩 OR 다른 오브젝트가 주변에 있을때 획득요청을 합니다.
+}
+
+void Network::Send_Use_Tagger_Skill(int skill_type)
+{
+	// 여긴 만약 술래인 경우!
+	cs_packet_use_tagger_skill packet;
+	packet.size = sizeof(packet);
+	switch (skill_type)
+	{
+	case 1:
+		packet.type = CS_PACKET::CS_PACKET_USE_FIRST_TAGGER_SKILL;
+		break;
+
+	case 2:
+		packet.type = CS_PACKET::CS_PACKET_USE_SECOND_TAGGER_SKILL;
+		break;
+
+	case 3:
+		packet.type = CS_PACKET::CS_PACKET_USE_THIRD_TAGGER_SKILL;
+		break;
+	}
+
+	send_packet(&packet);
+}
+
 void Network::Debug_send_thread()
 {
 	while (m_shutdown == false)
@@ -319,59 +379,8 @@ void Network::ProcessPacket(char* ptr)
 	}
 
 	case SC_PACKET::SC_PACKET_OTHER_PLAYER_UPDATE:
-	{
-		sc_other_player_move* packet = reinterpret_cast<sc_other_player_move*>(ptr);
-		for (int i = 0; i < 5; ++i)
-		{
-			for (int j = 0; j < 5; ++j)
-			{
-				if (packet->data[i].id == m_ppOther[j]->GetID())
-				{
-					XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->data[i].position.x) / 10000.f, static_cast<float>(packet->data[i].position.y) / 10000.f, static_cast<float>(packet->data[i].position.z) / 10000.f);
-					XMFLOAT3 conversion_look = XMFLOAT3(static_cast<float>(packet->data[i].look.x) / 100.f, static_cast<float>(packet->data[i].look.y) / 100.f, static_cast<float>(packet->data[i].look.z) / 100.f);
-					XMFLOAT3 conversion_right = XMFLOAT3(static_cast<float>(packet->data[i].right.x) / 100.f, static_cast<float>(packet->data[i].right.y) / 100.f, static_cast<float>(packet->data[i].right.z) / 100.f);
-					//m_ppOther[j]->SetPosition(conversion_position)
-					Other_Player_Pos[j].pos_lock.lock();
-					Other_Player_Pos[j].Other_Pos = conversion_position;
-					Other_Player_Pos[j].pos_lock.unlock();
-					m_ppOther[j]->m_xmf3Look = conversion_look;
-					m_ppOther[j]->m_xmf3Right = conversion_right;
-					if (packet->data[i].input_key == DIR_FORWARD)
-					{
-						m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-						m_ppOther[j]->SetTrackAnimationSet(0, 1);
-					}
-					if (packet->data[i].input_key == DIR_BACKWARD)
-					{
-						m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-						m_ppOther[j]->SetTrackAnimationSet(0, 2);
-					}
-					if (packet->data[i].input_key == DIR_LEFT)
-					{
-						m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-						m_ppOther[j]->SetTrackAnimationSet(0, 3);
-					}
-					if (packet->data[i].input_key == DIR_RIGHT)
-					{
-						m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-						m_ppOther[j]->SetTrackAnimationSet(0, 4);
-					}
-					if (packet->data[i].input_key == DIR_UP)
-					{
-						m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-						m_ppOther[j]->SetTrackAnimationSet(0, 5);
-					}
-
-					if (packet->data[i].input_key == DIR_EMPTY)
-					{
-						m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-						m_ppOther[j]->SetTrackAnimationSet(0, 0);
-					}
-				}
-			}
-		}
+		Process_Other_Player_Move(ptr);
 		break;
-	}
 
 	case SC_PACKET::SC_PACKET_OTHER_PLAYER_DISCONNECT:
 	{
@@ -389,15 +398,8 @@ void Network::ProcessPacket(char* ptr)
 	}
 
 	case SC_PACKET::SC_PACKET_CALCULATE_MOVE:
-	{
-		sc_packet_calculate_move* packet = reinterpret_cast<sc_packet_calculate_move*>(ptr);
-		//m_pPlayer->SetPosition(packet->pos, true);
-		XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->pos.x) / 10000.f, static_cast<float>(packet->pos.y) / 10000.f, static_cast<float>(packet->pos.z) / 10000.f);
-		pos_lock.lock();
-		m_pPlayer_Pos = conversion_position;
-		pos_lock.unlock();
+		Process_Player_Move(ptr);
 		break;
-	}
 
 	case SC_PACKET::SC_PACKET_PUT_PLAYER:
 	{
