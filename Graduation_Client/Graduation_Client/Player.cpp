@@ -195,6 +195,7 @@ void Player::update(float fTimeElapsed)
 		if (!IsJump())
 			m_JumpElapsedTime = 0.0;
 		m_Isfalling = false;
+		m_pSkinnedAnimationController->SetTrackSpeed(0, 0.33f);
 	}
 	float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
 	float fMaxVelocityXZ = m_fMaxVelocityXZ;
@@ -330,6 +331,7 @@ void Player::OnPlayerUpdateCallback(float fTimeElapsed)
 			SetPosition(xmf3PlayerPosition);
 			m_JumpElapsedTime = 0.0f;
 			m_Isfalling = false;
+			m_pSkinnedAnimationController->SetTrackSpeed(0, 1);
 		}
 	}
 }
