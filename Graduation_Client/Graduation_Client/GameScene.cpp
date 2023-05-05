@@ -42,6 +42,8 @@ void GameScene::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pClass->render(pd3dCommandList);
 	m_pPiano->UpdateTransform(nullptr);
 	m_pPiano->render(pd3dCommandList);
+	m_pBroadcast->UpdateTransform(nullptr);
+	m_pBroadcast->render(pd3dCommandList);
 
 	for (int i = 0; i < m_nWalls; ++i)
 	{
@@ -64,13 +66,18 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	LoadedModelInfo* pClassModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InClassObject.bin", nullptr);
 	LoadedModelInfo* pPianoModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPianoRoom.bin", nullptr);
+	LoadedModelInfo* pBroadcastModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InBroadcast.bin", nullptr);
 
 	m_pClass = new GameObject();
 	m_pClass->SetChild(pClassModel->m_pModelRootObject, true);
-
 	m_pPiano = new GameObject();
 	m_pPiano->SetChild(pPianoModel->m_pModelRootObject, true);
-	//m_pPiano->SetScale(1.0f, 1.0f, 1.0f);
+	m_pBroadcast = new GameObject();
+	m_pBroadcast->SetChild(pBroadcastModel->m_pModelRootObject, true);
+
+	if (pClassModel) delete pClassModel;
+	if (pPianoModel) delete pPianoModel;
+	if (pBroadcastModel) delete pBroadcastModel;
 
 	m_pNPC = new GameObject();
 	m_pNPC->SetChild(pPlayerModel->m_pModelRootObject, true);
