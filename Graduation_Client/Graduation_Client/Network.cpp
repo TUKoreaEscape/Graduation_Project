@@ -404,9 +404,9 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_PUT_PLAYER:
 	{
 		sc_put_player_packet* packet = reinterpret_cast<sc_put_player_packet*>(ptr);
+		m_pPlayer->SetID(packet->data.id);
 		m_pPlayer->SetPosition(packet->data.position, true);
 		std::cout << "Set Init Pos : (" << packet->data.position.x << ", " << packet->data.position.y << ", " << packet->data.position.z << ") " << std::endl;
-		m_pPlayer->SetID(packet->data.id);
 		m_pPlayer->SetVelocity(packet->data.velocity);
 		//std::cout << "put player packet recv!" << std::endl;
 		break;
@@ -455,7 +455,7 @@ void Network::ProcessPacket(char* ptr)
 
 		for (int i = 0; i < 5; ++i)
 		{
-			if (m_ppOther[i]->GetID() == packet->id)
+			if (m_ppOther[i]->GetID() == packet->id && packet->id != -1)
 			{
 				GameObject::SetParts(i + 1, 0, static_cast<int>(packet->body));
 				GameObject::SetParts(i + 1, 1, static_cast<int>(packet->body_parts));
