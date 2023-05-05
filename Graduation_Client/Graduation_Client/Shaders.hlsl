@@ -368,6 +368,8 @@ struct VS_TEXTURED_LIGHTING_OUTPUT
 	float3 positionW : POSITION;
 	float3 normalW : NORMAL0;
 	float3 normalV : NORMAL1;
+	float3 tangentW : TANGENT;
+	float3 bitangentW : BITANGENT;
 	float2 uv : TEXCOORD;
 };
 
@@ -379,6 +381,8 @@ VS_TEXTURED_LIGHTING_OUTPUT VSTexturedLighting(VS_TEXTURED_LIGHTING_INPUT input)
 	output.normalV = mul(float4(output.normalW, 1.0f), gmtxView).xyz;
 	output.positionW = (float3)mul(float4(input.position, 1.0f), gmtxGameObject);
 	output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+	output.tangentW = mul(input.tangent, (float3x3)gmtxGameObject);
+	output.bitangentW = mul(input.bitangent, (float3x3)gmtxGameObject);
 	output.uv = input.uv;
 
 	return(output);
@@ -423,16 +427,34 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 	float4 cEmissionColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	if (gnTexturesMask & MATERIAL_EMISSION_MAP) cEmissionColor = gtxtEmissionTexture.Sample(gssWrap, input.uv);
 	float4 cColor = cAlbedoColor + cSpecularColor + cMetallicColor + cEmissionColor;
+	float3 normalW;
+	if (gnTexturesMask & MATERIAL_NORMAL_MAP)
+	{
+		float3x3 TBN = float3x3(normalize(input.tangentW), normalize(input.bitangentW), normalize(input.normalW));
+		float3 vNormal = normalize(cNormalColor.rgb * 2.0f - 1.0f); //[0, 1] → [-1, 1]
+		normalW = normalize(mul(vNormal, TBN));
+	}
+	else
+	{
+		normalW = normalize(input.normalW);
+	}
+
+	float4 cIllumination = Lighting(input.positionW, normalW);
+	//return(lerp(cColor, cIllumination, 0.5f));
+	output.f4Illumination = cIllumination;
 
 	float3 uvw = float3(input.uv, nPrimitiveID / 2);
-	output.f4Texture = gtxtAlbedoTexture.Sample(gssWrap, uvw);// Texture2DArray gtxtTextureArray : register(t0); 정의해야함   또 원래는 gtxtTextureArray를 사용하고있었는데 임시로 알베도로 바꿔놓음
-
+	//output.f4Texture = gtxtAlbedoTexture.Sample(gssWrap, uvw);// Texture2DArray gtxtTextureArray : register(t0); 정의해야함   또 원래는 gtxtTextureArray를 사용하고있었는데 임시로 알베도로 바꿔놓음
+	output.f4Texture = cColor;
 	input.normalW = normalize(input.normalW);
-	output.f4Illumination = Lighting(input.positionW, input.normalW);
+	//output.f4Illumination = Lighting(input.positionW, input.normalW);
 
-	output.f4Scene = output.f4Color = output.f4Illumination * output.f4Texture;
+	//output.f4Scene = output.f4Color = output.f4Illumination * output.f4Texture;
+	output.f4Scene = output.f4Color = lerp(output.f4Illumination, output.f4Texture, 0.7f);
+	//output.f4Normal = float4(input.normalW.xyz * 0.5f + 0.5f, input.position.z);
+	//output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
 
-	output.f4Normal = float4(input.normalW.xyz * 0.5f + 0.5f, input.position.z);
+	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
 
 	output.f2ObjectIDzDepth.x = (float)1.0f;
