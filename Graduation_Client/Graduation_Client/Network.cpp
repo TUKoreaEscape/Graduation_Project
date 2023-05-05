@@ -405,6 +405,7 @@ void Network::ProcessPacket(char* ptr)
 	{
 		sc_put_player_packet* packet = reinterpret_cast<sc_put_player_packet*>(ptr);
 		m_pPlayer->SetPosition(packet->data.position, true);
+		std::cout << "Set Init Pos : (" << packet->data.position.x << ", " << packet->data.position.y << ", " << packet->data.position.z << ") " << std::endl;
 		m_pPlayer->SetID(packet->data.id);
 		m_pPlayer->SetVelocity(packet->data.velocity);
 		//std::cout << "put player packet recv!" << std::endl;

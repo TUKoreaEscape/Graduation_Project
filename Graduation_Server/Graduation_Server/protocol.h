@@ -89,6 +89,7 @@ struct UserData {
 	Position			position;
 	Look				look;
 	Right				right;
+	bool				is_jump;
 	unsigned char		active; // 생명칩유무 :D
 };
 
@@ -129,6 +130,7 @@ struct cs_packet_move { // 이동관련 데이터
 	unsigned char		type;
 
 	unsigned char		input_key;
+	bool				is_jump;
 	float				yaw;
 	Look				look;
 	Right				right;

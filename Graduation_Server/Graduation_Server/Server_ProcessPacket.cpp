@@ -56,12 +56,12 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 			calculate_player_position = Add(current_player_position, player_check.SlidingVector);
 			m_clients[user_id].set_user_position(calculate_player_position);
 			m_clients[user_id].update_bounding_box_pos(calculate_player_position);
-			if (m_clients[user_id].get_user_position().y < 0)
-			{
-				calculate_player_position.y = 0;
-				m_clients[user_id].set_user_position(calculate_player_position);
-				m_clients[user_id].update_bounding_box_pos(calculate_player_position);
-			}
+			//if (m_clients[user_id].get_user_position().y < 0)
+			//{
+			//	calculate_player_position.y = 0;
+			//	m_clients[user_id].set_user_position(calculate_player_position);
+			//	m_clients[user_id].update_bounding_box_pos(calculate_player_position);
+			//}
 			current_shift = player_check.SlidingVector;
 			//cout << "적용후 캐릭터 좌표 : " << m_clients[user_id].get_user_position().x << ", " << m_clients[user_id].get_user_position().y << ", " << m_clients[user_id].get_user_position().z << endl;
 		}

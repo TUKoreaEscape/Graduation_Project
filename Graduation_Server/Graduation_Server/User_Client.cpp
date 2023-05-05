@@ -144,7 +144,6 @@ void CLIENT::update_rotation(float yaw)
 
 	XMFLOAT4 calculate{};
 	XMStoreFloat4(&calculate, XMQuaternionRotationRollPitchYaw(0.f, radian, 0.f));
-	//cout << calculate.x << ", " << calculate.y << ", " << calculate.z << ", " << calculate.w << endl;
 	m_bounding_box.Orientation = calculate;  // 바운딩박스도 회전은 해야지..
 }
 

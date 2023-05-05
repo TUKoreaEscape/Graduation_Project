@@ -324,6 +324,8 @@ void Framework::UpdateObjects()
 		packet.right.z = Input::GetInstance()->m_pPlayer->GetRightVector().z * 100;
 
 		packet.yaw = Input::GetInstance()->m_pPlayer->GetYaw();
+		packet.is_jump = Input::GetInstance()->m_pPlayer->GetIsFalling();
+		//std::cout << packet.xmf3Shift.x << ", " << packet.xmf3Shift.y << ", " << packet.xmf3Shift.z << std::endl;
 		network.send_packet(&packet);
 
 		//while (!network.m_recv_move);
