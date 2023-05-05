@@ -90,6 +90,7 @@ struct UserData {
 	Look				look;
 	Right				right;
 	bool				is_jump;
+	bool				is_collision_up_face;
 	unsigned char		active; // 생명칩유무 :D
 };
 
@@ -377,6 +378,7 @@ struct sc_packet_calculate_move {
 	unsigned char	type;
 	short			id;
 	Position		pos;
+	bool			is_collision_up_face;
 };
 
 struct sc_packet_select_tagger {

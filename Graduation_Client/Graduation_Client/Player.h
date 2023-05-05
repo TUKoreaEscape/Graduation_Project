@@ -55,6 +55,9 @@ public:
 	bool GetIsFalling() { return m_Isfalling; }
 	void SetIsFalling(bool state) { m_Isfalling = state; }
 
+	bool GetIsColledUpFace() { return m_collision_up_face; }
+	void SetIsColledUpFace(bool state) { m_collision_up_face = state; }
+
 	//CCamera* GetCamera() { return(m_pCamera); }
 	//void SetCamera(CCamera* pCamera) { m_pCamera = pCamera; }
 
@@ -115,4 +118,5 @@ protected:
 	float							m_Jumpping = 0.3f;
 	float							m_JumpElapsedTime = 0.f;
 	bool							m_Isfalling = false;
+	bool							m_collision_up_face = false;
 };

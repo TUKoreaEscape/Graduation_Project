@@ -17,6 +17,7 @@ void Network::Process_Player_Move(char* ptr)
 	XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->pos.x) / 10000.f, static_cast<float>(packet->pos.y) / 10000.f, static_cast<float>(packet->pos.z) / 10000.f);
 	pos_lock.lock();
 	m_pPlayer_Pos = conversion_position;
+	m_pPlayer->SetIsColledUpFace(packet->is_collision_up_face);
 	pos_lock.unlock();
 }
 
@@ -35,6 +36,7 @@ void Network::Process_Other_Player_Move(char* ptr)
 				//m_ppOther[j]->SetPosition(conversion_position)
 				Other_Player_Pos[j].pos_lock.lock();
 				Other_Player_Pos[j].Other_Pos = conversion_position;
+				m_ppOther[j]->SetIsColledUpFace(packet->data[i].is_collision_up_face);
 				Other_Player_Pos[j].pos_lock.unlock();
 				m_ppOther[j]->m_xmf3Look = conversion_look;
 				m_ppOther[j]->m_xmf3Right = conversion_right;

@@ -81,6 +81,8 @@ void cGameServer::Update_OtherPlayer(int room_number)
 					packet.data[index].position.x = static_cast<int>(m_clients[this_id].get_user_position().x * 10000);
 					packet.data[index].position.y = static_cast<int>(m_clients[this_id].get_user_position().y * 10000);
 					packet.data[index].position.z = static_cast<int>(m_clients[this_id].get_user_position().z * 10000);
+					packet.data[index].is_jump = m_clients[this_id].get_user_is_jump();
+					packet.data[index].is_collision_up_face = m_clients[this_id].get_user_collied_up_face();
 					packet.data[index].active = true;
 					index++;
 				}

@@ -245,6 +245,7 @@ CollisionInfo Room::is_collision_player_to_player(const int player_id, const XMF
 		return_data.is_collision = true;
 		return_data.SlidingVector = SlidingVector;
 		return_data.CollisionNormal = data.CollisionNormal;
+		return_data.collision_face_num = data.collision_face_num;
 	}
 	else
 	{
@@ -293,6 +294,7 @@ CollisionInfo Room::is_collision_wall_to_player(const int player_id, const XMFLO
 			return_data.is_collision = true;
 			return_data.SlidingVector = SlidingVector;
 			return_data.CollisionNormal = collision_data.CollisionNormal;
+			return_data.collision_face_num = collision_data.collision_face_num;
 			MotionVector = SlidingVector;
 			tmp_position = Add(tmp_position, SlidingVector);
 

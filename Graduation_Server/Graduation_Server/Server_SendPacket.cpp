@@ -147,6 +147,8 @@ void cGameServer::send_calculate_move_packet(const unsigned int id) // 이동을 요
 	packet.pos.x = static_cast<int>(m_clients[id].get_user_position().x * 10000);
 	packet.pos.y = static_cast<int>(m_clients[id].get_user_position().y * 10000);
 	packet.pos.z = static_cast<int>(m_clients[id].get_user_position().z * 10000);
+	packet.is_collision_up_face = m_clients[id].get_user_collied_up_face();
+
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 

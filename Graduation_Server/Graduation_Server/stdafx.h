@@ -60,6 +60,7 @@ using namespace DirectX;
 struct CollisionInfo
 {
 	bool	 is_collision;
+	int	     collision_face_num;
 	XMFLOAT3 CollisionNormal; // 충돌 면의 법선 벡터
 	XMFLOAT3 SlidingVector;
 };

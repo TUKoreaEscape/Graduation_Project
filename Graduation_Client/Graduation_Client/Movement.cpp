@@ -43,13 +43,13 @@ void CommonMovement::update(float elapsedTime)
 		}
 		if ((keyBuffer[VK_SPACE] & 0xF0&&!Input::GetInstance()->m_pPlayer->GetIsFalling()))
 		{
-			std::cout << "스페이스바" << std::endl;
+			//std::cout << "스페이스바" << std::endl;
 			Input::GetInstance()->m_pPlayer->SetIsFalling(true);
 		}
 
 		if ((Input::GetInstance()->m_pPlayer->IsJump() && Input::GetInstance()->m_pPlayer->GetIsFalling()))
 		{
-			std::cout << "점프 on" << std::endl;
+			//std::cout << "점프 on" << std::endl;
 			dwDirection |= DIR_UP;
 			gameObject->SetTrackAnimationSet(0, 5);
 			Input::GetInstance()->m_pPlayer->SetDirection(DIR_UP);

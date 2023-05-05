@@ -208,6 +208,7 @@ int cGameServer::get_new_id()
 CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& other, const BoundingOrientedBox& moved)
 {
 	CollisionInfo collisionInfo;
+	collisionInfo.collision_face_num = -1;
 	float penetrationDepth = 0.0f;
 	XMFLOAT3 collisionNormal(0.0f, 0.0f, 0.0f);
 	XMFLOAT3 collisionPoint(0.0f, 0.0f, 0.0f);
@@ -253,6 +254,7 @@ CollisionInfo cGameServer::GetCollisionInfo(const BoundingOrientedBox& other, co
 				{
 					collidedFaceIndex = i;
 					minPenetrationDepth = penetration;
+					collisionInfo.collision_face_num = i;
 				}
 			}
 		}
