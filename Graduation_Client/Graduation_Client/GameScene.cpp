@@ -51,14 +51,28 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
 	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
+
+	m_pSkybox->render(pd3dCommandList);
+
+	m_pMainTerrain->render(pd3dCommandList);
+	m_pPianoTerrain->render(pd3dCommandList);
+	m_pBroadcastTerrain->render(pd3dCommandList);
+	m_pCubeTerrain->render(pd3dCommandList);
+	m_pForestTerrain->render(pd3dCommandList);
+	m_pClassroomTerrain->render(pd3dCommandList);
+
+	for (int i = 0; i < m_nWalls; ++i)
+	{
+		if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
+	}
+
+	Scene::render(pd3dCommandList);
 	
 	m_pClass->UpdateTransform(nullptr);
 	m_pClass->render(pd3dCommandList);
 
 	m_pPiano->UpdateTransform(nullptr);
 	m_pPiano->render(pd3dCommandList);
-
-	//Scene::render(pd3dCommandList);
 }
 
 void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
