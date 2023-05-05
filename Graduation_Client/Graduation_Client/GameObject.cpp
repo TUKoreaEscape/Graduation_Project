@@ -158,22 +158,22 @@ void GameObject::SetParts(int player, int index, int partsNum)
 	if (player == PLAYER) {
 		switch (index) {
 		case 0:
-			PlayerParts[index] = Bodies[partsNum];
+			PlayerParts[index] = Bodies[partsNum].c_str();
 			break;
 		case 1:
-			PlayerParts[index] = Bodyparts[partsNum];
+			PlayerParts[index] = Bodyparts[partsNum].c_str();
 			break;
 		case 2:
-			PlayerParts[index] = Eyes[partsNum];
+			PlayerParts[index] = Eyes[partsNum].c_str();
 			break;
 		case 3:
-			PlayerParts[index] = Gloves[partsNum];
+			PlayerParts[index] = Gloves[partsNum].c_str();
 			break;
 		case 4:
-			PlayerParts[index] = MouthandNoses[partsNum];
+			PlayerParts[index] = MouthandNoses[partsNum].c_str();
 			break;
 		case 5:
-			PlayerParts[index] = Head[partsNum];
+			PlayerParts[index] = Head[partsNum].c_str();
 			break;
 		default:
 			break;
@@ -182,22 +182,22 @@ void GameObject::SetParts(int player, int index, int partsNum)
 	else {
 		switch (index) {
 		case 0:
-			OthersParts[player - 1][index] = Bodies[partsNum];
+			OthersParts[player - 1][index] = Bodies[partsNum].c_str();
 			break;
 		case 1:
-			OthersParts[player - 1][index] = Bodyparts[partsNum];
+			OthersParts[player - 1][index] = Bodyparts[partsNum].c_str();
 			break;
 		case 2:
-			OthersParts[player - 1][index] = Eyes[partsNum];
+			OthersParts[player - 1][index] = Eyes[partsNum].c_str();
 			break;
 		case 3:
-			OthersParts[player - 1][index] = Gloves[partsNum];
+			OthersParts[player - 1][index] = Gloves[partsNum].c_str();
 			break;
 		case 4:
-			OthersParts[player - 1][index] = MouthandNoses[partsNum];
+			OthersParts[player - 1][index] = MouthandNoses[partsNum].c_str();
 			break;
 		case 5:
-			OthersParts[player - 1][index] = Head[partsNum];
+			OthersParts[player - 1][index] = Head[partsNum].c_str();
 			break;
 		default:
 			break;
