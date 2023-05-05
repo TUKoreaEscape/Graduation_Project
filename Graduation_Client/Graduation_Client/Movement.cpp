@@ -41,20 +41,33 @@ void CommonMovement::update(float elapsedTime)
 			gameObject->SetTrackAnimationSet(0, 4);
 			Input::GetInstance()->m_pPlayer->SetDirection(DIR_RIGHT);
 		}
-		if (keyBuffer[VK_SPACE] & 0xF0)
+		if ((keyBuffer[VK_SPACE] & 0xF0&&!Input::GetInstance()->m_pPlayer->GetIsFalling()))
 		{
 			//std::cout << "스페이스바" << std::endl;
+			Input::GetInstance()->m_pPlayer->SetIsFalling(true);
+		}
+
+		if ((Input::GetInstance()->m_pPlayer->IsJump() && Input::GetInstance()->m_pPlayer->GetIsFalling()))
+		{
 			dwDirection |= DIR_UP;
 			gameObject->SetTrackAnimationSet(0, 5);
 			Input::GetInstance()->m_pPlayer->SetDirection(DIR_UP);
+			Input::GetInstance()->m_pPlayer->SetJumpTime(elapsedTime);
 		}
+
+		if (Input::GetInstance()->m_pPlayer->GetIsFalling())
+		{
+			gameObject->SetTrackAnimationSet(0, 5);
+		}
+
+
 		if (dwDirection)
 		{
 			if ((dwDirection == DIR_NOT_FB) ||
 				(dwDirection == DIR_NOT_LR) ||
 				(dwDirection == DIR_NOT_FBLR))
 				m_emptyKey = true;
-			//std::cout << elapsedTime << std::endl;
+			std::cout << elapsedTime << std::endl;
 			Input::GetInstance()->m_pPlayer->Move(dwDirection, 75.f * elapsedTime, true);
 		}
 		else m_emptyKey = true;

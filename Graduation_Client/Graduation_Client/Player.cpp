@@ -181,10 +181,13 @@ void Player::update(float fTimeElapsed)
 		//std::cout << "중력작용중" << std::endl;
 		//m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Gravity, fTimeElapsed, false));
 		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
+		m_Isfalling = true;
 	}
 	else if (m_xmf3Position.y < 0.0f)
 	{
 		m_xmf3Position.y = 0;
+		m_JumpElapsedTime = 0.0;
+		m_Isfalling = false;
 	}
 	float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
 	float fMaxVelocityXZ = m_fMaxVelocityXZ;
@@ -310,6 +313,8 @@ void Player::OnPlayerUpdateCallback(float fTimeElapsed)
 			SetVelocity(xmf3PlayerVelocity);
 			xmf3PlayerPosition.y = fHeight;
 			SetPosition(xmf3PlayerPosition);
+			m_JumpElapsedTime = 0.0f;
+			m_Isfalling = false;
 		}
 	}
 }

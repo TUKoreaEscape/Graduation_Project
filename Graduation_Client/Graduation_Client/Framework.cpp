@@ -367,11 +367,9 @@ void Framework::FrameAdvance()
 	
 	m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 	//렌더링 코드는 여기에 추가될 것이다.
-	
 	m_pLaplacianEdgeDetectionShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 	if(scene) scene->defrender(m_pd3dCommandList);
 	m_pLaplacianEdgeDetectionShader->OnPostRenderTarget(m_pd3dCommandList);
-	
 	m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 	if (scene) scene->forrender(m_pd3dCommandList);
 	m_pLaplacianEdgeDetectionShader->Render(m_pd3dCommandList);
