@@ -58,7 +58,8 @@ void CommonMovement::update(float elapsedTime)
 
 		if (Input::GetInstance()->m_pPlayer->GetIsFalling())
 		{
-			gameObject->SetTrackAnimationSet(0, 5);
+			gameObject->m_pSkinnedAnimationController->SetTrackSpeed(0, 0.33f);
+			gameObject->SetTrackAnimationSet(0, 6);
 		}
 
 

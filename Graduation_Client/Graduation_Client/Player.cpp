@@ -190,6 +190,7 @@ void Player::update(float fTimeElapsed)
 
 		m_JumpElapsedTime = 0.0;
 		m_Isfalling = false;
+		m_pSkinnedAnimationController->SetTrackSpeed(0, 1);
 	}
 	float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
 	float fMaxVelocityXZ = m_fMaxVelocityXZ;

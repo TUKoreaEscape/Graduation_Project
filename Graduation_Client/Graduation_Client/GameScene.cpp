@@ -87,7 +87,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
-	LoadedModelInfo* pPlayerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/C29.bin", nullptr); 
+	LoadedModelInfo* pPlayerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/C31.bin", nullptr); 
 	//LoadedModelInfo* pPlayerModel2 = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", nullptr);
 
 	LoadedModelInfo* pClassModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InClassObject.bin", nullptr);
@@ -134,7 +134,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_ppPlayers[3]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 	m_ppPlayers[3]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_ppPlayers[4]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-	m_ppPlayers[4]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+	m_ppPlayers[4]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 6);
 	
 	m_pPlayer = new Player();
 	m_pPlayer->SetChild(pPlayerModel->m_pModelRootObject, true);
