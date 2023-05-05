@@ -47,6 +47,14 @@ public:
 	float GetPitch() const { return(m_fPitch); }
 	float GetRoll() const { return(m_fRoll); }
 	DWORD GetDirection() const { return (m_direction); }
+
+
+	bool IsJump() { return m_JumpElapsedTime < m_Jumpping; }
+	void SetJumpTime(float elapsedTime) { m_JumpElapsedTime += elapsedTime; }
+
+	bool GetIsFalling() { return m_Isfalling; }
+	void SetIsFalling(bool state) { m_Isfalling = state; }
+
 	//CCamera* GetCamera() { return(m_pCamera); }
 	//void SetCamera(CCamera* pCamera) { m_pCamera = pCamera; }
 
@@ -103,4 +111,8 @@ protected:
 	LPVOID						m_pCameraUpdatedContext = NULL;
 
 	DWORD						m_direction;
+
+	float							m_Jumpping = 0.3f;
+	float							m_JumpElapsedTime = 0.f;
+	bool							m_Isfalling = false;
 };

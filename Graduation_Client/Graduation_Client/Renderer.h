@@ -53,3 +53,23 @@ public:
 	void update(float elapsedTime) {}
 	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
 };
+//
+//class PostProcessingRenderer : public StandardRenderer
+//{
+//public:
+//	void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) {};
+//	void update(float elapsedTime) {}
+//	virtual void OnPrepareRenderTarget(ID3D12GraphicsCommandList* pd3dCommandList, int nRenderTargets, D3D12_CPU_DESCRIPTOR_HANDLE* pd3dRtvCPUHandles, D3D12_CPU_DESCRIPTOR_HANDLE d3dDepthStencilBufferDSVCPUHandle);
+//	virtual void OnPostRenderTarget(ID3D12GraphicsCommandList* pd3dCommandList);
+//	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
+//};
+//
+//class LaplacianEdgeRenderer : public StandardRenderer
+//{
+//public:
+//	void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) {};
+//	void update(float elapsedTime) {}
+//	virtual void OnPrepareRenderTarget(ID3D12GraphicsCommandList* pd3dCommandList, int nRenderTargets, D3D12_CPU_DESCRIPTOR_HANDLE* pd3dRtvCPUHandles, D3D12_CPU_DESCRIPTOR_HANDLE d3dDepthStencilBufferDSVCPUHandle);
+//	virtual void OnPostRenderTarget(ID3D12GraphicsCommandList* pd3dCommandList);
+//	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
+//};

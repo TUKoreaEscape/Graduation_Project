@@ -11,6 +11,7 @@ void StandardRenderer::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 void StandardRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+
 	if (gameObject->m_pMesh)
 	{
 		UpdateShaderVariable(pd3dCommandList, &gameObject->m_xmf4x4World);
@@ -233,3 +234,58 @@ void DeferredRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	StandardRenderer::render(pd3dCommandList);
 }
+
+//void PostProcessingRenderer::OnPrepareRenderTarget(ID3D12GraphicsCommandList* pd3dCommandList, int nRenderTargets, D3D12_CPU_DESCRIPTOR_HANDLE* pd3dRtvCPUHandles, D3D12_CPU_DESCRIPTOR_HANDLE d3dDepthStencilBufferDSVCPUHandle)
+//{
+//}
+//
+//void PostProcessingRenderer::OnPostRenderTarget(ID3D12GraphicsCommandList* pd3dCommandList)
+//{
+//}
+//
+//void PostProcessingRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
+//{
+//	StandardRenderer::render(pd3dCommandList);
+//
+//	pd3dCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+//	pd3dCommandList->DrawInstanced(6, 1, 0, 0);
+//}
+//
+//void LaplacianEdgeRenderer::OnPrepareRenderTarget(ID3D12GraphicsCommandList* pd3dCommandList, int nRenderTargets, D3D12_CPU_DESCRIPTOR_HANDLE* pd3dRtvCPUHandles, D3D12_CPU_DESCRIPTOR_HANDLE d3dDepthStencilBufferDSVCPUHandle)
+//{
+//	int nResources = m_pTexture->GetTextures();
+//	D3D12_CPU_DESCRIPTOR_HANDLE* pd3dAllRtvCPUHandles = new D3D12_CPU_DESCRIPTOR_HANDLE[nRenderTargets + nResources];
+//
+//	for (int i = 0; i < nRenderTargets; i++)
+//	{
+//		pd3dAllRtvCPUHandles[i] = pd3dRtvCPUHandles[i];
+//		pd3dCommandList->ClearRenderTargetView(pd3dRtvCPUHandles[i], Colors::Black, 0, NULL);
+//	}
+//
+//	for (int i = 0; i < nResources; i++)
+//	{
+//		::SynchronizeResourceTransition(pd3dCommandList, GetTextureResource(i), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_RENDER_TARGET);
+//
+//		D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = GetRtvCPUDescriptorHandle(i);
+//		FLOAT pfClearColor[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
+//		pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor, 0, NULL);
+//		pd3dAllRtvCPUHandles[nRenderTargets + i] = d3dRtvCPUDescriptorHandle;
+//	}
+//	pd3dCommandList->OMSetRenderTargets(nRenderTargets + nResources, pd3dAllRtvCPUHandles, FALSE, &d3dDepthStencilBufferDSVCPUHandle);
+//
+//	if (pd3dAllRtvCPUHandles) delete[] pd3dAllRtvCPUHandles;
+//}
+//
+//void LaplacianEdgeRenderer::OnPostRenderTarget(ID3D12GraphicsCommandList* pd3dCommandList)
+//{
+//	int nResources = m_pTexture->GetTextures();
+//	for (int i = 0; i < nResources; i++)
+//	{
+//		::SynchronizeResourceTransition(pd3dCommandList, GetTextureResource(i), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_COMMON);
+//	}
+//}
+//
+//void LaplacianEdgeRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
+//{
+//	PostProcessingShader::render(pd3dCommandList);
+//}
