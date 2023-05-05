@@ -147,7 +147,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	GameObject::SetParts(0, 0, 4);
 	m_pPlayer->PlayerNum = 0;
 
-	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/CubeRoomWithWall.bin");
+	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene0506.bin");
 	
 	if (pPlayerModel) delete pPlayerModel;
 	
