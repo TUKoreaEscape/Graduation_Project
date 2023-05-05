@@ -65,7 +65,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 			//	m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 			//}
 			current_shift = player_check.SlidingVector;
-			if (player_check.collision_face_num == 1 || player_check.collision_face_num == 4)
+			if (player_check.collision_face_num == 4)
 				collision_up_face = true;
 			//cout << "적용후 캐릭터 좌표 : " << m_clients[user_id].get_user_position().x << ", " << m_clients[user_id].get_user_position().y << ", " << m_clients[user_id].get_user_position().z << endl;
 		}
@@ -84,7 +84,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 				m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 			}
 			current_shift = wall_check.SlidingVector;
-			if (wall_check.collision_face_num == 1 || wall_check.collision_face_num == 4)
+			if (wall_check.collision_face_num == 4)
 				collision_up_face = true;
 		}
 
@@ -92,7 +92,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 		if (object_check.is_collision)
 		{
 			// 이쪽은 오브젝트와 충돌한것을 처리하는 부분입니다.
-			if (object_check.collision_face_num == 1 || object_check.collision_face_num == 4)
+			if (object_check.collision_face_num == 4)
 				collision_up_face = true;
 		}
 	}
@@ -129,7 +129,7 @@ void cGameServer::Process_Create_Room(const unsigned int _user_id) // 요청받은 �
 	m_clients[_user_id]._state_lock.lock();
 	m_clients[_user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
 	m_clients[_user_id]._state_lock.unlock();
-	m_clients[_user_id].set_bounding_box(m_clients[_user_id].get_user_position(), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(0, 0, 0, 1));
+	m_clients[_user_id].set_bounding_box(m_clients[_user_id].get_user_position(), XMFLOAT3(0.5f, 1.f, 0.5f), XMFLOAT4(0, 0, 0, 1));
 	send_create_room_ok_packet(_user_id, m_clients[_user_id].get_join_room_number());
 	send_put_player_data(_user_id);
 }
@@ -172,7 +172,7 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 				}
 			}
 			m_clients[user_id].set_user_position(XMFLOAT3(0.0f, 0.0f, 0.0f));
-			m_clients[user_id].set_bounding_box(m_clients[user_id].get_user_position(), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(0, 0, 0, 1));
+			m_clients[user_id].set_bounding_box(m_clients[user_id].get_user_position(), XMFLOAT3(0.5f, 1.f, 0.5f), XMFLOAT4(0, 0, 0, 1));
 			send_join_room_success_packet(user_id);
 			//cout << "send_join_room_success_packet" << endl;
 		}

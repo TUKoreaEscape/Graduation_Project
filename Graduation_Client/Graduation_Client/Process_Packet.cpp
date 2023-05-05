@@ -9,11 +9,9 @@ void Network::Process_Game_Start(char* ptr)
 
 void Network::Process_Player_Move(char* ptr)
 {
+	m_pPlayer_before_Pos = m_pPlayer_Pos;
 	sc_packet_calculate_move* packet = reinterpret_cast<sc_packet_calculate_move*>(ptr);
-	//m_pPlayer->SetPosition(packet->pos);
-	
-	
-	
+	//m_pPlayer->SetPosition(packet->pos);	
 	XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->pos.x) / 10000.f, static_cast<float>(packet->pos.y) / 10000.f, static_cast<float>(packet->pos.z) / 10000.f);
 	pos_lock.lock();
 	m_pPlayer_Pos = conversion_position;
@@ -75,7 +73,7 @@ void Network::Process_Other_Player_Move(char* ptr)
 				if (packet->data[i].is_jump == true)
 				{
 					m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-					m_ppOther[j]->SetTrackAnimationSet(0, 5);
+					m_ppOther[j]->SetTrackAnimationSet(0, 6);
 				}
 			}
 		}

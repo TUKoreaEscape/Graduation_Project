@@ -41,6 +41,7 @@ public:
 
 	bool    m_login = false;
 	XMFLOAT3 m_pPlayer_Pos{ 0,0,0 };
+	XMFLOAT3 m_pPlayer_before_Pos{ 0,0,0 };
 	OtherPlayerPos Other_Player_Pos[5]{};
 	Player* m_pPlayer = nullptr;;
 	Player** m_ppOther = nullptr;

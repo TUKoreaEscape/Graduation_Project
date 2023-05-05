@@ -180,17 +180,21 @@ void Player::update(float fTimeElapsed)
 	{
 		//std::cout << "중력작용중" << std::endl;
 		//m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Gravity, fTimeElapsed, false));
+		Network& network = *Network::GetInstance();
+
+		if (network.m_pPlayer_before_Pos.y >= network.m_pPlayer_Pos.y)
+			m_JumpElapsedTime = 0.3f;
 		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
 		m_Isfalling = true;
 	}
 	else if (m_xmf3Position.y <= 0.0f || m_collision_up_face)
 	{
 		if (!m_collision_up_face)
-			m_xmf3Position.y = 0;	
+			m_xmf3Position.y = 0;
 
-		m_JumpElapsedTime = 0.0;
+		if (!IsJump())
+			m_JumpElapsedTime = 0.0;
 		m_Isfalling = false;
-		m_pSkinnedAnimationController->SetTrackSpeed(0, 1);
 	}
 	float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
 	float fMaxVelocityXZ = m_fMaxVelocityXZ;
