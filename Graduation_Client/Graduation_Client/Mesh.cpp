@@ -745,6 +745,9 @@ HeightMapGridMesh::HeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	m_nLength = nLength;
 	m_xmf3Scale = xmf3Scale;
 
+	int vertical = nWidth / 5;
+	int horizontal = nLength / 5;
+
 	m_pxmf3Positions = new XMFLOAT3[m_nVertices];
 	m_pxmf4Colors = new XMFLOAT4[m_nVertices];
 	m_pxmf2TextureCoords0 = new XMFLOAT2[m_nVertices];
@@ -763,8 +766,8 @@ HeightMapGridMesh::HeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 			fHeight = 0;
 			m_pxmf3Positions[i] = XMFLOAT3((x * m_xmf3Scale.x), fHeight, (z * m_xmf3Scale.z));
 			m_pxmf4Colors[i] = Vector4::Add(OnGetColor(x, z, pContext), xmf4Color);
-			m_pxmf2TextureCoords0[i] = XMFLOAT2(float(x) / float(cxHeightMap - 1), float(czHeightMap - 1 - z) / float(czHeightMap - 1));
-			m_pxmf2TextureCoords1[i] = XMFLOAT2(float(x) / float(m_xmf3Scale.x * 0.5f), float(z) / float(m_xmf3Scale.z * 0.5f));
+			m_pxmf2TextureCoords0[i] = XMFLOAT2(float(x) / float(cxHeightMap - 1) * vertical, float(czHeightMap - 1 - z) / float(czHeightMap - 1) * horizontal);
+			m_pxmf2TextureCoords1[i] = XMFLOAT2(float(x) / float(m_xmf3Scale.x * 0.5f) * vertical, float(z) / float(m_xmf3Scale.z * 0.5f) * horizontal);
 			if (fHeight < fMinHeight) fMinHeight = fHeight;
 			if (fHeight > fMaxHeight) fMaxHeight = fHeight;
 		}
