@@ -70,8 +70,8 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pBroadcast->UpdateTransform(nullptr);
 	m_pBroadcast->render(pd3dCommandList);
 
-	m_pHouse->UpdateTransform(nullptr);
-	m_pHouse->render(pd3dCommandList);
+	m_pPorest->UpdateTransform(nullptr);
+	m_pPorest->render(pd3dCommandList);
 
 	for (int i = 0; i < m_nBush; ++i)
 	{
@@ -89,11 +89,11 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
 	LoadedModelInfo* pPlayerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/C33.bin", nullptr); 
-	//LoadedModelInfo* pPlayerModel2 = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/P02.bin", nullptr);
-
+	
 	LoadedModelInfo* pClassModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InClassObject.bin", nullptr);
 	LoadedModelInfo* pPianoModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPianoRoom.bin", nullptr);
 	LoadedModelInfo* pBroadcastModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InBroadcast.bin", nullptr);
+	LoadedModelInfo* pHouseModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPorest.bin", nullptr);
 
 	m_pClass = new GameObject();
 	m_pClass->SetChild(pClassModel->m_pModelRootObject, true);
@@ -101,16 +101,12 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pPiano->SetChild(pPianoModel->m_pModelRootObject, true);
 	m_pBroadcast = new GameObject();
 	m_pBroadcast->SetChild(pBroadcastModel->m_pModelRootObject, true);
-
-	LoadedModelInfo* pHouseModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/OldHousePrefab.bin", nullptr);
-
-	m_pHouse = new GameObject();
-	m_pHouse->SetChild(pHouseModel->m_pModelRootObject, true);
-
+	m_pPorest = new GameObject();
+	m_pPorest->SetChild(pHouseModel->m_pModelRootObject, true);
+	
 	if (pClassModel) delete pClassModel;
 	if (pPianoModel) delete pPianoModel;
 	if (pBroadcastModel) delete pBroadcastModel;
-
 	if (pHouseModel) delete pHouseModel;
 
 	m_pNPC = new GameObject();
@@ -155,7 +151,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	GameObject::SetParts(0, 0, 4);
 	m_pPlayer->PlayerNum = 0;
 
-	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene0506.bin");
+	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene0507.bin");
 	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 	
 	if (pPlayerModel) delete pPlayerModel;
@@ -273,6 +269,8 @@ void GameScene::ReleaseObjects()
 
 	if (m_pClass) m_pClass->Release();
 	if (m_pPiano) m_pPiano->Release();
+	if (m_pBroadcast) m_pBroadcast->Release();
+	if (m_pPorest) m_pPiano->Release();
 }
 
 ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
@@ -511,6 +509,9 @@ void GameScene::ReleaseUploadBuffers()
 
 	if (m_pClass) m_pClass->ReleaseUploadBuffers();
 	if (m_pPiano) m_pPiano->ReleaseUploadBuffers();
+	if (m_pBroadcast) m_pBroadcast->ReleaseUploadBuffers();
+	if (m_pPorest) m_pPorest->ReleaseUploadBuffers();
+
 }
 
 void GameScene::CreateCbvSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nConstantBufferViews, int nShaderResourceViews)
