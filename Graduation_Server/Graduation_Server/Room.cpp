@@ -250,7 +250,8 @@ CollisionInfo Room::is_collision_player_to_player(const int player_id, const XMF
 	else
 	{
 		return_data.is_collision = false;
-		return_data.CollisionNormal = XMFLOAT3(0, 0, 0);
+		return_data.collision_face_num = -1;
+		return_data.SlidingVector = XMFLOAT3(0, 0, 0);
 		return_data.CollisionNormal = XMFLOAT3(0, 0, 0);
 	}
 	return return_data;
