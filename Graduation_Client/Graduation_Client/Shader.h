@@ -152,12 +152,13 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-class PlayerShader : public SkinnedAnimationShader
+class BushShader : public StandardShader
 {
 public:
-	PlayerShader();
-	virtual ~PlayerShader();
+	BushShader();
+	virtual ~BushShader();
 
+	virtual D3D12_BLEND_DESC CreateBlendState();
 	virtual D3D12_RASTERIZER_DESC CreateRasterizerState();
 	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
 

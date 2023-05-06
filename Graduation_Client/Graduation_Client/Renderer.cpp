@@ -66,8 +66,8 @@ void StandardRenderer::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12Gra
 				{
 					if (nMeshType & VERTEXT_BONE_INDEX_WEIGHT)
 					{
-						//pMaterial->SetSkinnedAnimationShader();
-						pMaterial->SetPlayerShader();
+						pMaterial->SetSkinnedAnimationShader();
+						//pMaterial->SetPlayerShader();
 					}
 					else
 					{

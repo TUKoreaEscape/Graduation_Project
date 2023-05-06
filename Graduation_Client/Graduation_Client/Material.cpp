@@ -50,7 +50,7 @@ void Material::ReleaseUploadBuffers()
 
 Shader* Material::m_pSkinnedAnimationShader = nullptr;
 Shader* Material::m_pStandardShader = nullptr;
-Shader* Material::m_pPlayerShader = nullptr;
+Shader* Material::m_pBushShader = nullptr;
 
 void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
@@ -64,9 +64,9 @@ void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	m_pSkinnedAnimationShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	m_pSkinnedAnimationShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
-	m_pPlayerShader = new PlayerShader();
-	m_pPlayerShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
-	m_pPlayerShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	m_pBushShader = new BushShader();
+	m_pBushShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	m_pBushShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
 void Material::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -78,10 +78,10 @@ void Material::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 1, &m_nType, 32);
 
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < m_nTextures; i++)
 	{
-		//if (m_ppTextures[i]) m_ppTextures[i]->UpdateShaderVariables(pd3dCommandList);
-		if (m_ppTextures[i]) m_ppTextures[i]->UpdateShaderVariable(pd3dCommandList, 0, 0);
+		if (m_ppTextures[i]) m_ppTextures[i]->UpdateShaderVariables(pd3dCommandList);
+		//if (m_ppTextures[i]) m_ppTextures[i]->UpdateShaderVariable(pd3dCommandList, 0, 0);
 	}
 }
 
@@ -137,6 +137,14 @@ void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 				GameObject* pRootGameObject = pParent;
 				*ppTexture = pRootGameObject->FindReplicatedTexture(pwstrTextureName);
 				if (*ppTexture) (*ppTexture)->AddRef();
+				else
+				{
+					*ppTexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
+					(*ppTexture)->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, pwstrTextureName, RESOURCE_TEXTURE2D, 0);
+					if (*ppTexture) (*ppTexture)->AddRef();
+
+					GameScene::CreateShaderResourceViews(pd3dDevice, *ppTexture, 0, nRootParameter);
+				}
 			}
 		}
 	}

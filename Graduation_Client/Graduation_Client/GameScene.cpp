@@ -23,10 +23,10 @@ GameScene::GameScene() : Scene()
 
 void GameScene::forrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
-	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
-	m_pPlayer->m_pCamera->update(pd3dCommandList);
-	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
+	//if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+	//if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
+	//m_pPlayer->m_pCamera->update(pd3dCommandList);
+	//m_pLight->GetComponent<Light>()->update(pd3dCommandList);
 
 	m_pSkybox->render(pd3dCommandList);
 	
@@ -67,6 +67,11 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
 	}
 
+	for (int i = 0; i < m_nBush; ++i)
+	{
+		if (m_ppBush[i]) m_ppBush[i]->render(pd3dCommandList);
+	}
+
 	Scene::render(pd3dCommandList);
 	
 	m_pClass->UpdateTransform(nullptr);
@@ -77,6 +82,10 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	m_pBroadcast->UpdateTransform(nullptr);
 	m_pBroadcast->render(pd3dCommandList);
+
+	m_pHouse->UpdateTransform(nullptr);
+	m_pHouse->render(pd3dCommandList);
+	//m_pHouse->render(pd3dCommandList);
 }
 
 void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -101,9 +110,16 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pBroadcast = new GameObject();
 	m_pBroadcast->SetChild(pBroadcastModel->m_pModelRootObject, true);
 
+	LoadedModelInfo* pHouseModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/OldHousePrefab.bin", nullptr);
+
+	m_pHouse = new GameObject();
+	m_pHouse->SetChild(pHouseModel->m_pModelRootObject, true);
+
 	if (pClassModel) delete pClassModel;
 	if (pPianoModel) delete pPianoModel;
 	if (pBroadcastModel) delete pBroadcastModel;
+
+	if (pHouseModel) delete pHouseModel;
 
 	m_pNPC = new GameObject();
 	m_pNPC->SetChild(pPlayerModel->m_pModelRootObject, true);
@@ -148,6 +164,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pPlayer->PlayerNum = 0;
 
 	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene0506.bin");
+	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 	
 	if (pPlayerModel) delete pPlayerModel;
 	
@@ -627,6 +644,63 @@ void GameScene::LoadSceneObjectsFromFile(ID3D12Device* pd3dDevice, ID3D12Graphic
 		pGameObject->renderer->SetMaterial(pMaterial);
 
 		m_ppWalls[i] = pGameObject;
+	}
+
+	::fclose(pFile);
+}
+
+void GameScene::LoadSceneBushFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName)
+{
+	FILE* pFile = NULL;
+	::fopen_s(&pFile, pstrFileName, "rb");
+	::rewind(pFile);
+
+	Material* pMaterial = new Material(7);
+	pMaterial->m_ppTextures[0] = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pMaterial->m_ppTextures[0]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Bush02_d.dds", RESOURCE_TEXTURE2D, 0);
+
+	CreateShaderResourceViews(pd3dDevice, pMaterial->m_ppTextures[0], 0, 3);
+
+	pMaterial->SetBushShader();
+	pMaterial->SetMaterialType(MATERIAL_ALBEDO_MAP);
+	
+	char pstrToken[64] = { '\0' };
+	char pstrGameObjectName[64] = { '\0' };
+
+	UINT nReads = 0, nObjectNameLength = 0;
+	BYTE nStrLength = 0;
+
+	nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pFile);
+	nReads = (UINT)::fread(pstrToken, sizeof(char), nStrLength, pFile); //"<GameObjects>:"
+	nReads = (UINT)::fread(&m_nBush, sizeof(int), 1, pFile);
+
+	m_ppBush = new GameObject * [m_nBush];
+
+	GameObject* pGameObject = NULL;
+	
+	FILE* pMeshFile = nullptr;
+	::fopen_s(&pMeshFile, "Model/bush02.bin", "rb");
+	::rewind(pMeshFile);
+	StandardMesh* bushMesh = new StandardMesh(pd3dDevice, pd3dCommandList);
+	bushMesh->LoadMeshFromFile(pd3dDevice, pd3dCommandList, pMeshFile);
+
+	for (int i = 0; i < m_nBush; i++)
+	{
+		pGameObject = new GameObject();
+
+		nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pFile);
+		nReads = (UINT)::fread(pstrToken, sizeof(char), 13, pFile); //"<GameObject>:"
+		nReads = (UINT)::fread(&nObjectNameLength, sizeof(BYTE), 1, pFile);
+		//nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pFile);
+		nReads = (UINT)::fread(pstrGameObjectName, sizeof(char), nObjectNameLength, pFile);
+		nReads = (UINT)::fread(&pGameObject->m_xmf4x4World, sizeof(float), 16, pFile);
+
+
+		pGameObject->SetMesh(bushMesh);
+
+		pGameObject->renderer->SetMaterial(pMaterial);
+
+		m_ppBush[i] = pGameObject;
 	}
 
 	::fclose(pFile);
