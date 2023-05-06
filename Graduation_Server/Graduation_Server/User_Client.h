@@ -110,8 +110,8 @@ public:
 	void				play_attack_animation(float ElapseTime) { m_attack_animation_time += ElapseTime; }
 	void				play_victim_animation(float ElapseTime) { m_victim_animation_time += ElapseTime; }
 
-	bool				IsAttackAnimation() { return m_attack_animation_time < 0.5f; }
-	bool				IsVictimAnimation() { return m_victim_animation_time < 0.5f; }
+	bool				IsAttackAnimation() { return m_attack_animation_time < 0.49f; }
+	bool				IsVictimAnimation() { return m_victim_animation_time < 0.49f; }
 
 	void				SetAttackTimeZero() { m_attack_animation_time = 0; }
 	void				SetVictimTimeZero() { m_victim_animation_time = 0; }
