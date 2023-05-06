@@ -186,6 +186,7 @@ void Network::Debug_send_thread()
 			break;
 
 		case 8:
+			system("cls");
 			GameObject::SetParts(0, 0, 0);
 			data.head = static_cast<HEADS>(0);
 			data.body_parts = static_cast<BODYPARTS>(0);
@@ -204,11 +205,13 @@ void Network::Debug_send_thread()
 
 		case 9:
 		{
+			system("cls");
 			TerminateProcess(info.hProcess, 1);
 			break;
 		}
 
 		case 10:
+			system("cls");
 			Send_Attack_Packet();
 			break;
 		}
@@ -453,15 +456,15 @@ void Network::ProcessPacket(char* ptr)
 	{
 		sc_packet_customizing_update* packet = reinterpret_cast<sc_packet_customizing_update*>(ptr);
 		//packet->body;
-		std::cout << "=======================================================================" << std::endl;
-		std::cout << "packet->id : " << packet->id << std::endl;
-		std::cout << "body : " << static_cast<BODIES>(packet->body) << std::endl;
-		std::cout << "body_parts : " << static_cast<BODYPARTS>(packet->body_parts) << std::endl;
-		std::cout << "eyes : " << static_cast<EYES>(packet->eyes) << std::endl;
-		std::cout << "gloves : " << static_cast<GLOVES>(packet->gloves) << std::endl;
-		std::cout << "mouthandnoses : " << static_cast<MOUTHANDNOSES>(packet->mouthandnoses) << std::endl;
-		std::cout << "head : " << static_cast<HEADS>(packet->head) << std::endl;
-		std::cout << "=======================================================================" << std::endl;
+		//std::cout << "=======================================================================" << std::endl;
+		//std::cout << "packet->id : " << packet->id << std::endl;
+		//std::cout << "body : " << static_cast<BODIES>(packet->body) << std::endl;
+		//std::cout << "body_parts : " << static_cast<BODYPARTS>(packet->body_parts) << std::endl;
+		//std::cout << "eyes : " << static_cast<EYES>(packet->eyes) << std::endl;
+		//std::cout << "gloves : " << static_cast<GLOVES>(packet->gloves) << std::endl;
+		//std::cout << "mouthandnoses : " << static_cast<MOUTHANDNOSES>(packet->mouthandnoses) << std::endl;
+		//std::cout << "head : " << static_cast<HEADS>(packet->head) << std::endl;
+		//std::cout << "=======================================================================" << std::endl;
 
  		if (packet->id == m_pPlayer->GetID())
 		{
