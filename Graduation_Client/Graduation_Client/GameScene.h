@@ -69,6 +69,7 @@ public:
 	GameScene();
 	~GameScene() {}
 
+	virtual void prerender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void defrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void forrender(ID3D12GraphicsCommandList* pd3dCommandList);
 

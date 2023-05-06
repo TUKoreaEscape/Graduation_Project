@@ -372,17 +372,18 @@ void Framework::FrameAdvance()
 	//m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL); //원하는 값으로 깊이-스텐실(뷰)을 지운다.
 	//m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle); //렌더 타겟 뷰(서술자)와 깊이-스텐실 뷰(서술자)를 출력-병합 단계(OM)에 연결한다.
 	
+	if (scene) scene->prerender(m_pd3dCommandList);
 	m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 	//렌더링 코드는 여기에 추가될 것이다.
 	m_pLaplacianEdgeDetectionShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 	if(scene) scene->defrender(m_pd3dCommandList);
-	//m_pLaplacianEdgeDetectionShader->Render(m_pd3dCommandList);
+	m_pLaplacianEdgeDetectionShader->Render(m_pd3dCommandList);
 	//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 	//if (scene) scene->forrender(m_pd3dCommandList);
 	m_pLaplacianEdgeDetectionShader->OnPostRenderTarget(m_pd3dCommandList);
 	//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 	
-	if(Input::GetInstance()->keyBuffer['1'] & 0xF0) m_pLaplacianEdgeDetectionShader->Render(m_pd3dCommandList);
+	//if(Input::GetInstance()->keyBuffer['1'] & 0xF0) m_pLaplacianEdgeDetectionShader->Render(m_pd3dCommandList);
 
 
 	::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);

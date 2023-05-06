@@ -34,13 +34,16 @@ void GameScene::forrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 }
 
-void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
+void GameScene::prerender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
 	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
+}
 
+void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
 	m_pSkybox->render(pd3dCommandList);
 
 	m_pMainTerrain->render(pd3dCommandList);
@@ -517,7 +520,7 @@ void GameScene::CreateCbvSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nConst
 	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	d3dDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	d3dDescriptorHeapDesc.NodeMask = 0;
-	pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pd3dCbvSrvDescriptorHeap);
+	HRESULT hResult = pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pd3dCbvSrvDescriptorHeap);
 
 	m_d3dCbvCPUDescriptorNextHandle = m_d3dCbvCPUDescriptorStartHandle = m_pd3dCbvSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_d3dCbvGPUDescriptorNextHandle = m_d3dCbvGPUDescriptorStartHandle = m_pd3dCbvSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
@@ -570,9 +573,11 @@ void GameScene::LoadSceneObjectsFromFile(ID3D12Device* pd3dDevice, ID3D12Graphic
 	FILE* pFile = NULL;
 	::fopen_s(&pFile, pstrFileName, "rb");
 	::rewind(pFile);
+	
+	DXGI_FORMAT pdxgiRtvFormats[7] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
 
 	WallShader* pShader = new WallShader();
-	pShader->CreateShader(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+	pShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, 7, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
 	pShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 	char pstrToken[64] = { '\0' };
