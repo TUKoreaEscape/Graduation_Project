@@ -77,9 +77,11 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 	case WM_RBUTTONDOWN:
 		if (!m_pPlayer->IsAttack())
 		{
+#if USE_NETWORK
 			Network& network = *Network::GetInstance();
 			network.Send_Attack_Packet();
 			m_pPlayer->SetAttackZeroTime();
+#endif
 		}
 		break;
 	case WM_LBUTTONUP:
