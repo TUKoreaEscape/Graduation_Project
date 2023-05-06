@@ -44,6 +44,8 @@ public:
 	int m_nWalls;
 	GameObject** m_ppWalls;
 
+	GameObject* m_pHouse = nullptr;
+
 protected:
 	static ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap;
 

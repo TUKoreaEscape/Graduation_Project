@@ -70,12 +70,24 @@ struct VS_STANDARD_OUTPUT
 {
 	float4 position : SV_POSITION;
 	float3 positionW : POSITION;
-	float3 normalW : NORMAL;
+	float3 normalW : NORMAL0;
+	float3 normalV : NORMAL1;
 	float3 tangentW : TANGENT;
 	float3 bitangentW : BITANGENT;
 	float2 uv : TEXCOORD;
 };
 
+struct PS_MULTIPLE_RENDER_TARGETS_OUTPUT
+{
+	float4 f4Scene : SV_TARGET0; //Swap Chain Back Buffer
+
+	float4 f4Color : SV_TARGET1;
+	float4 f4Normal : SV_TARGET2;
+	float4 f4Texture : SV_TARGET3;
+	float4 f4Illumination : SV_TARGET4;
+	float2 f2ObjectIDzDepth : SV_TARGET5;
+	float4 f4CameraNormal : SV_TARGET6;
+};
 
 VS_STANDARD_OUTPUT VSStandard(VS_STANDARD_INPUT input)
 {
@@ -83,6 +95,7 @@ VS_STANDARD_OUTPUT VSStandard(VS_STANDARD_INPUT input)
 
 	output.positionW = mul(float4(input.position, 1.0f), gmtxGameObject).xyz;
 	output.normalW = mul(input.normal, (float3x3)gmtxGameObject);
+	output.normalV = mul(float4(output.normalW, 1.0f), gmtxView).xyz;
 	output.tangentW = mul(input.tangent, (float3x3)gmtxGameObject);
 	output.bitangentW = mul(input.bitangent, (float3x3)gmtxGameObject);
 	output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
@@ -111,8 +124,10 @@ VS_STANDARD_OUTPUT VSOutline(VS_STANDARD_INPUT input)
 	return(output);
 }
 
-float4 PSStandard(VS_STANDARD_OUTPUT input) : SV_TARGET
+PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStandard(VS_STANDARD_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)
 {
+	PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
+
 	float4 cAlbedoColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	if (gnTexturesMask & MATERIAL_ALBEDO_MAP) cAlbedoColor = gtxtAlbedoTexture.Sample(gssWrap, input.uv);
 	float4 cSpecularColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -138,7 +153,20 @@ float4 PSStandard(VS_STANDARD_OUTPUT input) : SV_TARGET
 		normalW = normalize(input.normalW);
 	}
 	float4 cIllumination = Lighting(input.positionW, normalW);
-	return(lerp(cColor, cIllumination, 0.5f));
+	output.f4Illumination = cIllumination;
+
+	float3 uvw = float3(input.uv, nPrimitiveID / 2);
+	output.f4Texture = output.f4Color = cColor;
+	
+	output.f4Scene = output.f4Color = lerp(output.f4Illumination, output.f4Texture, 0.7f);
+	
+	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
+	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
+
+	output.f2ObjectIDzDepth.x = (float)1.0f;
+	output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
+
+	return(output);
 }
 
 float4 PSOutline(VS_STANDARD_OUTPUT input) : SV_TARGET
@@ -183,7 +211,8 @@ VS_STANDARD_OUTPUT VSSkinnedAnimationStandard(VS_SKINNED_STANDARD_INPUT input)
 		mtxVertexToBoneWorld += input.weights[i] * mul(gpmtxBoneOffsets[input.indices[i]], gpmtxBoneTransforms[input.indices[i]]);
 	}
 	output.positionW = mul(float4(input.position, 1.0f), mtxVertexToBoneWorld).xyz;
-	output.normalW = mul(input.normal, (float3x3)mtxVertexToBoneWorld).xyz;
+	output.normalW = mul(input.normal, (float3x3)mtxVertexToBoneWorld).xyz; 
+	output.normalV = mul(float4(output.normalW, 1.0f), gmtxView).xyz;
 	output.tangentW = mul(input.tangent, (float3x3)mtxVertexToBoneWorld).xyz;
 	output.bitangentW = mul(input.bitangent, (float3x3)mtxVertexToBoneWorld).xyz;
 
@@ -244,6 +273,12 @@ struct VS_TERRAIN_OUTPUT
 	float4 color : COLOR;
 	float2 uv0 : TEXCOORD0;
 	float2 uv1 : TEXCOORD1;
+
+	float3 positionW : POSITION;
+	float3 normalW : NORMAL0;
+	float3 normalV : NORMAL1;
+	float3 tangentW : TANGENT;
+	float3 bitangentW : BITANGENT;
 };
 
 VS_TERRAIN_OUTPUT VSTerrain(VS_TERRAIN_INPUT input)
@@ -251,6 +286,11 @@ VS_TERRAIN_OUTPUT VSTerrain(VS_TERRAIN_INPUT input)
 	VS_TERRAIN_OUTPUT output;
 
 	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	output.positionW = input.position;
+	output.normalW = float3(0, 1, 0);
+	output.normalV = float3(0, 1, 0);
+	output.tangentW = float3(0, 0, 0);
+	output.bitangentW = float3(0, 0, 0);
 	output.color = input.color;
 	output.uv0 = input.uv0;
 	output.uv1 = input.uv1;
@@ -258,14 +298,32 @@ VS_TERRAIN_OUTPUT VSTerrain(VS_TERRAIN_INPUT input)
 	return(output);
 }
 
-float4 PSTerrain(VS_TERRAIN_OUTPUT input) : SV_TARGET
+PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTerrain(VS_TERRAIN_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)
 {
+	PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
+
 	float4 cBaseTexColor = gtxtTerrainBaseTexture.Sample(gssWrap, input.uv0);
 	float4 cDetailTexColor = gtxtTerrainDetailTexture.Sample(gssWrap, input.uv1);
 	//	float4 cColor = saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
-		float4 cColor = input.color * saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
+	float4 cColor = input.color * saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
 
-		return(cColor);
+	float3 normalW = normalize(input.normalW);
+
+	float4 cIllumination = Lighting(input.positionW, normalW);
+	output.f4Illumination = cIllumination;
+
+	//float3 uvw = float3(input.uv0, nPrimitiveID / 2);
+	output.f4Texture = cColor;
+
+	output.f4Scene = output.f4Color = cColor;
+
+	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
+	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
+
+	output.f2ObjectIDzDepth.x = (float)1.0f;
+	output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
+
+	return(output);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -279,6 +337,12 @@ struct VS_SKYBOX_CUBEMAP_OUTPUT
 {
 	float3	positionL : POSITION;
 	float4	position : SV_POSITION;
+
+	float2 uv : TEXCOORD;
+	float3 normalW : NORMAL0;
+	float3 normalV : NORMAL1;
+	float3 tangentW : TANGENT;
+	float3 bitangentW : BITANGENT;
 };
 
 VS_SKYBOX_CUBEMAP_OUTPUT VSSkyBox(VS_SKYBOX_CUBEMAP_INPUT input)
@@ -287,6 +351,11 @@ VS_SKYBOX_CUBEMAP_OUTPUT VSSkyBox(VS_SKYBOX_CUBEMAP_INPUT input)
 
 	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
 	output.positionL = input.position;
+	output.uv = float2(0, 0);
+	output.normalW = float3(0, 0, 0);
+	output.normalV = float3(0, 0, 0);
+	output.tangentW = float3(0, 0, 0);
+	output.bitangentW = float3(0, 0, 0);
 
 	return(output);
 }
@@ -294,11 +363,28 @@ VS_SKYBOX_CUBEMAP_OUTPUT VSSkyBox(VS_SKYBOX_CUBEMAP_INPUT input)
 TextureCube gtxtSkyCubeTexture : register(t13);
 SamplerState gssClamp : register(s1);
 
-float4 PSSkyBox(VS_SKYBOX_CUBEMAP_OUTPUT input) : SV_TARGET
+PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSSkyBox(VS_SKYBOX_CUBEMAP_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)
 {
+	PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
+
 	float4 cColor = gtxtSkyCubeTexture.Sample(gssClamp, input.positionL);
 
-	return(cColor);
+	float3 normalW = normalize(input.normalW);
+
+	float4 cIllumination = Lighting(input.positionL, normalW);
+	output.f4Illumination = cIllumination;
+
+	output.f4Texture = cColor;
+
+	output.f4Scene = output.f4Color = cColor;
+
+	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
+	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
+
+	output.f2ObjectIDzDepth.x = (float)1.0f;
+	output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
+
+	return(output);
 }
 
 struct VS_WALL_INPUT
@@ -310,28 +396,34 @@ struct VS_WALL_INPUT
 
 struct VS_WALL_OUTPUT
 {
-	float4		position : SV_POSITION;
-	float3		positionW : POSITION;
-	float3		normalW : NORMAL;
-	float2		uv : TEXTURECOORD;
+	float4 position : SV_POSITION;
+	float3 positionW : POSITION;
+	float3 normalW : NORMAL0;
+	float3 normalV : NORMAL1;
+	float3 tangentW : TANGENT;
+	float3 bitangentW : BITANGENT;
+	float2 uv : TEXCOORD;
 };
 
 VS_WALL_OUTPUT VSWall(VS_WALL_INPUT input)
 {
 	VS_WALL_OUTPUT output;
 
-	output.positionW = mul(float4(input.position, 1.0f), gmtxGameObject).xyz;
 	output.normalW = mul(input.normal, (float3x3)gmtxGameObject);
+	output.normalV = mul(float4(output.normalW, 1.0f), gmtxView).xyz;
+	output.positionW = (float3)mul(float4(input.position, 1.0f), gmtxGameObject);
 	output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+	output.tangentW = float3(0, 0, 0);
+	output.bitangentW = float3(0, 0, 0);
 	output.uv = input.uv;
-	output.uv.y *= 2.5f;
-	output.uv.x *= 5.0f;
 
 	return(output);
 }
 
-float4 PSWall(VS_WALL_OUTPUT input) : SV_TARGET
+PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWall(VS_WALL_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)
 {
+	PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
+
 	float4 cAlbedoColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	if (gnTexturesMask & MATERIAL_ALBEDO_MAP) cAlbedoColor = gtxtAlbedoTexture.Sample(gssWrap, input.uv);
 	float4 cSpecularColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -348,9 +440,20 @@ float4 PSWall(VS_WALL_OUTPUT input) : SV_TARGET
 	float3 normalW = normalize(input.normalW);
 
 	float4 cIllumination = Lighting(input.positionW, normalW);
-	//return cIllumination;
-	return (lerp(cColor, cIllumination, 0.5f));
-	//return cColor;
+	output.f4Illumination = cIllumination;
+
+	float3 uvw = float3(input.uv, nPrimitiveID / 2);
+	output.f4Texture = cColor;
+	
+	output.f4Scene = output.f4Color = lerp(output.f4Illumination, output.f4Texture, 0.7f);
+	
+	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
+	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
+
+	output.f2ObjectIDzDepth.x = (float)1.0f;
+	output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
+	
+	return(output);
 }
 
 struct VS_TEXTURED_LIGHTING_INPUT
@@ -399,17 +502,6 @@ float4 PSTexturedLighting(VS_TEXTURED_LIGHTING_OUTPUT input, uint nPrimitiveID :
 }
 
 
-struct PS_MULTIPLE_RENDER_TARGETS_OUTPUT
-{
-	float4 f4Scene : SV_TARGET0; //Swap Chain Back Buffer
-
-	float4 f4Color : SV_TARGET1;
-	float4 f4Normal : SV_TARGET2;
-	float4 f4Texture : SV_TARGET3;
-	float4 f4Illumination : SV_TARGET4;
-	float2 f2ObjectIDzDepth : SV_TARGET5;
-	float4 f4CameraNormal : SV_TARGET6;
-};
 
 PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LIGHTING_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)
 {
@@ -476,20 +568,20 @@ VS_SCREEN_RECT_TEXTURED_OUTPUT VSScreenRectSamplingTextured(uint nVertexID : SV_
 {
 	VS_SCREEN_RECT_TEXTURED_OUTPUT output = (VS_SCREEN_RECT_TEXTURED_OUTPUT)0;
 
-	//if (nVertexID == 0) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
-	//else if (nVertexID == 1) { output.position = float4(+1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 0.0f); }
-	//else if (nVertexID == 2) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
-	//else if (nVertexID == 3) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
-	//else if (nVertexID == 4) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
-	//else if (nVertexID == 5) { output.position = float4(-1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 1.0f); }
+	if (nVertexID == 0) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
+	else if (nVertexID == 1) { output.position = float4(+1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 0.0f); }
+	else if (nVertexID == 2) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
+	else if (nVertexID == 3) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
+	else if (nVertexID == 4) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
+	else if (nVertexID == 5) { output.position = float4(-1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 1.0f); }
 
 	int screen = nVertexID/6;
-	if (nVertexID % 6 == 0)	{ output.position = float4((0.5 * screen) - 1.0f,			+1.0f, 0.0f, 1.0f);		output.uv = float2(0.0f, 0.0f);		output.screenNum = screen;}
-	else if (nVertexID%6 == 1)	{ output.position = float4((0.5*(screen+1)) - 1.0f,		+1.0f, 0.0f, 1.0f);		output.uv = float2(1.0f, 0.0f); output.screenNum = screen;}
-	else if (nVertexID%6 == 2)	{ output.position = float4((0.5 * (screen + 1)) - 1.0f,	+0.5f, 0.0f, 1.0f);		output.uv = float2(1.0f, 1.0f); output.screenNum = 6;}
-	else if (nVertexID%6 == 3)	{ output.position = float4((0.5*screen) - 1.0f,			+1.0f, 0.0f, 1.0f);		output.uv = float2(0.0f, 0.0f); output.screenNum = screen;}
-	else if (nVertexID%6 == 4)	{ output.position = float4((0.5 *(screen+1.0f)) - 1.0f,	+0.5f, 0.0f, 1.0f);		output.uv = float2(1.0f, 1.0f); output.screenNum = screen;}
-	else if (nVertexID%6 == 5)	{ output.position = float4((0.5 * screen)-1.0f,			+0.5f, 0.0f, 1.0f);		output.uv = float2(0.0f, 1.0f); output.screenNum = screen;}
+	//if (nVertexID % 6 == 0)	{ output.position = float4((0.5 * screen) - 1.0f,			+1.0f, 0.0f, 1.0f);		output.uv = float2(0.0f, 0.0f);		output.screenNum = screen;}
+	//else if (nVertexID%6 == 1)	{ output.position = float4((0.5*(screen+1)) - 1.0f,		+1.0f, 0.0f, 1.0f);		output.uv = float2(1.0f, 0.0f); output.screenNum = screen;}
+	////else if (nVertexID%6 == 2)	{ output.position = float4((0.5 * (screen + 1)) - 1.0f,	+0.5f, 0.0f, 1.0f);		output.uv = float2(1.0f, 1.0f); output.screenNum = 6;}
+	//else if (nVertexID%6 == 3)	{ output.position = float4((0.5*screen) - 1.0f,			+1.0f, 0.0f, 1.0f);		output.uv = float2(0.0f, 0.0f); output.screenNum = screen;}
+	//else if (nVertexID%6 == 4)	{ output.position = float4((0.5 *(screen+1.0f)) - 1.0f,	+0.5f, 0.0f, 1.0f);		output.uv = float2(1.0f, 1.0f); output.screenNum = screen;}
+	//else if (nVertexID%6 == 5)	{ output.position = float4((0.5 * screen)-1.0f,			+0.5f, 0.0f, 1.0f);		output.uv = float2(0.0f, 1.0f); output.screenNum = screen;}
 
 	output.viewSpaceDir = mul(output.position, gmtxInverseProjection).xyz;
 	return(output);
@@ -604,7 +696,7 @@ float4 Outline(VS_SCREEN_RECT_TEXTURED_OUTPUT input)
 	fEdgeNormal = (fEdgeNormal > 0.4f) ? 1.0f : 0.0f;
 
 	float fEdge = max(fDdgeDepth, fEdgeNormal);
-	float4 f4EdgeColor = float4(1.0f, 1.0f, 1.0f, 1.0f * fEdge);
+	float4 f4EdgeColor = float4(0.0f, 0.0f, 0.0f, 1.0f * fEdge);
 
 	float4 f4Color = gtxtInputTextures[0].Sample(gssWrap, input.uv);
 	return(AlphaBlend(f4EdgeColor, f4Color));
@@ -614,10 +706,10 @@ float4 PSScreenRectSamplingTextured(VS_SCREEN_RECT_TEXTURED_OUTPUT input) : SV_T
 {
 	float4 cColor = float4(1.0f, 1.0f, 0.0f, 0.1f);
 	//cColor = gtxtInputTextures[3].Sample(gssWrap, input.uv);
-	cColor = gtxtInputTextures[input.screenNum][int2(input.position.xy)];
+	//cColor = gtxtInputTextures[input.screenNum][int2(input.position.xy)];
 	//cColor = gtxtInputTextures[input.screenNum].Sample(gssWrap, input.uv);
 	//cColor = LaplacianEdge(input.position);
-	//cColor = Outline(input);
+	cColor = Outline(input);
 
 
 	//switch (gvDrawOptions.x)
@@ -674,4 +766,22 @@ float4 PSScreenRectSamplingTextured(VS_SCREEN_RECT_TEXTURED_OUTPUT input) : SV_T
 	//		}
 	//}
 	return(cColor);
+}
+
+float4 VSPostProcessing(uint nVertexID : SV_VertexID) : SV_POSITION
+{
+	if (nVertexID == 0) return(float4(-1.0f, +1.0f, 0.0f, 1.0f));
+	if (nVertexID == 1) return(float4(+1.0f, +1.0f, 0.0f, 1.0f));
+	if (nVertexID == 2) return(float4(+1.0f, -1.0f, 0.0f, 1.0f));
+
+	if (nVertexID == 3) return(float4(-1.0f, +1.0f, 0.0f, 1.0f));
+	if (nVertexID == 4) return(float4(+1.0f, -1.0f, 0.0f, 1.0f));
+	if (nVertexID == 5) return(float4(-1.0f, -1.0f, 0.0f, 1.0f));
+
+	return(float4(0, 0, 0, 0));
+}
+
+float4 PSPostProcessing(float4 position : SV_POSITION) : SV_Target
+{
+	return(float4(0.0f, 0.0f, 0.0f, 1.0f));
 }
