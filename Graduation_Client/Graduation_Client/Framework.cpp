@@ -379,7 +379,7 @@ void Framework::FrameAdvance()
 	m_pLaplacianEdgeDetectionShader->OnPostRenderTarget(m_pd3dCommandList);
 	//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 	//if (scene) scene->forrender(m_pd3dCommandList);
-	//m_pLaplacianEdgeDetectionShader->Render(m_pd3dCommandList);
+	if(Input::GetInstance()->keyBuffer['1'] & 0xF0) m_pLaplacianEdgeDetectionShader->Render(m_pd3dCommandList);
 
 
 	::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
