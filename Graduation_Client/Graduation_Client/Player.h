@@ -58,6 +58,10 @@ public:
 	bool GetIsColledUpFace() { return m_collision_up_face; }
 	void SetIsColledUpFace(bool state) { m_collision_up_face = state; }
 
+	bool IsAttack() { return m_AttackElapsedTime < m_Attack; }
+	void PlayAttack(float elapsedTime) { m_AttackElapsedTime += elapsedTime; }
+	void SetAttackZeroTime() { m_AttackElapsedTime = 0.0f; }
+
 	//CCamera* GetCamera() { return(m_pCamera); }
 	//void SetCamera(CCamera* pCamera) { m_pCamera = pCamera; }
 
@@ -117,6 +121,11 @@ protected:
 
 	float							m_Jumpping = 0.3f;
 	float							m_JumpElapsedTime = 0.f;
+
+	float							m_Attack = 0.2f;
+	float							m_AttackElapsedTime = 1.f;
+
+
 	bool							m_Isfalling = false;
 	bool							m_collision_up_face = false;
 };

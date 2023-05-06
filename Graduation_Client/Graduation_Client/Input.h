@@ -18,7 +18,6 @@ public:
 	}
 
 	static UCHAR		keyBuffer[256];
-
 	Player*			m_pPlayer=NULL;
 	Time				m_time;
 	POINT				m_ptOldCursorPos{ 0,0 };

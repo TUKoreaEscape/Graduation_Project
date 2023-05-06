@@ -62,7 +62,6 @@ void CommonMovement::update(float elapsedTime)
 			gameObject->SetTrackAnimationSet(0, 6);
 		}
 
-
 		if (dwDirection)
 		{
 			if ((dwDirection == DIR_NOT_FB) ||
@@ -74,7 +73,12 @@ void CommonMovement::update(float elapsedTime)
 		}
 		else m_emptyKey = true;
 
-		if (m_emptyKey && !Input::GetInstance()->m_pPlayer->GetIsFalling())
+		if (Input::GetInstance()->m_pPlayer->IsAttack())
+		{
+			Input::GetInstance()->m_pPlayer->PlayAttack(elapsedTime);
+			gameObject->SetTrackAnimationSet(0, 7);
+		}
+		else if (m_emptyKey && !Input::GetInstance()->m_pPlayer->GetIsFalling())
 		{
 			gameObject->SetTrackAnimationSet(0, 0);
 			Input::GetInstance()->m_pPlayer->SetDirection(DIR_EMPTY);

@@ -75,6 +75,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:
+		if(!m_pPlayer->IsAttack()) m_pPlayer->SetAttackZeroTime();
 		break;
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:
