@@ -23,10 +23,10 @@ GameScene::GameScene() : Scene()
 
 void GameScene::forrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
-	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
-	m_pPlayer->m_pCamera->update(pd3dCommandList);
-	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
+	//if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+	//if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
+	//m_pPlayer->m_pCamera->update(pd3dCommandList);
+	//m_pLight->GetComponent<Light>()->update(pd3dCommandList);
 
 	m_pSkybox->render(pd3dCommandList);
 	
@@ -82,6 +82,10 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	m_pBroadcast->UpdateTransform(nullptr);
 	m_pBroadcast->render(pd3dCommandList);
+
+	m_pHouse->UpdateTransform(nullptr);
+	m_pHouse->render(pd3dCommandList);
+	//m_pHouse->render(pd3dCommandList);
 }
 
 void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -106,9 +110,16 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pBroadcast = new GameObject();
 	m_pBroadcast->SetChild(pBroadcastModel->m_pModelRootObject, true);
 
+	LoadedModelInfo* pHouseModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/OldHousePrefab.bin", nullptr);
+
+	m_pHouse = new GameObject();
+	m_pHouse->SetChild(pHouseModel->m_pModelRootObject, true);
+
 	if (pClassModel) delete pClassModel;
 	if (pPianoModel) delete pPianoModel;
 	if (pBroadcastModel) delete pBroadcastModel;
+
+	if (pHouseModel) delete pHouseModel;
 
 	m_pNPC = new GameObject();
 	m_pNPC->SetChild(pPlayerModel->m_pModelRootObject, true);
