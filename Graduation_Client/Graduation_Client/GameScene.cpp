@@ -73,6 +73,9 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pPorest->UpdateTransform(nullptr);
 	m_pPorest->render(pd3dCommandList);
 
+	m_pLobby->UpdateTransform(nullptr);
+	m_pLobby->render(pd3dCommandList);
+
 	for (int i = 0; i < m_nBush; ++i)
 	{
 		if (m_ppBush[i]) m_ppBush[i]->render(pd3dCommandList);
@@ -94,6 +97,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	LoadedModelInfo* pPianoModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPianoRoom.bin", nullptr);
 	LoadedModelInfo* pBroadcastModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InBroadcast.bin", nullptr);
 	LoadedModelInfo* pHouseModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPorest.bin", nullptr);
+	LoadedModelInfo* pLobbyModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InDDD.bin", nullptr);
 
 	m_pClass = new GameObject();
 	m_pClass->SetChild(pClassModel->m_pModelRootObject, true);
@@ -103,11 +107,14 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pBroadcast->SetChild(pBroadcastModel->m_pModelRootObject, true);
 	m_pPorest = new GameObject();
 	m_pPorest->SetChild(pHouseModel->m_pModelRootObject, true);
-	
+	m_pLobby = new GameObject();
+	m_pLobby->SetChild(pLobbyModel->m_pModelRootObject, true);
+
 	if (pClassModel) delete pClassModel;
 	if (pPianoModel) delete pPianoModel;
 	if (pBroadcastModel) delete pBroadcastModel;
 	if (pHouseModel) delete pHouseModel;
+	if (pLobbyModel) delete pLobbyModel;
 
 	m_pNPC = new GameObject();
 	m_pNPC->SetChild(pPlayerModel->m_pModelRootObject, true);
@@ -151,7 +158,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	GameObject::SetParts(0, 0, 4);
 	m_pPlayer->PlayerNum = 0;
 
-	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene0507.bin");
+	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene05073.bin");
 	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 	
 	if (pPlayerModel) delete pPlayerModel;
@@ -164,17 +171,17 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	
 	XMFLOAT3 xmf3Scale(1.0f, 1.0f, 1.0f);
 	XMFLOAT4 xmf4Color(1.f, 1.f, 1.f, 0.0f);
-	m_pMainTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 0, 0, 121, 81, xmf3Scale, xmf4Color);
-	xmf4Color = XMFLOAT4(1.f, 1.f, 0.f, 0.0f);
-	m_pPianoTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), -30, 60, 61, 41, xmf3Scale, xmf4Color);
-	xmf4Color = XMFLOAT4(1.f, 0.f, 0.f, 0.0f);
-	m_pBroadcastTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 50, 60, 101, 41, xmf3Scale, xmf4Color);
-	xmf4Color = XMFLOAT4(0.f, 1.f, 0.f, 0.0f);
-	m_pCubeTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 80, 0, 41, 81, xmf3Scale, xmf4Color);
-	xmf4Color = XMFLOAT4(0.f, 0.f, 0.f, 0.0f);
-	m_pForestTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 60, -60, 81, 41, xmf3Scale, xmf4Color);
-	xmf4Color = XMFLOAT4(0.f, 1.f, 1.f, 0.0f);
-	m_pClassroomTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), -20, -60, 81, 41, xmf3Scale, xmf4Color);
+	m_pMainTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 0, 0, 121, 81, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
+	//xmf4Color = XMFLOAT4(1.f, 1.f, 0.f, 0.0f);
+	m_pPianoTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), -30, 60, 61, 41, xmf3Scale, xmf4Color, L"Terrain/Floor2.dds");
+	//xmf4Color = XMFLOAT4(1.f, 0.f, 0.f, 0.0f);
+	m_pBroadcastTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 50, 60, 101, 41, xmf3Scale, xmf4Color, L"Terrain/Floor2.dds");
+	//xmf4Color = XMFLOAT4(0.f, 1.f, 0.f, 0.0f);
+	m_pCubeTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 80, 0, 41, 81, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
+	//xmf4Color = XMFLOAT4(0.f, 0.f, 0.f, 0.0f);
+	m_pForestTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 60, -60, 81, 41, xmf3Scale, xmf4Color, L"Terrain/Floor2.dds");
+	//xmf4Color = XMFLOAT4(0.f, 1.f, 1.f, 0.0f);
+	m_pClassroomTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), -20, -60, 81, 41, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
 
 	LPVOID m_pTerrain[ROOM_COUNT]{ m_pMainTerrain ,m_pPianoTerrain,m_pBroadcastTerrain, m_pCubeTerrain ,m_pForestTerrain,m_pClassroomTerrain };
 	m_pPlayer->SetPlayerUpdatedContext(m_pTerrain);

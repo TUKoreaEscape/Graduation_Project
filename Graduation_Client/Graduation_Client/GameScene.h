@@ -36,6 +36,7 @@ public:
 	GameObject* m_pPiano = nullptr;
 	GameObject* m_pBroadcast = nullptr;
 	GameObject* m_pPorest = nullptr;
+	GameObject* m_pLobby = nullptr;
 
 	ID3D12RootSignature*	m_pd3dGraphicsRootSignature = NULL; //루트 시그너쳐를 나타내는 인터페이스 포인터이다.
 

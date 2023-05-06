@@ -109,7 +109,7 @@ void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 		size_t nConverted = 0;
 		mbstowcs_s(&nConverted, pwstrTextureName, 64, pstrFilePath, _TRUNCATE);
-		#define _WITH_DISPLAY_TEXTURE_NAME
+		//#define _WITH_DISPLAY_TEXTURE_NAME
 
 #ifdef _WITH_DISPLAY_TEXTURE_NAME
 		static int nTextures = 0, nRepeatedTextures = 0;
@@ -137,14 +137,14 @@ void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 				GameObject* pRootGameObject = pParent;
 				*ppTexture = pRootGameObject->FindReplicatedTexture(pwstrTextureName);
 				if (*ppTexture) (*ppTexture)->AddRef();
-				else
+				/*else
 				{
 					*ppTexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
 					(*ppTexture)->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, pwstrTextureName, RESOURCE_TEXTURE2D, 0);
 					if (*ppTexture) (*ppTexture)->AddRef();
 
 					GameScene::CreateShaderResourceViews(pd3dDevice, *ppTexture, 0, nRootParameter);
-				}
+				}*/
 			}
 		}
 	}
