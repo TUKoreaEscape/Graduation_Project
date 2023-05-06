@@ -17,8 +17,8 @@ void Input::Update(HWND hWnd)
 	{
 		SetCursor(NULL);
 		GetCursorPos(&ptCursorPos);
-		cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 3.0f;
-		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 3.0f;
+		cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 5.0f;
+		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 5.0f;
 		SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
 	}
 
@@ -33,11 +33,26 @@ void Input::Update(HWND hWnd)
 
 void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
+	RECT rcClient;
+	GetClientRect(hWnd, &rcClient);
+	POINT ptCenter = { (rcClient.right - rcClient.left) / 2, (rcClient.bottom - rcClient.top) / 2 };
+	POINT ptMouse;
 	switch (nMessageID)
 	{
 	case WM_KEYUP:
 		switch (wParam)
 		{
+		case VK_F1:
+			GetCursorPos(&ptMouse);
+			if (ptMouse.x != ptCenter.x || ptMouse.y != ptCenter.y) {
+				SetCursorPos(ptCenter.x, ptCenter.y);
+			}
+			::SetCapture(hWnd);
+			::GetCursorPos(&m_ptOldCursorPos);
+			break;
+		case VK_F2:
+			::ReleaseCapture();
+			break;
 		case VK_ESCAPE:
 			::PostQuitMessage(0);
 			break;
@@ -60,12 +75,9 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:
-		::SetCapture(hWnd);
-		::GetCursorPos(&m_ptOldCursorPos);
 		break;
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:
-		::ReleaseCapture();
 		break;
 	case WM_MOUSEMOVE:
 		break;
