@@ -351,3 +351,19 @@ void cGameServer::Process_Customizing(const int user_id, void* buff)
 		}
 	}
 }
+
+void cGameServer::Process_Attack(const int user_id)
+{
+	XMFLOAT3 attacker_look{ static_cast<float>(m_clients[user_id].get_look_x()) / 100, static_cast<float>(m_clients[user_id].get_look_y()) / 100, static_cast<float>(m_clients[user_id].get_look_z()) / 100 };
+	BoundingOrientedBox punch = m_clients[user_id].get_bounding_box();
+
+	punch.Center = Add(punch.Center, attacker_look);
+	for (auto other_player_id : m_clients[user_id].room_list)
+	{
+		if (punch.Intersects(m_clients[other_player_id].get_bounding_box()))
+		{
+			cout << "ÁÖ¸ÔÀ¸·Î ÇÑ´ë ²Î!" << std::endl;
+		}
+	}
+
+}
