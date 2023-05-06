@@ -28,21 +28,10 @@ void GameScene::forrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	//m_pPlayer->m_pCamera->update(pd3dCommandList);
 	//m_pLight->GetComponent<Light>()->update(pd3dCommandList);
 
-	m_pSkybox->render(pd3dCommandList);
-	
-	m_pMainTerrain->render(pd3dCommandList);
-	m_pPianoTerrain->render(pd3dCommandList);
-	m_pBroadcastTerrain->render(pd3dCommandList);
-	m_pCubeTerrain->render(pd3dCommandList);
-	m_pForestTerrain->render(pd3dCommandList);
-	m_pClassroomTerrain->render(pd3dCommandList);
-
-	for (int i = 0; i < m_nWalls; ++i)
+	for (int i = 0; i < m_nBush; ++i)
 	{
-		if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
+		if (m_ppBush[i]) m_ppBush[i]->render(pd3dCommandList);
 	}
-
-	Scene::render(pd3dCommandList);
 }
 
 void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -67,11 +56,6 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
 	}
 
-	for (int i = 0; i < m_nBush; ++i)
-	{
-		if (m_ppBush[i]) m_ppBush[i]->render(pd3dCommandList);
-	}
-
 	Scene::render(pd3dCommandList);
 	
 	m_pClass->UpdateTransform(nullptr);
@@ -85,6 +69,11 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	m_pHouse->UpdateTransform(nullptr);
 	m_pHouse->render(pd3dCommandList);
+
+	for (int i = 0; i < m_nBush; ++i)
+	{
+		if (m_ppBush[i]) m_ppBush[i]->render(pd3dCommandList);
+	}
 	//m_pHouse->render(pd3dCommandList);
 }
 

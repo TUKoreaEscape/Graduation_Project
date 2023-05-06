@@ -376,12 +376,12 @@ void Framework::FrameAdvance()
 	//렌더링 코드는 여기에 추가될 것이다.
 	m_pLaplacianEdgeDetectionShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 	if(scene) scene->defrender(m_pd3dCommandList);
-	m_pLaplacianEdgeDetectionShader->Render(m_pd3dCommandList);
-	m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
+	//m_pLaplacianEdgeDetectionShader->Render(m_pd3dCommandList);
+	//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 	//if (scene) scene->forrender(m_pd3dCommandList);
 	m_pLaplacianEdgeDetectionShader->OnPostRenderTarget(m_pd3dCommandList);
 	//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
-	//if (scene) scene->forrender(m_pd3dCommandList);
+	
 	if(Input::GetInstance()->keyBuffer['1'] & 0xF0) m_pLaplacianEdgeDetectionShader->Render(m_pd3dCommandList);
 
 
