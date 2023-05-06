@@ -34,6 +34,12 @@ private:
 	XMFLOAT3				m_velocity{};
 	bool					m_jump = false;
 	bool					m_collied_up_face = false;
+	bool					m_attack_animation = false;
+	bool					m_victim_animation = false;
+
+	float					m_attack_animation_time = 0;
+	float					m_victim_animation_time = 0;
+
 	float					m_yaw{};
 	short					m_look[3]{0};
 	short					m_right[3]{0};
@@ -73,6 +79,9 @@ public:
 	int					get_join_room_number() { return m_join_room_number; }
 	bool				get_user_is_jump() { return m_jump; }
 	bool				get_user_collied_up_face() { return m_collied_up_face; }
+	bool				get_user_attack_animation() { return m_attack_animation; }
+	bool				get_user_victim_animation() { return m_victim_animation; }
+
 	float				get_user_yaw();
 	XMFLOAT3			get_user_position();
 	XMFLOAT3			get_user_velocity();
@@ -95,6 +104,17 @@ public:
 	void				set_inputKey(unsigned char key) { m_input_key = key; }
 	void				set_isjump(bool value) { m_jump = value; }
 	void				set_collied_up_face(bool value) { m_collied_up_face = value; }
+	void				set_attack_animation(bool value) { m_attack_animation = value; }
+	void				set_victim_animation(bool value) { m_victim_animation = value; }
+
+	void				play_attack_animation(float ElapseTime) { m_attack_animation_time += ElapseTime; }
+	void				play_victim_animation(float ElapseTime) { m_victim_animation_time += ElapseTime; }
+
+	bool				IsAttackAnimation() { return m_attack_animation_time < 0.5f; }
+	bool				IsVictimAnimation() { return m_victim_animation_time < 0.5f; }
+
+	void				SetAttackTimeZero() { m_attack_animation_time = 0; }
+	void				SetVictimTimeZero() { m_victim_animation_time = 0; }
 
 	void				set_login_state(LOGIN_STATE _state);
 	void				set_state(CLIENT_STATE::STATE state);

@@ -77,6 +77,7 @@ void CommonMovement::update(float elapsedTime)
 		{
 			Input::GetInstance()->m_pPlayer->PlayAttack(elapsedTime);
 			gameObject->SetTrackAnimationSet(0, 7);
+			
 		}
 		else if (m_emptyKey && !Input::GetInstance()->m_pPlayer->GetIsFalling())
 		{

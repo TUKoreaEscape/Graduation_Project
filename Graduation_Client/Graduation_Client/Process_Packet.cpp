@@ -75,7 +75,38 @@ void Network::Process_Other_Player_Move(char* ptr)
 					m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 					m_ppOther[j]->SetTrackAnimationSet(0, 6);
 				}
+
+				if (packet->data[i].is_victim == true)
+				{
+					m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+					m_ppOther[j]->SetTrackAnimationSet(0, 8);
+				}
+
+				if (packet->data[i].is_attack == true)
+				{
+					m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+					m_ppOther[j]->SetTrackAnimationSet(0, 7);
+				}
 			}
+		}
+	}
+}
+
+void Network::Process_Attack_Packet(char* ptr)
+{
+	sc_packet_attack* packet = reinterpret_cast<sc_packet_attack*>(ptr);
+
+	if (packet->attacker_id == m_pPlayer->GetID())
+	{
+		// 굳이 할 필요 있음? 이미 애니메이션 동작하는데...ㅎ
+	}
+
+
+	for (int i = 0; i < 5; ++i)
+	{
+		if (m_ppOther[i]->GetID() == packet->attacker_id)
+		{
+
 		}
 	}
 }

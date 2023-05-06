@@ -24,7 +24,7 @@ void cGameServer::Update_Session(int thread_number)
 				{
 					rl._room_state_lock.unlock();
 #if DEBUG
-					Update_OtherPlayer(i);
+					Update_OtherPlayer(i, (float)1/60);
 #endif				
 					break;
 				}
@@ -33,7 +33,7 @@ void cGameServer::Update_Session(int thread_number)
 				{
 					rl._room_state_lock.unlock();
 					rl.Update_room_time();
-					Update_OtherPlayer(i);
+					Update_OtherPlayer(i, (float)1/60);
 					break;
 				}
 
@@ -51,9 +51,28 @@ void cGameServer::Update_Session(int thread_number)
 }
 
 
-void cGameServer::Update_OtherPlayer(int room_number)
+void cGameServer::Update_OtherPlayer(int room_number, float elaspeTime)
 {
 	Room& rl = *m_room_manager->Get_Room_Info(room_number);
+
+	for (int i = 0; i < 6; ++i)
+	{
+		if (rl.Get_Join_Member(i) != -1)
+		{
+			if (m_clients[rl.Get_Join_Member(i)].get_user_attack_animation())
+				m_clients[rl.Get_Join_Member(i)].play_attack_animation(elaspeTime);
+
+			if (m_clients[rl.Get_Join_Member(i)].get_user_victim_animation())
+				m_clients[rl.Get_Join_Member(i)].play_victim_animation(elaspeTime);
+
+			if (!m_clients[rl.Get_Join_Member(i)].IsAttackAnimation())
+				m_clients[rl.Get_Join_Member(i)].set_attack_animation(false);
+
+			if (!m_clients[rl.Get_Join_Member(i)].IsVictimAnimation())
+				m_clients[rl.Get_Join_Member(i)].set_victim_animation(false);
+		}
+	}
+
 	int index = 0;
 	for (int k = 0; k < 6; ++k)
 	{
@@ -82,6 +101,8 @@ void cGameServer::Update_OtherPlayer(int room_number)
 					packet.data[index].position.y = static_cast<int>(m_clients[this_id].get_user_position().y * 10000);
 					packet.data[index].position.z = static_cast<int>(m_clients[this_id].get_user_position().z * 10000);
 					packet.data[index].is_jump = m_clients[this_id].get_user_is_jump();
+					packet.data[index].is_attack = m_clients[this_id].get_user_attack_animation();
+					packet.data[index].is_victim = m_clients[this_id].get_user_victim_animation();
 					packet.data[index].is_collision_up_face = m_clients[this_id].get_user_collied_up_face();
 					packet.data[index].active = true;
 					index++;

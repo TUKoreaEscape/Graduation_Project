@@ -29,6 +29,11 @@ public:
         return m_fDeltaTime;
     }
 
+    float get_elapseTime()
+    {
+        return m_fDeltaTime;
+    }
+
     bool Frame_Limit(float frame_limit)
     {
         m_arrTimers_TimeAcc += update();

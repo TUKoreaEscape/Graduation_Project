@@ -66,6 +66,7 @@ public:
 	void Process_Player_Move(char* ptr);
 	void Process_Other_Player_Move(char* ptr);
 	void Process_Game_Start(char* ptr);
+	void Process_Attack_Packet(char* ptr);
 
 	// 게임 시작 전 사용하는 함수들
 	void Send_Request_Room_Info(int page);

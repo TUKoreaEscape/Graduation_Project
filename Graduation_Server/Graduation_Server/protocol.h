@@ -92,6 +92,8 @@ struct UserData {
 	Right				right;
 	bool				is_jump;
 	bool				is_collision_up_face;
+	bool				is_attack;
+	bool				is_victim;
 	unsigned char		active; // 생명칩유무 :D
 };
 
@@ -249,7 +251,8 @@ namespace SC_PACKET
 		SC_PACKET_TAGGER_SKILL,
 		SC_PACKET_ROOM_INFO,
 		SC_PACKET_VIVOX_DATA,
-		SC_PACKET_CUSTOMIZING
+		SC_PACKET_CUSTOMIZING,
+		SC_PACKET_ATTACK
 	};
 }
 
@@ -416,6 +419,13 @@ struct sc_other_player_disconnect {
 	unsigned char	size;
 	unsigned char	type;
 	short			id;
+};
+
+struct sc_packet_attack {
+	unsigned char	size;
+	unsigned char	type;
+	short			attacker_id;
+	short			victim_id;
 };
 
 struct sc_packet_customizing_update {

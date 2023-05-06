@@ -3,7 +3,7 @@
 #include "Framework.h"
 #include "Graduation_Client.h"
 #include "Input.h"
-
+#include "Network.h"
 Input* Input::InputInstance = nullptr;
 UCHAR Input::keyBuffer[256];
 
@@ -75,7 +75,12 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:
-		if(!m_pPlayer->IsAttack()) m_pPlayer->SetAttackZeroTime();
+		if (!m_pPlayer->IsAttack())
+		{
+			Network& network = *Network::GetInstance();
+			network.Send_Attack_Packet();
+			m_pPlayer->SetAttackZeroTime();
+		}
 		break;
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:

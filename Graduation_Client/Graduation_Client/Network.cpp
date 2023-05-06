@@ -395,6 +395,10 @@ void Network::ProcessPacket(char* ptr)
 		Process_Other_Player_Move(ptr);
 		break;
 
+	case SC_PACKET::SC_PACKET_ATTACK:
+
+		break;
+
 	case SC_PACKET::SC_PACKET_OTHER_PLAYER_DISCONNECT:
 	{
 		sc_other_player_disconnect* packet = reinterpret_cast<sc_other_player_disconnect*>(ptr);
