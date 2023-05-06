@@ -60,7 +60,8 @@ namespace CS_PACKET
 		CS_PACKET_CUSTOMIZING,
 		CS_PACKET_USE_FIRST_TAGGER_SKILL,
 		CS_PACKET_USE_SECOND_TAGGER_SKILL,
-		CS_PACKET_USE_THIRD_TAGGER_SKILL
+		CS_PACKET_USE_THIRD_TAGGER_SKILL,
+		CS_PACKET_ATTACK
 	};
 }
 
@@ -174,6 +175,11 @@ struct cs_packet_ready {
 };
 
 struct cs_packet_loading_success {
+	unsigned char	size;
+	unsigned char	type;
+};
+
+struct cs_packet_attack {
 	unsigned char	size;
 	unsigned char	type;
 };

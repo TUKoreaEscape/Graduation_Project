@@ -835,7 +835,7 @@ void PostProcessingShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (m_pTexture) m_pTexture->UpdateShaderVariables(pd3dCommandList);
 
 	pd3dCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	pd3dCommandList->DrawInstanced(24, 1, 0, 0);
+	pd3dCommandList->DrawInstanced(48, 1, 0, 0);
 }
 
 

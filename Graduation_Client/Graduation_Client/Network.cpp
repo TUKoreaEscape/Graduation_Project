@@ -68,6 +68,15 @@ void Network::Send_Picking_Object_Packet()
 	// 이쪽은 생명칩 OR 다른 오브젝트가 주변에 있을때 획득요청을 합니다.
 }
 
+void Network::Send_Attack_Packet()
+{
+	cs_packet_attack packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_ATTACK;
+
+	send_packet(&packet);
+}
+
 void Network::Send_Use_Tagger_Skill(int skill_type)
 {
 	// 여긴 만약 술래인 경우!
@@ -198,6 +207,10 @@ void Network::Debug_send_thread()
 			TerminateProcess(info.hProcess, 1);
 			break;
 		}
+
+		case 10:
+			Send_Attack_Packet();
+			break;
 		}
 	}
 }

@@ -76,6 +76,7 @@ public:
 	// 게임 플레이시 사용하는 패킷전송 함수
 	void Send_Use_Tagger_Skill(int skill_type);
 	void Send_Picking_Object_Packet();
+	void Send_Attack_Packet();
 
 	void send_packet(void* packet);
 };
