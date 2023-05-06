@@ -436,7 +436,17 @@ void Network::ProcessPacket(char* ptr)
 	{
 		sc_packet_customizing_update* packet = reinterpret_cast<sc_packet_customizing_update*>(ptr);
 		//packet->body;
-		if (packet->id == m_pPlayer->GetID())
+		std::cout << "=======================================================================" << std::endl;
+		std::cout << "packet->id : " << packet->id << std::endl;
+		std::cout << "body : " << static_cast<BODIES>(packet->body) << std::endl;
+		std::cout << "body_parts : " << static_cast<BODYPARTS>(packet->body_parts) << std::endl;
+		std::cout << "eyes : " << static_cast<EYES>(packet->eyes) << std::endl;
+		std::cout << "gloves : " << static_cast<GLOVES>(packet->gloves) << std::endl;
+		std::cout << "mouthandnoses : " << static_cast<MOUTHANDNOSES>(packet->mouthandnoses) << std::endl;
+		std::cout << "head : " << static_cast<HEADS>(packet->head) << std::endl;
+		std::cout << "=======================================================================" << std::endl;
+
+ 		if (packet->id == m_pPlayer->GetID())
 		{
 			GameObject::SetParts(0, 0, packet->body);
 			GameObject::SetParts(0, 1, packet->body_parts);

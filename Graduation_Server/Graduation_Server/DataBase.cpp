@@ -254,7 +254,6 @@ void DataBase::DataBaseThread()
 					server.m_clients[request.request_id].set_login_state(Y_LOGIN);
 					server.m_clients[request.request_id].set_state(CLIENT_STATE::ST_LOBBY);
 					server.m_clients[request.request_id].set_name(request.request_char_name);
-					server.send_login_ok_packet(request.request_id);
 
 
 					DB_Request req = request;
@@ -312,6 +311,7 @@ void DataBase::DataBaseThread()
 				packet.gloves = data.gloves;
 				packet.head = data.head;
 				packet.mouthandnoses = data.mouthandnoses;
+				server.send_login_ok_packet(request.request_id);
 				server.m_clients[request.request_id].do_send(sizeof(packet), &packet);
 				break;
 			}

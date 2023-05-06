@@ -81,14 +81,14 @@
     <ClInclude Include="Map_Load.h">
       <Filter>소스 파일\05 MapData</Filter>
     </ClInclude>
-    <ClInclude Include="object.h">
-      <Filter>소스 파일\06 Object</Filter>
-    </ClInclude>
     <ClInclude Include="Server_Timer.h">
       <Filter>소스 파일\00 Main\Session</Filter>
     </ClInclude>
     <ClInclude Include="User_Custom.h">
       <Filter>소스 파일\03 Client</Filter>
+    </ClInclude>
+    <ClInclude Include="object.h">
+      <Filter>소스 파일\09 Voice</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
