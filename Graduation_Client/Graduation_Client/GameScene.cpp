@@ -314,7 +314,6 @@ void GameScene::ReleaseObjects()
 	if (m_pClass) m_pClass->Release();
 	if (m_pPiano) m_pPiano->Release();
 	if (m_pBroadcast) m_pBroadcast->Release();
-	if (m_pPorest) m_pPiano->Release();
 }
 
 ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
