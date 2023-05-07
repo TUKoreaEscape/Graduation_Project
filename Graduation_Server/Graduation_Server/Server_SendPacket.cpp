@@ -178,7 +178,7 @@ void cGameServer::send_put_player_data(const unsigned int recv_id)
 			when_join = i;
 	}
 
-	m_clients[recv_id].set_user_position(XMFLOAT3{ 3.f - when_join, 5, -4 });
+	m_clients[recv_id].set_user_position(XMFLOAT3(static_cast<float>(6.f - ((float)when_join * 2.5)), 5.f, -4.f));
 	sc_put_player_packet packet;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_PUT_PLAYER;
