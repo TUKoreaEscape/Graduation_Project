@@ -27,7 +27,7 @@ class Network {
 private:
 	static Network* NetworkInstance;
 	SOCKET			m_socket;
-	const char*		SERVER_ADDR = "172.30.1.86";
+	const char*		SERVER_ADDR = "210.99.120.64";
 	Server_Timer	m_server_counter;
 	Custom			data;
 
@@ -36,6 +36,7 @@ private:
 	bool				m_shutdown = false;
 public:
 	std::mutex pos_lock;
+	std::mutex other_pos_lock;
 	bool	m_recv_move = false;
 	int		m_my_id = -1;
 
@@ -78,6 +79,7 @@ public:
 	void Send_Use_Tagger_Skill(int skill_type);
 	void Send_Picking_Object_Packet();
 	void Send_Attack_Packet();
+	void Send_Ready_Packet();
 
 	void send_packet(void* packet);
 };

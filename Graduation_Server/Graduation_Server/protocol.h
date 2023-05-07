@@ -394,6 +394,8 @@ struct sc_packet_select_tagger {
 	unsigned char	size;
 	unsigned char	type;
 
+	short			id;
+
 	bool			first_skill;
 	bool			second_skill;
 	bool			third_skill;

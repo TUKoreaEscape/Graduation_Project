@@ -212,7 +212,7 @@ void Network::Debug_send_thread()
 
 		case 10:
 			system("cls");
-			Send_Attack_Packet();
+			Send_Ready_Packet(true);
 			break;
 		}
 	}
@@ -449,6 +449,24 @@ void Network::ProcessPacket(char* ptr)
 			}
 		}
 		//std::cout << "put player_other packet recv!" << std::endl;	
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_SELECT_TAGGER:
+	{
+		sc_packet_select_tagger* packet = reinterpret_cast<sc_packet_select_tagger*>(ptr);
+		
+		if (m_pPlayer->GetID() == packet->id)
+		{
+			m_pPlayer->SetPlayerType(TYPE_TAGGER);
+		}
+
+		for (int i = 0; i < 5; ++i)
+		{
+			if (m_ppOther[i]->GetID() == packet->id)
+				m_ppOther[i]->SetPlayerType(TYPE_TAGGER);
+		}
+
 		break;
 	}
 

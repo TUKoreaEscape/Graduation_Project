@@ -37,27 +37,30 @@ void Room::Update_room_time()
 {
 	now_time = chrono::system_clock::now();
 
-	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 60 && m_tagger_id == -1)
+	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 15 && m_tagger_id == -1)
 	{
 		m_tagger_id = in_player[Select_Tagger()];
 		cGameServer& server = cGameServer::GetInstance();
-		CLIENT& cl = *server.get_client_info(m_tagger_id);
-
-		sc_packet_tagger_skill packet;
+		
+		sc_packet_select_tagger packet;
 		packet.size = sizeof(packet);
-		packet.type = SC_PACKET::SC_PACKET_TAGGER_SKILL;
+		packet.type = SC_PACKET::SC_PACKET_SELECT_TAGGER;
+		packet.id = m_tagger_id;
 		packet.first_skill = m_first_skill_enable;
 		packet.second_skill = m_second_skill_enable;
 		packet.third_skill = m_third_skill_enable;
-		cl.do_send(sizeof(packet), &packet);
+
+		for (int i = 0; i < 6; ++i)
+		{
+			CLIENT& cl = *server.get_client_info(in_player[i]);
+			cl.do_send(sizeof(packet), &packet);
+		}
 	}
-
-	cGameServer& server = cGameServer::GetInstance();
-	CLIENT& cl = *server.get_client_info(m_tagger_id);
-
 
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 180 && false == m_first_skill_enable) // 술래 첫번째 스킬 활성화
 	{
+		cGameServer& server = cGameServer::GetInstance();
+		CLIENT& cl = *server.get_client_info(m_tagger_id);
 		m_first_skill_enable = false;
 		m_second_skill_enable = false;
 		m_third_skill_enable = false;
@@ -72,6 +75,8 @@ void Room::Update_room_time()
 	}
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 360 && false == m_second_skill_enable) // 술래 두번째 스킬 활성화
 	{
+		cGameServer& server = cGameServer::GetInstance();
+		CLIENT& cl = *server.get_client_info(m_tagger_id);
 		m_second_skill_enable = true;
 		cl.set_second_skill_enable();
 		sc_packet_tagger_skill packet;
@@ -83,6 +88,8 @@ void Room::Update_room_time()
 	}
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 540 && false == m_third_skill_enable) // 술래 세번째 스킬 활성화
 	{
+		cGameServer& server = cGameServer::GetInstance();
+		CLIENT& cl = *server.get_client_info(m_tagger_id);
 		m_third_skill_enable = true;
 		cl.set_third_skill_enable();
 		sc_packet_tagger_skill packet;
