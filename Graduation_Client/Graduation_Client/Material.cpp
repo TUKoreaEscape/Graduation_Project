@@ -65,7 +65,7 @@ void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	m_pSkinnedAnimationShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 	m_pBushShader = new BushShader();
-	m_pBushShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	m_pBushShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 7, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
 	m_pBushShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 

@@ -169,8 +169,10 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStandard(VS_STANDARD_OUTPUT input, uint nPri
 	return(output);
 }
 
-float4 PSAlpha(VS_STANDARD_OUTPUT input) : SV_TARGET
+PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSAlpha(VS_STANDARD_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)
 {
+	PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
+
 	float4 cAlbedoColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	if (gnTexturesMask & MATERIAL_ALBEDO_MAP) cAlbedoColor = gtxtAlbedoTexture.Sample(gssWrap, input.uv);
 	float4 cSpecularColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -184,8 +186,7 @@ float4 PSAlpha(VS_STANDARD_OUTPUT input) : SV_TARGET
 
 	float3 normalW;
 	float4 cColor = cAlbedoColor;
-	if (cColor.w > 0.15f)
-		cColor.w = 1.0f;
+
 	if (gnTexturesMask & MATERIAL_NORMAL_MAP)
 	{
 		float3x3 TBN = float3x3(normalize(input.tangentW), normalize(input.bitangentW), normalize(input.normalW));
@@ -197,7 +198,24 @@ float4 PSAlpha(VS_STANDARD_OUTPUT input) : SV_TARGET
 		normalW = normalize(input.normalW);
 	}
 	float4 cIllumination = Lighting(input.positionW, normalW);
-	return(cColor);
+
+	output.f4Illumination = cIllumination;
+
+	float3 uvw = float3(input.uv, nPrimitiveID / 2);
+	output.f4Texture = cColor;
+
+	output.f4Scene = output.f4Color = lerp(output.f4Illumination, output.f4Texture, 0.7f);
+
+	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
+	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
+
+	output.f2ObjectIDzDepth.x = (float)1.0f;
+	output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
+
+	if (cColor.w < 0.15f)
+		discard;
+
+	return(output);
 }
 
 

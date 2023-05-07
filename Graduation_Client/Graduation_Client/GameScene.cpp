@@ -168,7 +168,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	GameObject::SetParts(0, 0, 4);
 	m_pPlayer->PlayerNum = 0;
 
-	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene05075.bin");
+	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene050706.bin");
 	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 	
 	if (pPlayerModel) delete pPlayerModel;
@@ -212,7 +212,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	Vents[3]->SetPosition(XMFLOAT3(18.56689, 1.0061, -77.6103));
 	Vents[4]->SetPosition(XMFLOAT3(-56.00388, 1.033527, -40.54385));
 	Vents[5]->SetPosition(XMFLOAT3(-56.04684, 1.0061, 40.43311));
-	Vents[6]->SetPosition(XMFLOAT3(35.96133, 1.0061, 40.56689));
+	Vents[6]->SetPosition(XMFLOAT3(35.994, 1.0061, 40.56689));
 	Vents[7]->SetPosition(XMFLOAT3(35.96133, 1.0061, 23.56689));
 	for (int i = 0; i < 8; ++i) {
 		Vents[i]->UpdateTransform(nullptr);
