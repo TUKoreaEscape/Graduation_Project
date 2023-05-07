@@ -153,6 +153,18 @@ void GameObject::SetDraw()
 	if (m_pChild) m_pChild->SetDraw();
 }
 
+void GameObject::SetType(int type)
+{
+	m_Type = type;
+	if (m_pSibling) m_pSibling->SetType(type);
+	if (m_pChild) m_pChild->SetType(type);
+}
+
+int GameObject::GetType()
+{
+	return m_Type;
+}
+
 void GameObject::SetParts(int player, int index, int partsNum)
 {
 	if (player == PLAYER) {

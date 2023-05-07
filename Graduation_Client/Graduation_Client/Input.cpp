@@ -54,8 +54,10 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			::ReleaseCapture();
 			break;
 		case VK_ESCAPE:
-			::PostQuitMessage(0);
+		{
+			//::PostQuitMessage(0);
 			break;
+		}
 		case VK_RETURN:
 			break;
 		case VK_F9:

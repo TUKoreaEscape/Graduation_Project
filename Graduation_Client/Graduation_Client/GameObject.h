@@ -91,10 +91,14 @@ public:
 	StandardRenderer* renderer = nullptr;
 
 	int PlayerNum = -1;
+
+	int m_Type = 0;
 public:
 	bool isNotDraw = false;
 
 	void SetDraw();
+	void SetType(int type);
+	int GetType();
 
 	static void SetParts(int player, int index, int partsNum);
 

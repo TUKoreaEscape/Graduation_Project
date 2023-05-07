@@ -68,6 +68,11 @@ using Microsoft::WRL::ComPtr;
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
 
+constexpr int TYPE_OBJECT = 0;
+constexpr int TYPE_PLAYER = 2;
+constexpr int TYPE_TAGGER = 4;
+constexpr int TYPE_DEAD_PLAYER = 8;
+
 extern UINT	gnCbvSrvDescriptorIncrementSize;
 extern UINT	gnRtvDescriptorIncrementSize;
 extern UINT gnDsvDescriptorIncrementSize;

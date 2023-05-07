@@ -20,7 +20,8 @@ cbuffer cbGameObjectInfo : register(b0)
 {
 	matrix					gmtxGameObject : packoffset(c0);
 	MATERIAL				gMaterial : packoffset(c4);
-	uint					gnTexturesMask : packoffset(c8);
+	uint					gnTexturesMask : packoffset(c8.x);
+	uint					gnObjectType : packoffset(c8.y);
 };
 
 #include "Light.hlsl"
@@ -42,6 +43,11 @@ matrix scaleMatrix = { 1.1f, 0.0f, 0.0f, 0.0f,
 #define MATERIAL_EMISSION_MAP		0x10
 #define MATERIAL_DETAIL_ALBEDO_MAP	0x20
 #define MATERIAL_DETAIL_NORMAL_MAP	0x40
+
+#define TYPE_OBJECT 0
+#define TYPE_PLAYER 2;
+#define TYPE_TAGGER 4;
+#define TYPE_DEAD_PLAYER 8;
 
 Texture2D gtxtAlbedoTexture : register(t6);
 Texture2D gtxtSpecularTexture : register(t7);
@@ -166,6 +172,8 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStandard(VS_STANDARD_OUTPUT input, uint nPri
 	output.f2ObjectIDzDepth.x = (float)1.0f;
 	output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
 
+	output.f4Color.w = gnObjectType / 10.0f;
+
 	return(output);
 }
 
@@ -215,6 +223,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSAlpha(VS_STANDARD_OUTPUT input, uint nPrimit
 	if (cColor.w < 0.15f)
 		discard;
 
+	output.f4Color.w = gnObjectType / 10.0f;
 	return(output);
 }
 
@@ -372,7 +381,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTerrain(VS_TERRAIN_OUTPUT input, uint nPrimi
 
 	output.f2ObjectIDzDepth.x = (float)1.0f;
 	output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
-
+	output.f4Color.w = gnObjectType / 10.0f;
 	return(output);
 }
 
@@ -433,7 +442,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSSkyBox(VS_SKYBOX_CUBEMAP_OUTPUT input, uint 
 
 	output.f2ObjectIDzDepth.x = (float)1.0f;
 	output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
-
+	output.f4Color.w = gnObjectType / 10.0f;
 	return(output);
 }
 
@@ -502,7 +511,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWall(VS_WALL_OUTPUT input, uint nPrimitiveID
 
 	output.f2ObjectIDzDepth.x = (float)1.0f;
 	output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
-	
+	output.f4Color.w = gnObjectType / 10.0f;
 	return(output);
 }
 
@@ -547,7 +556,7 @@ float4 PSTexturedLighting(VS_TEXTURED_LIGHTING_OUTPUT input, uint nPrimitiveID :
 	float4 cColor = gtxtAlbedoTexture.Sample(gssWrap, uvw);
 	input.normalW = normalize(input.normalW);
 	float4 cIllumination = Lighting(input.positionW, input.normalW);
-
+	//output.f4Color.w = (float)gnObjectType;
 	return(cColor * cIllumination);
 }
 
@@ -603,6 +612,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 	output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
 	//output.f4Scene = output.f4Texture;
 	//output.f4Scene = float4(1,1,1,1);
+	output.f4Color.w = gnObjectType / 10.0f;
 	return(output);
 }
 
@@ -746,8 +756,18 @@ float4 Outline(VS_SCREEN_RECT_TEXTURED_OUTPUT input)
 	fEdgeNormal = (fEdgeNormal > 0.4f) ? 1.0f : 0.0f;
 
 	float fEdge = max(fDdgeDepth, fEdgeNormal);
-	float4 f4EdgeColor = float4(0.0f, 0.0f, 0.0f, 1.0f * fEdge);
-
+	float k = gtxtInputTextures[0][int2(input.position.xy)].w;
+	float4 myColor = float4 (0, 0, 0, 1);
+	if (k < 0.1f)
+		myColor = float4(0, 0, 0, 1);
+	else if (k < 0.3f)
+		myColor = float4(0, 1, 0, 1);
+	else if (k < 0.5f)
+		myColor = float4(1, 0, 0, 1);
+	else
+		myColor = float4(0.2, 0.2, 0.2, 1);
+	float4 f4EdgeColor = float4(myColor.xyz, myColor.w * fEdge);
+	//float4 f4EdgeColor = float4(1.0f, 0,0,1.0f * fEdge);
 	float4 f4Color = gtxtInputTextures[0].Sample(gssWrap, input.uv);
 	return(AlphaBlend(f4EdgeColor, f4Color));
 }

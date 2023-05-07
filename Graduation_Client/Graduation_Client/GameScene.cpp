@@ -145,6 +145,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 		for (int j=0;j<6;++j)
 			GameObject::SetParts(i + 1, j, 0);
 		m_ppPlayers[i]->PlayerNum = i + 1;
+		m_ppPlayers[i]->SetPlayerType(TYPE_DEAD_PLAYER);
 	}
 	m_ppPlayers[0]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 	m_ppPlayers[0]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
@@ -156,6 +157,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_ppPlayers[3]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_ppPlayers[4]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 	m_ppPlayers[4]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 6);
+	//m_ppPlayers[4]->SetType(2);
 	
 	m_pPlayer = new Player();
 	m_pPlayer->SetChild(pPlayerModel->m_pModelRootObject, true);
@@ -195,7 +197,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	LPVOID m_pTerrain[ROOM_COUNT]{ m_pMainTerrain ,m_pPianoTerrain,m_pBroadcastTerrain, m_pCubeTerrain ,m_pForestTerrain,m_pClassroomTerrain };
 	m_pPlayer->SetPlayerUpdatedContext(m_pTerrain);
-
+	m_pPlayer->SetPlayerType(TYPE_PLAYER);
 	m_pPlayer->AddComponent<CommonMovement>(); 
 	
 	LoadedModelInfo* pVentModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/airvent.bin", nullptr);
@@ -397,7 +399,7 @@ ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDe
 	pd3dRootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
 	pd3dRootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
-	pd3dRootParameters[1].Constants.Num32BitValues = 33;
+	pd3dRootParameters[1].Constants.Num32BitValues = 34;
 	pd3dRootParameters[1].Constants.ShaderRegister = 0;
 	pd3dRootParameters[1].Constants.RegisterSpace = 0;
 	pd3dRootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;

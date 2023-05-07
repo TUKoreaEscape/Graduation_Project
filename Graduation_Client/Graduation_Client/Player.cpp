@@ -290,6 +290,13 @@ void Player::OnPrepareRender()
 		if (pp)
 			pp->FindCustomPart(OthersParts[PlayerNum - 1][5].c_str());
 	}
+
+	SetType(m_playerType);
+}
+
+void Player::SetPlayerType(int type)
+{
+	m_playerType = type;
 }
 
 void Player::render(ID3D12GraphicsCommandList* pd3dCommandList)

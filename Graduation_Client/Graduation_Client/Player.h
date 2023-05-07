@@ -91,6 +91,8 @@ public:
 	void SetID(const int id) { m_id = id; }
 	int GetID() const { return m_id; }
 
+	void SetPlayerType(int type);
+
 	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
 
 protected:
@@ -128,4 +130,6 @@ protected:
 
 	bool							m_Isfalling = false;
 	bool							m_collision_up_face = false;
+
+	int							m_playerType = 2;
 };
