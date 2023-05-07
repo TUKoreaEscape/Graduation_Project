@@ -79,7 +79,6 @@ public:
 	void Send_Use_Tagger_Skill(int skill_type);
 	void Send_Picking_Object_Packet();
 	void Send_Attack_Packet();
-	void Send_Ready_Packet();
 
 	void send_packet(void* packet);
 };
