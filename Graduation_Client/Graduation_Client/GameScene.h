@@ -32,6 +32,8 @@ public:
 	GameObject* m_pForestTerrain = nullptr;
 	GameObject* m_pCubeTerrain = nullptr;
 
+	GameObject* m_pCeilling = nullptr;
+
 	GameObject* m_pClass = nullptr;
 	GameObject* m_pPiano = nullptr;
 	GameObject* m_pBroadcast = nullptr;

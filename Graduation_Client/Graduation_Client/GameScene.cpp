@@ -46,6 +46,8 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	m_pSkybox->render(pd3dCommandList);
 
+	m_pCeilling->render(pd3dCommandList);
+
 	m_pMainTerrain->render(pd3dCommandList);
 	m_pPianoTerrain->render(pd3dCommandList);
 	m_pBroadcastTerrain->render(pd3dCommandList);
@@ -61,19 +63,14 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	Scene::render(pd3dCommandList);
 	
-	m_pClass->UpdateTransform(nullptr);
 	m_pClass->render(pd3dCommandList);
 
-	m_pPiano->UpdateTransform(nullptr);
 	m_pPiano->render(pd3dCommandList);
 
-	m_pBroadcast->UpdateTransform(nullptr);
 	m_pBroadcast->render(pd3dCommandList);
 
-	m_pPorest->UpdateTransform(nullptr);
 	m_pPorest->render(pd3dCommandList);
 
-	m_pLobby->UpdateTransform(nullptr);
 	m_pLobby->render(pd3dCommandList);
 
 	for (int i = 0; i < 8; ++i)
@@ -109,14 +106,19 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	m_pClass = new GameObject();
 	m_pClass->SetChild(pClassModel->m_pModelRootObject, true);
+	m_pClass->UpdateTransform(nullptr);
 	m_pPiano = new GameObject();
 	m_pPiano->SetChild(pPianoModel->m_pModelRootObject, true);
+	m_pPiano->UpdateTransform(nullptr);
 	m_pBroadcast = new GameObject();
 	m_pBroadcast->SetChild(pBroadcastModel->m_pModelRootObject, true);
+	m_pBroadcast->UpdateTransform(nullptr);
 	m_pPorest = new GameObject();
-	m_pPorest->SetChild(pHouseModel->m_pModelRootObject, true);
+	m_pPorest->SetChild(pHouseModel->m_pModelRootObject, true); 
+	m_pPorest->UpdateTransform(nullptr);
 	m_pLobby = new GameObject();
 	m_pLobby->SetChild(pLobbyModel->m_pModelRootObject, true);
+	m_pLobby->UpdateTransform(nullptr);
 
 	if (pClassModel) delete pClassModel;
 	if (pPianoModel) delete pPianoModel;
@@ -212,7 +214,18 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	Vents[5]->SetPosition(XMFLOAT3(-56.04684, 1.0061, 40.43311));
 	Vents[6]->SetPosition(XMFLOAT3(35.96133, 1.0061, 40.56689));
 	Vents[7]->SetPosition(XMFLOAT3(35.96133, 1.0061, 23.56689));
-	
+	for (int i = 0; i < 8; ++i) {
+		Vents[i]->UpdateTransform(nullptr);
+	}
+	if (pVentModel) delete pVentModel;
+
+	LoadedModelInfo* pCeilModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Ceilling.bin", nullptr);
+	m_pCeilling = new GameObject();
+	m_pCeilling->SetChild(pCeilModel->m_pModelRootObject, true);
+	m_pCeilling->UpdateTransform(nullptr);
+
+	if (pCeilModel) delete pCeilModel;
+
 	for (int i = 0; i < m_nPlayers; ++i) {
 		AddPlayer(m_ppPlayers[i]);
 	}
