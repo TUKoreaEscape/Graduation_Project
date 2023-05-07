@@ -55,7 +55,6 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pForestTerrain->render(pd3dCommandList);
 	m_pClassroomTerrain->render(pd3dCommandList);
 
-
 	for (int i = 0; i < m_nWalls; ++i)
 	{
 		if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
@@ -64,13 +63,9 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	Scene::render(pd3dCommandList);
 	
 	m_pClass->render(pd3dCommandList);
-
 	m_pPiano->render(pd3dCommandList);
-
 	m_pBroadcast->render(pd3dCommandList);
-
 	m_pPorest->render(pd3dCommandList);
-
 	m_pLobby->render(pd3dCommandList);
 
 	for (int i = 0; i < 8; ++i)
@@ -80,7 +75,7 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			Vents[i]->render(pd3dCommandList);
 		}
 	}
-
+	m_pOak->render(pd3dCommandList);
 	for (int i = 0; i < m_nBush; ++i)
 	{
 		if (m_ppBush[i]) m_ppBush[i]->render(pd3dCommandList);
@@ -92,73 +87,33 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 268);
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 100);
 
 	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
 	LoadedModelInfo* pPlayerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/C33.bin", nullptr); 
-	
 	LoadedModelInfo* pClassModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InClassObject.bin", nullptr);
 	LoadedModelInfo* pPianoModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPianoRoom.bin", nullptr);
 	LoadedModelInfo* pBroadcastModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InBroadcast.bin", nullptr);
 	LoadedModelInfo* pHouseModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPorest.bin", nullptr);
 	LoadedModelInfo* pLobbyModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InDDD.bin", nullptr);
-
-	m_pClass = new GameObject();
-	m_pClass->SetChild(pClassModel->m_pModelRootObject, true);
-	m_pClass->UpdateTransform(nullptr);
-	m_pPiano = new GameObject();
-	m_pPiano->SetChild(pPianoModel->m_pModelRootObject, true);
-	m_pPiano->UpdateTransform(nullptr);
-	m_pBroadcast = new GameObject();
-	m_pBroadcast->SetChild(pBroadcastModel->m_pModelRootObject, true);
-	m_pBroadcast->UpdateTransform(nullptr);
-	m_pPorest = new GameObject();
-	m_pPorest->SetChild(pHouseModel->m_pModelRootObject, true); 
-	m_pPorest->UpdateTransform(nullptr);
-	m_pLobby = new GameObject();
-	m_pLobby->SetChild(pLobbyModel->m_pModelRootObject, true);
-	m_pLobby->UpdateTransform(nullptr);
-
-	if (pClassModel) delete pClassModel;
-	if (pPianoModel) delete pPianoModel;
-	if (pBroadcastModel) delete pBroadcastModel;
-	if (pHouseModel) delete pHouseModel;
-	if (pLobbyModel) delete pLobbyModel;
-
-	m_pNPC = new GameObject();
-	m_pNPC->SetChild(pPlayerModel->m_pModelRootObject, true);
-	m_pNPC->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 1, pPlayerModel);
-	m_pNPC->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 1);
-	m_pNPC->m_pSkinnedAnimationController->SetTrackPosition(0, 0.5f);
-	m_pNPC->m_pSkinnedAnimationController->SetTrackSpeed(0, 2.0f);
-	m_pNPC->m_xmf4x4ToParent._42 = 100.0f;
+	LoadedModelInfo* pVentModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/airvent.bin", nullptr);
+	LoadedModelInfo* pCeilModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Ceilling.bin", nullptr);
 
 	m_nPlayers = 5;
 	m_ppPlayers = new Player * [m_nPlayers];
 	for (int i = 0; i < m_nPlayers; ++i) {
 		m_ppPlayers[i] = new Player();
-		m_ppPlayers[i]->SetChild(pPlayerModel->m_pModelRootObject, true); 
+		m_ppPlayers[i]->SetChild(pPlayerModel->m_pModelRootObject, true);
 		m_ppPlayers[i]->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 1, pPlayerModel);
-		m_ppPlayers[i]->SetPosition(XMFLOAT3(0, 5.f, i * 3.f));
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-		for (int j=0;j<6;++j)
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+		m_ppPlayers[i]->SetPosition(XMFLOAT3(0, 5.f, i * 3.f));
+		for (int j = 0; j < 6; ++j)
 			GameObject::SetParts(i + 1, j, 0);
 		m_ppPlayers[i]->PlayerNum = i + 1;
 		m_ppPlayers[i]->SetPlayerType(TYPE_DEAD_PLAYER);
 	}
-	m_ppPlayers[0]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-	m_ppPlayers[0]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_ppPlayers[1]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-	m_ppPlayers[1]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_ppPlayers[2]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-	m_ppPlayers[2]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_ppPlayers[3]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-	m_ppPlayers[3]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_ppPlayers[4]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-	m_ppPlayers[4]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 6);
-	//m_ppPlayers[4]->SetType(2);
-	
 	m_pPlayer = new Player();
 	m_pPlayer->SetChild(pPlayerModel->m_pModelRootObject, true);
 	m_pPlayer->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 1, pPlayerModel);
@@ -170,42 +125,47 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	GameObject::SetParts(0, 0, 4);
 	m_pPlayer->PlayerNum = 0;
 
-	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene050706.bin");
-	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
-	
-	if (pPlayerModel) delete pPlayerModel;
-	
-	m_pSkybox = new SkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
-
 	m_pLight = new GameObject();
 	m_pLight->AddComponent<Light>();
 	m_pLight->start(pd3dDevice, pd3dCommandList);
+	m_pSkybox = new SkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 	
 	XMFLOAT3 xmf3Scale(1.0f, 1.0f, 1.0f);
 	XMFLOAT4 xmf4Color(1.f, 1.f, 1.f, 0.0f);
-	m_pMainTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"),0, 0, 109, 81, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
-	//xmf4Color = XMFLOAT4(1.f, 1.f, 0.f, 0.0f);
+	m_pMainTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 0, 0, 109, 81, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
 	m_pPianoTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), -30, 60, 61, 41, xmf3Scale, xmf4Color, L"Terrain/Floor2.dds");
-	//xmf4Color = XMFLOAT4(1.f, 0.f, 0.f, 0.0f);
 	m_pBroadcastTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 50, 60, 101, 41, xmf3Scale, xmf4Color, L"Terrain/Floor2.dds");
-	//xmf4Color = XMFLOAT4(0.f, 1.f, 0.f, 0.0f);
 	m_pCubeTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 74, 0, 41, 81, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
-	//xmf4Color = XMFLOAT4(0.f, 0.f, 0.f, 0.0f);
 	m_pForestTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 60, -60, 81, 41, xmf3Scale, xmf4Color, L"Terrain/Floor2.dds");
-	//xmf4Color = XMFLOAT4(0.f, 1.f, 1.f, 0.0f);
 	m_pClassroomTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), -20, -60, 81, 41, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
 
 	LPVOID m_pTerrain[ROOM_COUNT]{ m_pMainTerrain ,m_pPianoTerrain,m_pBroadcastTerrain, m_pCubeTerrain ,m_pForestTerrain,m_pClassroomTerrain };
-	m_pPlayer->SetPlayerUpdatedContext(m_pTerrain);
-	m_pPlayer->SetPlayerType(TYPE_PLAYER);
-	m_pPlayer->AddComponent<CommonMovement>(); 
 	
-	LoadedModelInfo* pVentModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/airvent.bin", nullptr);
+	m_pCeilling = new GameObject();
+	m_pCeilling->SetChild(pCeilModel->m_pModelRootObject, true);
+	m_pCeilling->UpdateTransform(nullptr);
+	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene05077.bin");
+
+	m_pClass = new GameObject();
+	m_pClass->SetChild(pClassModel->m_pModelRootObject, true);
+	m_pClass->UpdateTransform(nullptr);
+	m_pPiano = new GameObject();
+	m_pPiano->SetChild(pPianoModel->m_pModelRootObject, true);
+	m_pPiano->UpdateTransform(nullptr);
+	m_pBroadcast = new GameObject();
+	m_pBroadcast->SetChild(pBroadcastModel->m_pModelRootObject, true);
+	m_pBroadcast->UpdateTransform(nullptr);
+	m_pLobby = new GameObject();
+	m_pLobby->SetChild(pLobbyModel->m_pModelRootObject, true);
+	m_pLobby->UpdateTransform(nullptr);
+	m_pPorest = new GameObject();
+	m_pPorest->SetChild(pHouseModel->m_pModelRootObject, true);
+	m_pPorest->UpdateTransform(nullptr);
 
 	for (int i = 0; i < 8; ++i) {
 		Vents[i] = new Vent();
 		Vents[i]->SetChild(pVentModel->m_pModelRootObject, true);
-	}
+	}	
 	Vents[0]->SetPosition(XMFLOAT3(97.2155, 1.0061, 40.43311));
 	Vents[1]->SetPosition(XMFLOAT3(97.27, 1.0061, -40.43311));
 	Vents[2]->SetPosition(XMFLOAT3(20.43311, 1.0061, -77.6103));
@@ -219,21 +179,26 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	for (int i = 0; i < 8; ++i) {
 		Vents[i]->UpdateTransform(nullptr);
 	}
-	if (pVentModel) delete pVentModel;
 
-	LoadedModelInfo* pCeilModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Ceilling.bin", nullptr);
-	m_pCeilling = new GameObject();
-	m_pCeilling->SetChild(pCeilModel->m_pModelRootObject, true);
-	m_pCeilling->UpdateTransform(nullptr);
+	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 
-	if (pCeilModel) delete pCeilModel;
-
+	m_pPlayer->SetPlayerUpdatedContext(m_pTerrain);
+	m_pPlayer->SetPlayerType(TYPE_PLAYER);
+	m_pPlayer->AddComponent<CommonMovement>(); 
+	
 	for (int i = 0; i < m_nPlayers; ++i) {
 		AddPlayer(m_ppPlayers[i]);
 	}
-	AddPlayer(m_pPlayer); 
-	//AddPlayer(m_pNPC);
-	
+	AddPlayer(m_pPlayer);
+
+	if (pPlayerModel) delete pPlayerModel;
+	if (pClassModel) delete pClassModel;
+	if (pPianoModel) delete pPianoModel;
+	if (pBroadcastModel) delete pBroadcastModel;
+	if (pHouseModel) delete pHouseModel;
+	if (pLobbyModel) delete pLobbyModel;
+	if (pVentModel) delete pVentModel;
+	if (pCeilModel) delete pCeilModel;
 
 #if USE_NETWORK
 	char id[20]{};
@@ -302,7 +267,6 @@ void GameScene::ReleaseObjects()
 		}
 		delete[] m_ppWalls;
 	}
-	if (m_pNPC) m_pNPC->Release();
 	if (m_pLight) m_pLight->Release();
 	if (m_pSkybox) m_pSkybox->Release();
 
@@ -316,6 +280,18 @@ void GameScene::ReleaseObjects()
 	if (m_pClass) m_pClass->Release();
 	if (m_pPiano) m_pPiano->Release();
 	if (m_pBroadcast) m_pBroadcast->Release();
+	if (m_pPorest) m_pPorest->Release();
+	if (m_pLobby) m_pLobby->Release();
+
+	if (m_ppBush) {
+		for (int i = 0; i < m_nBush; ++i) {
+			if (m_ppBush[i]) m_ppBush[i]->Release();
+		}
+		delete[] m_ppBush;
+	}
+
+	for (int i = 0; i < 8; ++i) if (Vents[i]) Vents[i]->Release();
+	if(m_pOak) m_pOak->Release();
 }
 
 ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
@@ -541,7 +517,11 @@ void GameScene::ReleaseUploadBuffers()
 			if (m_ppWalls[i]) m_ppWalls[i]->ReleaseUploadBuffers();
 		}
 	}
-	if (m_pNPC) m_pNPC->ReleaseUploadBuffers();
+	if (m_ppBush) {
+		for (int i = 0; i < m_nBush; ++i) {
+			if (m_ppBush[i]) m_ppBush[i]->ReleaseUploadBuffers();
+		}
+	}
 	if (m_pLight) m_pLight->ReleaseUploadBuffers();
 	if (m_pSkybox) m_pSkybox->ReleaseUploadBuffers();
 
@@ -556,7 +536,7 @@ void GameScene::ReleaseUploadBuffers()
 	if (m_pPiano) m_pPiano->ReleaseUploadBuffers();
 	if (m_pBroadcast) m_pBroadcast->ReleaseUploadBuffers();
 	if (m_pPorest) m_pPorest->ReleaseUploadBuffers();
-
+	if (m_pLobby) m_pLobby->ReleaseUploadBuffers();
 }
 
 void GameScene::CreateCbvSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nConstantBufferViews, int nShaderResourceViews)
@@ -642,7 +622,7 @@ void GameScene::LoadSceneObjectsFromFile(ID3D12Device* pd3dDevice, ID3D12Graphic
 	Material* pMaterial = new Material(7);
 	pMaterial->m_ppTextures[0] = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
 	pMaterial->m_ppTextures[0]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Model/Textures/WallTex.dds", RESOURCE_TEXTURE2D, 0);
-
+	
 	CreateShaderResourceViews(pd3dDevice, pMaterial->m_ppTextures[0], 0, 3);
 
 	pMaterial->SetShader(pShader);
@@ -744,4 +724,11 @@ void GameScene::LoadSceneBushFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 	}
 
 	::fclose(pFile);
+
+	m_pOak = new GameObject();
+	LoadedModelInfo* pOakModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Oak.bin", nullptr);
+	m_pOak->SetChild(pOakModel->m_pModelRootObject, true);
+	//m_pOak->SetPosition(61.25, 0.7897112, -68.4);
+	m_pOak->UpdateTransform(nullptr);
+	if (pOakModel) delete pOakModel;
 }

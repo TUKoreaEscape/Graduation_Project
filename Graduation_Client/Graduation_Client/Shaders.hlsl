@@ -162,7 +162,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStandard(VS_STANDARD_OUTPUT input, uint nPri
 	output.f4Illumination = cIllumination;
 
 	float3 uvw = float3(input.uv, nPrimitiveID / 2);
-	output.f4Texture = output.f4Color = cColor;
+	output.f4Texture = cAlbedoColor;
 	
 	output.f4Scene = output.f4Color = lerp(output.f4Illumination, output.f4Texture, 0.7f);
 	
@@ -171,7 +171,10 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStandard(VS_STANDARD_OUTPUT input, uint nPri
 
 	output.f2ObjectIDzDepth.x = (float)1.0f;
 	output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
-
+	
+	if (cColor.w < 0.524f)
+		discard;
+	
 	output.f4Color.w = gnObjectType / 10.0f;
 
 	return(output);

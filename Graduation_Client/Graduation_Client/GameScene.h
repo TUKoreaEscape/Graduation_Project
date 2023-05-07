@@ -16,12 +16,13 @@ extern E_GAME_STATE gameState; //게임이 진행중인지 끝났는지 사용하기위한 변수이�
 class GameScene : public Scene
 {
 public:
+	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;
+
 	Player* m_pPlayer = nullptr;
 
 	int m_nPlayers = 0;
 	Player** m_ppPlayers = nullptr;
 
-	GameObject* m_pNPC = nullptr;
 	GameObject* m_pLight = nullptr;
 	GameObject* m_pSkybox = nullptr;
 
@@ -31,28 +32,28 @@ public:
 	GameObject* m_pClassroomTerrain = nullptr;
 	GameObject* m_pForestTerrain = nullptr;
 	GameObject* m_pCubeTerrain = nullptr;
-
+	
 	GameObject* m_pCeilling = nullptr;
 
+	int m_nWalls;
+	GameObject** m_ppWalls;
+	
 	GameObject* m_pClass = nullptr;
 	GameObject* m_pPiano = nullptr;
 	GameObject* m_pBroadcast = nullptr;
 	GameObject* m_pPorest = nullptr;
 	GameObject* m_pLobby = nullptr;
 
-	ID3D12RootSignature*	m_pd3dGraphicsRootSignature = NULL; //루트 시그너쳐를 나타내는 인터페이스 포인터이다.
-
 	GameObject* Vents[8];
+
+	int m_nBush;
+	GameObject** m_ppBush;
+	GameObject* m_pOak;	
 
 	Network* m_network;
 	std::thread recv_thread;
 	std::thread send_thread;
-	int m_nWalls;
-	GameObject** m_ppWalls;
 
-
-	int m_nBush;
-	GameObject** m_ppBush;
 protected:
 	static ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap;
 
@@ -65,8 +66,6 @@ protected:
 	static D3D12_GPU_DESCRIPTOR_HANDLE	m_d3dCbvGPUDescriptorNextHandle;
 	static D3D12_CPU_DESCRIPTOR_HANDLE	m_d3dSrvCPUDescriptorNextHandle;
 	static D3D12_GPU_DESCRIPTOR_HANDLE	m_d3dSrvGPUDescriptorNextHandle;
-
-
 public:
 	GameScene();
 	~GameScene() {}

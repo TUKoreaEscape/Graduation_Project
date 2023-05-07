@@ -4,6 +4,8 @@
 #include "Renderer.h"
 #include "Animation.h"
 
+static std::unordered_map<std::wstring, Texture*> g_textures;
+
 class GameObject
 {
 	std::list<Component*> components;
