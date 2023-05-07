@@ -17,8 +17,8 @@ void Room::Start_Game()
 
 	for (auto p : in_player)
 	{
-		CLIENT& player = *server.get_client_info(p);
-		player.set_user_position({ 100,100,100 });
+		//CLIENT& player = *server.get_client_info(p);
+		//player.set_user_position({ 100,100,100 });
 	}
 }
 
@@ -37,7 +37,7 @@ void Room::Update_room_time()
 {
 	now_time = chrono::system_clock::now();
 
-	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 15 && m_tagger_id == -1)
+	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 10 && m_tagger_id == -1)
 	{
 		m_tagger_id = in_player[Select_Tagger()];
 		cGameServer& server = cGameServer::GetInstance();

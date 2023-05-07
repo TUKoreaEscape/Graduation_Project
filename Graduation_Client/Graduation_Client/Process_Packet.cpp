@@ -4,6 +4,8 @@ void Network::Process_Game_Start(char* ptr)
 {
 	sc_packet_game_start* packet = reinterpret_cast<sc_packet_game_start*>(ptr);
 
+	std::cout << std::endl;
+	std::cout << "10초뒤 술래가 결정됩니다." << std::endl;
 	// 여기서 로비씬 -> 게임씬으로 전환 해주면 됨
 }
 

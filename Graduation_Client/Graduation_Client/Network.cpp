@@ -360,6 +360,8 @@ void Network::ProcessPacket(char* ptr)
 		ShellExecuteEx(&info); // start process
 
 		GetProcessId(info.hProcess); // retrieve PID
+
+		Send_Ready_Packet(true);
 		break;
 	}
 
@@ -381,6 +383,7 @@ void Network::ProcessPacket(char* ptr)
 		ShellExecuteEx(&info); // start process
 
 		GetProcessId(info.hProcess); // retrieve PID
+		Send_Ready_Packet(true);
 		break;
 	}
 
@@ -445,6 +448,7 @@ void Network::ProcessPacket(char* ptr)
 				Other_Player_Pos[i].id = packet->data.id;
 				m_ppOther[i]->SetPosition(packet->data.position, true);
 				m_ppOther[i]->SetVelocity(packet->data.velocity);
+				m_ppOther[i]->SetPlayerType(TYPE_PLAYER);
 				break;
 			}
 		}
@@ -467,6 +471,15 @@ void Network::ProcessPacket(char* ptr)
 				m_ppOther[i]->SetPlayerType(TYPE_TAGGER);
 		}
 
+		std::cout << std::endl;
+		std::cout << "Player (Server ID) [" << packet->id << "] 가 술래로 결정되었습니다. 외곽선이 빨간선으로 바뀝니다." << std::endl;
+
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_GAME_START:
+	{
+		Process_Game_Start(ptr);
 		break;
 	}
 
