@@ -40,6 +40,8 @@ public:
 
 	ID3D12RootSignature*	m_pd3dGraphicsRootSignature = NULL; //루트 시그너쳐를 나타내는 인터페이스 포인터이다.
 
+	GameObject* Vents[8];
+
 	Network* m_network;
 	std::thread recv_thread;
 	std::thread send_thread;

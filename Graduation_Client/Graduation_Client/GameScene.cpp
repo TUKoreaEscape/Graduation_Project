@@ -76,6 +76,14 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pLobby->UpdateTransform(nullptr);
 	m_pLobby->render(pd3dCommandList);
 
+	for (int i = 0; i < 8; ++i)
+	{
+		if (Vents[i]) {
+			Vents[i]->UpdateTransform(nullptr);
+			Vents[i]->render(pd3dCommandList);
+		}
+	}
+
 	for (int i = 0; i < m_nBush; ++i)
 	{
 		if (m_ppBush[i]) m_ppBush[i]->render(pd3dCommandList);
@@ -158,7 +166,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	GameObject::SetParts(0, 0, 4);
 	m_pPlayer->PlayerNum = 0;
 
-	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene05073.bin");
+	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene05075.bin");
 	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 	
 	if (pPlayerModel) delete pPlayerModel;
@@ -171,13 +179,13 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	
 	XMFLOAT3 xmf3Scale(1.0f, 1.0f, 1.0f);
 	XMFLOAT4 xmf4Color(1.f, 1.f, 1.f, 0.0f);
-	m_pMainTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 0, 0, 121, 81, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
+	m_pMainTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"),0, 0, 109, 81, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
 	//xmf4Color = XMFLOAT4(1.f, 1.f, 0.f, 0.0f);
 	m_pPianoTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), -30, 60, 61, 41, xmf3Scale, xmf4Color, L"Terrain/Floor2.dds");
 	//xmf4Color = XMFLOAT4(1.f, 0.f, 0.f, 0.0f);
 	m_pBroadcastTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 50, 60, 101, 41, xmf3Scale, xmf4Color, L"Terrain/Floor2.dds");
 	//xmf4Color = XMFLOAT4(0.f, 1.f, 0.f, 0.0f);
-	m_pCubeTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 80, 0, 41, 81, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
+	m_pCubeTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 74, 0, 41, 81, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
 	//xmf4Color = XMFLOAT4(0.f, 0.f, 0.f, 0.0f);
 	m_pForestTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 60, -60, 81, 41, xmf3Scale, xmf4Color, L"Terrain/Floor2.dds");
 	//xmf4Color = XMFLOAT4(0.f, 1.f, 1.f, 0.0f);
@@ -188,6 +196,22 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	m_pPlayer->AddComponent<CommonMovement>(); 
 	
+	LoadedModelInfo* pVentModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/airvent.bin", nullptr);
+
+	for (int i = 0; i < 8; ++i) {
+		Vents[i] = new Vent();
+		Vents[i]->SetChild(pVentModel->m_pModelRootObject, true);
+	}
+	Vents[0]->SetPosition(XMFLOAT3(97.2155, 1.0061, 40.43311));
+	Vents[1]->SetPosition(XMFLOAT3(97.27, 1.0061, -40.43311));
+	Vents[2]->SetPosition(XMFLOAT3(20.43311, 1.0061, -77.6103));
+	reinterpret_cast<Vent*>(Vents[2])->Rotate(0, 90, 0);
+	reinterpret_cast<Vent*>(Vents[3])->Rotate(0, 90, 0);
+	Vents[3]->SetPosition(XMFLOAT3(18.56689, 1.0061, -77.6103));
+	Vents[4]->SetPosition(XMFLOAT3(-56.00388, 1.033527, -40.54385));
+	Vents[5]->SetPosition(XMFLOAT3(-56.04684, 1.0061, 40.43311));
+	Vents[6]->SetPosition(XMFLOAT3(35.96133, 1.0061, 40.56689));
+	Vents[7]->SetPosition(XMFLOAT3(35.96133, 1.0061, 23.56689));
 	
 	for (int i = 0; i < m_nPlayers; ++i) {
 		AddPlayer(m_ppPlayers[i]);

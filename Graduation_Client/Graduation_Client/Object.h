@@ -40,3 +40,12 @@ public:
 	float GetWidth() { return(m_nWidth * m_xmf3Scale.x); }
 	float GetLength() { return(m_nLength * m_xmf3Scale.z); }
 };
+
+class Vent : public GameObject
+{
+public:
+	Vent();
+	virtual ~Vent();
+
+	void Rotate(float fPitch, float fYaw, float fRoll);
+};
