@@ -669,18 +669,7 @@ float4 GetColorFromDepth(float fDepth)
 	float4 cColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	if (fDepth > 1.0f) cColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
-	else if (fDepth < 0.00625f) cColor = float4(1.0f, 0.0f, 0.0f, 1.0f);
-	else if (fDepth < 0.0125f) cColor = float4(0.0f, 1.0f, 0.0f, 1.0f);
-	else if (fDepth < 0.025f) cColor = float4(0.0f, 0.0f, 1.0f, 1.0f);
-	else if (fDepth < 0.05f) cColor = float4(1.0f, 1.0f, 0.0f, 1.0f);
-	else if (fDepth < 0.075f) cColor = float4(0.0f, 1.0f, 1.0f, 1.0f);
-	else if (fDepth < 0.1f) cColor = float4(1.0f, 0.5f, 0.5f, 1.0f);
-	else if (fDepth < 0.4f) cColor = float4(0.5f, 1.0f, 1.0f, 1.0f);
-	else if (fDepth < 0.6f) cColor = float4(1.0f, 0.0f, 1.0f, 1.0f);
-	else if (fDepth < 0.8f) cColor = float4(0.5f, 0.5f, 1.0f, 1.0f);
-	else if (fDepth < 0.9f) cColor = float4(0.5f, 1.0f, 0.5f, 1.0f);
-	else cColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
-
+	else cColor = float4(fDepth*1.2, fDepth*1.2, fDepth*1.2, 1.0f);
 	return(cColor);
 }
 
@@ -799,7 +788,12 @@ float4 PSScreenRectSamplingTextured(VS_SCREEN_RECT_TEXTURED_OUTPUT input) : SV_T
 	}
 	else
 	{
-		cColor = gtxtInputTextures[input.screenNum][int2(input.position.xy)];
+		if (input.screenNum == 6)
+		{
+			float fDepth = gtxtInputTextures[6].Load(uint3((uint)input.position.x, (uint)input.position.y, 0)).r;
+			cColor = GetColorFromDepth(1.0f - fDepth);
+		}
+		else cColor = gtxtInputTextures[input.screenNum][int2(input.position.xy)];
 
 	}
 	//cColor = gtxtInputTextures[3].Sample(gssWrap, input.uv);
