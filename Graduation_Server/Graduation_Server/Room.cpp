@@ -269,6 +269,7 @@ CollisionInfo Room::is_collision_wall_to_player(const int player_id, const XMFLO
 	XMFLOAT3 MotionVector = xmf3shift;
 	XMFLOAT3 tmp_position = current_position;
 	BoundingOrientedBox check_box = cl.get_bounding_box();
+	int collied_face_num = -1;
 	for (auto& object : m_game_wall_and_door_and_fix_object) // 모든벽을 체크 후 값을 더해주는 방식이 좋아보임!
 	{
 		if (check_box.Intersects(object.Get_BoundingBox()))
@@ -292,9 +293,11 @@ CollisionInfo Room::is_collision_wall_to_player(const int player_id, const XMFLO
 				SlidingVector = MotionVector;
 			}
 
+			if (collision_data.collision_face_num == 4)
+				collied_face_num = 4;
+
 			return_data.is_collision = true;
 			return_data.SlidingVector = SlidingVector;
-			return_data.CollisionNormal = collision_data.CollisionNormal;
 			return_data.collision_face_num = collision_data.collision_face_num;
 			MotionVector = SlidingVector;
 			tmp_position = Add(tmp_position, SlidingVector);
@@ -304,6 +307,8 @@ CollisionInfo Room::is_collision_wall_to_player(const int player_id, const XMFLO
 			check_box.Center = tmp_position;
 		}
 	}
+
+	return_data.collision_face_num = collied_face_num;
 	return return_data;
 }
 

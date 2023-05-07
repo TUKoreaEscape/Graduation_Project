@@ -58,6 +58,7 @@ public:
 	mutex		_room_list_lock;
 	mutex		_state_lock;
 	mutex		_update_lock;
+	mutex		_pos_lock;
 
 	SOCKET		_socket = NULL;
 	EXP_OVER	_recv_over;

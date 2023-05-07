@@ -39,6 +39,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	XMFLOAT3 calculate_player_position = Add(current_player_position, current_shift);
 	bool collision_up_face = false;
 
+	m_clients[user_id]._pos_lock.lock();
 	m_clients[user_id].set_user_position(calculate_player_position);
 	m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 	if (m_clients[user_id].get_user_position().y < 0)
@@ -96,6 +97,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 				collision_up_face = true;
 		}
 	}
+	m_clients[user_id]._pos_lock.unlock();
 	m_clients[user_id].set_collied_up_face(collision_up_face);
 	send_calculate_move_packet(user_id); // -> 이동에 대한걸 처리하여 클라에게 보내줌
 }
