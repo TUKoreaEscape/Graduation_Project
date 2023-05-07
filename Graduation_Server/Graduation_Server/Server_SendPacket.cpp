@@ -170,16 +170,23 @@ void cGameServer::send_voice_data(const unsigned int id)
 
 void cGameServer::send_put_player_data(const unsigned int recv_id)
 {
+	Room& rl = *m_room_manager->Get_Room_Info(m_clients[recv_id].get_join_room_number());
+	int when_join = 0;
+	for (int i = 0; i < 6; ++i)
+	{
+		if (rl.Get_Join_Member(i) == recv_id)
+			when_join = i;
+	}
+
+	m_clients[recv_id].set_user_position(XMFLOAT3{ 3.f - when_join, 5, -4 });
 	sc_put_player_packet packet;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_PUT_PLAYER;
 	packet.data.active = false;
 	packet.data.id = recv_id;
-	packet.data.position = XMFLOAT3{ 0.0f, 0.0f, 0.0f };
+	packet.data.position = m_clients[recv_id].get_user_position();
 	packet.data.velocity = XMFLOAT3{ 0,0,0 };
 	packet.data.yaw = 0.0f;
-
-	m_clients[recv_id].set_user_position(XMFLOAT3(0, 0, 0)); // 이건 임시사용입니다.
 	m_clients[recv_id].do_send(sizeof(packet), &packet);
 }
 

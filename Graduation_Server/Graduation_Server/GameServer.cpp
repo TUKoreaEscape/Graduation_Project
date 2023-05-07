@@ -41,7 +41,7 @@ void cGameServer::StartServer()
 
 	for (auto& player : m_clients)
 	{
-		player.set_user_position({ 0,0,0 });
+		player.set_user_position({ 0,5,0 });
 	}
 	// ¿Ã¬ ¿∫ ¿Ã¡¶ ∏  ∑ŒµÂ«“ ∫Œ∫–
 	for (int i = 0; i < 4; ++i)
@@ -352,7 +352,7 @@ void cGameServer::Disconnect(const unsigned int _user_id) // ≈¨∂Û¿Ãæ∆Æ ø¨∞·¿ª «
 	cl.set_name(reset_name);
 	cl.set_id(-1);
 	cl._state_lock.unlock();
-	cl.set_user_position({ 0,0,0 });
+	cl.set_user_position({ 0,5,0 });
 	cl.set_user_velocity({ 0,0,0 });
 	cl.set_user_yaw(0);
 	closesocket(cl._socket);
