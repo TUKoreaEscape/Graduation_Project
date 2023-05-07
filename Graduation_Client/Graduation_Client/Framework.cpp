@@ -272,18 +272,18 @@ void Framework::BuildObjects()
 	scene = new GameScene();
 	scene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 
-	m_pLaplacianEdgeDetectionShader = new LaplacianEdgeShader();
-	m_pLaplacianEdgeDetectionShader->CreateShader(m_pd3dDevice, scene->GetGraphicsRootSignature(), 1, NULL, DXGI_FORMAT_D32_FLOAT);
-	//m_pLaplacianEdgeDetectionShader->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+	m_pEdgeShader = new LaplacianEdgeShader();
+	m_pEdgeShader->CreateShader(m_pd3dDevice, scene->GetGraphicsRootSignature(), 1, NULL, DXGI_FORMAT_D32_FLOAT);
+	//m_pEdgeShader->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	d3dRtvCPUDescriptorHandle.ptr += (::gnRtvDescriptorIncrementSize * m_nSwapChainBuffers);
 
 	DXGI_FORMAT pdxgiResourceFormats[6] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
-	m_pLaplacianEdgeDetectionShader->CreateResourcesAndViews(m_pd3dDevice, 6, pdxgiResourceFormats, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, d3dRtvCPUDescriptorHandle, 6 + 1); //SRV to (Render Targets) + (Depth Buffer)
+	m_pEdgeShader->CreateResourcesAndViews(m_pd3dDevice, 6, pdxgiResourceFormats, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, d3dRtvCPUDescriptorHandle, 6 + 1); //SRV to (Render Targets) + (Depth Buffer)
 
 	DXGI_FORMAT pdxgiDepthSrvFormats[1] = { DXGI_FORMAT_R32_FLOAT };
-	m_pLaplacianEdgeDetectionShader->CreateShaderResourceViews(m_pd3dDevice, 1, &m_pd3dDepthStencilBuffer, pdxgiDepthSrvFormats);
+	m_pEdgeShader->CreateShaderResourceViews(m_pd3dDevice, 1, &m_pd3dDepthStencilBuffer, pdxgiDepthSrvFormats);
 
 	m_pd3dCommandList->Close();
 	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
@@ -352,38 +352,25 @@ void Framework::FrameAdvance()
 	input->Update(m_hWnd);
 	
 	UpdateObjects();
-
+	if (Input::GetInstance()->keyBuffer['1'] & 0xF0) m_nDebugOptions = 85;
+	else m_nDebugOptions = 10;
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL); //명령 할당자와 명령 리스트를 리셋한다.
 
 	::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-	/*현재 렌더 타겟에 대한 프리젠트가 끝나기를 기다린다. 프리젠트가 끝나면 렌더 타겟 버퍼의 상태는 프리젠트 상태
-	(D3D12_RESOURCE_STATE_PRESENT)에서 렌더 타겟 상태(D3D12_RESOURCE_STATE_RENDER_TARGET)로 바뀔 것이다.*/
-
-	//m_pd3dCommandList->RSSetViewports(1, &m_d3dViewport);
-	//m_pd3dCommandList->RSSetScissorRects(1, &m_d3dScissorRect); //뷰포트와 씨저 사각형을 설정한다.
-
-	//D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle =  m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	//d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * ::gnRtvDescriptorIncrementSize); //현재의 렌더 타겟에 해당하는 서술자의 CPU 주소(핸들)를 계산한다.
-	//
-	//float pfClearColor[4] = { 0.0f, 0.3f, 0.3f, 1.0f };
-	//m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor/*Colors::Azure*/, 0, NULL); //원하는 색상으로 렌더 타겟(뷰)을 지운다.
-	//D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(); //깊이-스텐실 서술자의 CPU 주소를 계산한다.
-	//m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL); //원하는 값으로 깊이-스텐실(뷰)을 지운다.
-	//m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle); //렌더 타겟 뷰(서술자)와 깊이-스텐실 뷰(서술자)를 출력-병합 단계(OM)에 연결한다.
 	
 	if (scene) scene->prerender(m_pd3dCommandList);
 	m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 	//렌더링 코드는 여기에 추가될 것이다.
-	m_pLaplacianEdgeDetectionShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+	m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 	if(scene) scene->defrender(m_pd3dCommandList);
-	m_pLaplacianEdgeDetectionShader->Render(m_pd3dCommandList);
 	//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 	//if (scene) scene->forrender(m_pd3dCommandList);
-	m_pLaplacianEdgeDetectionShader->OnPostRenderTarget(m_pd3dCommandList);
+	m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
+	m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
+	m_pEdgeShader->Render(m_pd3dCommandList);
 	//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
-	
-	//if(Input::GetInstance()->keyBuffer['1'] & 0xF0) m_pLaplacianEdgeDetectionShader->Render(m_pd3dCommandList);
+	//if(Input::GetInstance()->keyBuffer['1'] & 0xF0) m_pEdgeShader->Render(m_pd3dCommandList);
 
 
 	::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);

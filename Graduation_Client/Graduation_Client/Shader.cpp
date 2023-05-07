@@ -840,7 +840,7 @@ void PostProcessingShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (m_pTexture) m_pTexture->UpdateShaderVariables(pd3dCommandList);
 
 	pd3dCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	pd3dCommandList->DrawInstanced(48, 1, 0, 0);
+	pd3dCommandList->DrawInstanced(36, 1, 0, 0);
 }
 
 
@@ -864,15 +864,25 @@ D3D12_SHADER_BYTECODE LaplacianEdgeShader::CreatePixelShader()
 
 void LaplacianEdgeShader::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	UINT ncbElementBytes = ((sizeof(VS_PS_DEBUG_OPTIONS) + 255) & ~255); //256ÀÇ ¹è¼ö
+	m_pd3dcbDebugOptions = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
+	m_pd3dcbDebugOptions->Map(0, NULL, (void**)&m_pcbMappedDebugOptions);
+
+	//PostProcessingShader::CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
 void LaplacianEdgeShader::ReleaseShaderVariables()
 {
+	if (m_pd3dcbDebugOptions) m_pd3dcbDebugOptions->Release();
 }
 
 void LaplacianEdgeShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
 {
+	m_pcbMappedDebugOptions->m_DebugOptions.x = *((int*)pContext);
+	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbDebugOptions->GetGPUVirtualAddress();
+	pd3dCommandList->SetGraphicsRootConstantBufferView(16, d3dGpuVirtualAddress);
 
+	PostProcessingShader::UpdateShaderVariables(pd3dCommandList);
 }
 
 void LaplacianEdgeShader::CreateResourcesAndViews(ID3D12Device* pd3dDevice, UINT nResources, DXGI_FORMAT* pdxgiFormats, UINT nWidth, UINT nHeight, D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle, UINT nShaderResources)

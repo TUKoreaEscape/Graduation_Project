@@ -53,9 +53,11 @@ private:
 
 	float           timeToSend;
 
-	LaplacianEdgeShader		*m_pLaplacianEdgeDetectionShader = NULL;
+	LaplacianEdgeShader		*m_pEdgeShader = NULL;
 
 	_TCHAR						m_pszFrameRate[70];
+
+	int								m_nDebugOptions = 10; // U
 public:
 	Framework();
 	~Framework();

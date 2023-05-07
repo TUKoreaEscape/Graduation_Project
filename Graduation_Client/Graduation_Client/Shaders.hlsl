@@ -24,6 +24,11 @@ cbuffer cbGameObjectInfo : register(b0)
 	uint					gnObjectType : packoffset(c8.y);
 };
 
+cbuffer cbDebug : register(b2)
+{
+	int4 gvDebugOptions : packoffset(c0);
+};
+
 #include "Light.hlsl"
 
 
@@ -631,21 +636,30 @@ VS_SCREEN_RECT_TEXTURED_OUTPUT VSScreenRectSamplingTextured(uint nVertexID : SV_
 {
 	VS_SCREEN_RECT_TEXTURED_OUTPUT output = (VS_SCREEN_RECT_TEXTURED_OUTPUT)0;
 
-	if (nVertexID == 0) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
-	else if (nVertexID == 1) { output.position = float4(+1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 0.0f); }
-	else if (nVertexID == 2) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
-	else if (nVertexID == 3) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
-	else if (nVertexID == 4) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
-	else if (nVertexID == 5) { output.position = float4(-1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 1.0f); }
-
-	int screen = nVertexID/6;
-	//if (nVertexID % 6 == 0)	{ output.position = float4((0.5 * screen) - 1.0f,			+1.0f, 0.0f, 1.0f);		output.uv = float2(0.0f, 0.0f);		output.screenNum = screen;}
-	//else if (nVertexID%6 == 1)	{ output.position = float4((0.5*(screen+1)) - 1.0f,		+1.0f, 0.0f, 1.0f);		output.uv = float2(1.0f, 0.0f); output.screenNum = screen;}
-	////else if (nVertexID%6 == 2)	{ output.position = float4((0.5 * (screen + 1)) - 1.0f,	+0.5f, 0.0f, 1.0f);		output.uv = float2(1.0f, 1.0f); output.screenNum = 6;}
-	//else if (nVertexID%6 == 3)	{ output.position = float4((0.5*screen) - 1.0f,			+1.0f, 0.0f, 1.0f);		output.uv = float2(0.0f, 0.0f); output.screenNum = screen;}
-	//else if (nVertexID%6 == 4)	{ output.position = float4((0.5 *(screen+1.0f)) - 1.0f,	+0.5f, 0.0f, 1.0f);		output.uv = float2(1.0f, 1.0f); output.screenNum = screen;}
-	//else if (nVertexID%6 == 5)	{ output.position = float4((0.5 * screen)-1.0f,			+0.5f, 0.0f, 1.0f);		output.uv = float2(0.0f, 1.0f); output.screenNum = screen;}
-
+	if (gvDebugOptions.x == 10)
+	{
+		if (nVertexID == 0) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
+		else if (nVertexID == 1) { output.position = float4(+1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 0.0f); }
+		else if (nVertexID == 2) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
+		else if (nVertexID == 3) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
+		else if (nVertexID == 4) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
+		else if (nVertexID == 5) { output.position = float4(-1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 1.0f); }
+	}
+	else
+	{
+		int screen = nVertexID / 6;
+		int add = 0;
+		if (nVertexID > 23)
+		{
+			add = 1;
+		}
+		if (nVertexID % 6 == 0)	{ output.position = float4((0.25 * screen) - 1.0f,				+1.0f, 0.0f, 1.0f);		output.uv = float2(0.0f, 0.0f);		output.screenNum = screen+ add;}
+		else if (nVertexID%6 == 1)	{ output.position = float4((0.25 * (screen + 1.0f)) - 1.0f,		+1.0f, 0.0f, 1.0f);		output.uv = float2(1.0f, 0.0f);		output.screenNum = screen+add;}
+		else if (nVertexID%6 == 2)	{ output.position = float4((0.25 * (screen + 1.0f)) - 1.0f,		+0.5f, 0.0f, 1.0f);		output.uv = float2(1.0f, 1.0f);		output.screenNum = screen+add;}
+		else if (nVertexID%6 == 3)	{ output.position = float4((0.25 * screen) - 1.0f,				+1.0f, 0.0f, 1.0f);		output.uv = float2(0.0f, 0.0f);		output.screenNum = screen+add;}
+		else if (nVertexID%6 == 4)	{ output.position = float4((0.25 * (screen +1.0f)) - 1.0f,		+0.5f, 0.0f, 1.0f);		output.uv = float2(1.0f, 1.0f);		output.screenNum = screen+add;}
+		else if (nVertexID%6 == 5)	{ output.position = float4((0.25 * screen) - 1.0f,				+0.5f, 0.0f, 1.0f);		output.uv = float2(0.0f, 1.0f);		output.screenNum = screen+add;}
+	}
 	output.viewSpaceDir = mul(output.position, gmtxInverseProjection).xyz;
 	return(output);
 }
@@ -778,12 +792,19 @@ float4 Outline(VS_SCREEN_RECT_TEXTURED_OUTPUT input)
 float4 PSScreenRectSamplingTextured(VS_SCREEN_RECT_TEXTURED_OUTPUT input) : SV_Target
 {
 	float4 cColor = float4(1.0f, 1.0f, 0.0f, 0.1f);
+
+	if (gvDebugOptions.x == 10)
+	{
+		cColor = Outline(input);
+	}
+	else
+	{
+		cColor = gtxtInputTextures[input.screenNum][int2(input.position.xy)];
+
+	}
 	//cColor = gtxtInputTextures[3].Sample(gssWrap, input.uv);
-	//cColor = gtxtInputTextures[input.screenNum][int2(input.position.xy)];
 	//cColor = gtxtInputTextures[input.screenNum].Sample(gssWrap, input.uv);
 	//cColor = LaplacianEdge(input.position);
-	cColor = Outline(input);
-
 
 	//switch (gvDrawOptions.x)
 	//{

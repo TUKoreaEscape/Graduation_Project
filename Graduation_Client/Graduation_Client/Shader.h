@@ -230,6 +230,11 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRtvCPUDescriptorHandle(UINT nIndex) { return(m_pd3dRtvCPUDescriptorHandles[nIndex]); }
 };
 
+struct VS_PS_DEBUG_OPTIONS
+{
+	XMINT4							m_DebugOptions;
+};
+
 class LaplacianEdgeShader : public PostProcessingShader
 {
 public:
@@ -250,4 +255,8 @@ public:
 	virtual void OnPostRenderTarget(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
+
+protected:
+	ID3D12Resource* m_pd3dcbDebugOptions = NULL;
+	VS_PS_DEBUG_OPTIONS* m_pcbMappedDebugOptions = NULL;
 };
