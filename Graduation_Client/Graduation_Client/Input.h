@@ -22,6 +22,8 @@ public:
 	Time				m_time;
 	POINT				m_ptOldCursorPos{ 0,0 };
 
+	float speed = 60.0f;
+
 	void Update(HWND hWnd);
 	void KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	void Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);

@@ -575,7 +575,8 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 	PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
 
 
-	float4 cAlbedoColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	//float4 cAlbedoColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	float4 cAlbedoColor = gMaterial.m_cDiffuse;
 	if (gnTexturesMask & MATERIAL_ALBEDO_MAP) cAlbedoColor = gtxtAlbedoTexture.Sample(gssWrap, input.uv);
 	float4 cSpecularColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	if (gnTexturesMask & MATERIAL_SPECULAR_MAP) cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uv);

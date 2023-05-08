@@ -53,6 +53,12 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 		case VK_F2:
 			::ReleaseCapture();
 			break;
+		case VK_F4:
+			speed = 160.0f;
+			break;
+		case VK_F5:
+			speed = 60.0f;
+			break;
 		case VK_ESCAPE:
 		{
 			//::PostQuitMessage(0);

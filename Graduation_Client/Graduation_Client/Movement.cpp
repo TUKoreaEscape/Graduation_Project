@@ -11,6 +11,7 @@ void CommonMovement::update(float elapsedTime)
 		UCHAR keyBuffer[256];
 		DWORD dwDirection = 0;
 		bool		m_emptyKey = false;
+		float speed = Input::GetInstance()->speed;
 		memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
 		if (keyBuffer['w'] & 0xF0 || keyBuffer['W'] & 0xF0)
 		{
@@ -69,7 +70,7 @@ void CommonMovement::update(float elapsedTime)
 				(dwDirection == DIR_NOT_FBLR))
 				m_emptyKey = true;
 			//std::cout << elapsedTime << std::endl;
-			Input::GetInstance()->m_pPlayer->Move(dwDirection, 60.f * elapsedTime, true);
+			Input::GetInstance()->m_pPlayer->Move(dwDirection, speed * elapsedTime, true);
 		}
 		else m_emptyKey = true;
 
