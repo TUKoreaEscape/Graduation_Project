@@ -11,35 +11,35 @@ void cGameServer::Update_Session(int thread_number)
 			//cout << "Update Session!" << endl;
 			for (int i = thread_number; i < MAX_ROOM; i++)
 			{
-				Room& rl = *m_room_manager->Get_Room_Info(i);
-				rl._room_state_lock.lock();
-				switch (rl._room_state)
+				Room& room = *m_room_manager->Get_Room_Info(i);
+				room._room_state_lock.lock();
+				switch (room._room_state)
 				{
 				case GAME_ROOM_STATE::FREE:
 				{
-					rl._room_state_lock.unlock();
+					room._room_state_lock.unlock();
 					break;
 				}
 				case GAME_ROOM_STATE::READY:
 				{
-					rl._room_state_lock.unlock();
+					room._room_state_lock.unlock();
 #if DEBUG
-					Update_OtherPlayer(i, (float)1/60);
+					Update_OtherPlayer(i, (float)1/50);
 #endif				
 					break;
 				}
 
 				case GAME_ROOM_STATE::PLAYING:
 				{
-					rl._room_state_lock.unlock();
-					rl.Update_room_time();
-					Update_OtherPlayer(i, (float)1/60);
+					room._room_state_lock.unlock();
+					room.Update_room_time();
+					Update_OtherPlayer(i, (float)1/50);
 					break;
 				}
 
 				case GAME_ROOM_STATE::END:
 				{
-					rl._room_state_lock.unlock();
+					room._room_state_lock.unlock();
 					break;
 				}
 
@@ -53,30 +53,30 @@ void cGameServer::Update_Session(int thread_number)
 
 void cGameServer::Update_OtherPlayer(int room_number, float elaspeTime)
 {
-	Room& rl = *m_room_manager->Get_Room_Info(room_number);
+	Room& room = *m_room_manager->Get_Room_Info(room_number);
 
 	for (int i = 0; i < 6; ++i)
 	{
-		if (rl.Get_Join_Member(i) != -1)
+		if (room.Get_Join_Member(i) != -1)
 		{
-			if (m_clients[rl.Get_Join_Member(i)].get_user_attack_animation())
-				m_clients[rl.Get_Join_Member(i)].play_attack_animation(elaspeTime);
+			if (m_clients[room.Get_Join_Member(i)].get_user_attack_animation())
+				m_clients[room.Get_Join_Member(i)].play_attack_animation(elaspeTime);
 
-			if (m_clients[rl.Get_Join_Member(i)].get_user_victim_animation())
-				m_clients[rl.Get_Join_Member(i)].play_victim_animation(elaspeTime);
+			if (m_clients[room.Get_Join_Member(i)].get_user_victim_animation())
+				m_clients[room.Get_Join_Member(i)].play_victim_animation(elaspeTime);
 
-			if (!m_clients[rl.Get_Join_Member(i)].IsAttackAnimation())
-				m_clients[rl.Get_Join_Member(i)].set_attack_animation(false);
+			if (!m_clients[room.Get_Join_Member(i)].IsAttackAnimation())
+				m_clients[room.Get_Join_Member(i)].set_attack_animation(false);
 
-			if (!m_clients[rl.Get_Join_Member(i)].IsVictimAnimation())
-				m_clients[rl.Get_Join_Member(i)].set_victim_animation(false);
+			if (!m_clients[room.Get_Join_Member(i)].IsVictimAnimation())
+				m_clients[room.Get_Join_Member(i)].set_victim_animation(false);
 		}
 	}
 
 	int index = 0;
 	for (int k = 0; k < 6; ++k)
 	{
-		if (rl.Get_Join_Member(k) != -1)
+		if (room.Get_Join_Member(k) != -1)
 		{
 			sc_other_player_move packet;
 			packet.size = sizeof(packet);
@@ -86,9 +86,9 @@ void cGameServer::Update_OtherPlayer(int room_number, float elaspeTime)
 				temp.id = -1;
 			for (int in_id = 0; in_id < 6; ++in_id)
 			{
-				if (rl.Get_Join_Member(in_id) != -1 && rl.Get_Join_Member(in_id) != rl.Get_Join_Member(k))
+				if (room.Get_Join_Member(in_id) != -1 && room.Get_Join_Member(in_id) != room.Get_Join_Member(k))
 				{
-					int this_id = rl.Get_Join_Member(in_id);
+					int this_id = room.Get_Join_Member(in_id);
 					m_clients[this_id]._pos_lock.lock();
 					packet.data[index].id = this_id;
 					packet.data[index].input_key = m_clients[this_id].get_input_key();
@@ -110,7 +110,7 @@ void cGameServer::Update_OtherPlayer(int room_number, float elaspeTime)
 					index++;
 				}
 
-				else if (rl.Get_Join_Member(in_id) == -1 && rl.Get_Join_Member(in_id) != rl.Get_Join_Member(k))
+				else if (room.Get_Join_Member(in_id) == -1 && room.Get_Join_Member(in_id) != room.Get_Join_Member(k))
 				{
 					packet.data[index].id = -1;
 					packet.data[index].look.x = 0;
@@ -127,7 +127,7 @@ void cGameServer::Update_OtherPlayer(int room_number, float elaspeTime)
 				}
 			}
 			//if (rl.Get_Number_of_users() < 5);
-			m_clients[rl.Get_Join_Member(k)].do_send(sizeof(packet), &packet);
+			m_clients[room.Get_Join_Member(k)].do_send(sizeof(packet), &packet);
 		}
 
 	}

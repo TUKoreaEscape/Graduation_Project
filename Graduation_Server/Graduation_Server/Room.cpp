@@ -138,7 +138,7 @@ bool Room::All_Player_Loading()
 	return true;
 }
 
-void Room::Update_Player_Position()
+void Room::Update_Player_Position() // 사용하지 않습니다.
 {
 	cGameServer& server = cGameServer::GetInstance();
 }
@@ -151,21 +151,21 @@ bool Room::Is_Door_Open()
 CollisionInfo Room::is_collision_player_to_object(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift)
 {
 	cGameServer& server = cGameServer::GetInstance();
-	CLIENT& cl = *server.get_client_info(player_id);
+	CLIENT& client = *server.get_client_info(player_id);
 	CollisionInfo return_data;
 	return_data.is_collision = false;
 	return_data.CollisionNormal = XMFLOAT3(0, 0, 0);
 	return_data.SlidingVector = XMFLOAT3(0, 0, 0);
-	BoundingOrientedBox player_bounding_box = cl.get_bounding_box();
+	BoundingOrientedBox player_bounding_box = client.get_bounding_box();
 	XMFLOAT3 MotionVector = xmf3shift;
 	XMFLOAT3 tmp_position = current_position;
-	BoundingOrientedBox check_box = cl.get_bounding_box();
+	BoundingOrientedBox check_box = client.get_bounding_box();
 	for (auto& object : m_game_object) // 모든벽을 체크 후 값을 더해주는 방식이 좋아보임!
 	{
 		if (check_box.Intersects(object.Get_BoundingBox()))
 		{
-			cl.set_user_position(tmp_position);
-			cl.update_bounding_box_pos(tmp_position);
+			client.set_user_position(tmp_position);
+			client.update_bounding_box_pos(tmp_position);
 			CollisionInfo collision_data = server.GetCollisionInfo(object.Get_BoundingBox(), player_bounding_box);
 			XMFLOAT3 SlidingVector = XMFLOAT3(0.0f, 0.0f, 0.0f);
 			XMFLOAT3 current_player_position = tmp_position;
@@ -189,8 +189,8 @@ CollisionInfo Room::is_collision_player_to_object(const int player_id, const XMF
 			MotionVector = SlidingVector;
 			tmp_position = Add(tmp_position, SlidingVector);
 
-			cl.set_user_position(current_position);
-			cl.update_bounding_box_pos(current_position);
+			client.set_user_position(current_position);
+			client.update_bounding_box_pos(current_position);
 			check_box.Center = tmp_position;
 		}
 	}
@@ -203,9 +203,9 @@ CollisionInfo Room::is_collision_player_to_player(const int player_id, const XMF
 
 	int collied_id = -1;
 	cGameServer& server = cGameServer::GetInstance();
-	CLIENT& cl = *server.get_client_info(player_id);
+	CLIENT& client = *server.get_client_info(player_id);
 
-	BoundingOrientedBox player_bounding_box = cl.get_bounding_box();
+	BoundingOrientedBox player_bounding_box = client.get_bounding_box();
 	for (int i = 0; i < Number_of_users; ++i)
 	{
 		if (in_player[i] != player_id && in_player[i] != -1)
@@ -223,11 +223,11 @@ CollisionInfo Room::is_collision_player_to_player(const int player_id, const XMF
 	if (collied_id != -1)
 	{
 		XMFLOAT3 SlidingVector = XMFLOAT3(0.0f, 0.0f, 0.0f);
-		cl.set_user_position(current_position);
-		cl.update_bounding_box_pos(current_position);
+		client.set_user_position(current_position);
+		client.update_bounding_box_pos(current_position);
 
 		CLIENT& other = *server.get_client_info(collied_id);
-		player_bounding_box = cl.get_bounding_box();
+		player_bounding_box = client.get_bounding_box();
 		BoundingOrientedBox other_player_bounding_box = other.get_bounding_box();
 		CollisionInfo data = server.GetCollisionInfo(other_player_bounding_box, player_bounding_box);
 

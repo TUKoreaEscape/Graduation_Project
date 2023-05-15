@@ -344,6 +344,10 @@ void cGameServer::Disconnect(const unsigned int _user_id) // ≈¨∂Û¿Ãæ∆Æ ø¨∞·¿ª «
 	cl._room_list_lock.lock();
 	cl.room_list.clear();
 	cl._room_list_lock.unlock();
+	cl.set_user_position({ 0,5,0 });
+	cl.set_user_velocity({ 0,0,0 });
+	cl.set_user_yaw(0);
+	closesocket(cl._socket);
 
 	cl._state_lock.lock();
 	cl.set_state(CLIENT_STATE::ST_FREE);
@@ -352,10 +356,6 @@ void cGameServer::Disconnect(const unsigned int _user_id) // ≈¨∂Û¿Ãæ∆Æ ø¨∞·¿ª «
 	cl.set_name(reset_name);
 	cl.set_id(-1);
 	cl._state_lock.unlock();
-	cl.set_user_position({ 0,5,0 });
-	cl.set_user_velocity({ 0,0,0 });
-	cl.set_user_yaw(0);
-	closesocket(cl._socket);
 }
 
 //============================================================================
