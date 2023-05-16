@@ -56,6 +56,7 @@ public:
 	unordered_set <int> view_list; // 현재는 사용하지 않지만 맵을 서버에 추가할 때 사용할 예정
 
 	mutex		_room_list_lock;
+	mutex		_view_list_lock;
 	mutex		_state_lock;
 	mutex		_update_lock;
 	mutex		_pos_lock;

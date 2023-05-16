@@ -110,18 +110,14 @@ void cGameServer::Process_Chat(const int user_id, void* buff)
 	strcpy_s(mess, packet->message);
 
 	// 같은 방에 있는 유저한테만 메세지 보낼 예정
-	//m_clients[user_id]._room_list_lock.lock();
-	//for (auto ptr = m_clients[user_id].room_list.begin(); ptr != m_clients[user_id].room_list.end(); ++ptr)
-	//	send_chat_packet(*ptr, user_id, mess);
-	//m_clients[user_id]._room_list_lock.unlock();
 
-	Room& rl = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
 
 	for (int i = 0; i < 6; ++i)
 	{
-		if (rl.Get_Join_Member(i) != -1 && rl.Get_Join_Member(i) != user_id)
-			send_chat_packet(rl.Get_Join_Member(i), user_id, mess);
+		if (room.Get_Join_Member(i) != -1 && room.Get_Join_Member(i) != user_id)
+			send_chat_packet(room.Get_Join_Member(i), user_id, mess);
 	}
 }
 
