@@ -144,7 +144,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pCeilling = new GameObject();
 	m_pCeilling->SetChild(pCeilModel->m_pModelRootObject, true);
 	m_pCeilling->UpdateTransform(nullptr);
-	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene05077.bin");
+	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene0519.bin");
 
 	m_pClass = new GameObject();
 	m_pClass->SetChild(pClassModel->m_pModelRootObject, true);
