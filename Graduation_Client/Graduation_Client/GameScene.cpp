@@ -75,7 +75,7 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			Vents[i]->render(pd3dCommandList);
 		}
 	}
-	//m_pOak->render(pd3dCommandList);
+	m_pOak->render(pd3dCommandList);
 	for (int i = 0; i < m_nBush; ++i)
 	{
 		if (m_ppBush[i]) m_ppBush[i]->render(pd3dCommandList);
