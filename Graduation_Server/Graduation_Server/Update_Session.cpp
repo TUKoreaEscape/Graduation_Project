@@ -70,9 +70,8 @@ void cGameServer::Update_OtherPlayer(int room_number, float elaspeTime)
 
 			if (!m_clients[room.Get_Join_Member(i)].IsVictimAnimation())
 				m_clients[room.Get_Join_Member(i)].set_victim_animation(false);
+			Update_Viewlist(room.Get_Join_Member(i), room_number);
 		}
-
-		Update_Viewlist(room.Get_Join_Member(i), room_number);
 	}
 
 	int index = 0;
@@ -139,17 +138,21 @@ void cGameServer::Update_Viewlist(const int id, const int room_number)
 {
 	for (auto player : m_room_manager->Get_Room_Info(room_number)->in_player)
 	{
-		if (Is_near(id, player))
+		if (player != -1 && player != id)
 		{
-			m_clients[id]._view_list_lock.lock();
-			m_clients[id].view_list.insert(player);
-			m_clients[id]._view_list_lock.unlock();
-		}
-		else
-		{
-			m_clients[id]._view_list_lock.lock();
-			m_clients[id].view_list.erase(player);
-			m_clients[id]._view_list_lock.unlock();
+
+			if (Is_near(id, player))
+			{
+				m_clients[id]._view_list_lock.lock();
+				m_clients[id].view_list.insert(player);
+				m_clients[id]._view_list_lock.unlock();
+			}
+			else
+			{
+				m_clients[id]._view_list_lock.lock();
+				m_clients[id].view_list.erase(player);
+				m_clients[id]._view_list_lock.unlock();
+			}
 		}
 	}
 }

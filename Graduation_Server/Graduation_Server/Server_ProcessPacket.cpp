@@ -23,6 +23,7 @@ void cGameServer::Process_Create_ID(int c_id, void* buff) // 요청받은 ID생성패킷
 
 void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터 이동을 처리
 {
+	auto start_time = chrono::high_resolution_clock::now();
 	cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(buff);
 	m_clients[user_id].set_user_velocity(packet->velocity);
 	m_clients[user_id].set_user_yaw(packet->yaw);
@@ -49,7 +50,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 		m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 	}
 	//cout << "적용전 캐릭터 좌표 : " << m_clients[user_id].get_user_position().x << ", " << m_clients[user_id].get_user_position().y << ", " << m_clients[user_id].get_user_position().z << endl;
-	
+
 	if (m_clients[user_id].get_join_room_number() >= 0) {
 		CollisionInfo player_check = join_room.is_collision_player_to_player(user_id, current_player_position, current_shift);
 		if (player_check.is_collision)
@@ -100,6 +101,9 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	m_clients[user_id]._pos_lock.unlock();
 	m_clients[user_id].set_collied_up_face(collision_up_face);
 	send_calculate_move_packet(user_id); // -> 이동에 대한걸 처리하여 클라에게 보내줌
+	auto end_time = chrono::high_resolution_clock::now();
+
+	cout << "이동처리 걸린 시간 : " << std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() << "us" << endl;
 }
 
 void cGameServer::Process_Chat(const int user_id, void* buff)
