@@ -103,7 +103,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	send_calculate_move_packet(user_id); // -> 이동에 대한걸 처리하여 클라에게 보내줌
 	auto end_time = chrono::high_resolution_clock::now();
 
-	cout << "이동처리 걸린 시간 : " << std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() << "us" << endl;
+	//cout << "이동처리 걸린 시간 : " << std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() << "us" << endl;
 }
 
 void cGameServer::Process_Chat(const int user_id, void* buff)
@@ -283,15 +283,10 @@ void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
 		send_packet.room_info[i].room_number = room_number;
 		send_packet.room_info[i].join_member = get_room_info.Get_Number_of_users();
 		send_packet.room_info[i].state = get_room_info._room_state;
-		get_room_info.Get_Room_Name(send_packet.room_info[i].room_name, 20);
+		get_room_info.Get_Room_Name(send_packet.room_info[i].room_name, 10);
 	}
 
-	if (sizeof(send_packet) >= CHECK_MAX_PACKET_SIZE)
-	{
-		send_packet.size = CHECK_MAX_PACKET_SIZE;
-		send_packet.sub_size_mul = sizeof(send_packet) / CHECK_MAX_PACKET_SIZE;
-		send_packet.sub_size_add = sizeof(send_packet) % CHECK_MAX_PACKET_SIZE;
-	}
+	send_packet.size = sizeof(send_packet);
 	send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
 	m_clients[user_id].do_send(sizeof(send_packet), &send_packet);
 }

@@ -194,7 +194,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	char id[20]{};
 	char pw[20]{};
 	int select;
-	
+
 	m_network = Network::GetInstance();
 	m_network->init_network();
 	m_network->m_pPlayer = m_pPlayer;
@@ -241,6 +241,49 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 			break;
 		}
 		std::this_thread::sleep_for(std::chrono::seconds(1));
+		system("cls");
+	}
+
+	while (m_network->m_join_room == false)
+	{
+		int option = 0;
+		std::cout << "옵션 선택" << std::endl;
+		std::cout << "1. 방 정보 보기" << std::endl;
+		std::cout << "2. 방 생성 하기" << std::endl;
+		std::cout << "Select : ";
+		std::cin >> option;
+
+		switch (option)
+		{
+		case 1:
+		{
+			cs_packet_request_all_room_info packet;
+			packet.size = sizeof(packet);
+			packet.type = CS_PACKET::CS_PACKET_REQUEST_ROOM_INFO;
+			packet.request_page = 0;
+			m_network->send_packet(&packet);
+
+			std::cin >> option;
+
+			cs_packet_join_room join_packet;
+			join_packet.size = sizeof(join_packet);
+			join_packet.type = CS_PACKET::CS_PACKET_JOIN_ROOM;
+			join_packet.room_number = option;
+			m_network->send_packet(&join_packet);
+			break;
+		}
+
+		case 2:
+		{
+			cs_packet_create_room packet;
+			packet.size = sizeof(packet);
+			packet.type = CS_PACKET::CS_PACKET_CREATE_ROOM;
+			m_network->send_packet(&packet);
+			break;
+		}
+		}
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+
 	}
 
 	send_thread = std::thread{ &Network::Debug_send_thread, m_network };

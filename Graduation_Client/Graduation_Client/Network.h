@@ -41,7 +41,10 @@ public:
 	bool	m_recv_move = false;
 	int		m_my_id = -1;
 
+	//임시사용 변수입니다.
 	bool    m_login = false;
+	bool	m_join_room = false;
+
 	XMFLOAT3 m_pPlayer_Pos{ 0,0,0 };
 	XMFLOAT3 m_pPlayer_before_Pos{ 0,0,0 };
 	OtherPlayerPos Other_Player_Pos[5]{};

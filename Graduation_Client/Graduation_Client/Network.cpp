@@ -320,11 +320,11 @@ void Network::ProcessPacket(char* ptr)
 		std::cout << "========================================" << std::endl;
 		std::cout << ">>>>>> 로그인에 성공하였습니다! <<<<<<" << std::endl;
 		std::cout << "========================================" << std::endl;
-		cs_packet_join_room packet;
-		packet.size = sizeof(cs_packet_join_room);
-		packet.type = CS_PACKET::CS_PACKET_JOIN_ROOM;
-		packet.room_number = 0;
-		send_packet(&packet);
+		//cs_packet_join_room packet;
+		//packet.size = sizeof(cs_packet_join_room);
+		//packet.type = CS_PACKET::CS_PACKET_JOIN_ROOM;
+		//packet.room_number = 0;
+		//send_packet(&packet);
 		break;
 	}
 
@@ -347,6 +347,7 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_JOIN_ROOM_SUCCESS:
 	{
 		//std::cout << "방 접속 성공" << std::endl;
+		m_join_room = true;
 		info.cbSize = sizeof(SHELLEXECUTEINFO);
 		info.fMask = SEE_MASK_NOCLOSEPROCESS;
 		info.hwnd = NULL;
@@ -369,7 +370,8 @@ void Network::ProcessPacket(char* ptr)
 	{
 		//std::cout << "보이스 시작" << std::endl;
 		//ShellExecute(NULL, L"open", L"voice\Voice.exe", NULL, NULL, SW_SHOWMINIMIZED);
-
+		//std::cout << "방 생성에 성공하였습니다." << std::endl;
+		m_join_room = true;
 		info.cbSize = sizeof(SHELLEXECUTEINFO);
 		info.fMask = SEE_MASK_NOCLOSEPROCESS;
 		info.hwnd = NULL;
@@ -390,10 +392,18 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_JOIN_ROOM_FAIL:
 	{
 		//std::cout << "recv SC_PACKET_JOIN_ROOM_FAIL" << std::endl;
-		cs_packet_create_room packet;
-		packet.size = sizeof(packet);
-		packet.type = CS_PACKET::CS_PACKET_CREATE_ROOM;
-		send_packet(&packet);
+		
+		std::cout << "방 접속에 실패하였습니다." << std::endl;
+		//cs_packet_request_all_room_info packet;
+		//packet.size = sizeof(packet);
+		//packet.type = CS_PACKET::CS_PACKET_REQUEST_ROOM_INFO;
+		//packet.request_page = 0;
+
+		//send_packet(&packet);
+		//cs_packet_create_room packet;
+		//packet.size = sizeof(packet);
+		//packet.type = CS_PACKET::CS_PACKET_CREATE_ROOM;
+		//send_packet(&packet);
 		break;
 	}
 
@@ -528,6 +538,19 @@ void Network::ProcessPacket(char* ptr)
 		}
 		break;
 	}
+
+	case SC_PACKET::SC_PACKET_ROOM_INFO:
+	{
+		sc_packet_request_room_info* packet = reinterpret_cast<sc_packet_request_room_info*>(ptr);
+		system("cls");
+		for (int i = 0; i < MAX_ROOM_INFO_SEND; ++i)
+		{
+			std::cout << "[" << packet->room_info[i].room_number << "] 번방 [" << packet->room_info[i].room_name << "] : [" << packet->room_info[i].join_member << "/6]" << std::endl;
+		}
+		std::cout << "접속할 방 번호 입력 : ";
+		break;
+	}
+
 	}
 }
 

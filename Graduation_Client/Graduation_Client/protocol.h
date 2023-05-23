@@ -8,7 +8,7 @@ const int	MAX_CHAT_SIZE = 100;
 const int  MAX_NAME_SIZE = 20;
 const int  MAX_ROOM = 5000;
 
-const int  MAX_ROOM_INFO_SEND = 10;
+const int  MAX_ROOM_INFO_SEND = 4;
 
 const int CHECK_MAX_PACKET_SIZE = 127;
 
@@ -108,7 +108,7 @@ struct PutData {
 
 struct Roominfo_by10 {
 	unsigned short				room_number;
-	char						room_name[20];
+	char						room_name[10];
 	unsigned short				join_member;
 	GAME_ROOM_STATE::TYPE		state;
 };
