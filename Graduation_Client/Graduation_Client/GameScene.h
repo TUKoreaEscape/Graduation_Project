@@ -32,7 +32,10 @@ public:
 	GameObject* m_pClassroomTerrain = nullptr;
 	GameObject* m_pForestTerrain = nullptr;
 	GameObject* m_pCubeTerrain = nullptr;
-	
+
+	int m_nUI = 0;
+	GameObject* m_UITest[2];
+
 	GameObject* m_pCeilling = nullptr;
 
 	int m_nWalls;
@@ -73,6 +76,7 @@ public:
 	virtual void prerender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void defrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void forrender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList, int index);
 
 	void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 

@@ -674,7 +674,7 @@ float4 GetColorFromDepth(float fDepth)
 	return(cColor);
 }
 
-Texture2D gtxtInputTextures[7] : register(t14); //Color, NormalW, Texture, Illumination, ObjectID+zDepth, NormalV, Depth 
+Texture2D gtxtInputTextures[7] : register(t14); //Color, NormalW, Texture, Illumination, ObjectID+zDepth, NormalV, Depth
 
 static float gfLaplacians[9] = { -1.0f, -1.0f, -1.0f, -1.0f, 8.0f, -1.0f, -1.0f, -1.0f, -1.0f };
 static int2 gnOffsets[9] = { { -1,-1 }, { 0,-1 }, { 1,-1 }, { -1,0 }, { 0,0 }, { 1,0 }, { -1,1 }, { 0,1 }, { 1,1 } };
@@ -800,60 +800,6 @@ float4 PSScreenRectSamplingTextured(VS_SCREEN_RECT_TEXTURED_OUTPUT input) : SV_T
 	//cColor = gtxtInputTextures[3].Sample(gssWrap, input.uv);
 	//cColor = gtxtInputTextures[input.screenNum].Sample(gssWrap, input.uv);
 	//cColor = LaplacianEdge(input.position);
-
-	//switch (gvDrawOptions.x)
-	//{
-	//	case 84: //'T'
-	//	{
-	//		cColor = gtxtInputTextures[2].Sample(gssWrap, input.uv);
-	//		break;
-	//	}
-	//	case 76: //'L'
-	//	{
-	//		cColor = gtxtInputTextures[3].Sample(gssWrap, input.uv);
-	//		break;
-	//	}
-	//	case 78: //'N'
-	//	{
-	//		cColor = gtxtInputTextures[1].Sample(gssWrap, input.uv);
-	//		break;
-	//	}
-	//	case 68: //'D'
-	//	{
-	//		float fDepth = gtxtInputTextures[6].Load(uint3((uint)input.position.x, (uint)input.position.y, 0)).r;
-	//		cColor = GetColorFromDepth(1.0f - fDepth);
-	//		break;
-	//	}
-	//	case 90: //'Z' 
-	//	{
-	//		float fDepth = gtxtInputTextures[5].Load(uint3((uint)input.position.x, (uint)input.position.y, 0)).r;
-	//		cColor = GetColorFromDepth(fDepth);
-	//		break;
-	//	}
-	//	case 79: //'O'
-	//	{
-	//		uint fObjectID = (uint)gtxtInputTextures[4].Load(uint3((uint)input.position.x, (uint)input.position.y, 0)).r;
-	//		//uint fObjectID = (uint)gtxtInputTextures[4][int2(input.position.xy)].r;
-	//		if (fObjectID == 0) cColor.rgb = float3(1.0f, 1.0f, 1.0f);
-	//		else if (fObjectID <= 1000) cColor.rgb = float3(1.0f, 0.0f, 0.0f);
-	//		else if (fObjectID <= 2000) cColor.rgb = float3(0.0f, 1.0f, 0.0f);
-	//		else if (fObjectID <= 3000) cColor.rgb = float3(0.0f, 0.0f, 1.0f);
-	//		else if (fObjectID <= 4000) cColor.rgb = float3(0.0f, 1.0f, 1.0f);
-	//		else if (fObjectID <= 5000) cColor.rgb = float3(1.0f, 1.0f, 0.0f);
-	//		else if (fObjectID <= 6000) cColor.rgb = float3(1.0f, 1.0f, 1.0f);
-	//		else if (fObjectID <= 7000) cColor.rgb = float3(1.0f, 0.5f, 0.5f);
-	//		else cColor.rgb = float3(0.3f, 0.75f, 0.5f);
-
-	//		//cColor.rgb = fObjectID;
-	//		break;
-	//		}
-	//		case 69: //'E'
-	//		{
-	//			cColor = LaplacianEdge(input.position);
-	//			//cColor = Outline(input);
-	//			break;
-	//		}
-	//}
 	return(cColor);
 }
 
@@ -873,4 +819,37 @@ float4 VSPostProcessing(uint nVertexID : SV_VertexID) : SV_POSITION
 float4 PSPostProcessing(float4 position : SV_POSITION) : SV_Target
 {
 	return(float4(0.0f, 0.0f, 0.0f, 1.0f));
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+Texture2D gtxtUITexture : register(t21);
+
+struct VS_UI_OUTPUT
+{
+	float4 position : SV_POSITION;
+	float2 uv : TEXCOORD;
+};
+
+VS_UI_OUTPUT VSUI(uint nVertexID : SV_VertexID)
+{
+	VS_UI_OUTPUT output;
+
+	if (nVertexID == 0) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
+	else if (nVertexID == 1) { output.position = float4(+1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 0.0f); }
+	else if (nVertexID == 2) { output.position = float4(-1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 1.0f); }
+	else if (nVertexID == 3) { output.position = float4(-1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 1.0f); }
+	else if (nVertexID == 4) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
+	else if (nVertexID == 5) { output.position = float4(+1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 0.0f); }
+
+	//output.position = mul(float4(gvCameraPosition,1.0f), gmtxGameObject);
+
+	return output;
+}
+
+float4 PSUI(VS_UI_OUTPUT input) : SV_TARGET
+{
+	float4 Color = gtxtUITexture.Sample(gssWrap, input.uv);
+	return Color;
+	return float4(1, 0, 0, 1);
 }

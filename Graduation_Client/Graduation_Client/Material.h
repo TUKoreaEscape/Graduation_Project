@@ -61,6 +61,7 @@ public:
 	static Shader* m_pSkinnedAnimationShader;
 	static Shader* m_pBushShader;
 	static Shader* m_pTerrainShader;
+	static Shader* m_pUIShader;
 
 	static void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
 
@@ -68,4 +69,5 @@ public:
 	void SetSkinnedAnimationShader() { Material::SetShader(m_pSkinnedAnimationShader); }
 	void SetBushShader() { Material::SetShader(m_pBushShader); }
 	void SetTerrainShader() { Material::SetShader(m_pTerrainShader); }
+	void SetUIShader() { Material::SetShader(m_pUIShader); }
 };

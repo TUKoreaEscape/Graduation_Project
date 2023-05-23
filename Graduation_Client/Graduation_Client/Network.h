@@ -7,7 +7,7 @@
 #include "Server_Timer.h"
 
 #define  DIR_NO 100
-#define  USE_NETWORK 1
+#define  USE_NETWORK 0
 
 struct Custom {
 	HEADS			head;
