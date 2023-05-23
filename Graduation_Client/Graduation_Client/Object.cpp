@@ -86,3 +86,19 @@ void Vent::Rotate(float fPitch, float fYaw, float fRoll)
 
 	UpdateTransform(NULL);
 }
+
+Door::Door() : GameObject()
+{
+}
+
+Door::~Door()
+{
+}
+
+void Door::Rotate(float fPitch, float fYaw, float fRoll)
+{
+	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
+	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
+
+	UpdateTransform(NULL);
+}

@@ -49,3 +49,12 @@ public:
 
 	void Rotate(float fPitch, float fYaw, float fRoll);
 };
+
+class Door : public GameObject
+{
+public:
+	Door();
+	virtual ~Door();
+
+	void Rotate(float fPitch, float fYaw, float fRoll);
+};

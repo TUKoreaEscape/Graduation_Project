@@ -50,6 +50,8 @@ public:
 	GameObject** m_ppBush;
 	GameObject* m_pOak;	
 
+	GameObject* m_pDoors[6];
+
 	Network* m_network;
 	std::thread recv_thread;
 	std::thread send_thread;
@@ -100,4 +102,7 @@ public:
 
 	void LoadSceneObjectsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName);
 	void LoadSceneBushFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName);
+
+	void MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 };

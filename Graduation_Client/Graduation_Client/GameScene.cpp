@@ -75,6 +75,13 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			Vents[i]->render(pd3dCommandList);
 		}
 	}
+	for (int i = 0; i < 6; ++i)
+	{
+		if (m_pDoors[i]) {
+			m_pDoors[i]->UpdateTransform(nullptr);
+			m_pDoors[i]->render(pd3dCommandList);
+		}
+	}
 	m_pOak->render(pd3dCommandList);
 	for (int i = 0; i < m_nBush; ++i)
 	{
@@ -97,7 +104,6 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	LoadedModelInfo* pBroadcastModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InBroadcast.bin", nullptr);
 	LoadedModelInfo* pHouseModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPorest.bin", nullptr);
 	LoadedModelInfo* pLobbyModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InDDD.bin", nullptr);
-	LoadedModelInfo* pVentModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/airvent.bin", nullptr);
 	LoadedModelInfo* pCeilModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Ceilling.bin", nullptr);
 
 	m_nPlayers = 5;
@@ -144,7 +150,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pCeilling = new GameObject();
 	m_pCeilling->SetChild(pCeilModel->m_pModelRootObject, true);
 	m_pCeilling->UpdateTransform(nullptr);
-	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene0519.bin");
+	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene0523.bin");
 
 	m_pClass = new GameObject();
 	m_pClass->SetChild(pClassModel->m_pModelRootObject, true);
@@ -162,23 +168,8 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pPorest->SetChild(pHouseModel->m_pModelRootObject, true);
 	m_pPorest->UpdateTransform(nullptr);
 
-	for (int i = 0; i < 8; ++i) {
-		Vents[i] = new Vent();
-		Vents[i]->SetChild(pVentModel->m_pModelRootObject, true);
-	}	
-	Vents[0]->SetPosition(XMFLOAT3(97.2155, 1.0061, 40.43311));
-	Vents[1]->SetPosition(XMFLOAT3(97.27, 1.0061, -40.43311));
-	Vents[2]->SetPosition(XMFLOAT3(20.43311, 1.0061, -77.6103));
-	reinterpret_cast<Vent*>(Vents[2])->Rotate(0, 90, 0);
-	reinterpret_cast<Vent*>(Vents[3])->Rotate(0, 90, 0);
-	Vents[3]->SetPosition(XMFLOAT3(18.56689, 1.0061, -77.6103));
-	Vents[4]->SetPosition(XMFLOAT3(-56.00388, 1.033527, -40.54385));
-	Vents[5]->SetPosition(XMFLOAT3(-56.04684, 1.0061, 40.43311));
-	Vents[6]->SetPosition(XMFLOAT3(35.994, 1.0061, 40.56689));
-	Vents[7]->SetPosition(XMFLOAT3(35.96133, 1.0061, 23.56689));
-	for (int i = 0; i < 8; ++i) {
-		Vents[i]->UpdateTransform(nullptr);
-	}
+	MakeVents(pd3dDevice, pd3dCommandList);
+	MakeDoors(pd3dDevice, pd3dCommandList);
 
 	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 
@@ -197,7 +188,6 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	if (pBroadcastModel) delete pBroadcastModel;
 	if (pHouseModel) delete pHouseModel;
 	if (pLobbyModel) delete pLobbyModel;
-	if (pVentModel) delete pVentModel;
 	if (pCeilModel) delete pCeilModel;
 
 #if USE_NETWORK
@@ -736,4 +726,53 @@ void GameScene::LoadSceneBushFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 	//m_pOak->SetPosition(61.25, 0.7897112, -68.4);
 	m_pOak->UpdateTransform(nullptr);
 	if (pOakModel) delete pOakModel;
+}
+
+void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	LoadedModelInfo* pVentModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/airvent.bin", nullptr);
+
+	for (int i = 0; i < 8; ++i) {
+		Vents[i] = new Vent();
+		Vents[i]->SetChild(pVentModel->m_pModelRootObject, true);
+	}
+	Vents[0]->SetPosition(XMFLOAT3(97.2155, 1.0061, 40.43311));
+	Vents[1]->SetPosition(XMFLOAT3(97.27, 1.0061, -40.43311));
+	Vents[2]->SetPosition(XMFLOAT3(20.43311, 1.0061, -77.6103));
+	reinterpret_cast<Vent*>(Vents[2])->Rotate(0, 90, 0);
+	reinterpret_cast<Vent*>(Vents[3])->Rotate(0, 90, 0);
+	Vents[3]->SetPosition(XMFLOAT3(18.56689, 1.0061, -77.6103));
+	Vents[4]->SetPosition(XMFLOAT3(-56.00388, 1.033527, -40.54385));
+	Vents[5]->SetPosition(XMFLOAT3(-56.04684, 1.0061, 40.43311));
+	Vents[6]->SetPosition(XMFLOAT3(35.994, 1.0061, 40.56689));
+	Vents[7]->SetPosition(XMFLOAT3(35.96133, 1.0061, 23.56689));
+	for (int i = 0; i < 8; ++i) {
+		Vents[i]->UpdateTransform(nullptr);
+	}
+
+	if (pVentModel) delete pVentModel;
+}
+
+void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	LoadedModelInfo* pDoorModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Future_Door_Final.bin", nullptr);
+
+	for (int i = 0; i < 6; ++i) {
+		m_pDoors[i] = new Door();
+		m_pDoors[i]->SetChild(pDoorModel->m_pModelRootObject, true);
+	}
+	m_pDoors[0]->SetPosition(XMFLOAT3(-29.73866, 0, 39.6)); 
+	reinterpret_cast<Door*>(m_pDoors[0])->Rotate(0, 180, 0);
+	m_pDoors[1]->SetPosition(XMFLOAT3(77.37788, 0, 39.72));
+	m_pDoors[1]->UpdateTransform(nullptr);
+	m_pDoors[2]->SetPosition(XMFLOAT3(23.26, 0, -39.99));
+	m_pDoors[2]->UpdateTransform(nullptr);
+	m_pDoors[3]->SetPosition(XMFLOAT3(-29.99397, 0, -39.71));
+	m_pDoors[3]->UpdateTransform(nullptr);
+	m_pDoors[4]->SetPosition(XMFLOAT3(54.99, 0, -0.4182036));
+	reinterpret_cast<Door*>(m_pDoors[4])->Rotate(0, -90, 0);
+	m_pDoors[5]->SetPosition(XMFLOAT3(0.18, 0, 60.25972));
+	reinterpret_cast<Door*>(m_pDoors[5])->Rotate(0, -90, 0);
+
+	if (pDoorModel) delete pDoorModel;
 }
