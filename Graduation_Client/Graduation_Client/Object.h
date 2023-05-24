@@ -57,4 +57,10 @@ public:
 	virtual ~Door();
 
 	void Rotate(float fPitch, float fYaw, float fRoll);
+
+class UIObject : public GameObject
+{
+public:
+	UIObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName);
+	virtual ~UIObject();
 };

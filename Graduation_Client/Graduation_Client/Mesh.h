@@ -283,3 +283,10 @@ public:
 
 	virtual void OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
 };
+
+class UIMesh : public Mesh
+{
+public:
+	UIMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual ~UIMesh();
+};
