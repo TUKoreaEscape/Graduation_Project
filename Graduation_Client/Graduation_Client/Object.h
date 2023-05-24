@@ -57,6 +57,7 @@ public:
 	virtual ~Door();
 
 	void Rotate(float fPitch, float fYaw, float fRoll);
+};
 
 class UIObject : public GameObject
 {
