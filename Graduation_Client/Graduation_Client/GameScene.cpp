@@ -856,3 +856,18 @@ void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 	if (pDoorModel) delete pDoorModel;
 }
+
+void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	Scene::update(elapsedTime, pd3dDevice, pd3dCommandList);
+
+	XMFLOAT3 PlayerPos = m_pPlayer->GetPosition();
+
+	for (int i = 0; i < 6; ++i) {
+		if (reinterpret_cast<Door*>(m_pDoors[i])->CheckDoor(PlayerPos)) {
+			//do something
+			printf("%d 문에 접근\n", i);
+			break;
+		}
+	}
+}

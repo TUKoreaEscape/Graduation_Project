@@ -57,6 +57,12 @@ public:
 	virtual ~Door();
 
 	void Rotate(float fPitch, float fYaw, float fRoll);
+
+public:
+	bool IsRot = false;
+	bool IsOpen = false;
+
+	bool CheckDoor(const XMFLOAT3& PlayerPos);
 };
 
 class UIObject : public GameObject

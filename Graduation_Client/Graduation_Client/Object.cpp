@@ -1,4 +1,5 @@
 #include "Object.h"
+#include "Input.h"
 
 SkyBox::SkyBox(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature)
 {
@@ -101,6 +102,30 @@ void Door::Rotate(float fPitch, float fYaw, float fRoll)
 	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
 
 	UpdateTransform(NULL);
+
+	IsRot = true;
+}
+
+bool Door::CheckDoor(const XMFLOAT3& PlayerPos)
+{
+	float minx, maxx, minz, maxz;
+	if (IsRot) {
+		minx = m_xmf4x4ToParent._41 - 1.5f;
+		maxx = m_xmf4x4ToParent._41 + 1.5f;
+		minz = m_xmf4x4ToParent._43 - 2.0f;
+		maxz = m_xmf4x4ToParent._43 + 2.0f;
+	}
+	else {
+		minx = m_xmf4x4ToParent._41 - 2.0f;
+		maxx = m_xmf4x4ToParent._41 + 2.0f;
+		minz = m_xmf4x4ToParent._43 - 1.5f;
+		maxz = m_xmf4x4ToParent._43 + 1.5f;
+	}
+	if (PlayerPos.x > maxx) return false;
+	if (PlayerPos.x < minx) return false;
+	if (PlayerPos.z < minz) return false;
+	if (PlayerPos.z > maxz) return false;
+	return true;
 }
 
 UIObject::UIObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
