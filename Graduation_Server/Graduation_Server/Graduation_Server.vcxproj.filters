@@ -88,7 +88,7 @@
       <Filter>소스 파일\03 Client</Filter>
     </ClInclude>
     <ClInclude Include="object.h">
-      <Filter>소스 파일\09 Voice</Filter>
+      <Filter>소스 파일\06 Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

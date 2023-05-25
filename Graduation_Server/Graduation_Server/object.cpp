@@ -70,3 +70,27 @@ Door::Door()
 	m_orientation = { 0.0f, 0.0f, 0.0f, 0.0f };
 	m_type = Object_Type::OB_DOOR;
 }
+
+bool Door::process_door_event()
+{
+	if (m_state == ST_CLOSE)
+	{
+		m_state = ST_OPEN;
+	}
+
+	else if (m_state == ST_OPEN)
+	{
+		m_state = ST_CLOSE;
+	}
+		
+}
+
+void Door::Set_Position(XMFLOAT3& pos) // 문은 따로 파일 입출력 해야함
+{
+	m_pos = pos;
+	BoundingOrientedBox door_obb;
+	door_obb.Center = pos;
+	door_obb.Extents;
+	door_obb.Orientation = XMFLOAT4(0, 0, 0, 1);
+	Set_BoundingBox(door_obb);
+}

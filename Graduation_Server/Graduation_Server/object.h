@@ -21,7 +21,7 @@ public:
 	virtual ~GameObject() = default;
 
 	void					Set_BoundingBox(const BoundingOrientedBox& box);
-	void					Set_Position(XMFLOAT3 pos) { m_pos = pos; }
+	virtual void			Set_Position(XMFLOAT3 pos) { m_pos = pos; }
 	void					Set_ObjectSection(int section) { m_section = section; }
 
 	BoundingOrientedBox		Get_BoundingBox();
@@ -39,10 +39,16 @@ public:
 	virtual void			send_event(const unsigned int id) {};
 };
 
+enum Door_State{ST_OPEN, ST_OPENING ,ST_CLOSE};
+
 class Door : public GameObject { // 인게임 도어에 관련된 부분 (도어 오픈 시간 차이도 있으므로 체크해줘야함)
+private:
+	Door_State m_state;
 public:
 	Door();
 	virtual ~Door() = default;
 
 	void send_event(const unsigned int id) override {};
+	bool process_door_event();
+	Door_State get_state() { return m_state; }
 };

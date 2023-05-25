@@ -61,6 +61,8 @@ namespace CS_PACKET
 		CS_PACKET_USE_FIRST_TAGGER_SKILL,
 		CS_PACKET_USE_SECOND_TAGGER_SKILL,
 		CS_PACKET_USE_THIRD_TAGGER_SKILL,
+		CS_PACKET_REQUEST_OPEN_DOOR,
+		CS_PACKET_REQUEST_OPEN_HIDDEN_DOOR,
 		CS_PACKET_ATTACK
 	};
 }
@@ -187,6 +189,16 @@ struct cs_packet_attack {
 };
 
 struct cs_packet_use_tagger_skill {
+	unsigned char	size;
+	unsigned char	type;
+};
+
+struct cs_packet_request_open_door {
+	unsigned char	size;
+	unsigned char	type;
+};
+
+struct cs_packet_request_open_hidden_door {
 	unsigned char	size;
 	unsigned char	type;
 };
@@ -428,6 +440,14 @@ struct sc_packet_attack {
 	unsigned char	type;
 	short			attacker_id;
 	short			victim_id;
+};
+
+struct sc_packet_open_door {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned char	door_number;
+	unsigned char	door_state;
 };
 
 struct sc_packet_customizing_update {
