@@ -103,7 +103,13 @@ void Door::Rotate(float fPitch, float fYaw, float fRoll)
 
 	UpdateTransform(NULL);
 
+	GameObject* leftDoor = FindFrame("Left_Door_Final");
+	GameObject* rightDoor = FindFrame("Right_Door_Final");
+
+	LeftDoorPos = leftDoor->GetPosition();
+	RightDoorPos = rightDoor->GetPosition();
 	IsRot = true;
+
 }
 
 bool Door::CheckDoor(const XMFLOAT3& PlayerPos)
@@ -126,6 +132,58 @@ bool Door::CheckDoor(const XMFLOAT3& PlayerPos)
 	if (PlayerPos.z < minz) return false;
 	if (PlayerPos.z > maxz) return false;
 	return true;
+}
+
+void Door::render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+
+	GameObject* LeftDoor = FindFrame("Left_Door_Final");
+	GameObject* rightDoor = FindFrame("Right_Door_Final");
+
+	float prevLeftX = LeftDoor->m_xmf4x4ToParent._41;
+	float newLeftX = prevLeftX + OpenTime;
+	LeftDoor->m_xmf4x4ToParent._41 = newLeftX;
+
+	float prevRightX = rightDoor->m_xmf4x4ToParent._41;
+	float newRightX = prevRightX - OpenTime;
+	rightDoor->m_xmf4x4ToParent._41 = newRightX;
+
+	UpdateTransform(nullptr);
+
+	GameObject::render(pd3dCommandList);
+
+	LeftDoor->m_xmf4x4ToParent._41 = prevLeftX;
+	rightDoor->m_xmf4x4ToParent._41 = prevRightX;
+
+}
+
+void Door::update(float fElapsedTime)
+{
+	if (IsOpen) {
+		OpenTime += fElapsedTime;
+		if (OpenTime >= 1.6f) {
+			OpenTime = 1.6f;
+			IsOpen = false;
+		}
+	}
+	else {
+		OpenTime -= fElapsedTime;
+		if (OpenTime <= 0.0f) {
+			OpenTime = 0.0f;
+			IsOpen = true;
+		}
+	}
+}
+
+void Door::SetPosition(XMFLOAT3 xmf3Position)
+{
+	GameObject::SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
+
+	GameObject* leftDoor = FindFrame("Left_Door_Final");
+	GameObject* rightDoor = FindFrame("Right_Door_Final");
+
+	LeftDoorPos = leftDoor->GetPosition();
+	RightDoorPos = rightDoor->GetPosition();
 }
 
 UIObject::UIObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)

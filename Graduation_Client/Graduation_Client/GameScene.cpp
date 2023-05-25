@@ -836,11 +836,11 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	LoadedModelInfo* pDoorModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Future_Door_Final.bin", nullptr);
-
 	for (int i = 0; i < 6; ++i) {
 		m_pDoors[i] = new Door();
 		m_pDoors[i]->SetChild(pDoorModel->m_pModelRootObject, true);
 	}
+	
 	m_pDoors[0]->SetPosition(XMFLOAT3(-29.73866, 0, 39.6)); 
 	reinterpret_cast<Door*>(m_pDoors[0])->Rotate(0, 180, 0);
 	m_pDoors[1]->SetPosition(XMFLOAT3(77.37788, 0, 39.72));
@@ -864,10 +864,10 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	XMFLOAT3 PlayerPos = m_pPlayer->GetPosition();
 
 	for (int i = 0; i < 6; ++i) {
+		m_pDoors[i]->update(elapsedTime);
 		if (reinterpret_cast<Door*>(m_pDoors[i])->CheckDoor(PlayerPos)) {
 			//do something
-			printf("%d 문에 접근\n", i);
-			break;
+			printf("%d 문에 접근\n", i);			
 		}
 	}
 }

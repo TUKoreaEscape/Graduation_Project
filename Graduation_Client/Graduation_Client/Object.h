@@ -60,9 +60,18 @@ public:
 
 public:
 	bool IsRot = false;
-	bool IsOpen = false;
+	bool IsOpen = true;
 
+	float OpenTime = 0.0f;
+	float TestTIme = 0.0f;
 	bool CheckDoor(const XMFLOAT3& PlayerPos);
+
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void update(float fElapsedTime);
+	virtual void SetPosition(XMFLOAT3 xmf3Position);
+
+	XMFLOAT3 LeftDoorPos;
+	XMFLOAT3 RightDoorPos;
 };
 
 class UIObject : public GameObject
