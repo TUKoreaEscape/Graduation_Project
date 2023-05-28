@@ -84,13 +84,3 @@ bool Door::process_door_event()
 	}
 		
 }
-
-void Door::Set_Position(XMFLOAT3& pos) // 문은 따로 파일 입출력 해야함
-{
-	m_pos = pos;
-	BoundingOrientedBox door_obb;
-	door_obb.Center = pos;
-	door_obb.Extents;
-	door_obb.Orientation = XMFLOAT4(0, 0, 0, 1);
-	Set_BoundingBox(door_obb);
-}

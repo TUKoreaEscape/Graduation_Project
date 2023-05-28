@@ -21,7 +21,7 @@ public:
 	virtual ~GameObject() = default;
 
 	void					Set_BoundingBox(const BoundingOrientedBox& box);
-	virtual void			Set_Position(XMFLOAT3 pos) { m_pos = pos; }
+	void					Set_Position(XMFLOAT3 pos) { m_pos = pos; }
 	void					Set_ObjectSection(int section) { m_section = section; }
 
 	BoundingOrientedBox		Get_BoundingBox();
