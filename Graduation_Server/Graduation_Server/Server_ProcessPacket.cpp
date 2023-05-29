@@ -327,7 +327,7 @@ void cGameServer::Process_Customizing(const int user_id, void* buff)
 	m_clients[user_id].m_customizing->Set_Gloves_Custom(static_cast<GLOVES>(packet->gloves));
 	m_clients[user_id].m_customizing->Set_Head_Custom(static_cast<HEADS>(packet->head));
 	m_clients[user_id].m_customizing->Set_Mouthandnoses_Custom(static_cast<MOUTHANDNOSES>(packet->mouthandnoses));
-
+ 
 
 	sc_packet_customizing_update send_packet;
 	send_packet.size = sizeof(send_packet);
@@ -369,4 +369,23 @@ void cGameServer::Process_Attack(const int user_id)
 		}
 	}
 
+}
+
+void cGameServer::Process_Door(const int user_id, void* buff)
+{
+	cs_packet_request_open_door* packet = reinterpret_cast<cs_packet_request_open_door*>(buff);
+
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+	if (!room.Is_Door_Open(static_cast<int>(packet->door_num)))
+	{
+		room.Update_Door(static_cast<int>(packet->door_num));
+		sc_packet_open_door door_packet;
+		door_packet.size = sizeof(door_packet);
+		door_packet.type = SC_PACKET::SC_PACKET_DOOR_UPDATE;
+		door_packet.door_number = static_cast<int>(packet->door_num);
+		door_packet.door_state = room.Get_Door_State(static_cast<int>(packet->door_num));
+
+		m_clients[user_id].do_send(sizeof(door_packet), &door_packet);
+	}
 }

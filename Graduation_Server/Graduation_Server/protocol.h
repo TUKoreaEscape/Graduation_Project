@@ -196,6 +196,8 @@ struct cs_packet_use_tagger_skill {
 struct cs_packet_request_open_door {
 	unsigned char	size;
 	unsigned char	type;
+
+	unsigned char   door_num;
 };
 
 struct cs_packet_request_open_hidden_door {
@@ -261,6 +263,7 @@ namespace SC_PACKET
 		SC_PACKET_CALCULATE_MOVE,
 		SC_PACKET_SELECT_TAGGER,
 		SC_PACKET_TAGGER_SKILL,
+		SC_PACKET_DOOR_UPDATE,
 		SC_PACKET_ROOM_INFO,
 		SC_PACKET_VIVOX_DATA,
 		SC_PACKET_CUSTOMIZING,

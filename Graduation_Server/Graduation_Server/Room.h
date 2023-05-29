@@ -17,7 +17,8 @@ private:
 
 	array<BoundingOrientedBox, 6>	in_player_bounding_box;
 	vector<GameObject>				m_game_object;
-	vector<GameObject>				m_game_wall_and_door_and_fix_object;
+	vector<GameObject>				m_game_wall_and_fix_object;
+	vector<Door>					m_door_object;
 
 	chrono::system_clock::time_point start_time;
 	chrono::system_clock::time_point now_time;
@@ -70,6 +71,10 @@ public:
 	void	SetPlayerPos(CLIENT& player);
 	void	Update_room_time();
 	void	Update_Player_Position();
+	void	Update_Door(const int door_num);
+
+public: // 인게임 오브젝트 state 받아야하는 공간
+	Door_State Get_Door_State(const int door_num) { return m_door_object[door_num].get_state(); }
 
 public:
 	void	Reset_Room();
@@ -86,7 +91,7 @@ public:
 	bool	All_Player_Ready();
 	bool	All_Player_Loading();
 
-	bool	Is_Door_Open();
+	bool	Is_Door_Open(const int door_num);
 	CollisionInfo	is_collision_wall_to_player(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift);
 	CollisionInfo	is_collision_player_to_player(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift);
 	CollisionInfo	is_collision_player_to_object(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift);

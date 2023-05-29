@@ -71,6 +71,14 @@ Door::Door()
 	m_type = Object_Type::OB_DOOR;
 }
 
+void Door::init_data(const unsigned int obj_id, Object_Type obj_type, const XMFLOAT3& pos, const BoundingOrientedBox& box)
+{
+	m_pos = pos;
+	m_type = obj_type;
+	m_bounding_box = box;
+	m_door_id = obj_id;
+}
+
 bool Door::process_door_event()
 {
 	if (m_state == ST_CLOSE)

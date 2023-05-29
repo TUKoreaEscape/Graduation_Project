@@ -79,7 +79,7 @@ void Room::add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extent
 
 void Room::add_game_walls(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents)
 {
-	m_game_wall_and_door_and_fix_object.emplace_back(GameObject(ob_type, center, extents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)));
+	m_game_wall_and_fix_object.emplace_back(GameObject(ob_type, center, extents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)));
 }
 
 void Room::SetBoundingBox(XMFLOAT3 pos, XMFLOAT3 extents, XMFLOAT4 orientation)
@@ -143,9 +143,16 @@ void Room::Update_Player_Position() // 사용하지 않습니다.
 	cGameServer& server = cGameServer::GetInstance();
 }
 
-bool Room::Is_Door_Open()
+void Room::Update_Door(const int door_num)
 {
-	return true;
+	m_door_object[door_num].process_door_event();
+}
+
+bool Room::Is_Door_Open(const int door_num)
+{
+	if(m_door_object[door_num].get_state() == ST_OPEN)
+		return true;
+	return false;
 }
 
 CollisionInfo Room::is_collision_player_to_object(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift)
@@ -270,7 +277,7 @@ CollisionInfo Room::is_collision_wall_to_player(const int player_id, const XMFLO
 	XMFLOAT3 tmp_position = current_position;
 	BoundingOrientedBox check_box = cl.get_bounding_box();
 	int collied_face_num = -1;
-	for (auto& object : m_game_wall_and_door_and_fix_object) // 모든벽을 체크 후 값을 더해주는 방식이 좋아보임!
+	for (auto& object : m_game_wall_and_fix_object) // 모든벽을 체크 후 값을 더해주는 방식이 좋아보임!
 	{
 		if (check_box.Intersects(object.Get_BoundingBox()))
 		{

@@ -79,6 +79,7 @@ public:
 	void	Process_Game_Start(const int user_id);
 	void	Process_Attack(const int user_id);
 	void	Process_Customizing(const int user_id, void* buff);
+	void	Process_Door(const int user_id, void* buff);
 
 	// voice chat data를 전송하는 부분!
 	void	Process_Voice_Data(int user_id);
