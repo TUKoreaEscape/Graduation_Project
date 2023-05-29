@@ -36,8 +36,8 @@ public:
 	void					Update_bounding_box_pos(const XMFLOAT3 pos);
 	void					Update_bounding_box_rotate(const float yaw);
 
-	virtual void			send_event(const unsigned int id) {};
-	virtual void			init_data(const unsigned int obj_id, Object_Type obj_type, const XMFLOAT3& pos, const BoundingOrientedBox& box) {};
+	virtual void			send_event(const unsigned int id) {}
+	virtual void			init_data(const unsigned int obj_id, Object_Type obj_type, const XMFLOAT3& pos, const BoundingOrientedBox& box) {}
 };
 
 enum Door_State{ST_OPEN, ST_OPENING ,ST_CLOSE};

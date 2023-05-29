@@ -59,6 +59,34 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 
 		}
 	}
+	cout << "Walls and Fixed Object File Load Success!" << endl;
+
+	fclose(pFile);
+
+	fopen_s(&pFile, "", "rb");
+	if (pFile)
+		rewind(pFile);
+	nReads = 0;
+	nObjects = 0;
+	nStrLength = 0;
+	nReads = (unsigned int)fread(&nObjects, sizeof(int), 1, pFile);
+	for (int i = 0; i < nObjects; ++i)
+	{
+		// 여기서 door 추가할거임
+		float AABBCenter[3]{};
+		float AABBExtents[3]{};
+		float AABBQuats[4]{};
+
+
+		XMFLOAT3 center_pos = XMFLOAT3(AABBCenter[0], AABBCenter[1], AABBCenter[2]);
+		XMFLOAT3 Extents = XMFLOAT3(AABBExtents[0], AABBExtents[1], AABBExtents[2]);
+		for (auto& _room : a_in_game_room)
+		{
+			_room.add_game_doors(i, OB_DOOR, center_pos, Extents);
+		}
+	}
+	cout << "Door Load Success!" << endl;
+
 	cout << "All Objects File Load Success!" << endl;
 	// 여긴 맵에 존재하는 고정된 오브젝트를 서버에 로드하는 공간입니다.
 

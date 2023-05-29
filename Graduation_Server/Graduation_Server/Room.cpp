@@ -82,6 +82,13 @@ void Room::add_game_walls(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents
 	m_game_wall_and_fix_object.emplace_back(GameObject(ob_type, center, extents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)));
 }
 
+void Room::add_game_doors(const unsigned int door_id, Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents)
+{
+	m_door_object.emplace_back(Door());
+	Door& this_door = *m_door_object.end();
+	this_door.init_data(door_id, ob_type, center, BoundingOrientedBox{ center, extents, XMFLOAT4{0,0,0,1} });
+}
+
 void Room::SetBoundingBox(XMFLOAT3 pos, XMFLOAT3 extents, XMFLOAT4 orientation)
 {
 	for (int i = 0; i < in_player_bounding_box.size(); ++i)
