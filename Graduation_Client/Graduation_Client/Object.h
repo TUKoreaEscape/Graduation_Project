@@ -60,7 +60,7 @@ public:
 
 public:
 	bool IsRot = false;
-	bool IsOpen = true;
+	bool IsOpen = false;
 
 	float OpenTime = 0.0f;
 	float TestTIme = 0.0f;

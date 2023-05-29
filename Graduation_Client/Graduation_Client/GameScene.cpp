@@ -866,7 +866,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	for (int i = 0; i < 6; ++i) {
 		m_pDoors[i]->update(elapsedTime);
 		if (reinterpret_cast<Door*>(m_pDoors[i])->CheckDoor(PlayerPos)) {
-			//do something
+			
 			printf("%d 문에 접근\n", i);			
 		}
 	}

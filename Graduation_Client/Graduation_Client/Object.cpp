@@ -114,6 +114,7 @@ void Door::Rotate(float fPitch, float fYaw, float fRoll)
 
 bool Door::CheckDoor(const XMFLOAT3& PlayerPos)
 {
+	IsOpen = false;
 	float minx, maxx, minz, maxz;
 	if (IsRot) {
 		minx = m_xmf4x4ToParent._41 - 1.5f;
@@ -131,6 +132,7 @@ bool Door::CheckDoor(const XMFLOAT3& PlayerPos)
 	if (PlayerPos.x < minx) return false;
 	if (PlayerPos.z < minz) return false;
 	if (PlayerPos.z > maxz) return false;
+	IsOpen = true;
 	return true;
 }
 
@@ -163,14 +165,14 @@ void Door::update(float fElapsedTime)
 		OpenTime += fElapsedTime;
 		if (OpenTime >= 1.6f) {
 			OpenTime = 1.6f;
-			IsOpen = false;
+			//IsOpen = false;
 		}
 	}
 	else {
 		OpenTime -= fElapsedTime;
 		if (OpenTime <= 0.0f) {
 			OpenTime = 0.0f;
-			IsOpen = true;
+			//IsOpen = true;
 		}
 	}
 }
