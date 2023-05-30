@@ -64,19 +64,16 @@ XMFLOAT4 GameObject::Get_orientation()
 
 Door::Door()
 {
-	m_pos = { 0.0f, 0.0f, 0.0f };
-	m_center = { 0.0f, 0.0f, 0.0f };
-	m_extents = { 0.0f, 0.0f, 0.0f };
-	m_orientation = { 0.0f, 0.0f, 0.0f, 0.0f };
-	m_type = Object_Type::OB_DOOR;
 }
 
-void Door::init_data(const unsigned int obj_id, Object_Type obj_type, const XMFLOAT3& pos, const BoundingOrientedBox& box)
+Door::Door(const unsigned int door_id, Object_Type type, XMFLOAT3 center, XMFLOAT3 extents)
 {
-	m_pos = pos;
-	m_type = obj_type;
-	m_bounding_box = box;
-	m_door_id = obj_id;
+	m_door_id = door_id;
+	m_type = type;
+	m_pos = center;
+	m_extents = extents;
+	m_state = ST_CLOSE;
+	m_bounding_box = BoundingOrientedBox{ center, extents, XMFLOAT4(0,0,0,1) };
 }
 
 bool Door::process_door_event()
@@ -90,5 +87,5 @@ bool Door::process_door_event()
 	{
 		m_state = ST_CLOSE;
 	}
-		
+	return true;
 }

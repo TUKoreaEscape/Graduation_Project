@@ -37,7 +37,6 @@ public:
 	void					Update_bounding_box_rotate(const float yaw);
 
 	virtual void			send_event(const unsigned int id) {}
-	virtual void			init_data(const unsigned int obj_id, Object_Type obj_type, const XMFLOAT3& pos, const BoundingOrientedBox& box) {}
 };
 
 enum Door_State{ST_OPEN, ST_OPENING ,ST_CLOSE};
@@ -45,13 +44,13 @@ enum Door_State{ST_OPEN, ST_OPENING ,ST_CLOSE};
 class Door : public GameObject { // 인게임 도어에 관련된 부분 (도어 오픈 시간 차이도 있으므로 체크해줘야함)
 private:
 	int		   m_door_id;
-	Door_State m_state;
+	Door_State m_state = ST_CLOSE;
 public:
 	Door();
+	Door(const unsigned int obj_id, Object_Type type, XMFLOAT3 center, XMFLOAT3 extents);
 	virtual ~Door() = default;
 
-	void send_event(const unsigned int id) override {};
-	void init_data(const unsigned int obj_id, Object_Type obj_type, const XMFLOAT3& pos, const BoundingOrientedBox& box);
+	void send_event(const unsigned int id) override {}
 	bool process_door_event();
 	Door_State get_state() { return m_state; }
 };

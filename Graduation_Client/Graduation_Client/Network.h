@@ -7,8 +7,9 @@
 #include "Server_Timer.h"
 
 #define  DIR_NO 100
-#define  USE_NETWORK 0
+#define  USE_NETWORK 1
 
+class Door;
 struct Custom {
 	HEADS			head;
 	BODIES			body;
@@ -50,6 +51,7 @@ public:
 	OtherPlayerPos Other_Player_Pos[5]{};
 	Player* m_pPlayer = nullptr;;
 	Player** m_ppOther = nullptr;
+	Door* m_pDoors[6];
 
 	static Network* GetInstance() {
 		if (NetworkInstance == NULL) {
@@ -71,6 +73,7 @@ public:
 	void Process_Player_Move(char* ptr);
 	void Process_Other_Player_Move(char* ptr);
 	void Process_Game_Start(char* ptr);
+	void Process_Door_Update(char* ptr);
 	void Process_Attack_Packet(char* ptr);
 
 	// 게임 시작 전 사용하는 함수들

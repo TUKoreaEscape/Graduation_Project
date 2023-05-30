@@ -377,15 +377,15 @@ void cGameServer::Process_Door(const int user_id, void* buff)
 
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
-	if (!room.Is_Door_Open(static_cast<int>(packet->door_num)))
-	{
-		room.Update_Door(static_cast<int>(packet->door_num));
-		sc_packet_open_door door_packet;
-		door_packet.size = sizeof(door_packet);
-		door_packet.type = SC_PACKET::SC_PACKET_DOOR_UPDATE;
-		door_packet.door_number = static_cast<int>(packet->door_num);
-		door_packet.door_state = room.Get_Door_State(static_cast<int>(packet->door_num));
+	room.Update_Door(static_cast<int>(packet->door_num));
+	sc_packet_open_door door_packet;
+	door_packet.size = sizeof(door_packet);
+	door_packet.type = SC_PACKET::SC_PACKET_DOOR_UPDATE;
+	door_packet.door_number = static_cast<int>(packet->door_num);
+	door_packet.door_state = room.Get_Door_State(static_cast<int>(packet->door_num));
 
-		m_clients[user_id].do_send(sizeof(door_packet), &door_packet);
-	}
+	m_clients[user_id]._room_list_lock.lock();
+	for (auto& player : m_clients[user_id].room_list)
+		m_clients[player].do_send(sizeof(door_packet), &door_packet);
+	m_clients[user_id]._room_list_lock.unlock();
 }

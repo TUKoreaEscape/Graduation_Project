@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "Movement.h"
 #include "Input.h"
+#include "Network.h"
 
 void CommonMovement::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
@@ -70,7 +71,18 @@ void CommonMovement::update(float elapsedTime)
 			{
 				bool DoorState = Input::GetInstance()->m_pPlayer->m_pNearDoor->IsOpen;
 				if (Input::GetInstance()->m_pPlayer->m_pNearDoor->GetIsWorking() == false)
+				{
 					Input::GetInstance()->m_pPlayer->m_pNearDoor->SetOpen(!DoorState);
+
+					cs_packet_request_open_door packet;
+					packet.size = sizeof(packet);
+					packet.type = CS_PACKET::CS_PACKET_REQUEST_OPEN_DOOR;
+					packet.door_num = Input::GetInstance()->m_pPlayer->m_door_number;
+
+					Network& network = *Network::GetInstance();
+					network.send_packet(&packet);
+					std::cout << "오픈요청" << std::endl;
+				}
 			}
 		}
 

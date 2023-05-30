@@ -10,7 +10,6 @@
 enum E_GAME_STATE { E_GAME_OVER, E_GAME_RUNNING };
 extern E_GAME_STATE gameState; //게임이 진행중인지 끝났는지 사용하기위한 변수이다. 아직은 사용하지 않고 정의만 해두었다.
 
-class Door;
 
 //GameScene과 Scene을 분리해놓은 이유
 //GameScene에서 게임내의 플레이어 생성, 오브젝트 배치, 상태 등을 따로 관리하기 위해.

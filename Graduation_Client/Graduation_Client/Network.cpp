@@ -394,11 +394,12 @@ void Network::ProcessPacket(char* ptr)
 		//std::cout << "recv SC_PACKET_JOIN_ROOM_FAIL" << std::endl;
 		
 		std::cout << "방 접속에 실패하였습니다." << std::endl;
-		//cs_packet_request_all_room_info packet;
-		//packet.size = sizeof(packet);
-		//packet.type = CS_PACKET::CS_PACKET_REQUEST_ROOM_INFO;
-		//packet.request_page = 0;
+		cs_packet_request_all_room_info packet;
+		packet.size = sizeof(packet);
+		packet.type = CS_PACKET::CS_PACKET_REQUEST_ROOM_INFO;
+		packet.request_page = 0;
 
+		system("cls");
 		//send_packet(&packet);
 		//cs_packet_create_room packet;
 		//packet.size = sizeof(packet);
@@ -536,6 +537,12 @@ void Network::ProcessPacket(char* ptr)
 				GameObject::SetParts(i + 1, 5, static_cast<int>(packet->head));
 			}
 		}
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_DOOR_UPDATE:
+	{
+		Process_Door_Update(ptr);
 		break;
 	}
 

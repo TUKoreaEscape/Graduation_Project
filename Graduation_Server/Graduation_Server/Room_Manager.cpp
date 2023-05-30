@@ -33,9 +33,10 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	char pstrToken[64] = { '\0' };
 	char pstrGameObjectName[64] = { '\0' };
 	nReads = (unsigned int)fread(&nObjects, sizeof(int), 1, pFile);
+	system("cls");
 	for (int i = 0; i < nObjects; ++i)
 	{
-
+		cout << "FixedObjects BoundingBox : " << static_cast<int>((float)i / (float)nObjects * 100) << "%로드 완료\r";
 		nReads = (unsigned int)fread(&nStrLength, sizeof(unsigned char), 1, pFile);
 		nReads = (unsigned int)fread(&pstrToken, sizeof(char), nStrLength, pFile); // <Wall>:
 		nReads = (unsigned int)fread(&nStrLength, sizeof(unsigned char), 1, pFile);
@@ -63,19 +64,19 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 
 	fclose(pFile);
 
-	fopen_s(&pFile, "", "rb");
+	/*fopen_s(&pFile, "", "rb");
 	if (pFile)
-		rewind(pFile);
+		rewind(pFile);*/
 	nReads = 0;
 	nObjects = 0;
 	nStrLength = 0;
 	nReads = (unsigned int)fread(&nObjects, sizeof(int), 1, pFile);
-	for (int i = 0; i < nObjects; ++i)
+	for (int i = 0; i < 6; ++i)
 	{
 		// 여기서 door 추가할거임
-		float AABBCenter[3]{};
-		float AABBExtents[3]{};
-		float AABBQuats[4]{};
+		float AABBCenter[3]{0};
+		float AABBExtents[3]{0};
+		float AABBQuats[4]{0};
 
 
 		XMFLOAT3 center_pos = XMFLOAT3(AABBCenter[0], AABBCenter[1], AABBCenter[2]);

@@ -1,4 +1,6 @@
 #include "Network.h"
+#include "Object.h"
+#include "GameObject.h"
 
 void Network::Process_Game_Start(char* ptr)
 {
@@ -111,4 +113,14 @@ void Network::Process_Attack_Packet(char* ptr)
 
 		}
 	}
+}
+
+void Network::Process_Door_Update(char* ptr)
+{
+	std::cout << "다른사람이 문 요청" << std::endl;
+	sc_packet_open_door* packet = reinterpret_cast<sc_packet_open_door*>(ptr);
+	if (packet->door_state == 0)
+		m_pDoors[static_cast<int>(packet->door_number)]->SetOpen(true);
+	else if (packet->door_state == 2)
+		m_pDoors[static_cast<int>(packet->door_number)]->SetOpen(false);
 }

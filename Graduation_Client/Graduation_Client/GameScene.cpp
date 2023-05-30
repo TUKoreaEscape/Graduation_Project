@@ -217,6 +217,10 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_network->init_network();
 	m_network->m_pPlayer = m_pPlayer;
 	m_network->m_ppOther = m_ppPlayers;
+	
+	for(int i = 0; i < 6; ++i)
+		m_network->m_pDoors[i] = m_pDoors[i];
+
 	recv_thread = std::thread{ &Network::listen_thread, m_network };
 	while (m_network->m_login == false)
 	{
@@ -876,7 +880,8 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 			
 			m_pPlayer->m_pNearDoor = m_pDoors[i];
 			IsNearDoor = true;
-			printf("%d 문에 접근\n", i);			
+			//printf("%d 문에 접근\n", i);
+			m_pPlayer->m_door_number = i;
 		}
 	}
 	if (IsNearDoor == false) m_pPlayer->m_pNearDoor = nullptr;

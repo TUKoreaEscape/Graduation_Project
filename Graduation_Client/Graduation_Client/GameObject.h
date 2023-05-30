@@ -139,6 +139,7 @@ public:
 
 	virtual void SetOpen(bool Open) {}
 	bool IsOpen = false;
+	int	 m_door_number = 0;
 	virtual bool GetIsWorking() { return false; }
 };
 
