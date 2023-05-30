@@ -899,7 +899,7 @@ VS_UI_OUTPUT VSDoorUI(VS_UI_INPUT input)
 {
 	VS_UI_OUTPUT output;
 
-	output.position = float4(input.position, 1.0f);
+	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
 	output.uv = input.uv;
 
 	return output;

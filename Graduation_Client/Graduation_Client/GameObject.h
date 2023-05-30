@@ -131,6 +131,9 @@ public:
 	void Animate(float fTimeElapsed, int player = -1);
 
 	void FindCustomPart(const char* pstrFrameName);
+
+public:
+	void SetLookAt(XMFLOAT3& xmf3Target, XMFLOAT3& xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f));
 };
 
 template<typename T>

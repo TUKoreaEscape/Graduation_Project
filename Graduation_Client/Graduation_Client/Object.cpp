@@ -191,8 +191,10 @@ void Door::SetPosition(XMFLOAT3 xmf3Position)
 void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (1) {
-		if (m_pDoorUI)
+		if (m_pDoorUI) {
+			m_pDoorUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f );
 			m_pDoorUI->render(pd3dCommandList);
+		}
 	}
 }
 
@@ -248,4 +250,13 @@ DoorUI::DoorUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 
 DoorUI::~DoorUI()
 {
+}
+
+void DoorUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	XMFLOAT3 xmf3CameraPosition = Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition();
+
+	SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+
+	render(pd3dCommandList);
 }

@@ -55,6 +55,9 @@ class DoorUI : public GameObject
 public:
 	DoorUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName);
 	virtual ~DoorUI();
+
+	void BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList);
+
 };
 
 class Door : public GameObject
