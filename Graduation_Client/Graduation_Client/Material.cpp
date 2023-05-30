@@ -53,6 +53,7 @@ Shader* Material::m_pStandardShader = nullptr;
 Shader* Material::m_pBushShader = nullptr;
 Shader* Material::m_pTerrainShader = nullptr;
 Shader* Material::m_pUIShader = nullptr;
+Shader* Material::m_pDoorUIShader = nullptr;
 
 void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
@@ -80,6 +81,10 @@ void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	m_pUIShader = new UIShader();
 	m_pUIShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 7, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
 	m_pUIShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	m_pDoorUIShader = new DoorUIShader();
+	m_pDoorUIShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	m_pDoorUIShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
 void Material::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)

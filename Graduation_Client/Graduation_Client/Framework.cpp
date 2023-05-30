@@ -370,6 +370,8 @@ void Framework::FrameAdvance()
 	m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
 	m_pEdgeShader->Render(m_pd3dCommandList);
 	
+	scene->UIrender(m_pd3dCommandList, 0);
+
 	if(Input::GetInstance()->keyBuffer['7']& 0xF0) scene->UIrender(m_pd3dCommandList,7);
 	if(Input::GetInstance()->keyBuffer['8']& 0xF0) scene->UIrender(m_pd3dCommandList,8);
 	//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);

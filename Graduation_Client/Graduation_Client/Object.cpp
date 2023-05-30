@@ -188,6 +188,14 @@ void Door::SetPosition(XMFLOAT3 xmf3Position)
 	RightDoorPos = rightDoor->GetPosition();
 }
 
+void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (1) {
+		if (m_pDoorUI)
+			m_pDoorUI->render(pd3dCommandList);
+	}
+}
+
 UIObject::UIObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
 {
 	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
@@ -212,5 +220,32 @@ UIObject::UIObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComm
 }
 
 UIObject::~UIObject()
+{
+}
+
+DoorUI::DoorUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
+{
+	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
+	XMStoreFloat4x4(&m_xmf4x4ToParent, XMMatrixIdentity());
+	renderer->m_nMaterials = 1;
+	renderer->m_ppMaterials = new Material * [renderer->m_nMaterials];
+	renderer->m_ppMaterials[0] = new Material(0);
+
+	Mesh* pUIMesh = new TexturedRectMesh(pd3dDevice, pd3dCommandList, -0.5, -0.5, 1, 1);
+	SetMesh(pUIMesh);
+
+	Texture* pUITexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pUITexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, pstrFileName, RESOURCE_TEXTURE2D, 0);
+
+	GameScene::CreateShaderResourceViews(pd3dDevice, pUITexture, 0, 17);
+
+	Material* pUIMaterial = new Material(1);
+	pUIMaterial->SetTexture(pUITexture);
+	pUIMaterial->SetDoorUIShader();
+
+	renderer->SetMaterial(0, pUIMaterial);
+}
+
+DoorUI::~DoorUI()
 {
 }

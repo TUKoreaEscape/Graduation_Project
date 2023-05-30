@@ -860,6 +860,12 @@ float4 PSPostProcessing(float4 position : SV_POSITION) : SV_Target
 //
 Texture2D gtxtUITexture : register(t21);
 
+struct VS_UI_INPUT
+{
+	float3 position : POSITION;
+	float2 uv : TEXCOORD;
+};
+
 struct VS_UI_OUTPUT
 {
 	float4 position : SV_POSITION;
@@ -887,4 +893,20 @@ float4 PSUI(VS_UI_OUTPUT input) : SV_TARGET
 	float4 Color = gtxtUITexture.Sample(gssWrap, input.uv);
 	return Color;
 	return float4(1, 0, 0, 1);
+}
+
+VS_UI_OUTPUT VSDoorUI(VS_UI_INPUT input)
+{
+	VS_UI_OUTPUT output;
+
+	output.position = float4(input.position, 1.0f);
+	output.uv = input.uv;
+
+	return output;
+}
+
+float4 PSDoorUI(VS_UI_OUTPUT input) : SV_TARGET
+{
+	float4 Color = gtxtUITexture.Sample(gssWrap, input.uv);
+	return Color;
 }

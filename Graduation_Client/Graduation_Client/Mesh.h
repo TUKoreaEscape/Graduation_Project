@@ -298,12 +298,7 @@ protected:
 	int								m_nLength;
 
 protected:
-	XMFLOAT4* m_pxmf4Colors = NULL;
 	XMFLOAT2* m_pxmf2TextureCoords0 = NULL;
-
-	ID3D12Resource* m_pd3dColorBuffer = NULL;
-	ID3D12Resource* m_pd3dColorUploadBuffer = NULL;
-	D3D12_VERTEX_BUFFER_VIEW		m_d3dColorBufferView;
 
 	ID3D12Resource* m_pd3dTextureCoord0Buffer = NULL;
 	ID3D12Resource* m_pd3dTextureCoord0UploadBuffer = NULL;
