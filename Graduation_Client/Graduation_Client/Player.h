@@ -132,4 +132,7 @@ protected:
 	bool							m_collision_up_face = false;
 
 	int							m_playerType = 2;
+
+public:
+	GameObject* m_pNearDoor = nullptr;
 };

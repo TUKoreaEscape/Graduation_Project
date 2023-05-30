@@ -869,11 +869,15 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 
 	XMFLOAT3 PlayerPos = m_pPlayer->GetPosition();
 
+	bool IsNearDoor = false;
 	for (int i = 0; i < 6; ++i) {
 		m_pDoors[i]->update(elapsedTime);
 		if (reinterpret_cast<Door*>(m_pDoors[i])->CheckDoor(PlayerPos)) {
 			
+			m_pPlayer->m_pNearDoor = m_pDoors[i];
+			IsNearDoor = true;
 			printf("%d 문에 접근\n", i);			
 		}
 	}
+	if (IsNearDoor == false) m_pPlayer->m_pNearDoor = nullptr;
 }

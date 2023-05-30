@@ -58,6 +58,8 @@ public:
 
 	void BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList);
 
+	void Rotate(float fPitch, float fYaw, float fRoll) override;
+
 };
 
 class Door : public GameObject
@@ -66,11 +68,12 @@ public:
 	Door();
 	virtual ~Door();
 
-	void Rotate(float fPitch, float fYaw, float fRoll);
+	void Rotate(float fPitch, float fYaw, float fRoll) override;
 
 public:
 	bool IsRot = false;
-	bool IsOpen = false;
+	bool IsNear = false;
+	bool IsWorking = false;
 
 	float OpenTime = 0.0f;
 	float TestTIme = 0.0f;
@@ -86,6 +89,12 @@ public:
 	XMFLOAT3 RightDoorPos;
 
 	DoorUI* m_pDoorUI = nullptr;
+
+	float m_fPitch{}, m_fYaw{}, m_fRoll{};
+
+	void SetOpen(bool Open);
+
+	virtual bool GetIsWorking();
 };
 
 class UIObject : public GameObject

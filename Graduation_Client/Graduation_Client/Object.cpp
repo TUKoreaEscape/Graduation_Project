@@ -108,13 +108,15 @@ void Door::Rotate(float fPitch, float fYaw, float fRoll)
 
 	LeftDoorPos = leftDoor->GetPosition();
 	RightDoorPos = rightDoor->GetPosition();
+
+	m_fPitch = fPitch; m_fYaw = fYaw; m_fRoll = fRoll;
+
 	IsRot = true;
 
 }
 
 bool Door::CheckDoor(const XMFLOAT3& PlayerPos)
 {
-	IsOpen = false;
 	float minx, maxx, minz, maxz;
 	if (IsRot) {
 		minx = m_xmf4x4ToParent._41 - 1.5f;
@@ -128,17 +130,28 @@ bool Door::CheckDoor(const XMFLOAT3& PlayerPos)
 		minz = m_xmf4x4ToParent._43 - 1.5f;
 		maxz = m_xmf4x4ToParent._43 + 1.5f;
 	}
-	if (PlayerPos.x > maxx) return false;
-	if (PlayerPos.x < minx) return false;
-	if (PlayerPos.z < minz) return false;
-	if (PlayerPos.z > maxz) return false;
-	IsOpen = true;
+	if (PlayerPos.x > maxx) {
+		IsNear = false;
+		return false; 
+	}
+	if (PlayerPos.x < minx) {
+		IsNear = false;
+		return false; 
+	}
+	if (PlayerPos.z < minz) {
+		IsNear = false;
+		return false; 
+	}
+	if (PlayerPos.z > maxz) {
+		IsNear = false;
+		return false; 
+	}
+	IsNear = true;
 	return true;
 }
 
 void Door::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-
 	GameObject* LeftDoor = FindFrame("Left_Door_Final");
 	GameObject* rightDoor = FindFrame("Right_Door_Final");
 
@@ -165,14 +178,14 @@ void Door::update(float fElapsedTime)
 		OpenTime += fElapsedTime;
 		if (OpenTime >= 1.6f) {
 			OpenTime = 1.6f;
-			//IsOpen = false;
+			IsWorking = false;
 		}
 	}
 	else {
 		OpenTime -= fElapsedTime;
 		if (OpenTime <= 0.0f) {
 			OpenTime = 0.0f;
-			//IsOpen = true;
+			IsWorking = false;
 		}
 	}
 }
@@ -190,12 +203,37 @@ void Door::SetPosition(XMFLOAT3 xmf3Position)
 
 void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	if (1) {
+	if (IsNear) {
 		if (m_pDoorUI) {
+			if (IsRot)
+				m_pDoorUI->Rotate(m_fPitch, m_fYaw, m_fRoll);
 			m_pDoorUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f );
-			m_pDoorUI->render(pd3dCommandList);
+			m_pDoorUI->BillboardRender(pd3dCommandList);
 		}
 	}
+}
+
+void Door::SetOpen(bool Open)
+{
+	if (IsWorking)
+		return;
+	if (IsOpen) {
+		if (Open == false) {
+			IsOpen = false;
+			IsWorking = true;
+		}
+	}
+	else {
+		if (Open == true) {
+			IsOpen = true;
+			IsWorking = true;
+		}
+	}
+}
+
+bool Door::GetIsWorking()
+{
+	return IsWorking;
 }
 
 UIObject::UIObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
@@ -259,4 +297,12 @@ void DoorUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList)
 	SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 
 	render(pd3dCommandList);
+}
+
+void DoorUI::Rotate(float fPitch, float fYaw, float fRoll)
+{
+	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
+	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
+
+	UpdateTransform(NULL);
 }
