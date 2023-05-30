@@ -1,4 +1,5 @@
 #include "Object.h"
+#include "Input.h"
 
 SkyBox::SkyBox(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature)
 {
@@ -101,6 +102,138 @@ void Door::Rotate(float fPitch, float fYaw, float fRoll)
 	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
 
 	UpdateTransform(NULL);
+
+	GameObject* leftDoor = FindFrame("Left_Door_Final");
+	GameObject* rightDoor = FindFrame("Right_Door_Final");
+
+	LeftDoorPos = leftDoor->GetPosition();
+	RightDoorPos = rightDoor->GetPosition();
+
+	m_fPitch = fPitch; m_fYaw = fYaw; m_fRoll = fRoll;
+
+	IsRot = true;
+
+}
+
+bool Door::CheckDoor(const XMFLOAT3& PlayerPos)
+{
+	float minx, maxx, minz, maxz;
+	if (IsRot) {
+		minx = m_xmf4x4ToParent._41 - 1.5f;
+		maxx = m_xmf4x4ToParent._41 + 1.5f;
+		minz = m_xmf4x4ToParent._43 - 2.0f;
+		maxz = m_xmf4x4ToParent._43 + 2.0f;
+	}
+	else {
+		minx = m_xmf4x4ToParent._41 - 2.0f;
+		maxx = m_xmf4x4ToParent._41 + 2.0f;
+		minz = m_xmf4x4ToParent._43 - 1.5f;
+		maxz = m_xmf4x4ToParent._43 + 1.5f;
+	}
+	if (PlayerPos.x > maxx) {
+		IsNear = false;
+		return false; 
+	}
+	if (PlayerPos.x < minx) {
+		IsNear = false;
+		return false; 
+	}
+	if (PlayerPos.z < minz) {
+		IsNear = false;
+		return false; 
+	}
+	if (PlayerPos.z > maxz) {
+		IsNear = false;
+		return false; 
+	}
+	IsNear = true;
+	return true;
+}
+
+void Door::render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	GameObject* LeftDoor = FindFrame("Left_Door_Final");
+	GameObject* rightDoor = FindFrame("Right_Door_Final");
+
+	float prevLeftX = LeftDoor->m_xmf4x4ToParent._41;
+	float newLeftX = prevLeftX + OpenTime;
+	LeftDoor->m_xmf4x4ToParent._41 = newLeftX;
+
+	float prevRightX = rightDoor->m_xmf4x4ToParent._41;
+	float newRightX = prevRightX - OpenTime;
+	rightDoor->m_xmf4x4ToParent._41 = newRightX;
+
+	UpdateTransform(nullptr);
+
+	GameObject::render(pd3dCommandList);
+
+	LeftDoor->m_xmf4x4ToParent._41 = prevLeftX;
+	rightDoor->m_xmf4x4ToParent._41 = prevRightX;
+
+}
+
+void Door::update(float fElapsedTime)
+{
+	if (IsOpen) {
+		OpenTime += fElapsedTime;
+		if (OpenTime >= 1.6f) {
+			OpenTime = 1.6f;
+			IsWorking = false;
+		}
+	}
+	else {
+		OpenTime -= fElapsedTime;
+		if (OpenTime <= 0.0f) {
+			OpenTime = 0.0f;
+			IsWorking = false;
+		}
+	}
+}
+
+void Door::SetPosition(XMFLOAT3 xmf3Position)
+{
+	GameObject::SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
+
+	GameObject* leftDoor = FindFrame("Left_Door_Final");
+	GameObject* rightDoor = FindFrame("Right_Door_Final");
+
+	LeftDoorPos = leftDoor->GetPosition();
+	RightDoorPos = rightDoor->GetPosition();
+}
+
+void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (IsNear) {
+		if (m_pDoorUI) {
+			if (IsRot)
+				m_pDoorUI->Rotate(m_fPitch, m_fYaw, m_fRoll);
+			m_pDoorUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f );
+			m_pDoorUI->BillboardRender(pd3dCommandList);
+		}
+	}
+}
+
+void Door::SetOpen(bool Open)
+{
+	if (IsWorking)
+		return;
+	if (IsOpen) {
+		if (Open == false) {
+			IsOpen = false;
+			IsWorking = true;
+		}
+	}
+	else {
+		if (Open == true) {
+			IsOpen = true;
+			IsWorking = true;
+		}
+	}
+}
+
+bool Door::GetIsWorking()
+{
+	return IsWorking;
 }
 
 UIObject::UIObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
@@ -128,4 +261,48 @@ UIObject::UIObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComm
 
 UIObject::~UIObject()
 {
+}
+
+DoorUI::DoorUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
+{
+	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
+	XMStoreFloat4x4(&m_xmf4x4ToParent, XMMatrixIdentity());
+	renderer->m_nMaterials = 1;
+	renderer->m_ppMaterials = new Material * [renderer->m_nMaterials];
+	renderer->m_ppMaterials[0] = new Material(0);
+
+	Mesh* pUIMesh = new TexturedRectMesh(pd3dDevice, pd3dCommandList, -0.5, -0.5, 1, 1);
+	SetMesh(pUIMesh);
+
+	Texture* pUITexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pUITexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, pstrFileName, RESOURCE_TEXTURE2D, 0);
+
+	GameScene::CreateShaderResourceViews(pd3dDevice, pUITexture, 0, 17);
+
+	Material* pUIMaterial = new Material(1);
+	pUIMaterial->SetTexture(pUITexture);
+	pUIMaterial->SetDoorUIShader();
+
+	renderer->SetMaterial(0, pUIMaterial);
+}
+
+DoorUI::~DoorUI()
+{
+}
+
+void DoorUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	XMFLOAT3 xmf3CameraPosition = Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition();
+
+	SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+
+	render(pd3dCommandList);
+}
+
+void DoorUI::Rotate(float fPitch, float fYaw, float fRoll)
+{
+	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
+	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
+
+	UpdateTransform(NULL);
 }

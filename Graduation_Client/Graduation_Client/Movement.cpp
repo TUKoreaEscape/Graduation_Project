@@ -63,6 +63,17 @@ void CommonMovement::update(float elapsedTime)
 			gameObject->SetTrackAnimationSet(0, 6);
 		}
 
+		if (keyBuffer['f'] & 0xF0 || keyBuffer['F'] & 0xF0)
+		{
+			// 여기 건드세요 @우빈
+			if (Input::GetInstance()->m_pPlayer->m_pNearDoor)
+			{
+				bool DoorState = Input::GetInstance()->m_pPlayer->m_pNearDoor->IsOpen;
+				if (Input::GetInstance()->m_pPlayer->m_pNearDoor->GetIsWorking() == false)
+					Input::GetInstance()->m_pPlayer->m_pNearDoor->SetOpen(!DoorState);
+			}
+		}
+
 		if (dwDirection)
 		{
 			if ((dwDirection == DIR_NOT_FB) ||

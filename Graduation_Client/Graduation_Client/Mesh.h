@@ -290,3 +290,28 @@ public:
 	UIMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual ~UIMesh();
 };
+
+class TexturedRectMesh : public Mesh
+{
+protected:
+	int								m_nWidth;
+	int								m_nLength;
+
+protected:
+	XMFLOAT2* m_pxmf2TextureCoords0 = NULL;
+
+	ID3D12Resource* m_pd3dTextureCoord0Buffer = NULL;
+	ID3D12Resource* m_pd3dTextureCoord0UploadBuffer = NULL;
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dTextureCoord0BufferView;
+
+public:
+	TexturedRectMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int xStart, int zStart, int nWidth, int nLength);
+	virtual ~TexturedRectMesh();
+
+	int GetWidth() { return(m_nWidth); }
+	int GetLength() { return(m_nLength); }
+
+	virtual void ReleaseUploadBuffers();
+
+	virtual void OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
+};

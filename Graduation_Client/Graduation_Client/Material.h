@@ -62,7 +62,7 @@ public:
 	static Shader* m_pBushShader;
 	static Shader* m_pTerrainShader;
 	static Shader* m_pUIShader;
-
+	static Shader* m_pDoorUIShader;
 	static void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
 
 	void SetStandardShader() { Material::SetShader(m_pStandardShader); }
@@ -70,4 +70,5 @@ public:
 	void SetBushShader() { Material::SetShader(m_pBushShader); }
 	void SetTerrainShader() { Material::SetShader(m_pTerrainShader); }
 	void SetUIShader() { Material::SetShader(m_pUIShader); }
+	void SetDoorUIShader() { Material::SetShader(m_pDoorUIShader); }
 };
