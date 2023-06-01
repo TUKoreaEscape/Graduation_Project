@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
-enum Object_Type{NONE, OB_PIANO, OB_DOOR, OB_DESK, OB_WALL };
+enum Object_Type{NONE, OB_PIANO, OB_DOOR, OB_DESK, OB_WALL, OB_ELECTRONICSYSTEM };
 
 class GameObject {
 protected:
@@ -34,7 +34,7 @@ public:
 
 	int						Get_Section() { return m_section; }
 
-	virtual void			Update_bounding_box_pos(const XMFLOAT3 pos);
+	virtual void			Update_bounding_box_pos(const XMFLOAT3& pos);
 	virtual void			send_event(const unsigned int id) {}
 	virtual void			Update_Object() {};
 };
@@ -55,14 +55,25 @@ public:
 public:
 	Door();
 	Door(const unsigned int obj_id, Object_Type type, XMFLOAT3 center, XMFLOAT3 extents);
-	virtual ~Door() = default;
+	~Door() = default;
 
-	virtual void send_event(const unsigned int id) override {}
-	virtual void Update_bounding_box_pos(const XMFLOAT3 pos);
-	virtual void Update_Object();
+	void Update_bounding_box_pos(const XMFLOAT3& pos);
+	void Update_Object();
 
 	bool process_door_event();
 
 	void set_boundingbox_check(bool option) { m_check_bounding_box = option; }
 	Door_State get_state() { return m_state; }
+};
+
+class ElectronicSystem : public GameObject {
+private:
+	int		m_system_id = -1;
+public:
+	ElectronicSystem();
+	ElectronicSystem(const unsigned int obj_id, Object_Type type, XMFLOAT3 center, XMFLOAT3 extents);
+	~ElectronicSystem() = default;
+
+	void Update_bounding_box_pos(const XMFLOAT3& pos);
+	void Update_Object();
 };

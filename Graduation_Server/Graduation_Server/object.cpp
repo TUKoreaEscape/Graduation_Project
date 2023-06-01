@@ -21,7 +21,7 @@ void GameObject::Set_BoundingBox(const BoundingOrientedBox& box)
 	m_bounding_box = box;
 }
 
-void GameObject::Update_bounding_box_pos(const XMFLOAT3 pos)
+void GameObject::Update_bounding_box_pos(const XMFLOAT3& pos)
 {
 	m_bounding_box.Center = pos;
 }
@@ -93,12 +93,36 @@ bool Door::process_door_event()
 	return true;
 }
 
-void Door::Update_bounding_box_pos(const XMFLOAT3 pos)
+void Door::Update_bounding_box_pos(const XMFLOAT3& pos)
 {
 	m_bounding_box.Center = pos;
 }
 
 void Door::Update_Object()
+{
+
+}
+
+ElectronicSystem::ElectronicSystem()
+{
+
+}
+
+ElectronicSystem::ElectronicSystem(const unsigned int obj_id, Object_Type type, XMFLOAT3 center, XMFLOAT3 extents)
+{
+	m_system_id = obj_id;
+	m_type = type;
+	m_pos = center;
+	m_extents = extents;
+	m_bounding_box = BoundingOrientedBox{ center, extents, XMFLOAT4(0, 0, 0, 1) };
+}
+
+void ElectronicSystem::Update_Object()
+{
+
+}
+
+void ElectronicSystem::Update_bounding_box_pos(const XMFLOAT3& pos)
 {
 
 }

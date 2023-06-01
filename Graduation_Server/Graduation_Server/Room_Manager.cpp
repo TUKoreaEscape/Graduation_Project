@@ -22,6 +22,7 @@ void RoomManager::init() // 서버 시작 전 초기화해주는 함수입니다.
 void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. (파일입출력 부분)
 {
 	// 여긴 맵에 존재하는 벽, 고정된 오브젝트의 충돌 정보를 서버에 로드하는 공간입니다.
+//======================= Fixed and Wall Object Read =======================
 	FILE* pFile = nullptr;
 	fopen_s(&pFile, "walls/FixedObjectsBounding0523.bin", "rb");
 	if (pFile)
@@ -67,6 +68,8 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	/*fopen_s(&pFile, "", "rb");
 	if (pFile)
 		rewind(pFile);*/
+
+//======================= Door Object Read =======================
 	nReads = 0;
 	nObjects = 0;
 	nStrLength = 0;
@@ -74,6 +77,7 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	for (int i = 0; i < 6; ++i)
 	{
 		// 여기서 door 추가할거임
+		cout << "Doors BoundingBox : " << static_cast<int>((float)i / (float)6 * 100) << "%로드 완료\r";
 		float AABBCenter[3]{0};
 		float AABBExtents[3]{0};
 		float AABBQuats[4]{0};
@@ -86,7 +90,32 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 			_room.add_game_doors(i, OB_DOOR, center_pos, Extents);
 		}
 	}
-	cout << "Door Load Success!" << endl;
+	cout << "Doors BoundingBox : " << "100" << "%로드 완료\r";
+	cout << "Door Load Success!                                       " << endl;
+
+//======================= Electronic System Object Read =======================
+	nReads = 0;
+	nObjects = 0;
+	nStrLength = 0;
+	nReads = (unsigned int)fread(&nObjects, sizeof(int), 1, pFile);
+	for (int i = 0; i < 4; ++i)
+	{
+		// 여기서 door 추가할거임
+		cout << "Electronic System : " << static_cast<int>((float)i / (float)6 * 100) << "%로드 완료\r";
+		float AABBCenter[3]{ 0 };
+		float AABBExtents[3]{ 0 };
+		float AABBQuats[4]{ 0 };
+
+
+		XMFLOAT3 center_pos = XMFLOAT3(AABBCenter[0], AABBCenter[1], AABBCenter[2]);
+		XMFLOAT3 Extents = XMFLOAT3(AABBExtents[0], AABBExtents[1], AABBExtents[2]);
+		for (auto& _room : a_in_game_room)
+		{
+			_room.add_game_doors(i, OB_ELECTRONICSYSTEM, center_pos, Extents);
+		}
+	}
+	cout << "Electronic System : " << "100" << "%로드 완료\r";
+	cout << "Electronic System Load Success!                            " << endl;
 
 	cout << "All Objects File Load Success!" << endl;
 	// 여긴 맵에 존재하는 고정된 오브젝트를 서버에 로드하는 공간입니다.

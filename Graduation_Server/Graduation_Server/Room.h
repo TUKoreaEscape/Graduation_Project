@@ -4,6 +4,7 @@
 #include "User_Client.h"
 
 #define GAME_END_COLLECT_CHIP 12
+#define JOIN_ROOM_MAX_USER 6
 
 //class CLIENT;
 class Room {

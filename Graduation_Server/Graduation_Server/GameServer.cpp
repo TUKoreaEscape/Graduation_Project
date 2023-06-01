@@ -178,6 +178,82 @@ void cGameServer::Recv(EXP_OVER* exp_over, const unsigned int user_id, const DWO
 	// and send clients sending
 }
 
+void cGameServer::Send(EXP_OVER* exp_over)
+{
+
+}
+
+void cGameServer::Disconnect(const unsigned int _user_id) // 클라이언트 연결을 풀어줌(비정상 접속해제 or 정상종료시 사용)
+{
+	CLIENT& cl = m_clients[_user_id];
+
+	string cl_name{};
+
+	char client_name[20];
+	cl.get_client_name(*client_name, sizeof(client_name));
+	cl_name = client_name;
+
+	if (!cl_name.empty()) {
+		wstring convertID = stringToWstring(cl_name);
+		Custom custom_data;
+		custom_data.body = cl.m_customizing->Get_Body_Custom();
+		custom_data.body_parts = cl.m_customizing->Get_Body_Part_Custom();
+		custom_data.eyes = cl.m_customizing->Get_Eyes_Custom();
+		custom_data.gloves = cl.m_customizing->Get_Gloves_Custom();
+		custom_data.head = cl.m_customizing->Get_Head_Custom();
+		custom_data.mouthandnoses = cl.m_customizing->Get_Mouthandnoses_Custom();
+
+		DB_Request request;
+		request.type = REQUEST_SAVE_CUSTOMIZING;
+		request.request_custom_data = custom_data;
+		request.request_id = _user_id;
+		request.request_custom_data;
+		request.request_name = convertID;
+		m_database->insert_request(request);
+	}
+	// 여기서 초기화
+	if (cl.get_join_room_number() != -1) {
+		Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
+		for (int i = 0; i < 6; ++i)
+		{
+			if (rl.Get_Join_Member(i) != _user_id && rl.Get_Join_Member(i) != -1)
+			{
+				int rl_id = rl.Get_Join_Member(i);
+				m_clients[rl_id]._room_list_lock.lock();
+				m_clients[rl_id].room_list.erase(m_clients[rl_id].room_list.find(_user_id));
+				m_clients[rl_id]._room_list_lock.unlock();
+			}
+		}
+		rl.Exit_Player(_user_id);
+	}
+
+	// 여긴 같은 방에 있는 플레이어에게 사용자가 떠나버림을 알려줌
+	sc_other_player_disconnect packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_OTHER_PLAYER_DISCONNECT;
+	packet.id = _user_id;
+	for (auto p : cl.room_list)
+	{
+		m_clients[p].do_send(sizeof(packet), &packet);
+	}
+	//==============================================================
+	cl._room_list_lock.lock();
+	cl.room_list.clear();
+	cl._room_list_lock.unlock();
+	cl.set_user_position({ 0,5,0 });
+	cl.set_user_velocity({ 0,0,0 });
+	cl.set_user_yaw(0);
+	closesocket(cl._socket);
+
+	cl._state_lock.lock();
+	cl.set_state(CLIENT_STATE::ST_FREE);
+	cl.set_login_state(N_LOGIN);
+	char reset_name[20] = {};
+	cl.set_name(reset_name);
+	cl.set_id(-1);
+	cl._state_lock.unlock();
+}
+
 wstring cGameServer::stringToWstring(const std::string& t_str) // string -> wstring 변환
 {
 	typedef codecvt_utf8<wchar_t>  convert_type;
@@ -282,81 +358,7 @@ CLIENT* cGameServer::get_client_info(const int player_id)
 	return &m_clients[player_id];
 }
 
-void cGameServer::Send(EXP_OVER* exp_over)
-{
 
-}
-
-void cGameServer::Disconnect(const unsigned int _user_id) // 클라이언트 연결을 풀어줌(비정상 접속해제 or 정상종료시 사용)
-{
-	CLIENT& cl = m_clients[_user_id];
-	
-	string cl_name{};
-
-	char client_name[20];
-	cl.get_client_name(*client_name, sizeof(client_name));
-	cl_name = client_name;
-
-	if (!cl_name.empty()) {
-		wstring convertID = stringToWstring(cl_name);
-		Custom custom_data;
-		custom_data.body = cl.m_customizing->Get_Body_Custom();
-		custom_data.body_parts = cl.m_customizing->Get_Body_Part_Custom();
-		custom_data.eyes = cl.m_customizing->Get_Eyes_Custom();
-		custom_data.gloves = cl.m_customizing->Get_Gloves_Custom();
-		custom_data.head = cl.m_customizing->Get_Head_Custom();
-		custom_data.mouthandnoses = cl.m_customizing->Get_Mouthandnoses_Custom();
-
-		DB_Request request;
-		request.type = REQUEST_SAVE_CUSTOMIZING;
-		request.request_custom_data = custom_data;
-		request.request_id = _user_id;
-		request.request_custom_data;
-		request.request_name = convertID;
-		m_database->insert_request(request);
-	}
-	// 여기서 초기화
-	if (cl.get_join_room_number() != -1) {
-		Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
-		for (int i = 0; i < 6; ++i)
-		{
-			if (rl.Get_Join_Member(i) != _user_id && rl.Get_Join_Member(i) != -1)
-			{
-				int rl_id = rl.Get_Join_Member(i);
-				m_clients[rl_id]._room_list_lock.lock();
-				m_clients[rl_id].room_list.erase(m_clients[rl_id].room_list.find(_user_id));
-				m_clients[rl_id]._room_list_lock.unlock();
-			}
-		}
-		rl.Exit_Player(_user_id);	
-	}
-
-	// 여긴 같은 방에 있는 플레이어에게 사용자가 떠나버림을 알려줌
-	sc_other_player_disconnect packet;
-	packet.size = sizeof(packet);
-	packet.type = SC_PACKET::SC_PACKET_OTHER_PLAYER_DISCONNECT;
-	packet.id = _user_id;
-	for (auto p : cl.room_list)
-	{
-		m_clients[p].do_send(sizeof(packet), &packet);
-	}
-	//==============================================================
-	cl._room_list_lock.lock();
-	cl.room_list.clear();
-	cl._room_list_lock.unlock();
-	cl.set_user_position({ 0,5,0 });
-	cl.set_user_velocity({ 0,0,0 });
-	cl.set_user_yaw(0);
-	closesocket(cl._socket);
-
-	cl._state_lock.lock();
-	cl.set_state(CLIENT_STATE::ST_FREE);
-	cl.set_login_state(N_LOGIN);
-	char reset_name[20] = {};
-	cl.set_name(reset_name);
-	cl.set_id(-1);
-	cl._state_lock.unlock();
-}
 
 //============================================================================
 // 패킷 구분후 처리해주는 공간

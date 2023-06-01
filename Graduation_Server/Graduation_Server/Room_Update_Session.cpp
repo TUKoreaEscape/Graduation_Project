@@ -11,8 +11,9 @@ int Room::Select_Tagger()
 void Room::Start_Game()
 {
 	start_time = chrono::system_clock::now();
+	_room_state_lock.lock();
 	_room_state = GAME_ROOM_STATE::PLAYING;
-
+	_room_state_lock.unlock();
 	cGameServer& server = cGameServer::GetInstance();
 
 	for (auto p : in_player)
@@ -37,7 +38,7 @@ void Room::Update_room_time()
 {
 	now_time = chrono::system_clock::now();
 
-	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 10 && m_tagger_id == -1)
+	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 60 && m_tagger_id == -1)
 	{
 		m_tagger_id = in_player[Select_Tagger()];
 		cGameServer& server = cGameServer::GetInstance();
@@ -50,7 +51,7 @@ void Room::Update_room_time()
 		packet.second_skill = m_second_skill_enable;
 		packet.third_skill = m_third_skill_enable;
 
-		for (int i = 0; i < 6; ++i)
+		for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
 		{
 			CLIENT& cl = *server.get_client_info(in_player[i]);
 			cl.do_send(sizeof(packet), &packet);
@@ -101,7 +102,7 @@ void Room::Update_room_time()
 		cl.do_send(sizeof(packet), &packet);
 	}
 
-	for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < m_door_object.size(); ++i)
 	{
 		if (m_door_object[i].m_door_open_start)
 		{

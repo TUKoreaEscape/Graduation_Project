@@ -214,7 +214,6 @@ void Player::update(float fTimeElapsed)
 #if !USE_NETWORK
 	Move(xmf3Velocity, false);
 #endif
-	Network& network = *Network::GetInstance();
 	m_xmf3Shift = xmf3Velocity;
 	if (m_pPlayerUpdatedContext[0]) OnPlayerUpdateCallback(fTimeElapsed);
 

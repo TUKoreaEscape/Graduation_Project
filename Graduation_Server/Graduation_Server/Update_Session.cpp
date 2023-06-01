@@ -6,7 +6,7 @@ void cGameServer::Update_Session(int thread_number)
 	int index = 0;
 	while (true)
 	{
-		if (m_session_timer.Frame_Limit(30.f)) // 초당 1번 업데이트!
+		if (m_session_timer.Frame_Limit(SET_SERVER_UPDATE_FRAME)) // 초당 1번 업데이트!
 		{
 			//cout << "Update Session!" << endl;
 			for (int i = thread_number; i < MAX_ROOM; i++)
@@ -24,7 +24,7 @@ void cGameServer::Update_Session(int thread_number)
 				{
 					room._room_state_lock.unlock();
 #if DEBUG
-					Update_OtherPlayer(i, (float)1/30);
+					Update_OtherPlayer(i, (float)1/SET_SERVER_UPDATE_FRAME);
 #endif				
 					break;
 				}
@@ -33,7 +33,7 @@ void cGameServer::Update_Session(int thread_number)
 				{
 					room._room_state_lock.unlock();
 					room.Update_room_time();
-					Update_OtherPlayer(i, (float)1/30);
+					Update_OtherPlayer(i, (float)1/SET_SERVER_UPDATE_FRAME);
 					break;
 				}
 

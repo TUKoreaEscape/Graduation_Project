@@ -5,8 +5,6 @@
 #pragma comment (lib, "WS2_32.LIB")
 #pragma comment (lib, "MSWSock.LIB")
 
-cGameServer* g_server = nullptr;
-
 int main()
 {
 	_wsetlocale(LC_ALL, L"korean");
