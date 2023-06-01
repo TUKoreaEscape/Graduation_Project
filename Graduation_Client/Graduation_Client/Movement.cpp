@@ -72,6 +72,10 @@ void CommonMovement::update(float elapsedTime)
 				bool DoorState = Input::GetInstance()->m_pPlayer->m_pNearDoor->IsOpen;
 				if (Input::GetInstance()->m_pPlayer->m_pNearDoor->GetIsWorking() == false)
 				{
+#if !USE_NETWORK
+					Input::GetInstance()->m_pPlayer->m_pNearDoor->SetOpen(!DoorState);
+#endif
+#if USE_NETWORK
 					cs_packet_request_open_door packet;
 					packet.size = sizeof(packet);
 					packet.type = CS_PACKET::CS_PACKET_REQUEST_OPEN_DOOR;
@@ -79,6 +83,7 @@ void CommonMovement::update(float elapsedTime)
 
 					Network& network = *Network::GetInstance();
 					network.send_packet(&packet);
+#endif
 				}
 			}
 		}

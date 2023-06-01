@@ -180,10 +180,12 @@ void Player::update(float fTimeElapsed)
 	{
 		//std::cout << "중력작용중" << std::endl;
 		//m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Gravity, fTimeElapsed, false));
+#if USE_NETWORK
 		Network& network = *Network::GetInstance();
 
 		if (network.m_pPlayer_before_Pos.y >= network.m_pPlayer_Pos.y)
 			m_JumpElapsedTime = 0.3f;
+#endif
 		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
 		m_Isfalling = true;
 	}
