@@ -81,11 +81,24 @@ bool Door::process_door_event()
 	if (m_state == ST_CLOSE)
 	{
 		m_state = ST_OPEN;
+		m_door_open_start_time = chrono::system_clock::now();
+		m_door_open_start = true;
 	}
 
 	else if (m_state == ST_OPEN)
 	{
 		m_state = ST_CLOSE;
+		m_check_bounding_box = true;
 	}
 	return true;
+}
+
+void Door::Update_bounding_box_pos(const XMFLOAT3 pos)
+{
+	m_bounding_box.Center = pos;
+}
+
+void Door::Update_Object()
+{
+
 }

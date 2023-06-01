@@ -384,6 +384,7 @@ void cGameServer::Process_Door(const int user_id, void* buff)
 	door_packet.door_number = static_cast<int>(packet->door_num);
 	door_packet.door_state = room.Get_Door_State(static_cast<int>(packet->door_num));
 
+	m_clients[user_id].do_send(sizeof(door_packet), &door_packet);
 	m_clients[user_id]._room_list_lock.lock();
 	for (auto& player : m_clients[user_id].room_list)
 		m_clients[player].do_send(sizeof(door_packet), &door_packet);

@@ -26,7 +26,7 @@ private:
 	CLIENT_STATE::STATE		m_state = CLIENT_STATE::ST_FREE;
 	CLIENT_ROLE::STATE		m_role = CLIENT_ROLE::ROLE_NONE;
 
-	unsigned short			m_prev_size;
+	unsigned short			m_prev_size{};
 	int						m_id{};
 	int						m_join_room_number{};
 

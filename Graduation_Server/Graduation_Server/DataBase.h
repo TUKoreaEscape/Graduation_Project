@@ -20,11 +20,11 @@ enum REQUEST_TYPE {REQUEST_LOGIN = 0, REQUEST_CREATE_ID, REQUEST_LOAD_CUSTOMIZIN
 struct DB_Request {
 	REQUEST_TYPE	type{};
 	std::wstring	request_name{};
-	char			request_char_name[20];
+	char			request_char_name[20]{};
 	std::wstring	request_pw{};
-	int				request_id;
+	int				request_id = 0;
 
-	Custom			request_custom_data;
+	Custom			request_custom_data{};
 };
 
 class DataBase

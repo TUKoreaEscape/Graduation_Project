@@ -101,6 +101,18 @@ void Room::Update_room_time()
 		cl.do_send(sizeof(packet), &packet);
 	}
 
+	for (int i = 0; i < 6; ++i)
+	{
+		if (m_door_object[i].m_door_open_start)
+		{
+			if (std::chrono::duration_cast<std::chrono::seconds>(now_time - m_door_object[i].m_door_open_start_time).count() >= m_door_object[i].m_door_open_duration)
+			{
+				m_door_object[i].m_door_open_start = false;
+				m_door_object[i].set_boundingbox_check(false);
+			}
+		}
+	}
+
 
 	// 게임 종료를 확인하는 부분
 	if (m_tagger_collect_chip == GAME_END_COLLECT_CHIP) // 술래가 정해진 갯수의 생명칩을 수거한 경우

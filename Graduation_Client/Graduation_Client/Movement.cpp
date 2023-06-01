@@ -66,14 +66,12 @@ void CommonMovement::update(float elapsedTime)
 
 		if (keyBuffer['f'] & 0xF0 || keyBuffer['F'] & 0xF0)
 		{
-			// 여기 건드세요 @우빈
+			// 여기 건드세요 @우빈``
 			if (Input::GetInstance()->m_pPlayer->m_pNearDoor)
 			{
 				bool DoorState = Input::GetInstance()->m_pPlayer->m_pNearDoor->IsOpen;
 				if (Input::GetInstance()->m_pPlayer->m_pNearDoor->GetIsWorking() == false)
 				{
-					Input::GetInstance()->m_pPlayer->m_pNearDoor->SetOpen(!DoorState);
-
 					cs_packet_request_open_door packet;
 					packet.size = sizeof(packet);
 					packet.type = CS_PACKET::CS_PACKET_REQUEST_OPEN_DOOR;
@@ -81,7 +79,6 @@ void CommonMovement::update(float elapsedTime)
 
 					Network& network = *Network::GetInstance();
 					network.send_packet(&packet);
-					std::cout << "오픈요청" << std::endl;
 				}
 			}
 		}
