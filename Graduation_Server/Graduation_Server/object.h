@@ -77,3 +77,15 @@ public:
 	void Update_bounding_box_pos(const XMFLOAT3& pos);
 	void Update_Object();
 };
+
+class EscapeSystem : public GameObject {
+private:
+	int		m_system_id;
+public:
+	EscapeSystem();
+	EscapeSystem(const unsigned int obj_id, Object_Type type, XMFLOAT3 center, XMFLOAT3 extents);
+	~EscapeSystem() = default;
+
+	void Update_bounding_box_pos(const XMFLOAT3& pos);
+	void Update_Object();
+};

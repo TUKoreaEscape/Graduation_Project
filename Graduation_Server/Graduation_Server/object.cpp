@@ -126,3 +126,26 @@ void ElectronicSystem::Update_bounding_box_pos(const XMFLOAT3& pos)
 {
 
 }
+
+EscapeSystem::EscapeSystem()
+{
+}
+
+EscapeSystem::EscapeSystem(const unsigned int obj_id, Object_Type type, XMFLOAT3 center, XMFLOAT3 extents)
+{
+	m_system_id = obj_id;
+	m_type = type;
+	m_pos = center;
+	m_extents = extents;
+	m_bounding_box = BoundingOrientedBox{ center, extents, XMFLOAT4(0,0,0,1) };
+}
+
+void EscapeSystem::Update_bounding_box_pos(const XMFLOAT3& pos)
+{
+
+}
+
+void EscapeSystem::Update_Object()
+{
+
+}

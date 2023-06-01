@@ -205,6 +205,20 @@ struct cs_packet_request_open_hidden_door {
 	unsigned char	type;
 };
 
+struct cs_packet_request_electronic_system_open {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned char	es_num;
+};
+
+struct cs_packet_request_electronic_system_fix {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned char	fix_item_info;
+};
+
 struct cs_packet_request_exit_room {
 	unsigned char	size;
 	unsigned char	type;

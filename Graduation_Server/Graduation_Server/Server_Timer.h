@@ -52,7 +52,7 @@ private:
     LARGE_INTEGER    m_CurTime;
     LARGE_INTEGER   m_PrevTime;
 
-    double          m_dDeltaTime;
-    float           m_fDeltaTime;
+    double          m_dDeltaTime = 0;
+    float           m_fDeltaTime = 0;
     float           m_arrTimers_TimeAcc = 0;
 };
