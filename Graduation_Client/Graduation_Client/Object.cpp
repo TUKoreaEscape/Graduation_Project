@@ -103,7 +103,7 @@ void Door::Rotate(float fPitch, float fYaw, float fRoll)
 	UpdateTransform(NULL);
 }
 
-UIObject::UIObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
+UIObject::UIObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName, float x, float y, float width, float height)
 {
 	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_xmf4x4ToParent, XMMatrixIdentity());
@@ -111,7 +111,7 @@ UIObject::UIObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComm
 	renderer->m_ppMaterials = new Material * [renderer->m_nMaterials];
 	renderer->m_ppMaterials[0] = new Material(0);
 
-	UIMesh* pUIMesh = new UIMesh(pd3dDevice, pd3dCommandList);
+	UIMesh* pUIMesh = new UIMesh(pd3dDevice, pd3dCommandList,x,y,width,height);
 	SetMesh(pUIMesh);
 
 	Texture* pUITexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
