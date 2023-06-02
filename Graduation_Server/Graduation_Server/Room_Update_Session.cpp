@@ -38,7 +38,7 @@ void Room::Update_room_time()
 {
 	now_time = chrono::system_clock::now();
 
-	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 60 && m_tagger_id == -1)
+	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 60 && m_tagger_id == -1 && _room_state == GAME_ROOM_STATE::PLAYING)
 	{
 		m_tagger_id = in_player[Select_Tagger()];
 		cGameServer& server = cGameServer::GetInstance();
@@ -58,7 +58,7 @@ void Room::Update_room_time()
 		}
 	}
 
-	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 180 && false == m_first_skill_enable) // 술래 첫번째 스킬 활성화
+	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 180 && false == m_first_skill_enable && _room_state == GAME_ROOM_STATE::PLAYING) // 술래 첫번째 스킬 활성화
 	{
 		cGameServer& server = cGameServer::GetInstance();
 		CLIENT& cl = *server.get_client_info(m_tagger_id);
@@ -74,7 +74,7 @@ void Room::Update_room_time()
 		packet.third_skill = m_third_skill_enable;
 		cl.do_send(sizeof(packet), &packet);
 	}
-	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 360 && false == m_second_skill_enable) // 술래 두번째 스킬 활성화
+	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 360 && false == m_second_skill_enable && _room_state == GAME_ROOM_STATE::PLAYING) // 술래 두번째 스킬 활성화
 	{
 		cGameServer& server = cGameServer::GetInstance();
 		CLIENT& cl = *server.get_client_info(m_tagger_id);
@@ -87,7 +87,7 @@ void Room::Update_room_time()
 		packet.second_skill = m_second_skill_enable;
 		packet.third_skill = m_third_skill_enable;
 	}
-	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 540 && false == m_third_skill_enable) // 술래 세번째 스킬 활성화
+	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 540 && false == m_third_skill_enable && _room_state == GAME_ROOM_STATE::PLAYING) // 술래 세번째 스킬 활성화
 	{
 		cGameServer& server = cGameServer::GetInstance();
 		CLIENT& cl = *server.get_client_info(m_tagger_id);
@@ -104,13 +104,13 @@ void Room::Update_room_time()
 
 	for (int i = 0; i < m_door_object.size(); ++i)
 	{
-		if (m_door_object[i].m_door_open_start)
+		if (!m_door_object[i].m_door_open_start)
+			continue;
+
+		if (std::chrono::duration_cast<std::chrono::milliseconds>(now_time - m_door_object[i].m_door_open_start_time).count() >= m_door_object[i].m_door_open_duration && m_door_object[i].m_door_open_start == true)
 		{
-			if (std::chrono::duration_cast<std::chrono::seconds>(now_time - m_door_object[i].m_door_open_start_time).count() >= m_door_object[i].m_door_open_duration)
-			{
-				m_door_object[i].m_door_open_start = false;
-				m_door_object[i].set_boundingbox_check(false);
-			}
+			m_door_object[i].m_door_open_start = false;
+			m_door_object[i].set_boundingbox_check(false);
 		}
 	}
 
@@ -121,7 +121,7 @@ void Room::Update_room_time()
 		End_Game();
 	}
 
-	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 720) // 게임종료 확인(타임아웃)
+	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 720 && _room_state == GAME_ROOM_STATE::PLAYING) // 게임종료 확인(타임아웃)
 	{
 		End_Game();
 	}

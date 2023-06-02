@@ -174,7 +174,7 @@ CollisionInfo Room::is_collision_player_to_door(const int player_id, const XMFLO
 	BoundingOrientedBox check_box = client.get_bounding_box();
 	for (auto& object : m_door_object) // 모든벽을 체크 후 값을 더해주는 방식이 좋아보임!
 	{
-		if (object.get_state() == ST_OPEN)
+		if (!object.m_check_bounding_box)
 			continue;
 		if (check_box.Intersects(object.Get_BoundingBox()))
 		{

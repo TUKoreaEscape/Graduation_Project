@@ -24,6 +24,7 @@ void cGameServer::Update_Session(int thread_number)
 				{
 					room._room_state_lock.unlock();
 #if DEBUG
+					room.Update_room_time();
 					Update_OtherPlayer(i, (float)1/SET_SERVER_UPDATE_FRAME);
 #endif				
 					break;

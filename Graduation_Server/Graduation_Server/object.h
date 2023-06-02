@@ -45,13 +45,12 @@ class Door : public GameObject { // 인게임 도어에 관련된 부분 (도어 오픈 시간 차
 private:
 	int		   m_door_id;
 	Door_State m_state = ST_CLOSE;
-	bool	   m_check_bounding_box = true;
 
 public:
 	chrono::system_clock::time_point m_door_open_start_time;
-	float	   m_door_open_duration = 1.6f;
+	float	   m_door_open_duration = 400.f;
 	bool	   m_door_open_start = false;
-
+	bool	   m_check_bounding_box = true;
 public:
 	Door();
 	Door(const unsigned int obj_id, Object_Type type, XMFLOAT3 center, XMFLOAT3 extents);
