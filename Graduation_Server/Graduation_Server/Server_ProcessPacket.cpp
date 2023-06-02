@@ -90,6 +90,24 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 				collision_up_face = true;
 		}
 
+		CollisionInfo door_check = join_room.is_collision_player_to_door(user_id, current_player_position, current_shift);
+		if (door_check.is_collision)
+		{
+			calculate_player_position = current_player_position;
+			calculate_player_position = Add(current_player_position, door_check.SlidingVector);
+			m_clients[user_id].set_user_position(calculate_player_position);
+			m_clients[user_id].update_bounding_box_pos(calculate_player_position);
+			if (m_clients[user_id].get_user_position().y < 0)
+			{
+				calculate_player_position.y = 0;
+				m_clients[user_id].set_user_position(calculate_player_position);
+				m_clients[user_id].update_bounding_box_pos(calculate_player_position);
+			}
+			current_shift = door_check.SlidingVector;
+			if (door_check.collision_face_num == 4)
+				collision_up_face = true;
+		}
+
 		CollisionInfo object_check = join_room.is_collision_player_to_object(user_id, current_player_position, current_shift);
 		if (object_check.is_collision)
 		{

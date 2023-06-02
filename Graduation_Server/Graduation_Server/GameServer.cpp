@@ -44,10 +44,10 @@ void cGameServer::StartServer()
 		player.set_user_position({ 0,5,0 });
 	}
 	// 이쪽은 이제 맵 로드할 부분
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 6; ++i)
 		m_worker_threads.emplace_back(std::thread(&cGameServer::WorkerThread, this));
 
-	for(int i = 0; i < 1; ++i)
+	for(int i = 0; i < 2; ++i)
 		m_timer_thread.emplace_back(std::thread(&cGameServer::Update_Session,this, i));
 
 	for (int i = 0; i < 1; ++i)

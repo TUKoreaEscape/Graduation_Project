@@ -63,28 +63,42 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	}
 	cout << "Walls and Fixed Object File Load Success!" << endl;
 
-	fclose(pFile);
 
-	/*fopen_s(&pFile, "", "rb");
-	if (pFile)
-		rewind(pFile);*/
 
 //======================= Door Object Read =======================
+	fopen_s(&pFile, "walls/DoorBB.bin", "rb");
+	if (pFile)
+		rewind(pFile);
+	cout << "여긴 넘어옴" << endl;
 	nReads = 0;
 	nObjects = 0;
 	nStrLength = 0;
 	nReads = (unsigned int)fread(&nObjects, sizeof(int), 1, pFile);
-	for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < nObjects; ++i)
 	{
 		// 여기서 door 추가할거임
 		cout << "Doors BoundingBox : " << static_cast<int>((float)i / (float)6 * 100) << "%로드 완료\r";
-		float AABBCenter[3]{0};
-		float AABBExtents[3]{0};
-		float AABBQuats[4]{0};
+		nReads = (unsigned int)fread(&nStrLength, sizeof(unsigned char), 1, pFile);
+		nReads = (unsigned int)fread(&pstrToken, sizeof(char), nStrLength, pFile); // <Wall>:
+		nReads = (unsigned int)fread(&nStrLength, sizeof(unsigned char), 1, pFile);
+		nReads = (unsigned int)fread(&pstrGameObjectName, sizeof(char), nStrLength, pFile);
+
+		pstrGameObjectName[nStrLength] = '\0';
+
+		float AABBCenter[3]{};
+		float AABBExtents[3]{};
+		float AABBQuats[4]{};
+
+		nReads = (unsigned int)fread(&nStrLength, sizeof(unsigned char), 1, pFile);
+		nReads = (unsigned int)fread(pstrToken, sizeof(char), nStrLength, pFile); //"<BoundingBox>:"
+		nReads = (unsigned int)fread(AABBCenter, sizeof(float), 3, pFile);
+		nReads = (unsigned int)fread(AABBExtents, sizeof(float), 3, pFile);
+		nReads = (unsigned int)fread(AABBQuats, sizeof(float), 4, pFile);
 
 
 		XMFLOAT3 center_pos = XMFLOAT3(AABBCenter[0], AABBCenter[1], AABBCenter[2]);
 		XMFLOAT3 Extents = XMFLOAT3(AABBExtents[0], AABBExtents[1], AABBExtents[2]);
+		//cout << "Door - " << i + 1 << " - " << pstrGameObjectName << " Center - (" << AABBCenter[0] << ", " << AABBCenter[1] << ", " << AABBCenter[2] << "), Extents - (" << AABBExtents[0] << ", " << AABBExtents[1] << ", " << AABBExtents[2] << ")" << endl;
 		for (auto& _room : a_in_game_room)
 		{
 			_room.add_game_doors(i, OB_DOOR, center_pos, Extents);
