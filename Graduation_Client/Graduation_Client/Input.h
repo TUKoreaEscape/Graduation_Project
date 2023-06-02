@@ -1,6 +1,7 @@
 #pragma once
 #include "Time.h"
 #include "Player.h"
+#include "protocol.h"
 
 class Input
 {
@@ -22,12 +23,25 @@ public:
 	Time				m_time;
 	POINT				m_ptOldCursorPos{ 0,0 };
 
+	cs_packet_login				m_cs_packet_login{ NULL};
+	int								m_idNum = 0;
+	int								m_passwordNum = 0;
+
+	int								m_inputState = 0; //0->x , 1->Id입력, 2->password입력
+
+	RECT_FLOAT idInputRect{ };
+	RECT_FLOAT passwordInputRect{};
+
+
 	float speed = 60.0f;
 
 	void Update(HWND hWnd);
 	void KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	void Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	LRESULT ProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
+	void InputIdAndPassword(char input_char, char* str, int& num);
+	void DeleteIdAndPassword(char* str, int& num);
+	int InputState() { return m_inputState; };
 };
 
 //input 클래스는 입력을 처리하기 위한 클래스입니다.
