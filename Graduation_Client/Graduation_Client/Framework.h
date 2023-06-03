@@ -8,6 +8,7 @@
 #include "Shader.h"
 #include "GameObject.h"
 #include "Game_state.h"
+#include "UI.h"
 
 class Framework
 {
@@ -62,9 +63,16 @@ private:
 
 	ID2D1SolidColorBrush* m_pd2dbrBackground = NULL;
 	ID2D1SolidColorBrush* m_pd2dbrBorder = NULL;
-	IDWriteTextFormat* m_pdwFont = NULL;
+	IDWriteTextFormat* m_pdLoginFont = NULL;
+	IDWriteTextFormat* m_pdRoomTitleFont = NULL;
+	IDWriteTextFormat* m_pdRoomOtherFont = NULL;
 	IDWriteTextLayout* m_pdwTextLayout = NULL;
-	ID2D1SolidColorBrush* m_pd2dbrText = NULL;
+	IDWriteTextLayout* m_pdRoomTitleFLayout = NULL;
+	IDWriteTextLayout* m_pdRoomOtherLayout = NULL;
+
+	ID2D1SolidColorBrush* m_pd2dpurpleText = NULL;
+	ID2D1SolidColorBrush* m_pd2dlightsalmonText = NULL;
+	ID2D1SolidColorBrush* m_pd2dblackText = NULL;
 	
 	Input*			input;
 	GameScene*		scene;
@@ -106,6 +114,8 @@ public:
 	void ChangeSwapChainState();
 
 	void MoveToNextFrame();
+
+	void TextRender();
 };
 
 /*

@@ -4,7 +4,6 @@
 #include "Movement.h"
 #include "Network.h"
 
-E_GAME_STATE gameState;
 ID3D12DescriptorHeap* GameScene::m_pd3dCbvSrvDescriptorHeap = NULL;
 
 D3D12_CPU_DESCRIPTOR_HANDLE	GameScene::m_d3dCbvCPUDescriptorStartHandle;
@@ -18,7 +17,6 @@ D3D12_CPU_DESCRIPTOR_HANDLE	GameScene::m_d3dSrvCPUDescriptorNextHandle;
 D3D12_GPU_DESCRIPTOR_HANDLE	GameScene::m_d3dSrvGPUDescriptorNextHandle;
 GameScene::GameScene() : Scene()
 {
-	gameState = E_GAME_RUNNING;
 }
 
 void GameScene::forrender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -90,14 +88,20 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	//m_pHouse->render(pd3dCommandList);
 }
 
-void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList, int index)
+void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
-
-	if(index==7) m_UITest[0]->render(pd3dCommandList);
-	else if (index==8) m_UITest[1]->render(pd3dCommandList);
+	
+	switch (GameState::GetInstance()->GetGameState()) {
+	case LOGIN:
+		for (int i = 0; i < m_nLogin; ++i) m_UILogin[i]->render(pd3dCommandList);
+		break;
+	case ROOM_SELECT:
+		for (int i = 0; i < m_nRoomSelect; ++i) m_UIRoomSelect[i]->render(pd3dCommandList);
+		break;
+	}
 }
 
 void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -156,8 +160,22 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pClassroomTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), -20, -60, 81, 41, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
 
 	//UI생성 영역 dds파일 다음 x,y,width,height가 순서대로 들어간다. 아무것도 넣지않으면 화면중앙에 1x1사이즈로 나온다.
-	m_UITest[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Login.dds", 0.0f, 0.0f, 2.0f, 2.0f);
-	m_UITest[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Lobby.dds", 0.0f, 0.0f, 2.0f, 2.0f);
+	m_nLogin = 1;
+	m_UILogin = new GameObject * [m_nLogin];
+	m_UILogin[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Login.dds", 0.0f, 0.0f, 2.0f, 2.0f);
+
+	m_nRoomSelect = 9;
+	m_UIRoomSelect = new GameObject * [m_nRoomSelect];
+	m_UIRoomSelect[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/RoomSelect.dds", 0.0f, 0.0f, 2.0f, 2.0f);
+	m_UIRoomSelect[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/LArrow.dds", -0.2f, -0.9f, 0.2f, 0.2f);
+	m_UIRoomSelect[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/RArrow.dds", 0.2f, -0.9f, 0.2f, 0.2f);
+
+	m_UIRoomSelect[3] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", 0.4f, 0.7f, 0.5f, 0.4f);
+	m_UIRoomSelect[4] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", 0.4f, 0.1f, 0.5f, 0.4f);
+	m_UIRoomSelect[5] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", 0.4f, -0.5f, 0.5f, 0.4f);
+	m_UIRoomSelect[6] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", -0.4f, 0.7f, 0.5f, 0.4f);
+	m_UIRoomSelect[7] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", -0.4f, 0.1f, 0.5f, 0.4f);
+	m_UIRoomSelect[8] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", -0.4f, -0.5f, 0.5f, 0.4f);
 
 
 	LPVOID m_pTerrain[ROOM_COUNT]{ m_pMainTerrain ,m_pPianoTerrain,m_pBroadcastTerrain, m_pCubeTerrain ,m_pForestTerrain,m_pClassroomTerrain };
@@ -324,11 +342,17 @@ void GameScene::ReleaseObjects()
 	if (m_pClassroomTerrain) m_pClassroomTerrain->Release();
 	if (m_pForestTerrain) m_pForestTerrain->Release();
 	if (m_pCubeTerrain) m_pCubeTerrain->Release();
-	if (m_UITest) {
-		for (int i = 0; i < m_nUI; ++i) {
-			if (m_UITest[i]) m_UITest[i]->Release();
+	if (m_UILogin) {
+		for (int i = 0; i < m_nLogin; ++i) {
+			if (m_UILogin[i]) m_UILogin[i]->Release();
 		}
-		delete[] m_UITest;
+		delete[] m_UILogin;
+	}
+	if (m_UIRoomSelect) {
+		for (int i = 0; i < m_nRoomSelect; ++i) {
+			if (m_UIRoomSelect[i]) m_UIRoomSelect[i]->Release();
+		}
+		delete[] m_UIRoomSelect;
 	}
 
 	if (m_pClass) m_pClass->Release();
@@ -601,9 +625,14 @@ void GameScene::ReleaseUploadBuffers()
 	if (m_pClassroomTerrain) m_pClassroomTerrain->ReleaseUploadBuffers();
 	if (m_pForestTerrain) m_pForestTerrain->ReleaseUploadBuffers();
 	if (m_pCubeTerrain) m_pCubeTerrain->ReleaseUploadBuffers();
-	if (m_UITest) {
-		for (int i = 0; i < m_nUI; ++i) {
-			if (m_UITest[i]) m_UITest[i]->ReleaseUploadBuffers();
+	if (m_UILogin) {
+		for (int i = 0; i < m_nLogin; ++i) {
+			if (m_UILogin[i]) m_UILogin[i]->ReleaseUploadBuffers();
+		}
+	}
+	if (m_UIRoomSelect) {
+		for (int i = 0; i < m_nRoomSelect; ++i) {
+			if (m_UIRoomSelect[i]) m_UIRoomSelect[i]->ReleaseUploadBuffers();
 		}
 	}
 

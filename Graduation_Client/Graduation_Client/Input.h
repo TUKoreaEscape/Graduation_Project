@@ -23,15 +23,15 @@ public:
 	Player*			m_pPlayer=NULL;
 	Time				m_time;
 	POINT				m_ptOldCursorPos{ 0,0 };
-
+	
+	//패킷
 	cs_packet_login				m_cs_packet_login{ NULL};
+	Roominfo_by10				m_Roominfo[6]{ NULL };
+
 	int								m_idNum = 0;
 	int								m_passwordNum = 0;
 
 	int								m_inputState = 0; //0->x , 1->Id입력, 2->password입력
-
-	RECT_FLOAT idInputRect{ };
-	RECT_FLOAT passwordInputRect{};
 
 	float speed = 60.0f;
 
@@ -45,6 +45,7 @@ public:
 	void DeleteIdAndPassword(char* str, int& num);
 	int InputState() { return m_inputState; };
 	int ChangeInputState() { return m_inputState = (m_inputState + 1) % 3; };
+	void InputRoomInfo(); //이 함수에서 roominfo를 넣어줌 패킷주고받는곳에 넣으면 될듯? 안에 정의해주고, 일단 지금은 input.cpp 159번줄에 넣어놨음
 };
 
 //input 클래스는 입력을 처리하기 위한 클래스입니다.

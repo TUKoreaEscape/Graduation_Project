@@ -117,13 +117,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 		}
 		if (m_gamestate->GetGameState() == LOGIN)
 		{
-			RECT clientRect;
-			GetClientRect(hWnd, &clientRect);
-			float clientWidth = clientRect.right - clientRect.left;
-			float clientHeight = clientRect.bottom - clientRect.top;
-
-			idInputRect = RECT_FLOAT{ clientWidth / 9.14, clientHeight / 1.62, clientWidth / 2.73, clientHeight / 1.51 };
-			passwordInputRect = RECT_FLOAT{ clientWidth / 9.14, clientHeight / 1.46, clientWidth / 2.73, clientHeight / 1.37 };
+			UpdateRectSize(hWnd);
 			int xPos = LOWORD(lParam);
 			int yPos = HIWORD(lParam);
 
@@ -131,14 +125,14 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			//std::cout << passwordInputRect.left << " " << passwordInputRect.top << " " << passwordInputRect.right << " " << passwordInputRect.bottom << std::endl;
 			//std::cout << xPos << " " << yPos << std::endl;
 			//아이디
-			if (xPos >= idInputRect.left && xPos <= idInputRect.right && yPos >= idInputRect.top && yPos <= idInputRect.bottom)
+			if (xPos >= idRect.left && xPos <= idRect.right && yPos >= idRect.top && yPos <= idRect.bottom)
 			{
 				// 입력란을 활성화하고 입력을 받을 수 있는 상태로 전환합니다.
 				m_inputState = 1;
 				std::cout << "아이디 칸 클릭!" << std::endl;
 			}
 			//비밀번호
-			else if (xPos >= passwordInputRect.left && xPos <= passwordInputRect.right && yPos >= passwordInputRect.top && yPos <= passwordInputRect.bottom)
+			else if (xPos >= passwordRect.left && xPos <= passwordRect.right && yPos >= passwordRect.top && yPos <= passwordRect.bottom)
 			{
 				m_inputState = 2;
 				std::cout << "비밀번호 칸 클릭!" << std::endl;
@@ -148,6 +142,21 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 				m_inputState = 0;
 				std::cout << "빈칸 클릭!" << std::endl;
 			}
+		}
+		else if (m_gamestate->GetGameState() == ROOM_SELECT)
+		{
+			UpdateRectSize(hWnd);
+			int xPos = LOWORD(lParam);
+			int yPos = HIWORD(lParam);
+
+			for (int i = 0; i < 6; ++i)
+			{
+				if (xPos >= roominfoRect[i].left && xPos <= roominfoRect[i].right && yPos >= roominfoRect[i].top && yPos <= roominfoRect[i].bottom) //어떤 방을 클릭했는지 판단하는 코드
+				{
+					std::cout << i+1  << " 방 클릭!" << std::endl;
+				}
+			}
+			InputRoomInfo();
 		}
 		break;
 	case WM_LBUTTONUP:
@@ -236,4 +245,37 @@ void Input::DeleteIdAndPassword(char* str, int& num)
 		str[num] = '\0';
 	}
 	//std::cout << str << std::endl;
+}
+
+void Input::InputRoomInfo()
+{
+	m_Roominfo[0].room_number = 1;
+	strcpy_s(m_Roominfo[0].room_name, "come~\0");
+	m_Roominfo[0].join_member = 1;
+	m_Roominfo[0].state = GAME_ROOM_STATE::FREE;
+
+	m_Roominfo[1].room_number = 2;
+	strcpy_s(m_Roominfo[1].room_name, "run!\0");
+	m_Roominfo[1].join_member = 2;
+	m_Roominfo[1].state = GAME_ROOM_STATE::READY;
+
+	m_Roominfo[2].room_number = 3;
+	strcpy_s(m_Roominfo[2].room_name, "gogo\0");
+	m_Roominfo[2].join_member = 6;
+	m_Roominfo[2].state = GAME_ROOM_STATE::PLAYING;
+
+	m_Roominfo[3].room_number = 4;
+	strcpy_s(m_Roominfo[3].room_name, "try\0");
+	m_Roominfo[3].join_member = 5;
+	m_Roominfo[3].state = GAME_ROOM_STATE::READY;
+
+	m_Roominfo[4].room_number = 5;
+	strcpy_s(m_Roominfo[4].room_name, "fail\0");
+	m_Roominfo[4].join_member = 2;
+	m_Roominfo[4].state = GAME_ROOM_STATE::FREE;
+
+	m_Roominfo[5].room_number = 6;
+	strcpy_s(m_Roominfo[5].room_name, "plz\0");
+	m_Roominfo[5].join_member = 1;
+	m_Roominfo[5].state = GAME_ROOM_STATE::END;
 }
