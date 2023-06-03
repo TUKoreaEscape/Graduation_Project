@@ -7,6 +7,7 @@
 #include "Renderer.h"
 #include "Shader.h"
 #include "GameObject.h"
+#include "Game_state.h"
 
 class Framework
 {
@@ -68,6 +69,7 @@ private:
 	Input*			input;
 	GameScene*		scene;
 	Time			time;
+	GameState*	m_gamestate;
 
 	float           timeToSend;
 
@@ -76,8 +78,6 @@ private:
 	_TCHAR						m_pszFrameRate[70];
 
 	int								m_nDebugOptions = 10; // U
-
-	int								m_gamestate = 0;
 public:
 	Framework();
 	~Framework();
@@ -106,9 +106,6 @@ public:
 	void ChangeSwapChainState();
 
 	void MoveToNextFrame();
-
-	int GetGameState() { return m_gamestate; }; // 0일때 로그인화면 1일때 방선택 2 인게임 ...~~
-	void SetGameState() { m_gamestate = (m_gamestate + 1 ) % 3; }
 };
 
 /*

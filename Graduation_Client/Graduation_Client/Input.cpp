@@ -61,7 +61,7 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			speed = 60.0f;
 			break;
 		case VK_F6:
-			g_Framework.SetGameState();
+			m_gamestate->ChangeState();
 			break;
 		case VK_ESCAPE:
 		{
@@ -77,19 +77,23 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_KEYDOWN:
-		if (wParam == VK_BACK) {
-		if (g_Framework.GetGameState() == 0 && m_inputState == 1) DeleteIdAndPassword(m_cs_packet_login.id, m_idNum);//id 삭제
-		else if (g_Framework.GetGameState() == 0 && m_inputState == 2) DeleteIdAndPassword(m_cs_packet_login.pass_word, m_passwordNum); //password 삭제
-		}
-		else if (wParam >= VK_NUMPAD0 && wParam <= VK_NUMPAD9) {
-			char number = wParam - VK_NUMPAD0 + '0';
-			if (g_Framework.GetGameState() == 0 && m_inputState == 1) InputIdAndPassword(number, m_cs_packet_login.id, m_idNum);//id입력
-			else if (g_Framework.GetGameState() == 0 && m_inputState == 2) InputIdAndPassword(number, m_cs_packet_login.pass_word, m_passwordNum); //password입력
-		}
-		else if((wParam >= 'A' && wParam <= 'Z') || (wParam >= 'a' && wParam <= 'z') || (wParam >= '0' && wParam <= '9'))
+		if (m_gamestate->GetGameState() == LOGIN)
 		{
-			if (g_Framework.GetGameState() == 0 && m_inputState == 1) InputIdAndPassword(wParam, m_cs_packet_login.id, m_idNum);//id입력
-			else if (g_Framework.GetGameState() == 0 && m_inputState == 2) InputIdAndPassword(wParam, m_cs_packet_login.pass_word, m_passwordNum); //password입력
+			if (wParam == VK_BACK) {
+				if (m_inputState == 1) DeleteIdAndPassword(m_cs_packet_login.id, m_idNum);//id 삭제
+				else if (m_inputState == 2) DeleteIdAndPassword(m_cs_packet_login.pass_word, m_passwordNum); //password 삭제
+			}
+			else if (wParam >= VK_NUMPAD0 && wParam <= VK_NUMPAD9) {
+				char number = wParam - VK_NUMPAD0 + '0';
+				if (m_inputState == 1) InputIdAndPassword(number, m_cs_packet_login.id, m_idNum);//id입력
+				else if (m_inputState == 2) InputIdAndPassword(number, m_cs_packet_login.pass_word, m_passwordNum); //password입력
+			}
+			else if (wParam == VK_TAB) { ChangeInputState(); }
+			else if ((wParam >= 'A' && wParam <= 'Z') || (wParam >= 'a' && wParam <= 'z') || (wParam >= '0' && wParam <= '9'))
+			{
+				if (m_inputState == 1) InputIdAndPassword(wParam, m_cs_packet_login.id, m_idNum);//id입력
+				else if (m_inputState == 2) InputIdAndPassword(wParam, m_cs_packet_login.pass_word, m_passwordNum); //password입력
+			}
 		}
 		break;
 	default:
@@ -111,7 +115,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			m_pPlayer->SetAttackZeroTime();
 #endif
 		}
-		if (g_Framework.GetGameState() == 0)
+		if (m_gamestate->GetGameState() == LOGIN)
 		{
 			RECT clientRect;
 			GetClientRect(hWnd, &clientRect);

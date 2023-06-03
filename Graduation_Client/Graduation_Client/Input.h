@@ -2,11 +2,12 @@
 #include "Time.h"
 #include "Player.h"
 #include "protocol.h"
+#include "Game_state.h"
 
 class Input
 {
 private:
-	static Input*		InputInstance;
+	static Input*				InputInstance;
 	Input() {}
 	Input(const Input& other);
 	~Input() {}
@@ -32,8 +33,9 @@ public:
 	RECT_FLOAT idInputRect{ };
 	RECT_FLOAT passwordInputRect{};
 
-
 	float speed = 60.0f;
+
+	GameState*		m_gamestate;
 
 	void Update(HWND hWnd);
 	void KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
@@ -42,6 +44,7 @@ public:
 	void InputIdAndPassword(char input_char, char* str, int& num);
 	void DeleteIdAndPassword(char* str, int& num);
 	int InputState() { return m_inputState; };
+	int ChangeInputState() { return m_inputState = (m_inputState + 1) % 3; };
 };
 
 //input 클래스는 입력을 처리하기 위한 클래스입니다.

@@ -374,6 +374,8 @@ void Framework::BuildObjects()
 	//m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 	m_pd3dCommandList->Reset(m_ppd3dCommandAllocators[m_nSwapChainBufferIndex], NULL);
 	input = Input::GetInstance();
+	m_gamestate = GameState::GetInstance();
+	input->m_gamestate = m_gamestate;
 	scene = new GameScene();
 	scene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 
@@ -411,31 +413,31 @@ void Framework::UpdateObjects()
 {
 	float fTimeElapsed = time.GetTimeElapsed();
 	timeToSend += fTimeElapsed;
-	if (Input::GetInstance()->m_pPlayer->GetID() != -1) {
+	if (input ->m_pPlayer->GetID() != -1) {
 		Network& network = *Network::GetInstance();
 		cs_packet_move packet;
 		packet.size = sizeof(packet);
 		packet.type = CS_PACKET::CS_PACKET_MOVE;
-		packet.velocity = Input::GetInstance()->m_pPlayer->GetVelocity();
-		packet.xmf3Shift = Input::GetInstance()->m_pPlayer->GetShift();
-		packet.input_key = Input::GetInstance()->m_pPlayer->GetDirection();
+		packet.velocity = input->m_pPlayer->GetVelocity();
+		packet.xmf3Shift = input->m_pPlayer->GetShift();
+		packet.input_key = input->m_pPlayer->GetDirection();
 
-		packet.look.x = Input::GetInstance()->m_pPlayer->GetLookVector().x * 100;
-		packet.look.y = Input::GetInstance()->m_pPlayer->GetLookVector().y * 100;
-		packet.look.z = Input::GetInstance()->m_pPlayer->GetLookVector().z * 100;
+		packet.look.x = input->m_pPlayer->GetLookVector().x * 100;
+		packet.look.y = input->m_pPlayer->GetLookVector().y * 100;
+		packet.look.z = input->m_pPlayer->GetLookVector().z * 100;
 
-		packet.right.x = Input::GetInstance()->m_pPlayer->GetRightVector().x * 100;
-		packet.right.y = Input::GetInstance()->m_pPlayer->GetRightVector().y * 100;
-		packet.right.z = Input::GetInstance()->m_pPlayer->GetRightVector().z * 100;
+		packet.right.x = input->m_pPlayer->GetRightVector().x * 100;
+		packet.right.y = input->m_pPlayer->GetRightVector().y * 100;
+		packet.right.z = input->m_pPlayer->GetRightVector().z * 100;
 
-		packet.yaw = Input::GetInstance()->m_pPlayer->GetYaw();
-		packet.is_jump = Input::GetInstance()->m_pPlayer->GetIsFalling();
+		packet.yaw = input->m_pPlayer->GetYaw();
+		packet.is_jump = input->m_pPlayer->GetIsFalling();
 		//std::cout << packet.xmf3Shift.x << ", " << packet.xmf3Shift.y << ", " << packet.xmf3Shift.z << std::endl;
 		network.send_packet(&packet);
 
 		//while (!network.m_recv_move);
 		network.pos_lock.lock();
-		Input::GetInstance()->m_pPlayer->SetPosition(network.m_pPlayer_Pos);
+		input->m_pPlayer->SetPosition(network.m_pPlayer_Pos);
 		network.pos_lock.unlock();
 
 		for (int i = 0; i < 5; ++i)
@@ -457,26 +459,26 @@ void Framework::FrameAdvance()
 	input->Update(m_hWnd);
 	
 	UpdateObjects();
-	if (Input::GetInstance()->keyBuffer['1'] & 0xF0) m_nDebugOptions = 85;
+	if (input->keyBuffer['1'] & 0xF0) m_nDebugOptions = 85;
 	else m_nDebugOptions = 10;
 	HRESULT hResult = m_ppd3dCommandAllocators[m_nSwapChainBufferIndex]->Reset();
 	hResult = m_pd3dCommandList->Reset(m_ppd3dCommandAllocators[m_nSwapChainBufferIndex], NULL); //명령 할당자와 명령 리스트를 리셋한다.
 
 	::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-	if (m_gamestate == 0)
+	if (m_gamestate->GetGameState() == LOGIN)
 	{
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		scene->UIrender(m_pd3dCommandList, 7);
 	}
-	else if (m_gamestate == 1)
+	else if (m_gamestate->GetGameState() == ROOM_SELECT)
 	{
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		scene->UIrender(m_pd3dCommandList, 8);
 	}
-	else if(m_gamestate == 2)
+	else if(m_gamestate->GetGameState() == READY_TO_GAME)
 	{
 		if (scene) scene->prerender(m_pd3dCommandList);
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
@@ -502,7 +504,7 @@ void Framework::FrameAdvance()
 	m_pd3dCommandQueue->ExecuteCommandLists(_countof(ppd3dCommandLists), ppd3dCommandLists); //명령 리스트를 명령 큐에 추가하여 실행한다.
 	//WaitForGpuComplete(); //GPU가 모든 명령 리스트를 실행할 때 까지 기다린다.
 
-	if (m_gamestate == 0)
+	if (m_gamestate->GetGameState() == LOGIN)
 	{
 		m_pd2dDeviceContext->SetTarget(m_ppd2dRenderTargets[m_nSwapChainBufferIndex]);
 		ID3D11Resource* ppd3dResources[] = { m_ppd3d11WrappedBackBuffers[m_nSwapChainBufferIndex] };
@@ -517,12 +519,12 @@ void Framework::FrameAdvance()
 		//D2D1_RECT_F rcUpperText = D2D1::RectF(0, 0, szRenderTarget.width, szRenderTarget.height * 0.25f);
 		//m_pd2dDeviceContext->DrawTextW(m_pszFrameRate, (UINT32)wcslen(m_pszFrameRate), m_pdwFont, &rcUpperText, m_pd2dbrText);
 
-		int size = strlen(Input::GetInstance()->m_cs_packet_login.id);
+		int size = strlen(input->m_cs_packet_login.id);
 		if (size > 0)
 		{
 			wchar_t* array = new wchar_t[size + 1];
 			for (int i = 0; i < size; i++) {
-				array[i] = static_cast<wchar_t>(Input::GetInstance()->m_cs_packet_login.id[i]);
+				array[i] = static_cast<wchar_t>(input->m_cs_packet_login.id[i]);
 			}
 			array[size] = '\0';
 			D2D1_RECT_F rcLowerText = D2D1::RectF(szRenderTarget.width / 9.14, szRenderTarget.height / 1.62, szRenderTarget.width / 2.73, szRenderTarget.height / 1.51);
@@ -530,12 +532,12 @@ void Framework::FrameAdvance()
 			delete[] array;
 		}
 
-		size = strlen(Input::GetInstance()->m_cs_packet_login.pass_word);
+		size = strlen(input->m_cs_packet_login.pass_word);
 		if (size > 0)
 		{
 			wchar_t* array = new wchar_t[size + 1];
 			for (int i = 0; i < size; i++) {
-				array[i] = static_cast<wchar_t>(Input::GetInstance()->m_cs_packet_login.pass_word[i]);
+				array[i] = static_cast<wchar_t>(input->m_cs_packet_login.pass_word[i]);
 			}
 			array[size] = '\0';
 			D2D1_RECT_F rcLowerText = D2D1::RectF(szRenderTarget.width / 9.14, szRenderTarget.height / 1.46, szRenderTarget.width / 2.73, szRenderTarget.height / 1.37);
