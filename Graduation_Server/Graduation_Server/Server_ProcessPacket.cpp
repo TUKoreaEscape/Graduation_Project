@@ -224,7 +224,9 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 			update_room_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO_UPDATE;
 			update_room_packet.join_member = m_room_manager->Get_Room_Info(packet->room_number)->Get_Number_of_users();
 			update_room_packet.room_number = packet->room_number;
+			m_room_manager->Get_Room_Info(packet->room_number)->_room_state_lock.lock();
 			update_room_packet.state = m_room_manager->Get_Room_Info(packet->room_number)->_room_state;
+			m_room_manager->Get_Room_Info(packet->room_number)->_room_state_lock.unlock();
 
 			for (auto& cl : m_clients)
 			{
@@ -324,9 +326,8 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 #if PRINT
-	
-#endif
 	cout << "id : " << user_id << "가 ready함" << endl;
+#endif
 	room.SetReady(packet->ready_type, user_id);
 	cout << room.All_Player_Ready() << endl;
 	if (room.All_Player_Ready())
@@ -340,9 +341,7 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 		// 모든 플레이어가 레디가 된 경우 이제 게임을 시작하게 바꿔줘야하는 부분!
 
 		// 임시로 사용하는 부분 (중간발표 이후 삭제 예정)
-		room._room_state_lock.lock();
 		room.Start_Game();
-		room._room_state_lock.unlock();
 	}
 }
 

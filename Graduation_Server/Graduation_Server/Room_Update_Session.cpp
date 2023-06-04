@@ -16,10 +16,24 @@ void Room::Start_Game()
 	_room_state_lock.unlock();
 	cGameServer& server = cGameServer::GetInstance();
 
-	for (auto p : in_player)
+	sc_packet_update_room update_room_packet;
+	update_room_packet.size = sizeof(update_room_packet);
+	update_room_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO_UPDATE;
+	update_room_packet.join_member = Get_Number_of_users();
+	update_room_packet.room_number = room_number;
+	_room_state_lock.lock();
+	update_room_packet.state = _room_state;
+	_room_state_lock.unlock();
+
+	for (auto& cl : server.m_clients)
 	{
-		//CLIENT& player = *server.get_client_info(p);
-		//player.set_user_position({ 100,100,100 });
+		if (cl.get_state() != CLIENT_STATE::ST_LOBBY)
+			continue;
+
+		if (cl.get_look_lobby_page() != room_number / 6)
+			continue;
+
+		cl.do_send(sizeof(update_room_packet), &update_room_packet);
 	}
 }
 

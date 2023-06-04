@@ -69,7 +69,6 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	fopen_s(&pFile, "walls/DoorBB.bin", "rb");
 	if (pFile)
 		rewind(pFile);
-	cout << "여긴 넘어옴" << endl;
 	nReads = 0;
 	nObjects = 0;
 	nStrLength = 0;
