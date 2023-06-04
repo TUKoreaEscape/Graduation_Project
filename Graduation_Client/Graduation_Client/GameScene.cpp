@@ -109,10 +109,6 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 }
 
-	//if(index==7) m_UITest[0]->render(pd3dCommandList);
-	//else if (index==8) m_UITest[1]->render(pd3dCommandList);
-}
-
 void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
