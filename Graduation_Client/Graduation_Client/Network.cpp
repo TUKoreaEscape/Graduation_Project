@@ -1,6 +1,7 @@
 #pragma once
 #include "Network.h"
-
+#include "Game_state.h"
+#include "Input.h"
 Network* Network::NetworkInstance = nullptr;
 
 Network::Network()
@@ -102,6 +103,7 @@ void Network::Send_Use_Tagger_Skill(int skill_type)
 
 void Network::Debug_send_thread()
 {
+	while (m_join_room == false);
 	while (m_shutdown == false)
 	{
 		int code;
@@ -249,11 +251,11 @@ void Network::AssemblyPacket(char* net_buf, size_t io_byte)
 			make_size = ptr[0];
 			make_packet_size = make_size;
 			//std::cout << "packet size : " << make_packet_size << std::endl;
-			/*if (make_packet_size == 127)
+			if (make_packet_size == 127)
 			{
 				make_packet_size *= ptr[2];
 				make_packet_size += ptr[3];
-			}*/
+			}
 		}
 		if (io_byte + saved_packet_size >= make_packet_size) {
 			memcpy(packet_buffer + saved_packet_size, ptr, make_packet_size - saved_packet_size);
@@ -316,15 +318,15 @@ void Network::ProcessPacket(char* ptr)
 		sc_packet_login_ok* recv_packet = reinterpret_cast<sc_packet_login_ok*>(ptr);
 		m_pPlayer->SetID(recv_packet->id);
 
-		m_login = true;
-		std::cout << "========================================" << std::endl;
-		std::cout << ">>>>>> 로그인에 성공하였습니다! <<<<<<" << std::endl;
-		std::cout << "========================================" << std::endl;
-		//cs_packet_join_room packet;
-		//packet.size = sizeof(cs_packet_join_room);
-		//packet.type = CS_PACKET::CS_PACKET_JOIN_ROOM;
-		//packet.room_number = 0;
-		//send_packet(&packet);
+		GameState& game_state = *GameState::GetInstance();
+		game_state.ChangeState();
+
+		cs_packet_request_all_room_info packet;
+		packet.size = sizeof(packet);
+		packet.type = CS_PACKET::CS_PACKET_REQUEST_ROOM_INFO;
+		packet.request_page = 0;
+		
+		send_packet(&packet);
 		break;
 	}
 
@@ -348,6 +350,8 @@ void Network::ProcessPacket(char* ptr)
 	{
 		//std::cout << "방 접속 성공" << std::endl;
 		m_join_room = true;
+
+#if USE_VOICE
 		info.cbSize = sizeof(SHELLEXECUTEINFO);
 		info.fMask = SEE_MASK_NOCLOSEPROCESS;
 		info.hwnd = NULL;
@@ -361,6 +365,10 @@ void Network::ProcessPacket(char* ptr)
 		ShellExecuteEx(&info); // start process
 
 		GetProcessId(info.hProcess); // retrieve PID
+#endif
+
+		GameState& game_state = *GameState::GetInstance();
+		game_state.ChangeState();
 
 		Send_Ready_Packet(true);
 		break;
@@ -372,6 +380,7 @@ void Network::ProcessPacket(char* ptr)
 		//ShellExecute(NULL, L"open", L"voice\Voice.exe", NULL, NULL, SW_SHOWMINIMIZED);
 		//std::cout << "방 생성에 성공하였습니다." << std::endl;
 		m_join_room = true;
+#if USE_VOICE
 		info.cbSize = sizeof(SHELLEXECUTEINFO);
 		info.fMask = SEE_MASK_NOCLOSEPROCESS;
 		info.hwnd = NULL;
@@ -385,6 +394,10 @@ void Network::ProcessPacket(char* ptr)
 		ShellExecuteEx(&info); // start process
 
 		GetProcessId(info.hProcess); // retrieve PID
+#endif
+		GameState& game_state = *GameState::GetInstance();
+		game_state.ChangeState();
+
 		Send_Ready_Packet(true);
 		break;
 	}
@@ -552,9 +565,22 @@ void Network::ProcessPacket(char* ptr)
 		system("cls");
 		for (int i = 0; i < MAX_ROOM_INFO_SEND; ++i)
 		{
-			std::cout << "[" << packet->room_info[i].room_number << "] 번방 [" << packet->room_info[i].room_name << "] : [" << packet->room_info[i].join_member << "/6]" << std::endl;
+			memcpy(Input::GetInstance()->m_Roominfo[i].room_name, packet->room_info[i].room_name, sizeof(packet->room_info[i].room_name));
+			Input::GetInstance()->m_Roominfo[i].room_number = packet->room_info[i].room_number;
+			Input::GetInstance()->m_Roominfo[i].join_member = packet->room_info[i].join_member;
+			Input::GetInstance()->m_Roominfo[i].state = packet->room_info[i].state;
 		}
 		std::cout << "접속할 방 번호 입력 : ";
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_ROOM_INFO_UPDATE:
+	{
+		sc_packet_update_room* packet = reinterpret_cast<sc_packet_update_room*>(ptr);
+		int calcul_num = packet->room_number % 6;
+		Input::GetInstance()->m_Roominfo[calcul_num].join_member = packet->join_member;
+		Input::GetInstance()->m_Roominfo[calcul_num].state = packet->state;
+		Input::GetInstance()->m_Roominfo[calcul_num].room_number = packet->room_number;
 		break;
 	}
 
@@ -577,5 +603,40 @@ void Network::send_packet(void* packet)
 		int err_no = WSAGetLastError();
 		if (WSA_IO_PENDING != err_no)
 			exit(0);
+	}
+}
+
+void Network::Send_Select_Room(int select_room_number)
+{
+	switch (Input::GetInstance()->m_Roominfo[select_room_number].state)
+	{
+	
+	case GAME_ROOM_STATE::FREE:
+	{
+		cs_packet_create_room packet;
+		packet.size = sizeof(packet);
+		packet.type = CS_PACKET::CS_PACKET_CREATE_ROOM;
+		packet.room_number = select_room_number;
+
+		send_packet(&packet);
+		break;
+	}
+
+	case GAME_ROOM_STATE::READY:
+	{
+		cs_packet_join_room packet;
+		packet.size = sizeof(packet);
+		packet.type = CS_PACKET::CS_PACKET_JOIN_ROOM;
+		packet.room_number = select_room_number;
+
+		send_packet(&packet);
+		break;
+	}
+
+	case GAME_ROOM_STATE::PLAYING:
+	{
+		break;
+	}
+
 	}
 }

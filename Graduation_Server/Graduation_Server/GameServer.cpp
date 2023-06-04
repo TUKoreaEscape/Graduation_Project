@@ -213,6 +213,7 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 	}
 	// ¿©±â¼­ ÃÊ±âÈ­
 	if (cl.get_join_room_number() != -1) {
+		int disconnect_room_number = cl.get_join_room_number();
 		Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
 		for (int i = 0; i < 6; ++i)
 		{
@@ -225,6 +226,27 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 			}
 		}
 		rl.Exit_Player(_user_id);
+
+		sc_packet_update_room update_room_packet;
+		update_room_packet.size = sizeof(update_room_packet);
+		update_room_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO_UPDATE;
+		update_room_packet.join_member = m_room_manager->Get_Room_Info(disconnect_room_number)->Get_Number_of_users();
+		update_room_packet.room_number = disconnect_room_number;
+		update_room_packet.state = m_room_manager->Get_Room_Info(disconnect_room_number)->_room_state;
+
+		for (auto& cl : m_clients)
+		{
+			if (cl.get_id() == _user_id)
+				continue;
+
+			if (cl.get_state() != CLIENT_STATE::ST_LOBBY)
+				continue;
+
+			if (cl.get_look_lobby_page() != disconnect_room_number / 6)
+				continue;
+
+			cl.do_send(sizeof(update_room_packet), &update_room_packet);
+		}
 	}
 
 	// ¿©±ä °°Àº ¹æ¿¡ ÀÖ´Â ÇÃ·¹ÀÌ¾î¿¡°Ô »ç¿ëÀÚ°¡ ¶°³ª¹ö¸²À» ¾Ë·ÁÁÜ
@@ -400,7 +422,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 #if !DEBUG
 		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY) // ·Î±×ÀÎÇÏ°í ·Îºñ¿¡ ÀÖÀ»¶§¸¸ ¹æ »ý¼º °¡´É
 #endif
-			Process_Create_Room(user_id);
+			Process_Create_Room(user_id, p);
 		break;
 	}
 

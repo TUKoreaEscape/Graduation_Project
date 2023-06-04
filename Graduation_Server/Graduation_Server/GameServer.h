@@ -70,7 +70,7 @@ public:
 	void	ProcessPacket(const unsigned int user_id, unsigned char* p); // 패킷을 구분후 처리함
 	void	Process_User_Login(int c_id, void* buff);
 	void	Process_Create_ID(int c_id, void* buff);
-	void	Process_Create_Room(const unsigned int _user_id);
+	void	Process_Create_Room(const unsigned int _user_id, void* buff);
 	void	Process_Move(const int user_id, void* buff);
 	void	Process_Chat(const int user_id, void* buff);
 	void	Process_Request_Room_Info(const int user_id, void* buff);

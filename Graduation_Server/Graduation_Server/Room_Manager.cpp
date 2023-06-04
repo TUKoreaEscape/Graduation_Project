@@ -137,21 +137,17 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 
 }
 
-int RoomManager::Create_room(int user_id) // 방생성을 요청받을경우 사용합니다. 
+int RoomManager::Create_room(int user_id, int room_number) // 방생성을 요청받을경우 사용합니다. 
 {
 	int return_create_room_number = -1;
-	for (int i = 0; i < a_in_game_room.size(); ++i)
-	{ 
-		a_in_game_room[i]._room_state_lock.lock();
-		if (a_in_game_room[i]._room_state == GAME_ROOM_STATE::FREE)
-		{
-			a_in_game_room[i].Create_Room(user_id, i, GAME_ROOM_STATE::READY);
-			a_in_game_room[i]._room_state_lock.unlock();
-			return_create_room_number = i;
-			cout << return_create_room_number << "번방 생성! " << endl;
-			return return_create_room_number;
-		}
-		a_in_game_room[i]._room_state_lock.unlock();
+
+	a_in_game_room[room_number]._room_state_lock.lock();
+	if (a_in_game_room[room_number]._room_state == GAME_ROOM_STATE::FREE)
+	{
+		a_in_game_room[room_number].Create_Room(user_id, room_number, GAME_ROOM_STATE::READY);
+		a_in_game_room[room_number]._room_state_lock.unlock();
+		return_create_room_number = room_number;
+		return return_create_room_number;
 	}
 
 	return return_create_room_number;

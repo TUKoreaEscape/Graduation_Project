@@ -143,15 +143,38 @@ void cGameServer::Process_Chat(const int user_id, void* buff)
 	}
 }
 
-void cGameServer::Process_Create_Room(const unsigned int _user_id) // 夸没罐篮 货肺款 规 积己
+void cGameServer::Process_Create_Room(const unsigned int _user_id, void* buff) // 夸没罐篮 货肺款 规 积己
 {
-	m_clients[_user_id].set_join_room_number(m_room_manager->Create_room(_user_id));
+	cs_packet_create_room* packet = reinterpret_cast<cs_packet_create_room*>(buff);
+
+	m_clients[_user_id].set_join_room_number(m_room_manager->Create_room(_user_id, packet->room_number));
 	m_clients[_user_id]._state_lock.lock();
 	m_clients[_user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
 	m_clients[_user_id]._state_lock.unlock();
 	send_create_room_ok_packet(_user_id, m_clients[_user_id].get_join_room_number());
 	send_put_player_data(_user_id);
 	m_clients[_user_id].set_bounding_box(m_clients[_user_id].get_user_position(), XMFLOAT3(0.7f, 1.f, 0.7f), XMFLOAT4(0, 0, 0, 1));
+
+	sc_packet_update_room update_room_packet;
+	update_room_packet.size = sizeof(update_room_packet);
+	update_room_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO_UPDATE;
+	update_room_packet.join_member = m_room_manager->Get_Room_Info(packet->room_number)->Get_Number_of_users();
+	update_room_packet.room_number = packet->room_number;
+	update_room_packet.state = m_room_manager->Get_Room_Info(packet->room_number)->_room_state;
+
+	for (auto& cl : m_clients)
+	{
+		if (cl.get_id() == _user_id)
+			continue;
+
+		if (cl.get_state() != CLIENT_STATE::ST_LOBBY)
+			continue;
+
+		if (cl.get_look_lobby_page() != packet->room_number / 6)
+			continue;
+
+		cl.do_send(sizeof(update_room_packet), &update_room_packet);
+	}
 }
 
 void cGameServer::Process_Join_Room(const int user_id, void* buff)
@@ -195,6 +218,27 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 			m_clients[user_id].set_bounding_box(m_clients[user_id].get_user_position(), XMFLOAT3(0.7f, 1.f, 0.7f), XMFLOAT4(0, 0, 0, 1));
 			send_join_room_success_packet(user_id);
 			//cout << "send_join_room_success_packet" << endl;
+
+			sc_packet_update_room update_room_packet;
+			update_room_packet.size = sizeof(update_room_packet);
+			update_room_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO_UPDATE;
+			update_room_packet.join_member = m_room_manager->Get_Room_Info(packet->room_number)->Get_Number_of_users();
+			update_room_packet.room_number = packet->room_number;
+			update_room_packet.state = m_room_manager->Get_Room_Info(packet->room_number)->_room_state;
+
+			for (auto& cl : m_clients)
+			{
+				if (cl.get_id() == user_id)
+					continue;
+
+				if (cl.get_state() != CLIENT_STATE::ST_LOBBY)
+					continue;
+
+				if (cl.get_look_lobby_page() != packet->room_number / 6)
+					continue;
+
+				cl.do_send(sizeof(update_room_packet), &update_room_packet);
+			}
 		}
 		else {
 			send_join_room_fail_packet(user_id);
@@ -209,6 +253,8 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 {
 	cs_packet_request_exit_room* packet = reinterpret_cast<cs_packet_request_exit_room*>(buff);
+
+	int request_exit_room_number = m_clients[user_id].get_join_room_number();
 
 	if (m_clients[user_id].get_join_room_number() != -1) {
 		Room& cl_room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
@@ -248,6 +294,27 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 		}/**/
 		send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
 		m_clients[user_id].do_send(sizeof(send_packet), &send_packet);
+	}
+
+	sc_packet_update_room update_room_packet;
+	update_room_packet.size = sizeof(update_room_packet);
+	update_room_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO_UPDATE;
+	update_room_packet.join_member = m_room_manager->Get_Room_Info(request_exit_room_number)->Get_Number_of_users();
+	update_room_packet.room_number = request_exit_room_number;
+	update_room_packet.state = m_room_manager->Get_Room_Info(request_exit_room_number)->_room_state;
+
+	for (auto& cl : m_clients)
+	{
+		if (cl.get_id() == user_id)
+			continue;
+
+		if (cl.get_state() != CLIENT_STATE::ST_LOBBY)
+			continue;
+
+		if (cl.get_look_lobby_page() != request_exit_room_number / 6)
+			continue;
+
+		cl.do_send(sizeof(update_room_packet), &update_room_packet);
 	}
 }
 
@@ -290,6 +357,7 @@ void cGameServer::Process_Game_Start(const int user_id)
 void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
 {
 	cs_packet_request_all_room_info* packet = reinterpret_cast<cs_packet_request_all_room_info*>(buff);
+	m_clients[user_id].set_look_lobby_page(packet->request_page);
 
 	sc_packet_request_room_info send_packet;
 

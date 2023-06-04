@@ -29,6 +29,7 @@ private:
 	unsigned short			m_prev_size{};
 	int						m_id{};
 	int						m_join_room_number{};
+	int						m_look_lobby_page = -1;
 
 	XMFLOAT3				m_pos{};
 	XMFLOAT3				m_velocity{};
@@ -79,6 +80,7 @@ public:
 	int					return_prev_size();
 	int					get_id() { return m_id; }
 	int					get_join_room_number() { return m_join_room_number; }
+	int					get_look_lobby_page() { return m_look_lobby_page; }
 	bool				get_user_is_jump() { return m_jump; }
 	bool				get_user_collied_up_face() { return m_collied_up_face; }
 	bool				get_user_attack_animation() { return m_attack_animation; }
@@ -100,6 +102,8 @@ public:
 	short				get_right_y() { return m_right[1]; }
 	short				get_right_z() { return m_right[2]; }
 	unsigned char		get_input_key() { return m_input_key; }
+
+	void				set_look_lobby_page(int page) { m_look_lobby_page = page; }
 
 	void				set_look(Look look) { m_look[0] = look.x; m_look[1] = look.y; m_look[2] = look.z; }
 	void				set_right(Right right) { m_right[0] = right.x; m_right[1] = right.y; m_right[2] = right.z; }

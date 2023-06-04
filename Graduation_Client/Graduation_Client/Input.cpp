@@ -69,7 +69,20 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		case VK_RETURN:
+		{
+#if USE_NETWORK
+			if (m_gamestate->GetGameState() == LOGIN)
+			{
+				Network& network = *Network::GetInstance();
+				m_cs_packet_login.size = sizeof(m_cs_packet_login);
+				m_cs_packet_login.type = CS_PACKET::CS_PACKET_LOGIN;
+
+				network.send_packet(&m_cs_packet_login);
+			}
+#endif
 			break;
+		}
+
 		case VK_F9:
 			g_Framework.ChangeSwapChainState();
 		default:
@@ -107,7 +120,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:
-		if (!m_pPlayer->IsAttack())
+		if (!m_pPlayer->IsAttack() && m_gamestate->GetGameState() == PLAYING_GAME)
 		{
 #if USE_NETWORK
 			Network& network = *Network::GetInstance();
@@ -154,9 +167,11 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 				if (xPos >= roominfoRect[i].left && xPos <= roominfoRect[i].right && yPos >= roominfoRect[i].top && yPos <= roominfoRect[i].bottom) //어떤 방을 클릭했는지 판단하는 코드
 				{
 					std::cout << i+1  << " 방 클릭!" << std::endl;
+					Network& network = *Network::GetInstance();
+					network.Send_Select_Room(i);
 				}
 			}
-			InputRoomInfo();
+			//InputRoomInfo();
 		}
 		break;
 	case WM_LBUTTONUP:

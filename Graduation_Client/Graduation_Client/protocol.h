@@ -8,7 +8,7 @@ const int	MAX_CHAT_SIZE = 100;
 const int  MAX_NAME_SIZE = 20;
 const int  MAX_ROOM = 5000;
 
-const int  MAX_ROOM_INFO_SEND = 4;
+const int  MAX_ROOM_INFO_SEND = 6;
 
 const int CHECK_MAX_PACKET_SIZE = 127;
 
@@ -162,6 +162,8 @@ struct cs_packet_chat {
 struct cs_packet_create_room {
 	unsigned char	size;
 	unsigned char	type;
+
+	int				room_number;
 };
 
 struct cs_packet_join_room {
@@ -203,6 +205,20 @@ struct cs_packet_request_open_door {
 struct cs_packet_request_open_hidden_door {
 	unsigned char	size;
 	unsigned char	type;
+};
+
+struct cs_packet_request_electronic_system_open {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned char	es_num;
+};
+
+struct cs_packet_request_electronic_system_fix {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned char	fix_item_info;
 };
 
 struct cs_packet_request_exit_room {
@@ -250,6 +266,7 @@ namespace SC_PACKET
 		SC_PACKET_CREATE_ID_OK,
 		SC_PACKET_CREATE_ID_FAIL,
 		SC_PACKET_CREATE_ROOM_OK,
+		SC_PACKET_ROOM_INFO_UPDATE,
 		SC_PACKET_USER_UPDATE,
 		SC_PACKET_OTHER_PLAYER_UPDATE,
 		SC_PACKET_OTHER_PLAYER_DISCONNECT,
@@ -464,5 +481,14 @@ struct sc_packet_customizing_update {
 	unsigned char	eyes;
 	unsigned char	gloves;
 	unsigned char	mouthandnoses;
+};
+
+struct sc_packet_update_room {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			room_number;
+	short			join_member;
+	GAME_ROOM_STATE::TYPE state;
 };
 #pragma pack(pop)

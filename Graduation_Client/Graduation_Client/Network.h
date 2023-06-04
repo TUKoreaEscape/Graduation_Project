@@ -8,6 +8,7 @@
 
 #define  DIR_NO 100
 #define  USE_NETWORK 1
+#define	 USE_VOICE 0
 
 class Door;
 struct Custom {
@@ -81,6 +82,7 @@ public:
 	void Send_Customizing_Data();
 	void Send_Ready_Packet(bool is_ready);
 	void Send_Loading_Success_Packet();
+	void Send_Select_Room(int select_room_number);
 
 	// 게임 플레이시 사용하는 패킷전송 함수
 	void Send_Use_Tagger_Skill(int skill_type);

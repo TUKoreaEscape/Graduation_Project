@@ -14,7 +14,7 @@ public:
 	void	init();
 	void	init_object();
 
-	int		Create_room(int user_id);
+	int		Create_room(int user_id, int room_number);
 	bool	Join_room(int user_id, int select_room_number);
 	void	Clean_room(int room_number);
 
