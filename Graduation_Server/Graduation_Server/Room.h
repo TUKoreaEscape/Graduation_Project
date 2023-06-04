@@ -94,10 +94,10 @@ public:
 	bool	All_Player_Loading();
 
 	bool	Is_Door_Open(const int door_num);
-	CollisionInfo	is_collision_wall_to_player(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift);
-	CollisionInfo	is_collision_player_to_player(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift);
-	CollisionInfo	is_collision_player_to_object(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift);
-	CollisionInfo	is_collision_player_to_door(const int player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
+	CollisionInfo	is_collision_wall_to_player(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
+	CollisionInfo	is_collision_player_to_player(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
+	CollisionInfo	is_collision_player_to_object(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
+	CollisionInfo	is_collision_player_to_door(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
 
 	char*	Get_Room_Name(char room_name[], int size);
 };

@@ -14,7 +14,7 @@ void Room::Start_Game()
 	_room_state_lock.lock();
 	_room_state = GAME_ROOM_STATE::PLAYING;
 	_room_state_lock.unlock();
-	cGameServer& server = cGameServer::GetInstance();
+	cGameServer& server = *cGameServer::GetInstance();
 
 	sc_packet_update_room update_room_packet;
 	update_room_packet.size = sizeof(update_room_packet);
@@ -55,7 +55,7 @@ void Room::Update_room_time()
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 60 && m_tagger_id == -1 && _room_state == GAME_ROOM_STATE::PLAYING)
 	{
 		m_tagger_id = in_player[Select_Tagger()];
-		cGameServer& server = cGameServer::GetInstance();
+		cGameServer& server = *cGameServer::GetInstance();
 		
 		sc_packet_select_tagger packet;
 		packet.size = sizeof(packet);
@@ -74,7 +74,7 @@ void Room::Update_room_time()
 
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 180 && false == m_first_skill_enable && _room_state == GAME_ROOM_STATE::PLAYING) // 술래 첫번째 스킬 활성화
 	{
-		cGameServer& server = cGameServer::GetInstance();
+		cGameServer& server = *cGameServer::GetInstance();
 		CLIENT& cl = *server.get_client_info(m_tagger_id);
 		m_first_skill_enable = false;
 		m_second_skill_enable = false;
@@ -90,7 +90,7 @@ void Room::Update_room_time()
 	}
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 360 && false == m_second_skill_enable && _room_state == GAME_ROOM_STATE::PLAYING) // 술래 두번째 스킬 활성화
 	{
-		cGameServer& server = cGameServer::GetInstance();
+		cGameServer& server = *cGameServer::GetInstance();
 		CLIENT& cl = *server.get_client_info(m_tagger_id);
 		m_second_skill_enable = true;
 		cl.set_second_skill_enable();
@@ -103,7 +103,7 @@ void Room::Update_room_time()
 	}
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 540 && false == m_third_skill_enable && _room_state == GAME_ROOM_STATE::PLAYING) // 술래 세번째 스킬 활성화
 	{
-		cGameServer& server = cGameServer::GetInstance();
+		cGameServer& server = *cGameServer::GetInstance();
 		CLIENT& cl = *server.get_client_info(m_tagger_id);
 		m_third_skill_enable = true;
 		cl.set_third_skill_enable();

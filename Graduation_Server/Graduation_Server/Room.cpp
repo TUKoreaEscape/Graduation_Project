@@ -145,7 +145,7 @@ bool Room::All_Player_Loading()
 
 void Room::Update_Player_Position() // 사용하지 않습니다.
 {
-	cGameServer& server = cGameServer::GetInstance();
+	cGameServer& server = *cGameServer::GetInstance();
 }
 
 void Room::Update_Door(const int door_num)
@@ -160,9 +160,9 @@ bool Room::Is_Door_Open(const int door_num)
 	return false;
 }
 
-CollisionInfo Room::is_collision_player_to_door(const int player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift)
+CollisionInfo Room::is_collision_player_to_door(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift)
 {
-	cGameServer& server = cGameServer::GetInstance();
+	cGameServer& server = *cGameServer::GetInstance();
 	CLIENT& client = *server.get_client_info(player_id);
 	CollisionInfo return_data;
 	return_data.is_collision = false;
@@ -211,9 +211,9 @@ CollisionInfo Room::is_collision_player_to_door(const int player_id, const XMFLO
 	return return_data;
 }
 
-CollisionInfo Room::is_collision_player_to_object(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift)
+CollisionInfo Room::is_collision_player_to_object(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift)
 {
-	cGameServer& server = cGameServer::GetInstance();
+	cGameServer& server = *cGameServer::GetInstance();
 	CLIENT& client = *server.get_client_info(player_id);
 	CollisionInfo return_data;
 	return_data.is_collision = false;
@@ -260,12 +260,12 @@ CollisionInfo Room::is_collision_player_to_object(const int player_id, const XMF
 	return return_data;
 }
 
-CollisionInfo Room::is_collision_player_to_player(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift)
+CollisionInfo Room::is_collision_player_to_player(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift)
 {
 	CollisionInfo return_data;
 
 	int collied_id = -1;
-	cGameServer& server = cGameServer::GetInstance();
+	cGameServer& server = *cGameServer::GetInstance();
 	CLIENT& client = *server.get_client_info(player_id);
 
 	BoundingOrientedBox player_bounding_box = client.get_bounding_box();
@@ -320,9 +320,9 @@ CollisionInfo Room::is_collision_player_to_player(const int player_id, const XMF
 	return return_data;
 }
 
-CollisionInfo Room::is_collision_wall_to_player(const int player_id, const XMFLOAT3 current_position, const XMFLOAT3 xmf3shift)
+CollisionInfo Room::is_collision_wall_to_player(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift)
 {
-	cGameServer& server = cGameServer::GetInstance();
+	cGameServer& server = *cGameServer::GetInstance();
 	CLIENT& cl = *server.get_client_info(player_id);
 	CollisionInfo return_data;
 	return_data.is_collision = false;

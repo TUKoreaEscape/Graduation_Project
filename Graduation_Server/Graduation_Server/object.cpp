@@ -58,7 +58,7 @@ XMFLOAT3 GameObject::Get_extents()
 
 XMFLOAT4 GameObject::Get_orientation()
 {
-	cGameServer& server = cGameServer::GetInstance();
+	cGameServer& server = *cGameServer::GetInstance();
 	return m_orientation;
 }
 

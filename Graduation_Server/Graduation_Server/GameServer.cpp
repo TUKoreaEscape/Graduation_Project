@@ -1,10 +1,10 @@
 #include "GameServer.h"
 
-cGameServer& cGameServer::GetInstance()
-{
-	static cGameServer instance;
-	return instance;
-}
+//cGameServer& cGameServer::GetInstance()
+//{
+//	static cGameServer instance;
+//	return instance;
+//}
 
 cGameServer::cGameServer()
 {
@@ -113,8 +113,8 @@ void cGameServer::WorkerThread()
 				std::cout << "send_error" << std::endl;
 				int WSAerror = WSAGetLastError();
 				Disconnect(client_id);
-				delete exp_over;
 			}
+			delete exp_over;
 			break;
 
 		case OP_ACCEPT:

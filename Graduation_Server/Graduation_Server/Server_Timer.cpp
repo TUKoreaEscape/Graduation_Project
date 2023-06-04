@@ -43,7 +43,7 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 	{
 		EXP_OVER* over = new EXP_OVER;
 		over->m_comp_op = OP_DOOR_OPEN;
-
+		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.obj_id, &over->m_wsa_over);
 		break;
 	}
 

@@ -29,6 +29,7 @@ struct TIMER_EVENT {
 	std::chrono::system_clock::time_point	event_time;
 	EventType								event_type;
 	float									cool_time;
+	int										obj_id;
 
 	constexpr bool operator < (const TIMER_EVENT& left) const
 	{
@@ -39,17 +40,22 @@ struct TIMER_EVENT {
 class cGameServer : public C_IOCP
 {
 public:
+	static cGameServer* server_instance;
 	cGameServer();
 	~cGameServer();
 
-	static cGameServer& GetInstance();
+public:
+
+	//static cGameServer& GetInstance();
+	static cGameServer* GetInstance() {
+		if (server_instance == nullptr)
+			server_instance = new cGameServer;
+		return server_instance;
+	}
 
 	void	init();
 	void	StartServer();
 	void	WorkerThread();
-
-
-
 
 	void	Accept(EXP_OVER* exp_over);
 	void	Send(EXP_OVER* exp_over);
@@ -128,3 +134,4 @@ private:
 	Server_Timer					m_session_timer;
 	concurrency::concurrent_priority_queue<TIMER_EVENT> m_timer_queue;
 };
+

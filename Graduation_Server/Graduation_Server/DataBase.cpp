@@ -245,7 +245,7 @@ void DataBase::DataBaseThread()
 			{
 			case REQUEST_LOGIN:
 			{
-				cGameServer& server = cGameServer::GetInstance();
+				cGameServer& server = *cGameServer::GetInstance();
 				int reason = 0;
 				reason = check_login(request.request_name, request.request_pw);
 
@@ -272,7 +272,7 @@ void DataBase::DataBaseThread()
 
 			case REQUEST_CREATE_ID:
 			{
-				cGameServer& server = cGameServer::GetInstance();
+				cGameServer& server = *cGameServer::GetInstance();
 				int reason = 0;
 				reason = create_id(request.request_name, request.request_pw);
 
@@ -297,7 +297,7 @@ void DataBase::DataBaseThread()
 
 			case REQUEST_LOAD_CUSTOMIZING:
 			{
-				cGameServer& server = cGameServer::GetInstance();
+				cGameServer& server = *cGameServer::GetInstance();
 				Custom data = Load_Customizing(request.request_name);
 				server.m_clients[request.request_id].m_customizing->Load_Customizing_Data_To_DB(data);
 				

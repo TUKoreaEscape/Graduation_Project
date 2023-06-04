@@ -71,7 +71,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 				collision_up_face = true;
 			//cout << "적용후 캐릭터 좌표 : " << m_clients[user_id].get_user_position().x << ", " << m_clients[user_id].get_user_position().y << ", " << m_clients[user_id].get_user_position().z << endl;
 		}
-
+		
 		CollisionInfo wall_check = join_room.is_collision_wall_to_player(user_id, current_player_position, current_shift);
 		if (wall_check.is_collision)
 		{
