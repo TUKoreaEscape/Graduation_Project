@@ -20,6 +20,22 @@ class CLIENT;
 class Voice_Chat;
 class RoomManager;
 
+enum class EventType : char
+{
+	DOOR_TIME
+};
+
+struct TIMER_EVENT {
+	std::chrono::system_clock::time_point	event_time;
+	EventType								event_type;
+	float									cool_time;
+
+	constexpr bool operator < (const TIMER_EVENT& left) const
+	{
+		return (event_time > left.event_time);
+	}
+};
+
 class cGameServer : public C_IOCP
 {
 public:
@@ -81,10 +97,13 @@ public:
 	void	Process_Attack(const int user_id);
 	void	Process_Customizing(const int user_id, void* buff);
 	void	Process_Door(const int user_id, void* buff);
+	
+	void	Process_Event(const TIMER_EVENT& ev);
 
 	// voice chat data를 전송하는 부분!
 	void	Process_Voice_Data(int user_id);
 
+	void	Timer();
 	int		get_new_id();
 	CLIENT*	get_client_info(const int player_id);
 	CollisionInfo GetCollisionInfo(const BoundingOrientedBox& other, const BoundingOrientedBox& moved);
@@ -107,4 +126,5 @@ private:
 	RoomManager						*m_room_manager = nullptr;
 	Server_Timer					m_PerformanceCounter;
 	Server_Timer					m_session_timer;
+	concurrency::concurrent_priority_queue<TIMER_EVENT> m_timer_queue;
 };
