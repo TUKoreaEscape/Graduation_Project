@@ -6,9 +6,7 @@
 #include "Camera.h"
 #include "Object.h"
 #include "Network.h"
-
-enum E_GAME_STATE { E_GAME_OVER, E_GAME_RUNNING };
-extern E_GAME_STATE gameState; //게임이 진행중인지 끝났는지 사용하기위한 변수이다. 아직은 사용하지 않고 정의만 해두었다.
+#include "Game_state.h"
 
 
 //GameScene과 Scene을 분리해놓은 이유
@@ -33,8 +31,10 @@ public:
 	GameObject* m_pForestTerrain = nullptr;
 	GameObject* m_pCubeTerrain = nullptr;
 
-	int m_nUI = 0;
-	GameObject* m_UITest[2];
+	int m_nLogin;
+	int m_nRoomSelect;
+	GameObject** m_UILogin = nullptr;
+	GameObject** m_UIRoomSelect = nullptr;
 
 	GameObject* m_pCeilling = nullptr;
 
@@ -78,7 +78,7 @@ public:
 	virtual void prerender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void defrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void forrender(ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList, int index);
+	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 

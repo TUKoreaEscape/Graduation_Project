@@ -126,6 +126,12 @@
     <ClInclude Include="Server_Timer.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="Game_state.h">
+      <Filter>Engine\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="UI.h">
+      <Filter>Engine\Framework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -202,6 +208,12 @@
     </ClCompile>
     <ClCompile Include="Process_Packet.cpp">
       <Filter>Client\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Game_state.cpp">
+      <Filter>Engine\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.cpp">
+      <Filter>Engine\Framework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

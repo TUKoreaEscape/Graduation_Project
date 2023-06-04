@@ -287,8 +287,16 @@ public:
 class UIMesh : public Mesh
 {
 public:
-	UIMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	UIMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float x = 0.0f, float y= 0.0f, float width=1.0f, float height=1.0f);
 	virtual ~UIMesh();
+
+	virtual void OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
+
+protected:
+	XMFLOAT2* m_pxmf2TextureCoords0 = NULL;
+	ID3D12Resource* m_pd3dTextureCoord0Buffer = NULL;
+	ID3D12Resource* m_pd3dTextureCoord0UploadBuffer = NULL;
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dTextureCoord0BufferView;
 };
 
 class TexturedRectMesh : public Mesh

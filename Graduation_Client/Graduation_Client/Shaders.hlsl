@@ -872,18 +872,21 @@ struct VS_UI_OUTPUT
 	float2 uv : TEXCOORD;
 };
 
-VS_UI_OUTPUT VSUI(uint nVertexID : SV_VertexID)
+VS_UI_OUTPUT VSUI(VS_UI_INPUT input, uint nVertexID : SV_VertexID)
 {
 	VS_UI_OUTPUT output;
+	output.position = float4(input.position,1.0f);
+	output.uv = input.uv;
+	//if (nVertexID == 0) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
+	//else if (nVertexID == 1) { output.position = float4(+1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 0.0f); }
+	//else if (nVertexID == 2) { output.position = float4(-1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 1.0f); }
+	//else if (nVertexID == 3) { output.position = float4(-1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 1.0f); }
+	//else if (nVertexID == 4) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
+	//else if (nVertexID == 5) { output.position = float4(+1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 0.0f); }
 
-	if (nVertexID == 0) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
-	else if (nVertexID == 1) { output.position = float4(+1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 0.0f); }
-	else if (nVertexID == 2) { output.position = float4(-1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 1.0f); }
-	else if (nVertexID == 3) { output.position = float4(-1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 1.0f); }
-	else if (nVertexID == 4) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
-	else if (nVertexID == 5) { output.position = float4(+1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 0.0f); }
-
-	//output.position = mul(float4(gvCameraPosition,1.0f), gmtxGameObject);
+	//output.position.xy *= float2(0.5f, 0.5f); // 위치를 화면 중심 기준으로 이동
+	//output.position.xy -= float2(0.1f, 0.1f); // 위치를 [0, 1] 범위로 조정
+	//output.position.xy *= float2(ScreenWidth, ScreenHeight); // 위치를 스크린 크기에 맞게 스케일 조정
 
 	return output;
 }
@@ -892,7 +895,6 @@ float4 PSUI(VS_UI_OUTPUT input) : SV_TARGET
 {
 	float4 Color = gtxtUITexture.Sample(gssWrap, input.uv);
 	return Color;
-	return float4(1, 0, 0, 1);
 }
 
 VS_UI_OUTPUT VSDoorUI(VS_UI_INPUT input)

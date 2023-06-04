@@ -7,6 +7,8 @@
 #include "Renderer.h"
 #include "Shader.h"
 #include "GameObject.h"
+#include "Game_state.h"
+#include "UI.h"
 
 class Framework
 {
@@ -35,7 +37,8 @@ private:
 	ID3D12DescriptorHeap* m_pd3dDsvDescriptorHeap;
 	
 	ID3D12CommandQueue *m_pd3dCommandQueue;
-	ID3D12CommandAllocator* m_pd3dCommandAllocator;
+	//ID3D12CommandAllocator* m_pd3dCommandAllocator;
+	ID3D12CommandAllocator* m_ppd3dCommandAllocators[m_nSwapChainBuffers];
 	ID3D12GraphicsCommandList* m_pd3dCommandList; //명령 큐, 명령 할당자, 명령 리스트 인터페이스 포인터이다.
 
 	D3D12_CPU_DESCRIPTOR_HANDLE		m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBuffers];//
@@ -46,10 +49,35 @@ private:
 	ID3D12Fence *m_pd3dFence;
 	UINT64 m_nFenceValues[m_nSwapChainBuffers];
 	HANDLE m_hFenceEvent; //펜스 인터페이스 포인터, 펜스의 값, 이벤트 핸들이다.
+
+	//D2D코드
+	ID3D11On12Device* m_pd3d11On12Device = NULL;
+	ID3D11DeviceContext* m_pd3d11DeviceContext = NULL;
+	ID2D1Factory3* m_pd2dFactory = NULL;
+	IDWriteFactory* m_pdWriteFactory = NULL;
+	ID2D1Device2* m_pd2dDevice = NULL;
+	ID2D1DeviceContext2* m_pd2dDeviceContext = NULL;
+
+	ID3D11Resource* m_ppd3d11WrappedBackBuffers[m_nSwapChainBuffers];
+	ID2D1Bitmap1* m_ppd2dRenderTargets[m_nSwapChainBuffers];
+
+	ID2D1SolidColorBrush* m_pd2dbrBackground = NULL;
+	ID2D1SolidColorBrush* m_pd2dbrBorder = NULL;
+	IDWriteTextFormat* m_pdLoginFont = NULL;
+	IDWriteTextFormat* m_pdRoomTitleFont = NULL;
+	IDWriteTextFormat* m_pdRoomOtherFont = NULL;
+	IDWriteTextLayout* m_pdwTextLayout = NULL;
+	IDWriteTextLayout* m_pdRoomTitleFLayout = NULL;
+	IDWriteTextLayout* m_pdRoomOtherLayout = NULL;
+
+	ID2D1SolidColorBrush* m_pd2dpurpleText = NULL;
+	ID2D1SolidColorBrush* m_pd2dlightsalmonText = NULL;
+	ID2D1SolidColorBrush* m_pd2dblackText = NULL;
 	
 	Input*			input;
 	GameScene*		scene;
 	Time			time;
+	GameState*	m_gamestate;
 
 	float           timeToSend;
 
@@ -67,6 +95,7 @@ public:
 	void CreateSwapChain();
 	void CreateRtvAndDsvDescriptorHeaps();
 	void CreateDirect3DDevice();
+	void CreateDirect2DDevice();
 	void CreateCommandQueueAndList(); //스왑 체인, 디바이스, 서술자 힙, 명령 큐/할당자/리스트를 생성하는 함수이다.
 
 	void CreateRenderTargetViews();
@@ -85,5 +114,12 @@ public:
 	void ChangeSwapChainState();
 
 	void MoveToNextFrame();
+
+	void TextRender();
 };
 
+/*
+* szRenderTarget.width / 9.14, szRenderTarget.height / 1.62, szRenderTarget.width / 2.73, szRenderTarget.height / 1.51 -> ID칸 //175,553,585,595
+* szRenderTarget.width / 9.14, szRenderTarget.height / 1.46, szRenderTarget.width / 2.73, szRenderTarget.height / 1.37 / 4칸 175, 615, 585, 657
+* 
+*/

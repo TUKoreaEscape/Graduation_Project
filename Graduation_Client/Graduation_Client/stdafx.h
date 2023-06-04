@@ -25,6 +25,13 @@
 #include <DirectXColors.h>
 #include <DirectXCollision.h>
 #include <DXGIDebug.h>
+
+#include <d2d1_3.h>
+#include <dwrite.h>
+#include <dwrite_1.h>
+#include <d3d11on12.h>
+#include <d2d1_1helper.h>
+
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 using Microsoft::WRL::ComPtr;
@@ -33,6 +40,9 @@ using Microsoft::WRL::ComPtr;
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "d2d1.lib")
+#pragma comment(lib, "dwrite.lib")
+#pragma comment(lib, "d3d11.lib")
 
 #define FRAME_BUFFER_WIDTH 1600
 #define FRAME_BUFFER_HEIGHT 900
@@ -141,6 +151,13 @@ enum HEADS {
 	HEAD11, HEAD12, HEAD13, HEAD14, HEAD15,
 	HEAD16, HEAD17, HEAD18, HEAD19, HEAD20,
 	HEAD21
+};
+
+struct RECT_FLOAT {
+	double left = 0.f;
+	double top = 0.f;
+	double right = 0.f;
+	double bottom = 0.f;
 };
 
 namespace Vector3
