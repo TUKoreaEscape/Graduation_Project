@@ -960,10 +960,10 @@ TexturedRectMesh::TexturedRectMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_pxmf3Positions[2] = XMFLOAT3(xStart + m_nWidth, zStart + m_nLength, 0);
 	m_pxmf3Positions[3] = XMFLOAT3(xStart, zStart + m_nLength , 0);
 
-	m_pxmf2TextureCoords0[0] = XMFLOAT2(0, 1);
-	m_pxmf2TextureCoords0[1] = XMFLOAT2(1, 1);
-	m_pxmf2TextureCoords0[2] = XMFLOAT2(1, 0);
-	m_pxmf2TextureCoords0[3] = XMFLOAT2(0, 0);
+	m_pxmf2TextureCoords0[0] = XMFLOAT2(1, 1);
+	m_pxmf2TextureCoords0[1] = XMFLOAT2(0, 1);
+	m_pxmf2TextureCoords0[2] = XMFLOAT2(0, 0);
+	m_pxmf2TextureCoords0[3] = XMFLOAT2(1, 0);
 
 	m_pd3dPositionBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Positions, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
 
@@ -992,8 +992,8 @@ TexturedRectMesh::TexturedRectMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_ppnSubSetIndices[0][1] = 2;
 	m_ppnSubSetIndices[0][2] = 0;
 	m_ppnSubSetIndices[0][3] = 0;
-	m_ppnSubSetIndices[0][4] = 2;
-	m_ppnSubSetIndices[0][5] = 1;
+	m_ppnSubSetIndices[0][4] = 1;
+	m_ppnSubSetIndices[0][5] = 2;
 
 	m_ppd3dSubSetIndexBuffers[0] = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_ppnSubSetIndices[0], sizeof(UINT) * m_pnSubSetIndices[0], D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_INDEX_BUFFER, &m_ppd3dSubSetIndexUploadBuffers[0]);
 
