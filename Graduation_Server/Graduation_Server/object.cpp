@@ -78,7 +78,7 @@ Door::Door(const unsigned int door_id, Object_Type type, XMFLOAT3 center, XMFLOA
 
 bool Door::process_door_event()
 {
-	if (m_state == ST_CLOSE)
+	if (m_state == ST_CLOSE && m_door_open_start == false)
 	{
 		m_state = ST_OPEN;
 		m_door_open_start_time = chrono::system_clock::now();
