@@ -618,7 +618,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 		cEmissionColor = gtxtEmissionTexture.Sample(gssWrap, input.uv);
 		cEmissionColor = cEmissionColor * gMaterial.m_cEmissive;
 	}
-	float4 cColor = cAlbedoColor + cSpecularColor + cMetallicColor + cEmissionColor;
+	float4 cColor = cAlbedoColor + cSpecularColor + cEmissionColor;
 
 	clip(cColor.a - 0.1f);
 

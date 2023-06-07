@@ -80,6 +80,9 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			m_pDoors[i]->render(pd3dCommandList);
 		}
 	}
+
+	m_pElectric->render(pd3dCommandList);
+
 	m_pOak->render(pd3dCommandList);
 	for (int i = 0; i < m_nBush; ++i)
 	{
@@ -113,7 +116,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 100);
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 150);
 
 	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
@@ -124,6 +127,17 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	LoadedModelInfo* pHouseModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPorest.bin", nullptr);
 	LoadedModelInfo* pLobbyModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InDDD.bin", nullptr);
 	LoadedModelInfo* pCeilModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Ceilling.bin", nullptr);
+
+	//
+
+	LoadedModelInfo* pElecModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Shield2.bin", nullptr);
+
+	m_pElectric = new GameObject();
+	m_pElectric->SetChild(pElecModel->m_pModelRootObject, true);
+	m_pElectric->UpdateTransform(nullptr);
+
+	if (pElecModel) delete pElecModel;
+	//
 
 	m_nPlayers = 5;
 	m_ppPlayers = new Player * [m_nPlayers];

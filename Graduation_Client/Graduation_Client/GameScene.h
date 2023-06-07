@@ -55,6 +55,8 @@ public:
 
 	Door* m_pDoors[6];
 
+	GameObject* m_pElectric = nullptr;
+
 	Network* m_network;
 	std::thread recv_thread;
 
