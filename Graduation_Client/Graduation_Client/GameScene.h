@@ -57,7 +57,7 @@ public:
 
 	Network* m_network;
 	std::thread recv_thread;
-	std::thread send_thread;
+
 
 protected:
 	static ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap;

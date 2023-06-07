@@ -142,18 +142,18 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			{
 				// 입력란을 활성화하고 입력을 받을 수 있는 상태로 전환합니다.
 				m_inputState = 1;
-				std::cout << "아이디 칸 클릭!" << std::endl;
+				//std::cout << "아이디 칸 클릭!" << std::endl;
 			}
 			//비밀번호
 			else if (xPos >= passwordRect.left && xPos <= passwordRect.right && yPos >= passwordRect.top && yPos <= passwordRect.bottom)
 			{
 				m_inputState = 2;
-				std::cout << "비밀번호 칸 클릭!" << std::endl;
+				//std::cout << "비밀번호 칸 클릭!" << std::endl;
 			}
 			else
 			{
 				m_inputState = 0;
-				std::cout << "빈칸 클릭!" << std::endl;
+				//std::cout << "빈칸 클릭!" << std::endl;
 			}
 		}
 		else if (m_gamestate->GetGameState() == ROOM_SELECT)
@@ -166,7 +166,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			{
 				if (xPos >= roominfoRect[i].left && xPos <= roominfoRect[i].right && yPos >= roominfoRect[i].top && yPos <= roominfoRect[i].bottom) //어떤 방을 클릭했는지 판단하는 코드
 				{
-					std::cout << i+1  << " 방 클릭!" << std::endl;
+					//std::cout << i+1  << " 방 클릭!" << std::endl;
 					Network& network = *Network::GetInstance();
 					network.Send_Select_Room(i);
 				}

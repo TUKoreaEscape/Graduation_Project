@@ -43,6 +43,7 @@ public:
 	bool	m_recv_move = false;
 	int		m_my_id = -1;
 
+	std::thread send_thread;
 	//임시사용 변수입니다.
 	bool    m_login = false;
 	bool	m_join_room = false;

@@ -103,7 +103,6 @@ void Network::Send_Use_Tagger_Skill(int skill_type)
 
 void Network::Debug_send_thread()
 {
-	while (m_join_room == false);
 	while (m_shutdown == false)
 	{
 		int code;
@@ -350,7 +349,7 @@ void Network::ProcessPacket(char* ptr)
 	{
 		//std::cout << "规 立加 己傍" << std::endl;
 		m_join_room = true;
-
+		send_thread = std::thread{ &Network::Debug_send_thread, this };
 #if USE_VOICE
 		info.cbSize = sizeof(SHELLEXECUTEINFO);
 		info.fMask = SEE_MASK_NOCLOSEPROCESS;
@@ -380,6 +379,7 @@ void Network::ProcessPacket(char* ptr)
 		//ShellExecute(NULL, L"open", L"voice\Voice.exe", NULL, NULL, SW_SHOWMINIMIZED);
 		//std::cout << "规 积己俊 己傍窍看嚼聪促." << std::endl;
 		m_join_room = true;
+		send_thread = std::thread{ &Network::Debug_send_thread, this };
 #if USE_VOICE
 		info.cbSize = sizeof(SHELLEXECUTEINFO);
 		info.fMask = SEE_MASK_NOCLOSEPROCESS;
@@ -453,7 +453,7 @@ void Network::ProcessPacket(char* ptr)
 		sc_put_player_packet* packet = reinterpret_cast<sc_put_player_packet*>(ptr);
 		m_pPlayer->SetID(packet->data.id);
 		m_pPlayer->SetPosition(packet->data.position, true);
-		std::cout << "Set Init Pos : (" << packet->data.position.x << ", " << packet->data.position.y << ", " << packet->data.position.z << ") " << std::endl;
+		//std::cout << "Set Init Pos : (" << packet->data.position.x << ", " << packet->data.position.y << ", " << packet->data.position.z << ") " << std::endl;
 		m_pPlayer->SetVelocity(packet->data.velocity);
 		//std::cout << "put player packet recv!" << std::endl;
 		break;
@@ -570,7 +570,6 @@ void Network::ProcessPacket(char* ptr)
 			Input::GetInstance()->m_Roominfo[i].join_member = packet->room_info[i].join_member;
 			Input::GetInstance()->m_Roominfo[i].state = packet->room_info[i].state;
 		}
-		std::cout << "立加且 规 锅龋 涝仿 : ";
 		break;
 	}
 
