@@ -136,6 +136,8 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pElectric->SetChild(pElecModel->m_pModelRootObject, true);
 	m_pElectric->UpdateTransform(nullptr);
 
+	m_pElectric->FindFrame("Lamp_2")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+
 	if (pElecModel) delete pElecModel;
 	//
 
@@ -760,6 +762,7 @@ void GameScene::LoadSceneBushFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 		pGameObject->renderer->SetMaterial(pMaterial);
 
 		m_ppBush[i] = pGameObject;
+		//m_ppBush[i]->SetType(-1);
 	}
 
 	::fclose(pFile);
@@ -767,6 +770,7 @@ void GameScene::LoadSceneBushFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 	m_pOak = new GameObject();
 	LoadedModelInfo* pOakModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Oak.bin", nullptr);
 	m_pOak->SetChild(pOakModel->m_pModelRootObject, true);
+	m_pOak->SetType(-1);
 	//m_pOak->SetPosition(61.25, 0.7897112, -68.4);
 	m_pOak->UpdateTransform(nullptr);
 	if (pOakModel) delete pOakModel;

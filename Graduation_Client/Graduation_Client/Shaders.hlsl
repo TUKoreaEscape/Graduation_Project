@@ -21,7 +21,7 @@ cbuffer cbGameObjectInfo : register(b0)
 	matrix					gmtxGameObject : packoffset(c0);
 	MATERIAL				gMaterial : packoffset(c4);
 	uint					gnTexturesMask : packoffset(c8.x);
-	uint					gnObjectType : packoffset(c8.y);
+	int						gnObjectType : packoffset(c8.y);
 };
 
 cbuffer cbDebug : register(b2)
@@ -619,8 +619,9 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 		cEmissionColor = cEmissionColor * gMaterial.m_cEmissive;
 	}
 	float4 cColor = cAlbedoColor + cSpecularColor + cEmissionColor;
-
-	clip(cColor.a - 0.1f);
+	
+	if (gnObjectType < 0)
+		clip(cColor.a - 0.1f);
 
 	float3 normalW;
 	if (gnTexturesMask & MATERIAL_NORMAL_MAP)
