@@ -64,6 +64,8 @@ XMFLOAT4 GameObject::Get_orientation()
 
 Door::Door()
 {
+	if (m_state_lock == nullptr)
+		m_state_lock = new mutex;
 }
 
 Door::Door(const unsigned int door_id, Object_Type type, XMFLOAT3 center, XMFLOAT3 extents)
@@ -74,7 +76,8 @@ Door::Door(const unsigned int door_id, Object_Type type, XMFLOAT3 center, XMFLOA
 	m_extents = extents;
 	m_state = ST_CLOSE;
 	m_bounding_box = BoundingOrientedBox{ center, extents, XMFLOAT4(0,0,0,1) };
-	m_state_lock = new mutex;
+	if(m_state_lock == nullptr)
+		m_state_lock = new mutex;
 }
 
 bool Door::process_door_event()

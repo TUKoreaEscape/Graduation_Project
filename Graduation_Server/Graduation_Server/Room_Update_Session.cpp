@@ -131,6 +131,8 @@ void Room::Update_room_time()
 			m_door_object[i].set_boundingbox_check(false);
 			m_door_object[i].m_state_lock->unlock();
 		}
+		else
+			m_door_object[i].m_state_lock->unlock();
 	}
 
 
