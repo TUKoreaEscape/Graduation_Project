@@ -118,10 +118,10 @@ void Room::Update_room_time()
 
 	for (int i = 0; i < m_door_object.size(); ++i)
 	{
-		m_door_object[i].set_state_lock();
+		m_door_object[i].m_state_lock->lock();
 		if (!m_door_object[i].m_door_open_start)
 		{
-			m_door_object[i].set_state_unlock();
+			m_door_object[i].m_state_lock->unlock();
 			continue;
 		}
 		
@@ -129,7 +129,7 @@ void Room::Update_room_time()
 		{
 			m_door_object[i].m_door_open_start = false;
 			m_door_object[i].set_boundingbox_check(false);
-			m_door_object[i].set_state_unlock();
+			m_door_object[i].m_state_lock->unlock();
 		}
 	}
 
