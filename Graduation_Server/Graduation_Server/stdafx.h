@@ -2,6 +2,8 @@
 #define DEBUG 1
 #define PRINT 0
 #define MAX_USER 30000
+#define NUMBER_OF_DOOR 6
+
 #include <iostream>
 #include <WS2tcpip.h>
 #include <MSWSock.h>
@@ -16,7 +18,6 @@
 #include <concurrent_priority_queue.h>
 #include <unordered_map>
 #include <unordered_set>
-#include <mutex>
 #include <bitset>
 #include <locale.h>
 #include <random>

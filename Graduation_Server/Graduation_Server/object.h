@@ -43,8 +43,9 @@ enum Door_State{ST_OPEN, ST_OPENING ,ST_CLOSE};
 
 class Door : public GameObject { // 인게임 도어에 관련된 부분 (도어 오픈 시간 차이도 있으므로 체크해줘야함)
 private:
-	int		   m_door_id;
-	Door_State m_state = ST_CLOSE;
+	int			m_door_id;
+	Door_State	m_state = ST_CLOSE;
+	mutex*		m_state_lock = nullptr;
 
 public:
 	chrono::system_clock::time_point m_door_open_start_time;
@@ -61,7 +62,11 @@ public:
 
 	bool process_door_event();
 
+	void set_state_lock() { m_state_lock->lock(); }
+	void set_state_unlock() { m_state_lock->unlock(); }
 	void set_boundingbox_check(bool option) { m_check_bounding_box = option; }
+
+	void Release();
 	Door_State get_state() { return m_state; }
 };
 

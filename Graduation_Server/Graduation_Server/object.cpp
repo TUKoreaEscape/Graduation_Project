@@ -74,21 +74,25 @@ Door::Door(const unsigned int door_id, Object_Type type, XMFLOAT3 center, XMFLOA
 	m_extents = extents;
 	m_state = ST_CLOSE;
 	m_bounding_box = BoundingOrientedBox{ center, extents, XMFLOAT4(0,0,0,1) };
+	m_state_lock = new mutex;
 }
 
 bool Door::process_door_event()
 {
+	m_state_lock->lock();
 	if (m_state == ST_CLOSE && m_door_open_start == false)
 	{
 		m_state = ST_OPEN;
 		m_door_open_start_time = chrono::system_clock::now();
 		m_door_open_start = true;
+		m_state_lock->unlock();
 	}
 
 	else if (m_state == ST_OPEN)
 	{
 		m_state = ST_CLOSE;
 		m_check_bounding_box = true;
+		m_state_lock->unlock();
 	}
 	return true;
 }
@@ -101,6 +105,11 @@ void Door::Update_bounding_box_pos(const XMFLOAT3& pos)
 void Door::Update_Object()
 {
 
+}
+
+void Door::Release()
+{
+	delete m_state_lock;
 }
 
 ElectronicSystem::ElectronicSystem()

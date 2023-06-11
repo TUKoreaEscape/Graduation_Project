@@ -118,13 +118,18 @@ void Room::Update_room_time()
 
 	for (int i = 0; i < m_door_object.size(); ++i)
 	{
+		m_door_object[i].set_state_lock();
 		if (!m_door_object[i].m_door_open_start)
+		{
+			m_door_object[i].set_state_unlock();
 			continue;
-
+		}
+		
 		if (std::chrono::duration_cast<std::chrono::milliseconds>(now_time - m_door_object[i].m_door_open_start_time).count() >= m_door_object[i].m_door_open_duration && m_door_object[i].m_door_open_start == true)
 		{
 			m_door_object[i].m_door_open_start = false;
 			m_door_object[i].set_boundingbox_check(false);
+			m_door_object[i].set_state_unlock();
 		}
 	}
 
