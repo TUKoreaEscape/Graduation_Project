@@ -62,6 +62,16 @@ public:
 
 };
 
+class InteractionObject : public GameObject
+{
+public:
+	bool IsNear = false;
+	bool IsWorking = false;
+
+public:
+	bool IsPlayerNear(const XMFLOAT3& PlayerPos) { return false; }
+};
+
 class Door : public GameObject
 {
 public:
