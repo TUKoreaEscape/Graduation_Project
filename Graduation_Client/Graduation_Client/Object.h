@@ -62,14 +62,29 @@ public:
 
 };
 
+class InteractionUI : public GameObject
+{
+public:
+	InteractionUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName);
+	virtual ~InteractionUI();
+
+	void BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList);
+
+	void Rotate(float fPitch, float fYaw, float fRoll) override;
+
+};
+
 class InteractionObject : public GameObject
 {
 public:
 	bool IsNear = false;
 	bool IsWorking = false;
 
+	InteractionUI* m_pInteractionUI = nullptr;
 public:
-	bool IsPlayerNear(const XMFLOAT3& PlayerPos) { return false; }
+	InteractionObject();
+	virtual ~InteractionObject();
+	virtual bool IsPlayerNear(const XMFLOAT3& PlayerPos) { return false; }
 };
 
 class Door : public GameObject
@@ -112,4 +127,13 @@ class UIObject : public GameObject
 public:
 	UIObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName, float x = 0.0f, float y = 0.0f, float width = 1.0f, float height = 1.0f);
 	virtual ~UIObject();
+};
+
+class PowerSwitch : public InteractionObject
+{
+public:
+	PowerSwitch();
+	virtual ~PowerSwitch();
+	
+	bool IsPlayerNear(const XMFLOAT3& PlayerPos);
 };
