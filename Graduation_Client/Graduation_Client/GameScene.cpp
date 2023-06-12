@@ -66,14 +66,14 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pPorest->render(pd3dCommandList);
 	m_pLobby->render(pd3dCommandList);
 
-	for (int i = 0; i < 8; ++i)
+	for (int i = 0; i < NUM_VENT; ++i)
 	{
 		if (Vents[i]) {
 			Vents[i]->UpdateTransform(nullptr);
 			Vents[i]->render(pd3dCommandList);
 		}
 	}
-	for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < NUM_DOOR; ++i)
 	{
 		if (m_pDoors[i]) {
 			m_pDoors[i]->UpdateTransform(nullptr);
@@ -81,7 +81,12 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		}
 	}
 
-	m_pElectric->render(pd3dCommandList);
+	for (int i = 0; i < NUM_POWER; ++i) {
+		if (m_pPowers[i]) {
+			m_pPowers[i]->UpdateTransform(nullptr);
+			m_pPowers[i]->render(pd3dCommandList);
+		}
+	}
 
 	m_pOak->render(pd3dCommandList);
 	for (int i = 0; i < m_nBush; ++i)
@@ -105,7 +110,7 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < m_nRoomSelect; ++i) m_UIRoomSelect[i]->render(pd3dCommandList);
 		break;
 	case READY_TO_GAME:
-		for (int i = 0; i < 6; ++i) {
+		for (int i = 0; i < NUM_DOOR; ++i) {
 			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
 		}
 		break;
@@ -127,19 +132,6 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	LoadedModelInfo* pHouseModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPorest.bin", nullptr);
 	LoadedModelInfo* pLobbyModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InDDD.bin", nullptr);
 	LoadedModelInfo* pCeilModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Ceilling.bin", nullptr);
-
-	//
-
-	LoadedModelInfo* pElecModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Shield2.bin", nullptr);
-
-	m_pElectric = new GameObject();
-	m_pElectric->SetChild(pElecModel->m_pModelRootObject, true);
-	m_pElectric->UpdateTransform(nullptr);
-
-	m_pElectric->FindFrame("Lamp_2")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-
-	if (pElecModel) delete pElecModel;
-	//
 
 	m_nPlayers = 5;
 	m_ppPlayers = new Player * [m_nPlayers];
@@ -223,6 +215,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	MakeVents(pd3dDevice, pd3dCommandList);
 	MakeDoors(pd3dDevice, pd3dCommandList);
+	MakePowers(pd3dDevice, pd3dCommandList);
 
 	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 
@@ -780,7 +773,7 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 {
 	LoadedModelInfo* pVentModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/airvent.bin", nullptr);
 
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < NUM_VENT; ++i) {
 		Vents[i] = new Vent();
 		Vents[i]->SetChild(pVentModel->m_pModelRootObject, true);
 	}
@@ -794,7 +787,7 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	Vents[5]->SetPosition(XMFLOAT3(-56.04684, 1.0061, 40.43311));
 	Vents[6]->SetPosition(XMFLOAT3(35.994, 1.0061, 40.56689));
 	Vents[7]->SetPosition(XMFLOAT3(35.96133, 1.0061, 23.56689));
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < NUM_VENT; ++i) {
 		Vents[i]->UpdateTransform(nullptr);
 	}
 
@@ -806,7 +799,7 @@ void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	LoadedModelInfo* pDoorModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Future_Door_Final.bin", nullptr);
 	DoorUI* doorUI = new DoorUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Login.dds");
 
-	for (int i = 0; i < 6; ++i) {
+	for (int i = 0; i < NUM_DOOR; ++i) {
 		m_pDoors[i] = new Door();
 		m_pDoors[i]->SetChild(pDoorModel->m_pModelRootObject, true);
 		reinterpret_cast<Door*>(m_pDoors[i])->m_pDoorUI = doorUI;
@@ -828,6 +821,26 @@ void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	if (pDoorModel) delete pDoorModel;
 }
 
+void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	LoadedModelInfo* pElecModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Shield2.bin", nullptr);
+
+	for (int i = 0; i < NUM_POWER; ++i) {
+		m_pPowers[i] = new PowerSwitch();
+		m_pPowers[i]->SetChild(pElecModel->m_pModelRootObject, true);
+		//m_pPowers[i]->UpdateTransform(nullptr);
+	}
+
+	m_pPowers[0]->SetPosition(XMFLOAT3(-56.9905, 0.5, 77.786)); // piano
+	m_pPowers[1]->SetPosition(XMFLOAT3(-57.1155, 0.5, -70.0513)); // classroom
+	m_pPowers[2]->SetPosition(XMFLOAT3(68.0815, 0.5, -70.782)); // porest
+	m_pPowers[3]->SetPosition(XMFLOAT3(67.3729, 0.5, 41.2974)); // broadcastingroom
+	m_pPowers[4]->SetPosition(XMFLOAT3(86.0909, 0.5, 26.725)); // maze
+	m_pPowers[5]->SetPosition(XMFLOAT3(-41.3198, 0.5, 14.1916)); // cdd
+
+	if (pElecModel) delete pElecModel;
+}
+
 void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	Scene::update(elapsedTime, pd3dDevice, pd3dCommandList);
@@ -835,7 +848,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	XMFLOAT3 PlayerPos = m_pPlayer->GetPosition();
 
 	bool IsNearDoor = false;
-	for (int i = 0; i < 6; ++i) {
+	for (int i = 0; i < NUM_DOOR; ++i) {
 		m_pDoors[i]->update(elapsedTime);
 		if (reinterpret_cast<Door*>(m_pDoors[i])->CheckDoor(PlayerPos)) {
 			
