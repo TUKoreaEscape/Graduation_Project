@@ -22,7 +22,7 @@ class RoomManager;
 
 enum class EventType : char
 {
-	DOOR_TIME
+	DOOR_TIME, UPDATE_MOVE
 };
 
 struct TIMER_EVENT {

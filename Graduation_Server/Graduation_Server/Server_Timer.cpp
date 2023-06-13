@@ -39,10 +39,27 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 
 	switch (ev.event_type)
 	{
+	
 	case EventType::DOOR_TIME:
 	{
 		EXP_OVER* over = new EXP_OVER;
 		over->m_comp_op = OP_DOOR_OPEN;
+		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.obj_id, &over->m_wsa_over);
+		break;
+	}
+
+	case EventType::UPDATE_MOVE:
+	{
+		EXP_OVER* over = new EXP_OVER;
+		over->m_comp_op = OP_UPDATE_PLAYER_MOVE;
+		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.obj_id, &over->m_wsa_over);
+		break;
+	}
+
+	case EventType::SELECT_TAGGER:
+	{
+		EXP_OVER* over = new EXP_OVER;
+		over->m_comp_op = OP_SELECT_TAGGER;
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.obj_id, &over->m_wsa_over);
 		break;
 	}
