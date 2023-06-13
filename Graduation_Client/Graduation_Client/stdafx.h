@@ -85,7 +85,7 @@ constexpr int TYPE_DEAD_PLAYER = 8;
 
 constexpr int NUM_VENT = 8;
 constexpr int NUM_DOOR = 6;
-constexpr int NUM_POWER = 6;
+constexpr int NUM_POWER = 5;
 
 extern UINT	gnCbvSrvDescriptorIncrementSize;
 extern UINT	gnRtvDescriptorIncrementSize;

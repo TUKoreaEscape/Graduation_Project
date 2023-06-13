@@ -823,7 +823,7 @@ void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	LoadedModelInfo* pElecModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Shield2.bin", nullptr);
+	LoadedModelInfo* pElecModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Shield.bin", nullptr);
 
 	for (int i = 0; i < NUM_POWER; ++i) {
 		m_pPowers[i] = new PowerSwitch();
@@ -831,12 +831,16 @@ void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 		//m_pPowers[i]->UpdateTransform(nullptr);
 	}
 
-	m_pPowers[0]->SetPosition(XMFLOAT3(-56.9905, 0.5, 77.786)); // piano
-	m_pPowers[1]->SetPosition(XMFLOAT3(-57.1155, 0.5, -70.0513)); // classroom
-	m_pPowers[2]->SetPosition(XMFLOAT3(68.0815, 0.5, -70.782)); // porest
-	m_pPowers[3]->SetPosition(XMFLOAT3(67.3729, 0.5, 41.2974)); // broadcastingroom
-	m_pPowers[4]->SetPosition(XMFLOAT3(86.0909, 0.5, 26.725)); // maze
-	m_pPowers[5]->SetPosition(XMFLOAT3(-41.3198, 0.5, 14.1916)); // cdd
+	m_pPowers[0]->SetPosition(XMFLOAT3(-0.8266403, 2, 76.76)); // piano
+	//m_pPowers[0]->Rotate(0, -90, 0);
+	m_pPowers[1]->SetPosition(XMFLOAT3(-54.27026, 2, -66.95)); // classroom
+	//m_pPowers[1]->Rotate(0, -90, 0);
+	m_pPowers[2]->SetPosition(XMFLOAT3(60.87, 2, -69.61)); // porest
+	m_pPowers[2]->Rotate(0, -90, 0);
+	m_pPowers[3]->SetPosition(XMFLOAT3(67.6, 2, 40.84586)); // broadcastingroom
+	m_pPowers[3]->Rotate(0, 90, 0);
+	m_pPowers[4]->SetPosition(XMFLOAT3(64.991, 2, -27.34)); // maze
+	//m_pPowers[4]->Rotate(0, -90, 0);
 
 	if (pElecModel) delete pElecModel;
 }
