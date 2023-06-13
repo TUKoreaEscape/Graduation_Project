@@ -136,4 +136,6 @@ public:
 	virtual ~PowerSwitch();
 	
 	bool IsPlayerNear(const XMFLOAT3& PlayerPos);
+
+	void Rotate(float fPitch, float fYaw, float fRoll) override;
 };

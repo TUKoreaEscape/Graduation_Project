@@ -371,3 +371,11 @@ bool PowerSwitch::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
 	return false;
 }
+
+void PowerSwitch::Rotate(float fPitch, float fYaw, float fRoll)
+{
+	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
+	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
+
+	UpdateTransform(NULL);
+}
