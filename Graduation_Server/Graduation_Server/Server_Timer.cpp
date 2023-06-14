@@ -30,7 +30,6 @@ void cGameServer::Timer()
 				continue;
 			}
 		}
-
 		std::this_thread::sleep_for(1ms);
 	}
 }

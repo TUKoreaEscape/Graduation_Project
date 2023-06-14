@@ -136,7 +136,7 @@ void cGameServer::WorkerThread()
 				TIMER_EVENT ev;
 				ev.room_number = iocp_key;
 				ev.cool_time = (float)((float)1 / SET_SERVER_UPDATE_FRAME);
-				ev.event_time = chrono::system_clock::now();
+				ev.event_time = chrono::system_clock::now() + static_cast<std::chrono::seconds>(1 / SET_SERVER_UPDATE_FRAME);
 				ev.event_type = EventType::UPDATE_MOVE;
 				m_timer_queue.push(ev);
 			}
