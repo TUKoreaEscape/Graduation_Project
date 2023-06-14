@@ -120,7 +120,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:
-		if (!m_pPlayer->IsAttack() && m_gamestate->GetGameState() == PLAYING_GAME)
+		if (!m_pPlayer->IsAttack() && (m_gamestate->GetGameState() == PLAYING_GAME || m_gamestate->GetGameState() == READY_TO_GAME))
 		{
 #if USE_NETWORK
 			Network& network = *Network::GetInstance();

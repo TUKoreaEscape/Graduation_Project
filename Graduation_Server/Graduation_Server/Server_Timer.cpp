@@ -21,7 +21,8 @@ void cGameServer::Timer()
 
 		if (m_timer_queue.try_pop(ev)) {
 			if (ev.event_time > current_time) {
-				timer_queue.push(ev);
+				if(m_room_manager->Get_Room_Info(ev.room_number)->_room_state == GAME_ROOM_STATE::PLAYING || m_room_manager->Get_Room_Info(ev.room_number)->_room_state == GAME_ROOM_STATE::READY)
+					timer_queue.push(ev);
 				std::this_thread::sleep_for(1ms);
 				continue;
 			}
@@ -56,6 +57,12 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		over->m_comp_op = OP_TYPE::OP_SELECT_TAGGER;
 		memcpy(&over->m_wsa_buf, &ev, sizeof(ev));
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
+
+		TIMER_EVENT next_ev;
+		next_ev.room_number = ev.room_number;
+		next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(FIRST_SKILL_ENABLE_TIME);
+		next_ev.event_type = EventType::OPEN_TAGGER_SKILL_FIRST;
+		m_timer_queue.push(next_ev);
 		break;
 	}
 
@@ -64,6 +71,12 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		EXP_OVER* over = new EXP_OVER;
 		over->m_comp_op = OP_TYPE::OP_FIRST_TAGGER_SKILL_OPEN;
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
+
+		TIMER_EVENT next_ev;
+		next_ev.room_number = ev.room_number;
+		next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(SECOND_SKILL_ENABLE_TIME);
+		next_ev.event_type = EventType::OPEN_TAGGER_SKILL_SECOND;
+		m_timer_queue.push(next_ev);
 		break;
 	}
 
@@ -72,6 +85,12 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		EXP_OVER* over = new EXP_OVER;
 		over->m_comp_op = OP_TYPE::OP_SECOND_TAGGER_SKILL_OPEN;
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
+
+		TIMER_EVENT next_ev;
+		next_ev.room_number = ev.room_number;
+		next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(THIRD_SKILL_ENABLE_TIME);
+		next_ev.event_type = EventType::OPEN_TAGGER_SKILL_THIRD;
+		m_timer_queue.push(next_ev);
 		break;
 	}
 
@@ -98,6 +117,17 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 
 		rl.m_door_object[ev.obj_id].m_check_bounding_box = true;
 		rl.m_door_object[ev.obj_id].m_door_close_start = false;
+		break;
+	}
+
+	case EventType::OPEN_ELECTRONIC:
+	{
+		break;
+	}
+
+	case EventType::CLOSE_ELECTRONIC:
+	{
+
 		break;
 	}
 

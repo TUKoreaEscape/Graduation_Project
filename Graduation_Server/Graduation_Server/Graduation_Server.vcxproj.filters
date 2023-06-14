@@ -137,7 +137,7 @@
     <ClCompile Include="User_Custom.cpp">
       <Filter>소스 파일\03 Client</Filter>
     </ClCompile>
-    <ClCompile Include="Update_Session.cpp">
+    <ClCompile Include="Update_Func.cpp">
       <Filter>소스 파일\00 Main\Session</Filter>
     </ClCompile>
     <ClCompile Include="Server_Timer.cpp">

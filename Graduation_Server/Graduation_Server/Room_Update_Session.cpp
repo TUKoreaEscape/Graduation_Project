@@ -44,16 +44,8 @@ void Room::Start_Game()
 	ev.event_time = start_time + static_cast<chrono::seconds>(GAME_END_SECOND);
 	server.m_timer_queue.push(ev);
 
-	ev.event_type = EventType::OPEN_TAGGER_SKILL_FIRST;
-	ev.event_time = start_time + static_cast<chrono::seconds>(FIRST_TAGGER_SKILL_OPEN_SECOND);
-	server.m_timer_queue.push(ev);
-
-	ev.event_type = EventType::OPEN_TAGGER_SKILL_SECOND;
-	ev.event_time = start_time + static_cast<chrono::seconds>(SECOND_TAGGER_SKILL_OPEN_SECOND);
-	server.m_timer_queue.push(ev);
-
-	ev.event_type = EventType::OPEN_TAGGER_SKILL_THIRD;
-	ev.event_time = start_time + static_cast<chrono::seconds>(THIRD_TAGGER_SKILL_OPEN_SECOND);
+	ev.event_type = EventType::SELECT_TAGGER;
+	ev.event_time = start_time + 60s;
 	server.m_timer_queue.push(ev);
 }
 
