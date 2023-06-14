@@ -20,6 +20,15 @@ void Room::Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE r
 	in_player[Number_of_users] = make_player_id;
 	Number_of_users++;
 	remain_user = 6 - Number_of_users;
+
+	cGameServer& server = *cGameServer::GetInstance();
+
+	TIMER_EVENT ev;
+	ev.room_number = room_number;
+	ev.event_type = EventType::UPDATE_MOVE;
+	ev.cool_time = (float)((float)1 / SET_SERVER_UPDATE_FRAME);
+	ev.event_time = chrono::system_clock::now();
+	server.m_timer_queue.push(ev);
 }
 
 bool Room::Join_Player(int user_id)

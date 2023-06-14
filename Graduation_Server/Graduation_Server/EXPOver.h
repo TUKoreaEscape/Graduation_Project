@@ -4,7 +4,17 @@
 #include "protocol.h"
 #include <map>
 
-enum OP_TYPE { OP_RECV, OP_SEND, OP_ACCEPT, OP_NPC_MOVE, OP_PLAYER_MOVE, OP_DOOR_OPEN, OP_DOOR_CLOSE };
+enum OP_TYPE { 
+	OP_RECV, 
+	OP_SEND, 
+	OP_ACCEPT, 
+	OP_NPC_MOVE, 
+	OP_PLAYER_MOVE, 
+	OP_DOOR_OPEN, 
+	OP_DOOR_CLOSE, 
+	OP_UPDATE_PLAYER_MOVE,
+	OP_SELECT_TAGGER
+};
 
 class EXP_OVER {
 public:

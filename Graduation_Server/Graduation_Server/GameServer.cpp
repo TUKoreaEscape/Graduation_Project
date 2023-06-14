@@ -53,6 +53,9 @@ void cGameServer::StartServer()
 	for (int i = 0; i < 1; ++i)
 		m_database_thread.emplace_back(std::thread(&DataBase::DataBaseThread, m_database));
 
+	for (int i = 0; i < 1; ++i)
+		m_event_thread.emplace_back(std::thread(&cGameServer::Timer, this));
+
 	for (auto& worker : m_worker_threads)
 		worker.join();
 	
@@ -61,6 +64,9 @@ void cGameServer::StartServer()
 
 	for (auto& db_worker : m_database_thread)
 		db_worker.join();
+
+	for (auto& event_worker : m_event_thread)
+		event_worker.join();
 }
 
 void cGameServer::WorkerThread()
@@ -102,13 +108,13 @@ void cGameServer::WorkerThread()
 		}
 
 		switch (exp_over->m_comp_op) {
-		case OP_RECV:
+		case OP_TYPE::OP_RECV:
 			if (num_byte == 0)
 				Disconnect(client_id);
 			Recv(exp_over, client_id, num_byte);
 			break;
 
-		case OP_SEND:
+		case OP_TYPE::OP_SEND:
 			if (num_byte != exp_over->m_wsa_buf.len) {
 				std::cout << "send_error" << std::endl;
 				int WSAerror = WSAGetLastError();
@@ -117,9 +123,30 @@ void cGameServer::WorkerThread()
 			delete exp_over;
 			break;
 
-		case OP_ACCEPT:
+		case OP_TYPE::OP_ACCEPT:
 			Accept(exp_over);
 			break;
+
+		case OP_TYPE::OP_UPDATE_PLAYER_MOVE:
+		{
+			Update_OtherPlayer(iocp_key, SET_SERVER_UPDATE_FRAME);
+
+			if (m_room_manager->Get_Room_Info(iocp_key)->_room_state == GAME_ROOM_STATE::PLAYING || m_room_manager->Get_Room_Info(iocp_key)->_room_state == GAME_ROOM_STATE::READY)
+			{
+				TIMER_EVENT ev;
+				ev.room_number = iocp_key;
+				ev.cool_time = (float)((float)1 / SET_SERVER_UPDATE_FRAME);
+				ev.event_time = chrono::system_clock::now();
+				ev.event_type = EventType::UPDATE_MOVE;
+				m_timer_queue.push(ev);
+			}
+			break;
+		}
+
+		default:
+			cout << exp_over->m_comp_op << " : recv" << endl;
+			break;
+
 		}
 	}
 }

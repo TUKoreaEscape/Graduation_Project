@@ -22,13 +22,20 @@ class RoomManager;
 
 enum class EventType : char
 {
-	DOOR_TIME, UPDATE_MOVE
+	DOOR_TIME,
+	UPDATE_MOVE,
+	SELECT_TAGGER,
+	OPEN_TAGGER_SKILL_FIRST,
+	OPEN_TAGGER_SKILL_SECOND,
+	OPEN_TAGGER_SKILL_THIRD,
+	GAME_END
 };
 
 struct TIMER_EVENT {
 	std::chrono::system_clock::time_point	event_time;
 	EventType								event_type;
 	float									cool_time;
+	int										room_number;
 	int										obj_id;
 
 	constexpr bool operator < (const TIMER_EVENT& left) const
@@ -118,6 +125,8 @@ public:
 
 	std::array<CLIENT, MAX_USER>	m_clients;
 	DataBase						*m_database = nullptr;
+
+	concurrency::concurrent_priority_queue<TIMER_EVENT> m_timer_queue;
 protected:
 	std::queue<CLIENT>				request_querry;
 
@@ -127,11 +136,11 @@ private:
 	std::vector<std::thread>		m_worker_threads;
 	std::vector<std::thread>		m_timer_thread;
 	std::vector<std::thread>		m_database_thread; // worker thread에서 쿼리 날리는건 손해다.
+	std::vector<std::thread>		m_event_thread;
 
 	Voice_Chat						*m_voice_chat = nullptr;
 	RoomManager						*m_room_manager = nullptr;
 	Server_Timer					m_PerformanceCounter;
 	Server_Timer					m_session_timer;
-	concurrency::concurrent_priority_queue<TIMER_EVENT> m_timer_queue;
 };
 
