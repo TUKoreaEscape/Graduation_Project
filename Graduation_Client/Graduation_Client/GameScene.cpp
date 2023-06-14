@@ -824,7 +824,7 @@ void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	LoadedModelInfo* pElecModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Shield.bin", nullptr);
-
+	pElecModel->m_pModelRootObject->SetScale(0.5, 0.5, 0.5);
 	for (int i = 0; i < NUM_POWER; ++i) {
 		m_pPowers[i] = new PowerSwitch();
 		m_pPowers[i]->SetChild(pElecModel->m_pModelRootObject, true);
