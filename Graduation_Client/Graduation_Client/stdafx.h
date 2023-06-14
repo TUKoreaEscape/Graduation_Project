@@ -77,10 +77,15 @@ using Microsoft::WRL::ComPtr;
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
 
+constexpr int TYPE_ALPHACUT = -1;
 constexpr int TYPE_OBJECT = 0;
 constexpr int TYPE_PLAYER = 2;
 constexpr int TYPE_TAGGER = 4;
 constexpr int TYPE_DEAD_PLAYER = 8;
+
+constexpr int NUM_VENT = 8;
+constexpr int NUM_DOOR = 6;
+constexpr int NUM_POWER = 5;
 
 extern UINT	gnCbvSrvDescriptorIncrementSize;
 extern UINT	gnRtvDescriptorIncrementSize;

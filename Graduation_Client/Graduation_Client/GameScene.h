@@ -8,7 +8,7 @@
 #include "Network.h"
 #include "Game_state.h"
 
-
+class InteractionObject;
 //GameScene과 Scene을 분리해놓은 이유
 //GameScene에서 게임내의 플레이어 생성, 오브젝트 배치, 상태 등을 따로 관리하기 위해.
 class GameScene : public Scene
@@ -47,13 +47,15 @@ public:
 	GameObject* m_pPorest = nullptr;
 	GameObject* m_pLobby = nullptr;
 
-	GameObject* Vents[8];
+	GameObject* Vents[NUM_VENT];
 
 	int m_nBush;
 	GameObject** m_ppBush;
 	GameObject* m_pOak;	
 
-	Door* m_pDoors[6];
+	Door* m_pDoors[NUM_DOOR];
+
+	InteractionObject* m_pPowers[NUM_POWER];
 
 	Network* m_network;
 	std::thread recv_thread;
@@ -109,6 +111,7 @@ public:
 
 	void MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 };

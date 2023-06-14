@@ -66,20 +66,28 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pPorest->render(pd3dCommandList);
 	m_pLobby->render(pd3dCommandList);
 
-	for (int i = 0; i < 8; ++i)
+	for (int i = 0; i < NUM_VENT; ++i)
 	{
 		if (Vents[i]) {
 			Vents[i]->UpdateTransform(nullptr);
 			Vents[i]->render(pd3dCommandList);
 		}
 	}
-	for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < NUM_DOOR; ++i)
 	{
 		if (m_pDoors[i]) {
 			m_pDoors[i]->UpdateTransform(nullptr);
 			m_pDoors[i]->render(pd3dCommandList);
 		}
 	}
+
+	for (int i = 0; i < NUM_POWER; ++i) {
+		if (m_pPowers[i]) {
+			m_pPowers[i]->UpdateTransform(nullptr);
+			m_pPowers[i]->render(pd3dCommandList);
+		}
+	}
+
 	m_pOak->render(pd3dCommandList);
 	for (int i = 0; i < m_nBush; ++i)
 	{
@@ -102,7 +110,7 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < m_nRoomSelect; ++i) m_UIRoomSelect[i]->render(pd3dCommandList);
 		break;
 	case READY_TO_GAME:
-		for (int i = 0; i < 6; ++i) {
+		for (int i = 0; i < NUM_DOOR; ++i) {
 			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
 		}
 		break;
@@ -113,7 +121,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 100);
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 150);
 
 	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
@@ -161,7 +169,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pPianoTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), -30, 60, 61, 41, xmf3Scale, xmf4Color, L"Terrain/Floor2.dds");
 	m_pBroadcastTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 50, 60, 101, 41, xmf3Scale, xmf4Color, L"Terrain/Floor2.dds");
 	m_pCubeTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 80, 0, 41, 81, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
-	m_pForestTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 60, -60, 81, 41, xmf3Scale, xmf4Color, L"Terrain/Floor2.dds");
+	m_pForestTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 60, -60, 81, 41, xmf3Scale, xmf4Color, L"Terrain/Road_grass.dds");
 	m_pClassroomTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), -20, -60, 81, 41, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
 
 	//UI생성 영역 dds파일 다음 x,y,width,height가 순서대로 들어간다. 아무것도 넣지않으면 화면중앙에 1x1사이즈로 나온다.
@@ -207,6 +215,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	MakeVents(pd3dDevice, pd3dCommandList);
 	MakeDoors(pd3dDevice, pd3dCommandList);
+	MakePowers(pd3dDevice, pd3dCommandList);
 
 	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 
@@ -746,6 +755,7 @@ void GameScene::LoadSceneBushFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 		pGameObject->renderer->SetMaterial(pMaterial);
 
 		m_ppBush[i] = pGameObject;
+		//m_ppBush[i]->SetType(-1);
 	}
 
 	::fclose(pFile);
@@ -753,6 +763,7 @@ void GameScene::LoadSceneBushFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 	m_pOak = new GameObject();
 	LoadedModelInfo* pOakModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Oak.bin", nullptr);
 	m_pOak->SetChild(pOakModel->m_pModelRootObject, true);
+	m_pOak->SetType(-1);
 	//m_pOak->SetPosition(61.25, 0.7897112, -68.4);
 	m_pOak->UpdateTransform(nullptr);
 	if (pOakModel) delete pOakModel;
@@ -762,7 +773,7 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 {
 	LoadedModelInfo* pVentModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/airvent.bin", nullptr);
 
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < NUM_VENT; ++i) {
 		Vents[i] = new Vent();
 		Vents[i]->SetChild(pVentModel->m_pModelRootObject, true);
 	}
@@ -776,7 +787,7 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	Vents[5]->SetPosition(XMFLOAT3(-56.04684, 1.0061, 40.43311));
 	Vents[6]->SetPosition(XMFLOAT3(35.994, 1.0061, 40.56689));
 	Vents[7]->SetPosition(XMFLOAT3(35.96133, 1.0061, 23.56689));
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < NUM_VENT; ++i) {
 		Vents[i]->UpdateTransform(nullptr);
 	}
 
@@ -786,9 +797,9 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	LoadedModelInfo* pDoorModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Future_Door_Final.bin", nullptr);
-	DoorUI* doorUI = new DoorUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Login.dds");
+	DoorUI* doorUI = new DoorUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/f.dds");
 
-	for (int i = 0; i < 6; ++i) {
+	for (int i = 0; i < NUM_DOOR; ++i) {
 		m_pDoors[i] = new Door();
 		m_pDoors[i]->SetChild(pDoorModel->m_pModelRootObject, true);
 		reinterpret_cast<Door*>(m_pDoors[i])->m_pDoorUI = doorUI;
@@ -810,6 +821,30 @@ void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	if (pDoorModel) delete pDoorModel;
 }
 
+void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	LoadedModelInfo* pElecModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Shield.bin", nullptr);
+	pElecModel->m_pModelRootObject->SetScale(0.5, 0.5, 0.5);
+	for (int i = 0; i < NUM_POWER; ++i) {
+		m_pPowers[i] = new PowerSwitch();
+		m_pPowers[i]->SetChild(pElecModel->m_pModelRootObject, true);
+		//m_pPowers[i]->UpdateTransform(nullptr);
+	}
+
+	m_pPowers[0]->SetPosition(XMFLOAT3(-0.7033535, 2, 76.76)); // piano
+	//m_pPowers[0]->Rotate(0, -90, 0);
+	m_pPowers[1]->SetPosition(XMFLOAT3(-54.11389, 2, -66.95)); // classroom
+	//m_pPowers[1]->Rotate(0, -90, 0);
+	m_pPowers[2]->SetPosition(XMFLOAT3(60.87, 2, -69.61)); // porest
+	m_pPowers[2]->Rotate(0, -90, 0);
+	m_pPowers[3]->SetPosition(XMFLOAT3(67.6, 2, 40.6322)); // broadcastingroom
+	m_pPowers[3]->Rotate(0, 90, 0);
+	m_pPowers[4]->SetPosition(XMFLOAT3(65.231, 2, -27.5)); // maze
+	//m_pPowers[4]->Rotate(0, -90, 0);
+
+	if (pElecModel) delete pElecModel;
+}
+
 void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	Scene::update(elapsedTime, pd3dDevice, pd3dCommandList);
@@ -817,7 +852,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	XMFLOAT3 PlayerPos = m_pPlayer->GetPosition();
 
 	bool IsNearDoor = false;
-	for (int i = 0; i < 6; ++i) {
+	for (int i = 0; i < NUM_DOOR; ++i) {
 		m_pDoors[i]->update(elapsedTime);
 		if (reinterpret_cast<Door*>(m_pDoors[i])->CheckDoor(PlayerPos)) {
 			

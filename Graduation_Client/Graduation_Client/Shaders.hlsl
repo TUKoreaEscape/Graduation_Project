@@ -21,7 +21,7 @@ cbuffer cbGameObjectInfo : register(b0)
 	matrix					gmtxGameObject : packoffset(c0);
 	MATERIAL				gMaterial : packoffset(c4);
 	uint					gnTexturesMask : packoffset(c8.x);
-	uint					gnObjectType : packoffset(c8.y);
+	int						gnObjectType : packoffset(c8.y);
 };
 
 cbuffer cbDebug : register(b2)
@@ -392,9 +392,11 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTerrain(VS_TERRAIN_OUTPUT input, uint nPrimi
 	PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
 
 	float4 cBaseTexColor = gtxtTerrainBaseTexture.Sample(gssWrap, input.uv0);
-	float4 cDetailTexColor = gtxtTerrainDetailTexture.Sample(gssWrap, input.uv1);
+	//float4 cDetailTexColor = gtxtTerrainDetailTexture.Sample(gssWrap, input.uv1);
 	//	float4 cColor = saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
-	float4 cColor = input.color * saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
+	//float4 cColor = input.color * saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
+
+	float4 cColor = input.color * cBaseTexColor;
 
 	float3 normalW = normalize(input.normalW);
 
@@ -618,9 +620,10 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 		cEmissionColor = gtxtEmissionTexture.Sample(gssWrap, input.uv);
 		cEmissionColor = cEmissionColor * gMaterial.m_cEmissive;
 	}
-	float4 cColor = cAlbedoColor + cSpecularColor + cMetallicColor + cEmissionColor;
-
-	clip(cColor.a - 0.1f);
+	float4 cColor = cAlbedoColor + cSpecularColor + cEmissionColor;
+	
+	if (gnObjectType < 0)
+		clip(cColor.a - 0.1f);
 
 	float3 normalW;
 	if (gnTexturesMask & MATERIAL_NORMAL_MAP)
