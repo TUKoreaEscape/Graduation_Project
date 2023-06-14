@@ -42,7 +42,7 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 	
 	case EventType::UPDATE_MOVE:
 	{
-		cout << "event update µé¾î¿È" << endl;
+		//cout << "event update µé¾î¿È" << endl;
 		EXP_OVER* over = new EXP_OVER;
 		over->m_comp_op = OP_TYPE::OP_UPDATE_PLAYER_MOVE;
 		memcpy(&over->m_wsa_buf, &ev, sizeof(ev));
