@@ -1,57 +1,6 @@
 #include "GameServer.h"
 
 
-void cGameServer::Update_Session(int thread_number)
-{
-	int index = 0;
-	while (true)
-	{
-		if (m_session_timer.Frame_Limit(SET_SERVER_UPDATE_FRAME)) // 초당 1번 업데이트!
-		{
-			//cout << "Update Session!" << endl;
-			for (int i = thread_number; i < MAX_ROOM; i++)
-			{
-				Room& room = *m_room_manager->Get_Room_Info(i);
-				room._room_state_lock.lock();
-				switch (room._room_state)
-				{
-				case GAME_ROOM_STATE::FREE:
-				{
-					room._room_state_lock.unlock();
-					break;
-				}
-				case GAME_ROOM_STATE::READY:
-				{
-					room._room_state_lock.unlock();
-#if DEBUG
-					room.Update_room_time();
-					//Update_OtherPlayer(i, (float)1/SET_SERVER_UPDATE_FRAME);
-#endif				
-					break;
-				}
-
-				case GAME_ROOM_STATE::PLAYING:
-				{
-					room._room_state_lock.unlock();
-					room.Update_room_time();
-					//Update_OtherPlayer(i, (float)1/SET_SERVER_UPDATE_FRAME);
-					break;
-				}
-
-				case GAME_ROOM_STATE::END:
-				{
-					room._room_state_lock.unlock();
-					break;
-				}
-
-				}
-
-			}
-		}
-	}
-}
-
-
 void cGameServer::Update_OtherPlayer(int room_number, float elaspeTime)
 {
 	Room& room = *m_room_manager->Get_Room_Info(room_number);

@@ -95,7 +95,7 @@ bool Door::process_door_event()
 	{
 		m_state = ST_CLOSE;
 		m_door_close_start = true;
-		m_check_bounding_box = true;
+		m_door_close_start_time = chrono::system_clock::now();
 		m_state_lock->unlock();
 	}
 	return true;

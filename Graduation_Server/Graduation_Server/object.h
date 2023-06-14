@@ -50,6 +50,7 @@ private:
 public:
 	mutex*								m_state_lock = nullptr;
 	chrono::system_clock::time_point	m_door_open_start_time;
+	chrono::system_clock::time_point	m_door_close_start_time;
 	float								m_door_open_duration = 400.f;
 	bool								m_door_open_start = false;
 	bool								m_door_close_start = false;
