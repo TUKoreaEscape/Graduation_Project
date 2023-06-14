@@ -4,8 +4,9 @@
 int Room::Select_Tagger()
 {
 	mt19937 engine((unsigned int)time(NULL));
-
-	return engine() % 6;
+	int tagger_id = engine() % 6;
+	m_tagger_id = in_player[tagger_id];
+	return tagger_id;
 }
 
 void Room::Start_Game()
@@ -35,6 +36,25 @@ void Room::Start_Game()
 
 		cl.do_send(sizeof(update_room_packet), &update_room_packet);
 	}
+
+	auto start_time = chrono::system_clock::now();
+	TIMER_EVENT ev;
+	ev.room_number = room_number;
+	ev.event_type = EventType::GAME_END;
+	ev.event_time = start_time + static_cast<chrono::seconds>(GAME_END_SECOND);
+	server.m_timer_queue.push(ev);
+
+	ev.event_type = EventType::OPEN_TAGGER_SKILL_FIRST;
+	ev.event_time = start_time + static_cast<chrono::seconds>(FIRST_TAGGER_SKILL_OPEN_SECOND);
+	server.m_timer_queue.push(ev);
+
+	ev.event_type = EventType::OPEN_TAGGER_SKILL_SECOND;
+	ev.event_time = start_time + static_cast<chrono::seconds>(SECOND_TAGGER_SKILL_OPEN_SECOND);
+	server.m_timer_queue.push(ev);
+
+	ev.event_type = EventType::OPEN_TAGGER_SKILL_THIRD;
+	ev.event_time = start_time + static_cast<chrono::seconds>(THIRD_TAGGER_SKILL_OPEN_SECOND);
+	server.m_timer_queue.push(ev);
 }
 
 void Room::End_Game()

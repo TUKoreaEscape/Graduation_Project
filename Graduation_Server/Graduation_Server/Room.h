@@ -6,6 +6,11 @@
 #define GAME_END_COLLECT_CHIP 12
 #define JOIN_ROOM_MAX_USER 6
 
+#define FIRST_TAGGER_SKILL_OPEN_SECOND 180
+#define SECOND_TAGGER_SKILL_OPEN_SECOND 360
+#define THIRD_TAGGER_SKILL_OPEN_SECOND 540
+#define GAME_END_SECOND 900
+
 //class CLIENT;
 class Room {
 private:
@@ -16,11 +21,13 @@ private:
 	int					m_tagger_id = -1;
 	long long			duration_time;
 
+public:
 	array<BoundingOrientedBox, 6>	in_player_bounding_box;
 	vector<GameObject>				m_game_object;
 	vector<GameObject>				m_game_wall_and_fix_object;
 	vector<Door>					m_door_object;
 
+private:
 	chrono::system_clock::time_point start_time;
 	chrono::system_clock::time_point now_time;
 
@@ -82,10 +89,12 @@ public:
 	void	Reset_Room();
 	void	Start_Game();
 	void	End_Game();
+
+
 private:
-	int		Select_Tagger();
-	
+
 public:
+	int		Select_Tagger();
 	int		Get_Number_of_users();
 	int		Get_Join_Member(int data);
 

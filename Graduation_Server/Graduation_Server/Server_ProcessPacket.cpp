@@ -463,6 +463,7 @@ void cGameServer::Process_Door(const int user_id, void* buff)
 
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
+	bool is_door_open = room.Is_Door_Open(packet->door_num);
 	room.Update_Door(static_cast<int>(packet->door_num));
 	sc_packet_open_door door_packet;
 	door_packet.size = sizeof(door_packet);
@@ -475,4 +476,23 @@ void cGameServer::Process_Door(const int user_id, void* buff)
 	for (auto& player : m_clients[user_id].room_list)
 		m_clients[player].do_send(sizeof(door_packet), &door_packet);
 	m_clients[user_id]._room_list_lock.unlock();
+
+	if (!is_door_open)
+	{
+		TIMER_EVENT ev;
+		ev.event_type = EventType::OPEN_DOOR;
+		ev.event_time = chrono::system_clock::now() + 400ms;
+		ev.obj_id = packet->door_num;
+		ev.room_number = m_clients[user_id].get_join_room_number();
+		m_timer_queue.push(ev);
+	}
+	else
+	{
+		TIMER_EVENT ev;
+		ev.event_type = EventType::CLOSE_DOOR;
+		ev.event_time = chrono::system_clock::now() + 400ms;
+		ev.obj_id = packet->door_num;
+		ev.room_number = m_clients[user_id].get_join_room_number();
+		m_timer_queue.push(ev);
+	}
 }

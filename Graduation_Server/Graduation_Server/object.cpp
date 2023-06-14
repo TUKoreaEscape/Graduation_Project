@@ -83,7 +83,7 @@ Door::Door(const unsigned int door_id, Object_Type type, XMFLOAT3 center, XMFLOA
 bool Door::process_door_event()
 {
 	m_state_lock->lock();
-	if (m_state == ST_CLOSE && m_door_open_start == false)
+	if (m_state == ST_CLOSE && m_door_open_start == false && m_door_close_start == false)
 	{
 		m_state = ST_OPEN;
 		m_door_open_start_time = chrono::system_clock::now();
@@ -91,9 +91,10 @@ bool Door::process_door_event()
 		m_state_lock->unlock();
 	}
 
-	else if (m_state == ST_OPEN)
+	else if (m_state == ST_OPEN && m_door_close_start == false && m_door_open_start == false)
 	{
 		m_state = ST_CLOSE;
+		m_door_close_start = true;
 		m_check_bounding_box = true;
 		m_state_lock->unlock();
 	}

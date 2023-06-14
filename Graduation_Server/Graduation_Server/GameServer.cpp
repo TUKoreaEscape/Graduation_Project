@@ -47,8 +47,8 @@ void cGameServer::StartServer()
 	for (int i = 0; i < 4; ++i)
 		m_worker_threads.emplace_back(std::thread(&cGameServer::WorkerThread, this));
 
-	for(int i = 0; i < 1; ++i)
-		m_timer_thread.emplace_back(std::thread(&cGameServer::Update_Session,this, i));
+	//for(int i = 0; i < 1; ++i)
+	//	m_timer_thread.emplace_back(std::thread(&cGameServer::Update_Session,this, i));
 
 	for (int i = 0; i < 1; ++i)
 		m_database_thread.emplace_back(std::thread(&DataBase::DataBaseThread, m_database));
@@ -59,8 +59,8 @@ void cGameServer::StartServer()
 	for (auto& worker : m_worker_threads)
 		worker.join();
 	
-	for (auto& timer_worker : m_timer_thread)
-		timer_worker.join();
+	//for (auto& timer_worker : m_timer_thread)
+	//	timer_worker.join();
 
 	for (auto& db_worker : m_database_thread)
 		db_worker.join();
@@ -140,6 +140,23 @@ void cGameServer::WorkerThread()
 				ev.event_type = EventType::UPDATE_MOVE;
 				m_timer_queue.push(ev);
 			}
+			break;
+		}
+
+		case OP_TYPE::OP_SELECT_TAGGER:
+		{
+			Room& rl = *m_room_manager->Get_Room_Info(iocp_key);
+			int tagger_id = rl.Select_Tagger();
+			sc_packet_select_tagger packet;
+			packet.size = sizeof(packet);
+			packet.type = SC_PACKET::SC_PACKET_SELECT_TAGGER;
+			packet.id = tagger_id;
+			packet.first_skill = false;
+			packet.second_skill = false;
+			packet.third_skill = false;
+
+			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
+				m_clients[rl.in_player[i]].do_send(sizeof(packet), &packet);
 			break;
 		}
 

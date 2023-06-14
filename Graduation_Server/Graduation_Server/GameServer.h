@@ -22,7 +22,8 @@ class RoomManager;
 
 enum class EventType : char
 {
-	DOOR_TIME,
+	OPEN_DOOR,
+	CLOSE_DOOR,
 	UPDATE_MOVE,
 	SELECT_TAGGER,
 	OPEN_TAGGER_SKILL_FIRST,

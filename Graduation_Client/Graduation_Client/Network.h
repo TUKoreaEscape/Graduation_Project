@@ -30,7 +30,7 @@ class Network {
 private:
 	static Network* NetworkInstance;
 	SOCKET			m_socket;
-	const char*		SERVER_ADDR = "127.0.0.1";
+	const char*		SERVER_ADDR = "210.99.120.64";
 	Server_Timer	m_server_counter;
 	Custom			data;
 
