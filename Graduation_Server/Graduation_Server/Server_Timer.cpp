@@ -48,6 +48,7 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		over->m_comp_op = OP_TYPE::OP_UPDATE_PLAYER_MOVE;
 		memcpy(&over->m_wsa_buf, &ev, sizeof(ev));
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
+		delete over;
 		break;
 	}
 
@@ -57,7 +58,7 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		over->m_comp_op = OP_TYPE::OP_SELECT_TAGGER;
 		memcpy(&over->m_wsa_buf, &ev, sizeof(ev));
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
-
+		delete over;
 		TIMER_EVENT next_ev;
 		next_ev.room_number = ev.room_number;
 		next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(FIRST_SKILL_ENABLE_TIME);
@@ -71,7 +72,7 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		EXP_OVER* over = new EXP_OVER;
 		over->m_comp_op = OP_TYPE::OP_FIRST_TAGGER_SKILL_OPEN;
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
-
+		delete over;
 		TIMER_EVENT next_ev;
 		next_ev.room_number = ev.room_number;
 		next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(SECOND_SKILL_ENABLE_TIME);
@@ -85,7 +86,7 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		EXP_OVER* over = new EXP_OVER;
 		over->m_comp_op = OP_TYPE::OP_SECOND_TAGGER_SKILL_OPEN;
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
-
+		delete over;
 		TIMER_EVENT next_ev;
 		next_ev.room_number = ev.room_number;
 		next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(THIRD_SKILL_ENABLE_TIME);
@@ -99,6 +100,7 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		EXP_OVER* over = new EXP_OVER;
 		over->m_comp_op = OP_TYPE::OP_THIRD_TAGGER_SKILL_OPEN;
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
+		delete over;
 		break;
 	}
 

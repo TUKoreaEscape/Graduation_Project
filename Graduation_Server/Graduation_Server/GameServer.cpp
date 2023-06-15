@@ -46,27 +46,23 @@ void cGameServer::StartServer()
 	// 이쪽은 이제 맵 로드할 부분
 	for (int i = 0; i < 10; ++i)
 		m_worker_threads.emplace_back(std::thread(&cGameServer::WorkerThread, this));
-
-	//for(int i = 0; i < 1; ++i)
-	//	m_timer_thread.emplace_back(std::thread(&cGameServer::Update_Session,this, i));
-
+	std::cout << "Server Worker_Thread Working! (10 threads) \n";
 	for (int i = 0; i < 1; ++i)
 		m_database_thread.emplace_back(std::thread(&DataBase::DataBaseThread, m_database));
-
+	std::cout << "Server DB_Thread Working! (1 threads) \n";
 	for (int i = 0; i < 1; ++i)
 		m_event_thread.emplace_back(std::thread(&cGameServer::Timer, this));
-
+	std::cout << "Server Event_Thread Working! (1 threads) \n";
 	for (auto& worker : m_worker_threads)
 		worker.join();
 	
-	//for (auto& timer_worker : m_timer_thread)
-	//	timer_worker.join();
-
 	for (auto& db_worker : m_database_thread)
 		db_worker.join();
 
 	for (auto& event_worker : m_event_thread)
 		event_worker.join();
+
+	std::cout << "Server Start!!! \n";
 }
 
 void cGameServer::WorkerThread()

@@ -43,7 +43,7 @@ void C_IOCP::Bind_Socket(short port_num)
 
 	AcceptEx(m_listen_socket, m_client_socket, buf_accept, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &m_exp_over.m_wsa_over);
 
-	std::cout << "Server Start!!! \n";
+	std::cout << "Server Bind_Socket Init Success!!! \n";
 }
 
 
