@@ -158,4 +158,11 @@ public:
 	void				set_second_skill_enable() { m_second_skill_able = true; };
 	void				set_third_skill_enable() { m_third_skill_able = true; };
 
+	void				use_first_skill() { if (m_first_skill_able == true) m_first_skill_able = false; }
+	void				use_second_skill() { if (m_second_skill_able == true) m_second_skill_able = false; }
+	void				use_third_skill() { if (m_third_skill_able == true) m_third_skill_able = false; }
+
+	bool				get_first_skill_enable() { return m_first_skill_able; }
+	bool				get_second_skill_enable() { return m_second_skill_able; }
+	bool				get_third_skill_enable() { return m_third_skill_able; }
 };

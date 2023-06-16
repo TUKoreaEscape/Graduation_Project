@@ -97,6 +97,7 @@ public:
 	int		Select_Tagger();
 	int		Get_Number_of_users();
 	int		Get_Join_Member(int data);
+	int		Get_Tagger_ID() { return m_tagger_id; }
 
 	bool	Join_Player(int user_id);
 	bool	All_Player_Ready();

@@ -284,7 +284,8 @@ namespace SC_PACKET
 		SC_PACKET_ROOM_INFO,
 		SC_PACKET_VIVOX_DATA,
 		SC_PACKET_CUSTOMIZING,
-		SC_PACKET_ATTACK
+		SC_PACKET_ATTACK,
+		SC_PACKET_GAME_END
 	};
 }
 
@@ -490,5 +491,12 @@ struct sc_packet_update_room {
 	short			room_number;
 	short			join_member;
 	GAME_ROOM_STATE::TYPE state;
+};
+
+struct sc_packet_game_end {
+	unsigned char	size;
+	unsigned char	type;
+
+	bool			is_tagger_win;
 };
 #pragma pack(pop)

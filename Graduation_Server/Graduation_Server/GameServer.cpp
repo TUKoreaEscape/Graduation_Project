@@ -132,6 +132,7 @@ void cGameServer::WorkerThread()
 		{
 			Update_OtherPlayer(iocp_key, SET_SERVER_UPDATE_FRAME);
 
+			m_room_manager->Get_Room_Info(iocp_key)->_room_state_lock.lock();
 			if (m_room_manager->Get_Room_Info(iocp_key)->_room_state == GAME_ROOM_STATE::PLAYING || m_room_manager->Get_Room_Info(iocp_key)->_room_state == GAME_ROOM_STATE::READY)
 			{
 				TIMER_EVENT ev;
@@ -141,6 +142,8 @@ void cGameServer::WorkerThread()
 				ev.event_type = EventType::UPDATE_MOVE;
 				m_timer_queue.push(ev);
 			}
+			m_room_manager->Get_Room_Info(iocp_key)->_room_state_lock.unlock();
+			delete exp_over;
 			break;
 		}
 
@@ -158,6 +161,79 @@ void cGameServer::WorkerThread()
 
 			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
 				m_clients[rl.in_player[i]].do_send(sizeof(packet), &packet);
+			delete exp_over;
+			break;
+		}
+
+		case OP_TYPE::OP_FIRST_TAGGER_SKILL_OPEN:
+		{
+			Room& rl = *m_room_manager->Get_Room_Info(iocp_key);
+			m_clients[rl.Get_Tagger_ID()].set_first_skill_enable();
+
+			sc_packet_tagger_skill packet;
+			packet.size = sizeof(packet);
+			packet.type = SC_PACKET::SC_PACKET_TAGGER_SKILL;
+			packet.first_skill = m_clients[rl.Get_Tagger_ID()].get_first_skill_enable();
+			packet.second_skill = m_clients[rl.Get_Tagger_ID()].get_second_skill_enable();
+			packet.third_skill = m_clients[rl.Get_Tagger_ID()].get_third_skill_enable();
+
+			m_clients[rl.Get_Tagger_ID()].do_send(sizeof(packet), &packet);
+			delete exp_over;
+			break;
+		}
+
+		case OP_TYPE::OP_SECOND_TAGGER_SKILL_OPEN:
+		{
+			Room& rl = *m_room_manager->Get_Room_Info(iocp_key);
+			m_clients[rl.Get_Tagger_ID()].set_second_skill_enable();
+
+			sc_packet_tagger_skill packet;
+			packet.size = sizeof(packet);
+			packet.type = SC_PACKET::SC_PACKET_TAGGER_SKILL;
+			packet.first_skill = m_clients[rl.Get_Tagger_ID()].get_first_skill_enable();
+			packet.second_skill = m_clients[rl.Get_Tagger_ID()].get_second_skill_enable();
+			packet.third_skill = m_clients[rl.Get_Tagger_ID()].get_third_skill_enable();
+
+			m_clients[rl.Get_Tagger_ID()].do_send(sizeof(packet), &packet);
+			delete exp_over;
+			break;
+		}
+
+		case OP_TYPE::OP_THIRD_TAGGER_SKILL_OPEN:
+		{
+			Room& rl = *m_room_manager->Get_Room_Info(iocp_key);
+			m_clients[rl.Get_Tagger_ID()].set_third_skill_enable();
+
+			sc_packet_tagger_skill packet;
+			packet.size = sizeof(packet);
+			packet.type = SC_PACKET::SC_PACKET_TAGGER_SKILL;
+			packet.first_skill = m_clients[rl.Get_Tagger_ID()].get_first_skill_enable();
+			packet.second_skill = m_clients[rl.Get_Tagger_ID()].get_second_skill_enable();
+			packet.third_skill = m_clients[rl.Get_Tagger_ID()].get_third_skill_enable();
+
+			m_clients[rl.Get_Tagger_ID()].do_send(sizeof(packet), &packet);
+			delete exp_over;
+			break;
+		}
+
+		case OP_TYPE::OP_GAME_END:
+		{
+			Room& rl = *m_room_manager->Get_Room_Info(iocp_key);
+			rl._room_state_lock.lock();
+			rl._room_state = GAME_ROOM_STATE::END;
+			rl._room_state_lock.unlock();
+
+			sc_packet_game_end packet;
+			packet.size = sizeof(packet);
+			packet.type = SC_PACKET::SC_PACKET_GAME_END;
+			packet.is_tagger_win = true; // 이건 방에서 누가 이겼는지 조건을 넘겨줘야함
+
+			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
+			{
+				m_clients[rl.in_player[i]].do_send(sizeof(packet), &packet);
+			}
+
+			delete exp_over;
 			break;
 		}
 
