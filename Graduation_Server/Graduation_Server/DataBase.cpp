@@ -250,7 +250,7 @@ void DataBase::DataBaseThread()
 				reason = check_login(request.request_name, request.request_pw);
 
 				if (reason == 1) // reason 0 : id가 존재하지 않음 / reason 1 : 성공 / reason 2 : pw가 틀림
-				{		
+				{
 					server.m_clients[request.request_id].set_login_state(Y_LOGIN);
 					server.m_clients[request.request_id].set_state(CLIENT_STATE::ST_LOBBY);
 					server.m_clients[request.request_id].set_name(request.request_char_name);
@@ -300,7 +300,7 @@ void DataBase::DataBaseThread()
 				cGameServer& server = *cGameServer::GetInstance();
 				Custom data = Load_Customizing(request.request_name);
 				server.m_clients[request.request_id].m_customizing->Load_Customizing_Data_To_DB(data);
-				
+
 				sc_packet_customizing_update packet;
 				packet.size = sizeof(packet);
 				packet.type = SC_PACKET::SC_PACKET_CUSTOMIZING;
@@ -319,13 +319,15 @@ void DataBase::DataBaseThread()
 			case REQUEST_SAVE_CUSTOMIZING:
 			{
 				Save_Customizing(request.request_name, request.request_custom_data);
-				cout << "커스터마이징 정보 저장 완료" << endl;
+				//cout << "커스터마이징 정보 저장 완료" << endl;
 				break;
 			}
 
 			}
 			request_db_queue.pop();
 		}
+		else
+			this_thread::sleep_for(6ms);
 	}
 }
 

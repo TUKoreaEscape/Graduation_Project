@@ -135,7 +135,7 @@ protected:
 
 private:
 	const int						RANGE = 7;
-
+	atomic<int>						join_member = 0;
 	std::vector<std::thread>		m_worker_threads;
 	std::vector<std::thread>		m_timer_thread;
 	std::vector<std::thread>		m_database_thread; // worker thread에서 쿼리 날리는건 손해다.

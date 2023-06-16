@@ -1,6 +1,7 @@
 #pragma once
 #define DEBUG 1
 #define PRINT 0
+#define SOCKET_ERROR_PRINT 0
 #define MAX_USER 30000
 #define NUMBER_OF_DOOR 6
 

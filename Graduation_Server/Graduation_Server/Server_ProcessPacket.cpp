@@ -330,7 +330,6 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 	cout << "id : " << user_id << "°¡ readyÇÔ" << endl;
 #endif
 	room.SetReady(packet->ready_type, user_id);
-	cout << room.All_Player_Ready() << endl;
 	if (room.All_Player_Ready())
 	{
 		for (auto player_index : room.in_player) {

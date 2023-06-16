@@ -53,6 +53,8 @@ void cGameServer::StartServer()
 	for (int i = 0; i < 1; ++i)
 		m_event_thread.emplace_back(std::thread(&cGameServer::Timer, this));
 	std::cout << "Server Event_Thread Working! (1 threads) \n";
+	std::cout << "Server Start!!! \n\n";
+	cout << "Number of users accessing the server : " << join_member << "\r";
 	for (auto& worker : m_worker_threads)
 		worker.join();
 	
@@ -61,8 +63,6 @@ void cGameServer::StartServer()
 
 	for (auto& event_worker : m_event_thread)
 		event_worker.join();
-
-	std::cout << "Server Start!!! \n";
 }
 
 void cGameServer::WorkerThread()
@@ -81,6 +81,7 @@ void cGameServer::WorkerThread()
 		{
 			int err_no = WSAGetLastError();
 			// ¿Ã¬ ¿∫ ø°∑Ø≈Ωªˆ∫Œ∫–!
+#if SOCKET_ERROR_PRINT
 			std::cout << "ID:" << client_id << " Error!";
 			if (err_no == ERROR_INVALID_HANDLE)
 				std::cout << "Handle Error" << std::endl;
@@ -96,8 +97,12 @@ void cGameServer::WorkerThread()
 			std::wcout << lpMsgBuf << std::endl;
 
 			LocalFree(lpMsgBuf);
+#endif
 			Disconnect(client_id);
+
+#if SOCKET_ERROR_PRINT
 			cout << "disconnect ID : " << client_id << endl;
+#endif
 			if (exp_over->m_comp_op == OP_SEND)
 				delete exp_over;
 			continue;
@@ -167,14 +172,16 @@ void cGameServer::WorkerThread()
 void cGameServer::Accept(EXP_OVER* exp_over)
 {
 #if DEBUG
-		std::cout << "Accept Completed \n";
+		//std::cout << "Accept Completed \n";
 #endif
 	unsigned int new_id = get_new_id();
 	if (-1 == new_id) {}
 	else
 	{
 #if DEBUG
-		cout << "Accept Client! new_id : " << new_id << endl;
+		//cout << "Accept Client! new_id : " << new_id << endl;
+		join_member++;
+		cout << "Number of users accessing the server : " << join_member << "\r";
 #endif
 		SOCKET c_socket = *(reinterpret_cast<SOCKET*>(exp_over->m_buf));
 		m_clients[new_id]._socket = c_socket;
@@ -314,6 +321,10 @@ void cGameServer::Disconnect(const unsigned int _user_id) // ≈¨∂Û¿Ãæ∆Æ ø¨∞·¿ª «
 	cl.set_name(reset_name);
 	cl.set_id(-1);
 	cl._state_lock.unlock();
+#if DEBUG
+	join_member--;
+	cout << "Number of users accessing the server : " << join_member << "\r";
+#endif
 }
 
 wstring cGameServer::stringToWstring(const std::string& t_str) // string -> wstring ∫Ø»Ø
@@ -474,7 +485,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 #if !DEBUG
 			if (m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY)
 #endif
-		cout << "recv Join Room" << endl;
+		//cout << "recv Join Room" << endl;
 		Process_Join_Room(user_id, p);
 		break;
 	}
