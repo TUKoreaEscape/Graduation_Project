@@ -449,8 +449,20 @@ void cGameServer::Process_Attack(const int user_id)
 	{
 		if (punch.Intersects(m_clients[other_player_id].get_bounding_box()))
 		{
-			m_clients[other_player_id].SetVictimTimeZero();
-			m_clients[other_player_id].set_victim_animation(true);
+
+			if (!m_clients[other_player_id].get_user_victim_animation())
+			{
+				m_clients[other_player_id].SetVictimTimeZero();
+				m_clients[other_player_id].set_victim_animation(true);
+
+				TIMER_EVENT ev;
+				ev.event_time = chrono::system_clock::now() + 499ms;
+				ev.event_type = EventType::PLAYER_VICTIM;
+				ev.room_number = m_clients[other_player_id].get_join_room_number();
+				ev.obj_id = other_player_id;
+
+				m_timer_queue.push(ev);
+			}
 		}
 	}
 

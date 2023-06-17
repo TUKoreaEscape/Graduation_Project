@@ -68,6 +68,20 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		break;
 	}
 
+	case EventType::PLAYER_ATTACK:
+	{
+		m_clients[ev.obj_id].set_attack_animation(false);
+		m_clients[ev.obj_id].SetAttackTimeZero();
+		break;
+	}
+
+	case EventType::PLAYER_VICTIM:
+	{
+		m_clients[ev.obj_id].set_victim_animation(false);
+		m_clients[ev.obj_id].SetVictimTimeZero();
+		break;
+	}
+
 	case EventType::OPEN_TAGGER_SKILL_FIRST:
 	{
 		EXP_OVER* over = new EXP_OVER;
