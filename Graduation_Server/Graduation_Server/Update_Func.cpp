@@ -5,25 +5,6 @@ void cGameServer::Update_OtherPlayer(int room_number, float elaspeTime)
 {
 	Room& room = *m_room_manager->Get_Room_Info(room_number);
 
-	for (int i = 0; i < 6; ++i)
-	{
-		if (room.Get_Join_Member(i) != -1)
-		{
-			if (m_clients[room.Get_Join_Member(i)].get_user_attack_animation())
-				m_clients[room.Get_Join_Member(i)].play_attack_animation(elaspeTime);
-
-			if (m_clients[room.Get_Join_Member(i)].get_user_victim_animation())
-				m_clients[room.Get_Join_Member(i)].play_victim_animation(elaspeTime);
-
-			if (!m_clients[room.Get_Join_Member(i)].IsAttackAnimation())
-				m_clients[room.Get_Join_Member(i)].set_attack_animation(false);
-
-			if (!m_clients[room.Get_Join_Member(i)].IsVictimAnimation())
-				m_clients[room.Get_Join_Member(i)].set_victim_animation(false);
-			Update_Viewlist(room.Get_Join_Member(i), room_number);
-		}
-	}
-
 	int index = 0;
 	for (int k = 0; k < 6; ++k)
 	{
