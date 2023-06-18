@@ -442,8 +442,10 @@ void cGameServer::Process_Attack(const int user_id)
 {
 	XMFLOAT3 attacker_look{ static_cast<float>(m_clients[user_id].get_look_x()) / 100, static_cast<float>(m_clients[user_id].get_look_y()) / 100, static_cast<float>(m_clients[user_id].get_look_z()) / 100 };
 	BoundingOrientedBox punch = m_clients[user_id].get_bounding_box();
-	m_clients[user_id].SetAttackTimeZero();
-	m_clients[user_id].set_attack_animation(true);
+
+	if(!m_clients[user_id].get_user_attack_animation())
+		m_clients[user_id].set_attack_animation(true);
+
 	punch.Center = Add(punch.Center, attacker_look);
 	for (auto other_player_id : m_clients[user_id].room_list)
 	{
@@ -452,7 +454,6 @@ void cGameServer::Process_Attack(const int user_id)
 
 			if (!m_clients[other_player_id].get_user_victim_animation())
 			{
-				m_clients[other_player_id].SetVictimTimeZero();
 				m_clients[other_player_id].set_victim_animation(true);
 
 				TIMER_EVENT ev;

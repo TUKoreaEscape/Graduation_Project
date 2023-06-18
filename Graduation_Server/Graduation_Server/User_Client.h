@@ -113,14 +113,8 @@ public:
 	void				set_attack_animation(bool value) { m_attack_animation = value; }
 	void				set_victim_animation(bool value) { m_victim_animation = value; }
 
-	void				play_attack_animation(float ElapseTime) { m_attack_animation_time += ElapseTime; }
-	void				play_victim_animation(float ElapseTime) { m_victim_animation_time += ElapseTime; }
-
-	bool				IsAttackAnimation() { return m_attack_animation_time < 0.49f; }
-	bool				IsVictimAnimation() { return m_victim_animation_time < 0.49f; }
-
-	void				SetAttackTimeZero() { m_attack_animation_time = 0; }
-	void				SetVictimTimeZero() { m_victim_animation_time = 0; }
+	bool				IsAttackAnimation() { return m_attack_animation; }
+	bool				IsVictimAnimation() { return m_victim_animation; }
 
 	void				set_login_state(LOGIN_STATE _state);
 	void				set_state(CLIENT_STATE::STATE state);

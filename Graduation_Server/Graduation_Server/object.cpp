@@ -140,6 +140,16 @@ void ElectronicSystem::Update_bounding_box_pos(const XMFLOAT3& pos)
 
 }
 
+bool ElectronicSystem::Get_On_Off_Switch_Vaild(int idx, bool data[])
+{
+	for (int i = 0; i < 15; ++i)
+	{
+		if (m_correct_on_off_switch[i] != data[i])
+			return false;
+	}
+	return true;
+}
+
 EscapeSystem::EscapeSystem()
 {
 }

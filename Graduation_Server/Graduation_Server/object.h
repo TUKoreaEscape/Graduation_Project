@@ -74,11 +74,16 @@ public:
 class ElectronicSystem : public GameObject {
 private:
 	int		m_system_id = -1;
+	bool	m_correct_on_off_switch[15];
 public:
 	ElectronicSystem();
 	ElectronicSystem(const unsigned int obj_id, Object_Type type, XMFLOAT3 center, XMFLOAT3 extents);
 	~ElectronicSystem() = default;
 
+	void init_electrinic_switch_data(int idx, bool value) { m_correct_on_off_switch[idx] = value; }
+
+	bool Get_On_Off_Switch_Vaild(int idx, bool data[]);
+	bool Get_On_Off_Switch_Value(int idx) { return m_correct_on_off_switch[idx]; }
 	void Update_bounding_box_pos(const XMFLOAT3& pos);
 	void Update_Object();
 };
@@ -86,6 +91,7 @@ public:
 class EscapeSystem : public GameObject {
 private:
 	int		m_system_id;
+
 public:
 	EscapeSystem();
 	EscapeSystem(const unsigned int obj_id, Object_Type type, XMFLOAT3 center, XMFLOAT3 extents);

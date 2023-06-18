@@ -26,6 +26,7 @@ public:
 	vector<GameObject>				m_game_object;
 	vector<GameObject>				m_game_wall_and_fix_object;
 	vector<Door>					m_door_object;
+	vector<ElectronicSystem>		m_electrinic_system;
 
 private:
 	chrono::system_clock::time_point start_time;
@@ -69,6 +70,7 @@ public:
 	void	add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation);
 	void	add_game_walls(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents);
 	void	add_game_doors(const unsigned int door_id, Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents);
+	void	add_game_ElectronicSystem(const unsigned int id, Object_Type ob_type, XMFLOAT3& center, XMFLOAT3& extents);
 	void	Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE room_state);
 	void	SetReady(const bool is_ready, const int user_id);
 	void	SetLoading(const bool is_loading, const int user_id);
@@ -77,7 +79,7 @@ public:
 public:
 	// 인게임 시작후 사용하는 함수
 	void	SetBoundingBox(XMFLOAT3 pos, XMFLOAT3 extents, XMFLOAT4 orientation);
-	void	SetPlayerPos(CLIENT& player);
+	void	Set_Electronic_System_ONOFF();
 	void	Update_room_time();
 	void	Update_Player_Position();
 	void	Update_Door(const int door_num);

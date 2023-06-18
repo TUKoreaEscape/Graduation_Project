@@ -96,6 +96,11 @@ void Room::add_game_doors(const unsigned int door_id, Object_Type ob_type, XMFLO
 	m_door_object.emplace_back(Door(door_id, ob_type, center, extents));
 }
 
+void Room::add_game_ElectronicSystem(const unsigned int id, Object_Type ob_type, XMFLOAT3& center, XMFLOAT3& extents)
+{
+	m_electrinic_system.emplace_back(ElectronicSystem(id, ob_type, center, extents));
+}
+
 void Room::SetBoundingBox(XMFLOAT3 pos, XMFLOAT3 extents, XMFLOAT4 orientation)
 {
 	for (int i = 0; i < in_player_bounding_box.size(); ++i)
@@ -129,6 +134,15 @@ void Room::SetLoading(const bool is_loading, const int user_id)
 			break;
 		}
 		in_player_lock.unlock();
+	}
+}
+
+void Room::Set_Electronic_System_ONOFF()
+{
+	for (int i = 0; i < m_electrinic_system.size(); ++i)
+	{
+		for (int idx = 0; idx < 15; ++idx)
+			m_electrinic_system[i].init_electrinic_switch_data(idx, rand() % 2);
 	}
 }
 

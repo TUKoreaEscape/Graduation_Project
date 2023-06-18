@@ -47,6 +47,23 @@ void Room::Start_Game()
 	ev.event_type = EventType::SELECT_TAGGER;
 	ev.event_time = start_time + 10s;
 	server.m_timer_queue.push(ev);
+
+	Set_Electronic_System_ONOFF();
+
+	// 여기서 전력장치 스위치 정보 다 보내줘야함
+	sc_packet_electronic_system_init system_packet;
+	system_packet.size = sizeof(system_packet);
+	system_packet.type = SC_PACKET::SC_PACKET_ELECTRONIC_SWITCH_INIT;
+
+	for (int i = 0; i < m_electrinic_system.size(); ++i)
+	{
+		system_packet.data[i].idx = i;
+		for (int idx = 0; idx < 15; ++idx)
+			system_packet.data[i].value[idx] = m_electrinic_system[i].Get_On_Off_Switch_Value(idx);
+	}
+
+	for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
+		server.m_clients[in_player[i]].do_send(sizeof(system_packet), &system_packet);
 }
 
 void Room::End_Game()

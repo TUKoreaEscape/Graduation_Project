@@ -111,7 +111,7 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	nObjects = 0;
 	nStrLength = 0;
 	nReads = (unsigned int)fread(&nObjects, sizeof(int), 1, pFile);
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 6; ++i)
 	{
 		// 여기서 door 추가할거임
 		cout << "Electronic System : " << static_cast<int>((float)i / (float)6 * 100) << "%로드 완료\r";
@@ -124,7 +124,7 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 		XMFLOAT3 Extents = XMFLOAT3(AABBExtents[0], AABBExtents[1], AABBExtents[2]);
 		for (auto& _room : a_in_game_room)
 		{
-			_room.add_game_doors(i, OB_ELECTRONICSYSTEM, center_pos, Extents);
+			_room.add_game_ElectronicSystem(i, OB_ELECTRONICSYSTEM, center_pos, Extents);
 		}
 	}
 	cout << "Electronic System : " << "100" << "%로드 완료\r";

@@ -86,6 +86,11 @@ struct Right {
 	short z;
 };
 
+struct ElectronicSystem_Data {
+	unsigned short	idx;
+	unsigned char	value[15];
+};
+
 struct UserData {
 	short				id;
 	unsigned char		input_key;
@@ -277,6 +282,7 @@ namespace SC_PACKET
 		SC_PACKET_PUT_PLAYER,
 		SC_PACKET_PUT_OTHER_PLAYER,
 		SC_PACKET_MOVE,
+		SC_PACKET_ELECTRONIC_SWITCH_INIT,
 		SC_PACKET_CALCULATE_MOVE,
 		SC_PACKET_SELECT_TAGGER,
 		SC_PACKET_TAGGER_SKILL,
@@ -454,6 +460,13 @@ struct sc_other_player_disconnect {
 	unsigned char	size;
 	unsigned char	type;
 	short			id;
+};
+
+struct sc_packet_electronic_system_init {
+	unsigned char	size;
+	unsigned char	type;
+
+	ElectronicSystem_Data data[6];
 };
 
 struct sc_packet_attack {

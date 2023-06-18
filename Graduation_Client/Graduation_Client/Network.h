@@ -30,7 +30,7 @@ class Network {
 private:
 	static Network* NetworkInstance;
 	SOCKET			m_socket;
-	const char*		SERVER_ADDR = "172.30.1.6";
+	const char*		SERVER_ADDR = "127.0.0.1";
 	Server_Timer	m_server_counter;
 	Custom			data;
 
@@ -77,6 +77,7 @@ public:
 	void Process_Game_Start(char* ptr);
 	void Process_Door_Update(char* ptr);
 	void Process_Attack_Packet(char* ptr);
+	void Process_ElectrinicSystem_Init(char* ptr);
 
 	// 게임 시작 전 사용하는 함수들
 	void Send_Request_Room_Info(int page);
