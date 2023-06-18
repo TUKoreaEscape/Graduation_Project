@@ -114,7 +114,7 @@ public:
 	//static GameObject* LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, GameObject* pParent, FILE* pInFile, Shader* pShader);
 	
 	static void PrintFrameInfo(GameObject* pGameObject, GameObject* pParent);
-	GameObject* FindFrame(char* pstrFrameName);
+	GameObject* FindFrame(const char* pstrFrameName);
 
 public:
 	SkinnedMesh* FindSkinnedMesh(char* pstrSkinnedMeshName);

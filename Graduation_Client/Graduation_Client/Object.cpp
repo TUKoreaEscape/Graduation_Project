@@ -371,6 +371,12 @@ void PowerSwitch::Init()
 {
 	IsOpen = true;
 
+	m_bOnAndOff[1] = true;
+	m_bOnAndOff[4] = true;
+	m_bOnAndOff[7] = true;
+
+	GameObject* pKnob = FindFrame("Knob");
+
 	m_pCup = FindFrame("Cup");
 	m_pMainKnob = FindFrame("Main_Knob");
 }
@@ -397,11 +403,32 @@ void PowerSwitch::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (IsOpen) {
 		m_pCup->isNotDraw = true;
-		if (m_pCup->m_pChild) m_pCup->m_pChild->isNotDraw = true;
+		//if (m_pCup->m_pChild) m_pCup->m_pChild->isNotDraw = true;
 	}
 	else {
 		m_pCup->isNotDraw = false;
-		if (m_pCup->m_pChild) m_pCup->m_pChild->isNotDraw = false;
+		//if (m_pCup->m_pChild) m_pCup->m_pChild->isNotDraw = false;
+	}
+	for (int i = 0; i < 15; ++i) {
+		std::string str = "Knob";
+		if (i != 0) {
+			if (i < 10)
+				str += "00" + std::to_string(i);
+			else
+				str += "0" + std::to_string(i);
+		}
+		GameObject* pKnob = FindFrame(str.c_str());
+		if (pKnob) {
+			m_fOffKnobPos = pKnob->GetPosition().x;		
+			if (true == m_bOnAndOff[i]) {
+				m_fOnKnobPos = m_fOffKnobPos;
+				m_fOnKnobPos -= 0.2;
+				pKnob->m_xmf4x4ToParent._41 = -0.21;
+			}
+			else {		
+				pKnob->m_xmf4x4ToParent._41 = 0.07291567;
+			}
+		}
 	}
 
 	GameObject::render(pd3dCommandList);

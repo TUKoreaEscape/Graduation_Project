@@ -139,7 +139,10 @@ public:
 	bool m_bOnAndOff[15];
 	GameObject* m_pCup = nullptr;
 	GameObject* m_pMainKnob = nullptr;
-	
+
+	float m_fOffKnobPos;
+	float m_fOnKnobPos;
+
 public:
 	PowerSwitch();
 	virtual ~PowerSwitch();

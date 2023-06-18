@@ -254,7 +254,7 @@ void GameObject::PrintFrameInfo(GameObject* pGameObject, GameObject* pParent)
 
 }
 
-GameObject* GameObject::FindFrame(char* pstrFrameName)
+GameObject* GameObject::FindFrame(const char* pstrFrameName)
 {
 	GameObject* pFrameObject = NULL;
 	if (!strncmp(m_pstrFrameName, pstrFrameName, strlen(pstrFrameName))) return(this);
