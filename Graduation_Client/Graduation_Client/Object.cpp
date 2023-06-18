@@ -88,7 +88,7 @@ void Vent::Rotate(float fPitch, float fYaw, float fRoll)
 	UpdateTransform(NULL);
 }
 
-Door::Door() : GameObject()
+Door::Door() : InteractionObject()
 {
 }
 
@@ -367,6 +367,14 @@ PowerSwitch::~PowerSwitch()
 {
 }
 
+void PowerSwitch::Init()
+{
+	IsOpen = true;
+
+	m_pCup = FindFrame("Cup");
+	m_pMainKnob = FindFrame("Main_Knob");
+}
+
 bool PowerSwitch::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
 	return false;
@@ -378,4 +386,23 @@ void PowerSwitch::Rotate(float fPitch, float fYaw, float fRoll)
 	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
 
 	UpdateTransform(NULL);
+}
+
+void PowerSwitch::SetOpen(bool Open)
+{
+	IsOpen = Open;
+}
+
+void PowerSwitch::render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (IsOpen) {
+		m_pCup->isNotDraw = true;
+		if (m_pCup->m_pChild) m_pCup->m_pChild->isNotDraw = true;
+	}
+	else {
+		m_pCup->isNotDraw = false;
+		if (m_pCup->m_pChild) m_pCup->m_pChild->isNotDraw = false;
+	}
+
+	GameObject::render(pd3dCommandList);
 }

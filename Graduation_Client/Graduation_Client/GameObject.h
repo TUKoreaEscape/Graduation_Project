@@ -98,7 +98,7 @@ public:
 public:
 	bool isNotDraw = false;
 
-	void SetDraw();
+	void SetDraw(bool isNotDraw = false);
 	void SetType(int type);
 	int GetType();
 

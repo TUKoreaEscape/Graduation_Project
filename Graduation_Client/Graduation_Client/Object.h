@@ -85,15 +85,19 @@ public:
 	InteractionObject();
 	virtual ~InteractionObject();
 	virtual bool IsPlayerNear(const XMFLOAT3& PlayerPos) { return false; }
+	virtual void Init() {}
+
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList) {};
 };
 
-class Door : public GameObject
+class Door : public InteractionObject
 {
 public:
 	Door();
 	virtual ~Door();
 
 	void Rotate(float fPitch, float fYaw, float fRoll) override;
+	void Init() override {};
 
 public:
 	bool IsRot = false;
@@ -132,10 +136,20 @@ public:
 class PowerSwitch : public InteractionObject
 {
 public:
+	bool m_bOnAndOff[15];
+	GameObject* m_pCup = nullptr;
+	GameObject* m_pMainKnob = nullptr;
+	
+public:
 	PowerSwitch();
 	virtual ~PowerSwitch();
 	
+	void Init() override;
 	bool IsPlayerNear(const XMFLOAT3& PlayerPos);
 
 	void Rotate(float fPitch, float fYaw, float fRoll) override;
+
+	void SetOpen(bool Open);
+
+	void render(ID3D12GraphicsCommandList* pd3dCommandList);
 };

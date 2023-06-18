@@ -84,7 +84,7 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	for (int i = 0; i < NUM_POWER; ++i) {
 		if (m_pPowers[i]) {
 			m_pPowers[i]->UpdateTransform(nullptr);
-			m_pPowers[i]->render(pd3dCommandList);
+			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->render(pd3dCommandList);
 		}
 	}
 
@@ -828,6 +828,7 @@ void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	for (int i = 0; i < NUM_POWER; ++i) {
 		m_pPowers[i] = new PowerSwitch();
 		m_pPowers[i]->SetChild(pElecModel->m_pModelRootObject, true);
+		m_pPowers[i]->Init();
 		//m_pPowers[i]->UpdateTransform(nullptr);
 	}
 
