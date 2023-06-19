@@ -88,7 +88,7 @@ void Vent::Rotate(float fPitch, float fYaw, float fRoll)
 	UpdateTransform(NULL);
 }
 
-Door::Door() : GameObject()
+Door::Door() : InteractionObject()
 {
 }
 
@@ -115,7 +115,7 @@ void Door::Rotate(float fPitch, float fYaw, float fRoll)
 
 }
 
-bool Door::CheckDoor(const XMFLOAT3& PlayerPos)
+bool Door::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
 	float minx, maxx, minz, maxz;
 	if (IsRot) {
@@ -203,12 +203,11 @@ void Door::SetPosition(XMFLOAT3 xmf3Position)
 
 void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (IsWorking) return;
 	if (IsNear) {
-		if (m_pDoorUI) {
-			if (IsRot)
-				m_pDoorUI->Rotate(m_fPitch, m_fYaw, m_fRoll);
-			m_pDoorUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f );
-			m_pDoorUI->BillboardRender(pd3dCommandList);
+		if (m_pInteractionUI) {
+			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f );
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_fPitch, m_fYaw, m_fRoll);
 		}
 	}
 }
@@ -315,6 +314,13 @@ InteractionObject::~InteractionObject()
 {
 }
 
+void InteractionObject::SetUI(InteractionUI* ui)
+{
+	if (m_pInteractionUI) m_pInteractionUI->Release();
+	m_pInteractionUI = ui;
+	if (m_pInteractionUI) m_pInteractionUI->AddRef();
+}
+
 InteractionUI::InteractionUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
 {
 	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
@@ -336,19 +342,28 @@ InteractionUI::InteractionUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	pUIMaterial->SetDoorUIShader();
 
 	renderer->SetMaterial(0, pUIMaterial);
+
+	SetScale(0.2f, 0.2f, 0.2f);
+	UpdateTransform(nullptr);
 }
 
 InteractionUI::~InteractionUI()
 {
 }
 
-void InteractionUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList)
+void InteractionUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList, float x, float y, float z)
 {
 	XMFLOAT3 xmf3CameraPosition = Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition();
 
 	SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 
+	Rotate(x, y, z);
+
+	UpdateTransform(nullptr);
+
 	render(pd3dCommandList);
+
+	Rotate(-x, -y, -z);
 }
 
 void InteractionUI::Rotate(float fPitch, float fYaw, float fRoll)
@@ -361,15 +376,58 @@ void InteractionUI::Rotate(float fPitch, float fYaw, float fRoll)
 
 PowerSwitch::PowerSwitch() : InteractionObject()
 {
+	IsOpen = false;
 }
 
 PowerSwitch::~PowerSwitch()
 {
 }
 
+void PowerSwitch::Init()
+{
+	m_bOnAndOff[1] = true;
+	m_bOnAndOff[4] = true;
+	m_bOnAndOff[7] = true;
+
+	GameObject* pKnob = FindFrame("Knob");
+
+	m_pCup = FindFrame("Cup");
+	m_pMainKnob = FindFrame("Main_Knob");
+}
+
 bool PowerSwitch::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
-	return false;
+	float minx, maxx, minz, maxz;
+	if (IsRot) {
+		minx = m_xmf4x4ToParent._41 - 1.5f;
+		maxx = m_xmf4x4ToParent._41 - 0.5f;
+		minz = m_xmf4x4ToParent._43 - 0.6f;
+		maxz = m_xmf4x4ToParent._43 + 0.6f;
+	}
+	else {
+		minx = m_xmf4x4ToParent._41 - 0.6f;
+		maxx = m_xmf4x4ToParent._41 + 0.6f;
+		minz = m_xmf4x4ToParent._43 + 0.5f;
+		maxz = m_xmf4x4ToParent._43 + 1.5f;
+	}
+	if (PlayerPos.x > maxx) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.x < minx) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.z < minz) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.z > maxz) {
+		IsNear = false;
+		return false;
+	}
+	IsNear = true;
+	return true;
 }
 
 void PowerSwitch::Rotate(float fPitch, float fYaw, float fRoll)
@@ -377,5 +435,69 @@ void PowerSwitch::Rotate(float fPitch, float fYaw, float fRoll)
 	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
 	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
 
-	UpdateTransform(NULL);
+	UpdateTransform(NULL);	
+	
+	m_fPitch = fPitch; m_fYaw = fYaw; m_fRoll = fRoll;
+
+	IsRot = true;
+}
+
+void PowerSwitch::SetOpen(bool Open)
+{
+	IsOpen = Open;
+}
+
+void PowerSwitch::render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (IsOpen) {
+		m_pCup->isNotDraw = true;
+		if (m_pCup->m_pChild) m_pCup->m_pChild->isNotDraw = true;
+	}
+	else {
+		m_pCup->isNotDraw = false;
+		if (m_pCup->m_pChild) m_pCup->m_pChild->isNotDraw = false;
+	}
+	for (int i = 0; i < 15; ++i) {
+		std::string str = "Knob";
+		if (i != 0) {
+			if (i < 10)
+				str += "00" + std::to_string(i);
+			else
+				str += "0" + std::to_string(i);
+		}
+		GameObject* pKnob = FindFrame(str.c_str());
+		if (pKnob) {
+			m_fOffKnobPos = pKnob->GetPosition().x;		
+			if (true == m_bOnAndOff[i]) {
+				m_fOnKnobPos = m_fOffKnobPos;
+				m_fOnKnobPos -= 0.2;
+				pKnob->m_xmf4x4ToParent._41 = -0.21;
+			}
+			else {		
+				pKnob->m_xmf4x4ToParent._41 = 0.07291567;
+			}
+		}
+	}
+	if (m_bClear) {
+		FindFrame("Lamp_1")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+		FindFrame("Lamp_2")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
+	}
+	else {
+		FindFrame("Lamp_1")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(0.0f, 0.5f, 0.04827571f, 1.0f);
+		FindFrame("Lamp_2")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	}
+	GameObject::render(pd3dCommandList);
+}
+
+void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (IsNear) {
+		if (m_pInteractionUI) {
+			if (IsRot)
+				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
+			else
+				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_fPitch, m_fYaw, m_fRoll);
+		}
+	}
 }

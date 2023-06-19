@@ -146,11 +146,11 @@ void GameObject::SetScale(float x, float y, float z)
 	UpdateTransform(NULL);
 }
 
-void GameObject::SetDraw()
+void GameObject::SetDraw(bool isNotDraw)
 {
-	isNotDraw = false;
-	if (m_pSibling) m_pSibling->SetDraw();
-	if (m_pChild) m_pChild->SetDraw();
+	this->isNotDraw = isNotDraw;
+	if (m_pSibling) m_pSibling->SetDraw(isNotDraw);
+	if (m_pChild) m_pChild->SetDraw(isNotDraw);
 }
 
 void GameObject::SetType(int type)
@@ -254,7 +254,7 @@ void GameObject::PrintFrameInfo(GameObject* pGameObject, GameObject* pParent)
 
 }
 
-GameObject* GameObject::FindFrame(char* pstrFrameName)
+GameObject* GameObject::FindFrame(const char* pstrFrameName)
 {
 	GameObject* pFrameObject = NULL;
 	if (!strncmp(m_pstrFrameName, pstrFrameName, strlen(pstrFrameName))) return(this);

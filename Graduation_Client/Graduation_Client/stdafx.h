@@ -79,6 +79,7 @@ using Microsoft::WRL::ComPtr;
 
 constexpr int TYPE_ALPHACUT = -1;
 constexpr int TYPE_OBJECT = 0;
+constexpr int TYPE_PLAYER_YET = 1;
 constexpr int TYPE_PLAYER = 2;
 constexpr int TYPE_TAGGER = 4;
 constexpr int TYPE_DEAD_PLAYER = 8;

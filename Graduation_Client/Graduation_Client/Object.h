@@ -68,7 +68,7 @@ public:
 	InteractionUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName);
 	virtual ~InteractionUI();
 
-	void BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList);
+	void BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList,float x = 0, float y = 0, float z = 0);
 
 	void Rotate(float fPitch, float fYaw, float fRoll) override;
 
@@ -77,32 +77,38 @@ public:
 class InteractionObject : public GameObject
 {
 public:
+	bool IsRot = false;
 	bool IsNear = false;
 	bool IsWorking = false;
 
 	InteractionUI* m_pInteractionUI = nullptr;
+
+	float m_fPitch{}, m_fYaw{}, m_fRoll{};
 public:
 	InteractionObject();
 	virtual ~InteractionObject();
 	virtual bool IsPlayerNear(const XMFLOAT3& PlayerPos) { return false; }
+	virtual void Init() {}
+
+	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList) {};
+	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) {};
+
+	virtual void SetUI(InteractionUI* ui);
 };
 
-class Door : public GameObject
+class Door : public InteractionObject
 {
 public:
 	Door();
 	virtual ~Door();
 
 	void Rotate(float fPitch, float fYaw, float fRoll) override;
+	void Init() override {};
 
 public:
-	bool IsRot = false;
-	bool IsNear = false;
-	bool IsWorking = false;
-
 	float OpenTime = 0.0f;
 	float TestTIme = 0.0f;
-	bool CheckDoor(const XMFLOAT3& PlayerPos);
+	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
 
 	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void update(float fElapsedTime);
@@ -112,10 +118,6 @@ public:
 
 	XMFLOAT3 LeftDoorPos;
 	XMFLOAT3 RightDoorPos;
-
-	DoorUI* m_pDoorUI = nullptr;
-
-	float m_fPitch{}, m_fYaw{}, m_fRoll{};
 
 	void SetOpen(bool Open);
 
@@ -132,10 +134,26 @@ public:
 class PowerSwitch : public InteractionObject
 {
 public:
+	bool m_bOnAndOff[15];
+	GameObject* m_pCup = nullptr;
+	GameObject* m_pMainKnob = nullptr;
+
+	float m_fOffKnobPos;
+	float m_fOnKnobPos;
+
+	bool m_bClear = false;
+
+public:
 	PowerSwitch();
 	virtual ~PowerSwitch();
 	
-	bool IsPlayerNear(const XMFLOAT3& PlayerPos);
+	void Init() override;
+	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
 
 	void Rotate(float fPitch, float fYaw, float fRoll) override;
+
+	void SetOpen(bool Open);
+
+	void render(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
 };
