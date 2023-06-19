@@ -505,6 +505,15 @@ struct sc_packet_open_electronic_system_door {
 	unsigned char	es_state;
 };
 
+struct sc_packet_electronic_system_update_value {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned short	es_num;
+	unsigned short	es_switch_idx;
+	bool			es_value;
+};
+
 struct sc_packet_customizing_update {
 	unsigned char	size;
 	unsigned char	type;
