@@ -206,10 +206,8 @@ void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (IsWorking) return;
 	if (IsNear) {
 		if (m_pInteractionUI) {
-			if (IsRot)
-				m_pInteractionUI->Rotate(m_fPitch, m_fYaw, m_fRoll);
 			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f );
-			m_pInteractionUI->BillboardRender(pd3dCommandList);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_fPitch, m_fYaw, m_fRoll);
 		}
 	}
 }
@@ -345,7 +343,7 @@ InteractionUI::InteractionUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	renderer->SetMaterial(0, pUIMaterial);
 
-	SetScale(0.1f, 0.1f, 0.1f);
+	SetScale(0.2f, 0.2f, 0.2f);
 	UpdateTransform(nullptr);
 }
 
@@ -353,13 +351,19 @@ InteractionUI::~InteractionUI()
 {
 }
 
-void InteractionUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList)
+void InteractionUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList, float x, float y, float z)
 {
 	XMFLOAT3 xmf3CameraPosition = Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition();
 
 	SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 
+	Rotate(x, y, z);
+
+	UpdateTransform(nullptr);
+
 	render(pd3dCommandList);
+
+	Rotate(-x, -y, -z);
 }
 
 void InteractionUI::Rotate(float fPitch, float fYaw, float fRoll)
@@ -395,16 +399,16 @@ bool PowerSwitch::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
 	float minx, maxx, minz, maxz;
 	if (IsRot) {
-		minx = m_xmf4x4ToParent._41 - 0.6f;
-		maxx = m_xmf4x4ToParent._41 + 0.6f;
-		minz = m_xmf4x4ToParent._43 + 0.5f;
-		maxz = m_xmf4x4ToParent._43 + 1.5f;
-	}
-	else {
 		minx = m_xmf4x4ToParent._41 - 1.5f;
 		maxx = m_xmf4x4ToParent._41 - 0.5f;
 		minz = m_xmf4x4ToParent._43 - 0.6f;
 		maxz = m_xmf4x4ToParent._43 + 0.6f;
+	}
+	else {
+		minx = m_xmf4x4ToParent._41 - 0.6f;
+		maxx = m_xmf4x4ToParent._41 + 0.6f;
+		minz = m_xmf4x4ToParent._43 + 0.5f;
+		maxz = m_xmf4x4ToParent._43 + 1.5f;
 	}
 	if (PlayerPos.x > maxx) {
 		IsNear = false;
@@ -490,9 +494,10 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (IsNear) {
 		if (m_pInteractionUI) {
 			if (IsRot)
-				m_pInteractionUI->Rotate(m_fPitch, m_fYaw, m_fRoll);
-			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
-			m_pInteractionUI->BillboardRender(pd3dCommandList);
+				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
+			else
+				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_fPitch, m_fYaw, m_fRoll);
 		}
 	}
 }

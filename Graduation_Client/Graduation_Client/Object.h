@@ -68,7 +68,7 @@ public:
 	InteractionUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName);
 	virtual ~InteractionUI();
 
-	void BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList);
+	void BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList,float x = 0, float y = 0, float z = 0);
 
 	void Rotate(float fPitch, float fYaw, float fRoll) override;
 
