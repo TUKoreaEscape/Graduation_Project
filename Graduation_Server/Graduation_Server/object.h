@@ -90,6 +90,7 @@ public:
 
 	bool Get_On_Off_Switch_Vaild(int idx, bool data[]);
 	bool Get_On_Off_Switch_Value(int idx) { return m_correct_on_off_switch[idx]; }
+	void Set_On_Off_Switch_Value(int idx, bool value) { m_correct_on_off_switch[idx] = value; }
 	void Update_bounding_box_pos(const XMFLOAT3& pos);
 	void Update_Object();
 

@@ -422,8 +422,10 @@ void Network::ProcessPacket(char* ptr)
 	}
 
 	case SC_PACKET::SC_PACKET_OTHER_PLAYER_UPDATE:
+	{
 		Process_Other_Player_Move(ptr);
 		break;
+	}
 
 	case SC_PACKET::SC_PACKET_ATTACK:
 
@@ -445,8 +447,10 @@ void Network::ProcessPacket(char* ptr)
 	}
 
 	case SC_PACKET::SC_PACKET_CALCULATE_MOVE:
+	{
 		Process_Player_Move(ptr);
 		break;
+	}
 
 	case SC_PACKET::SC_PACKET_PUT_PLAYER:
 	{
@@ -556,6 +560,18 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_ELECTRONIC_SWITCH_INIT:
 	{
 		Process_ElectrinicSystem_Init(ptr);
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_DOOR_UPDATE:
+	{
+		// 아직 처리할 전력장치 코드가 없음
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_SWITCH_UPDATE:
+	{
+		// 아직 처리할 전력장치 코드가 없음
 		break;
 	}
 

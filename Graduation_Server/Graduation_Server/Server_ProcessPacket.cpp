@@ -564,4 +564,23 @@ void cGameServer::Process_ElectronicSystem_Open(const int user_id, void* buff)
 void cGameServer::Process_ElectronicSystem_Control(const int user_id, void* buff)
 {
 	cs_packet_request_eletronic_system_switch_control* packet = reinterpret_cast<cs_packet_request_eletronic_system_switch_control*>(buff);
+
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+	room.m_electrinic_system[packet->electronic_system_index].m_state_lock->lock();
+	room.m_electrinic_system[packet->electronic_system_index].Set_On_Off_Switch_Value(packet->switch_idx, packet->switch_value);
+	room.m_electrinic_system[packet->electronic_system_index].m_state_lock->unlock();
+
+	sc_packet_electronic_system_update_value es_packet;
+	es_packet.size = sizeof(es_packet);
+	es_packet.type = SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_SWITCH_UPDATE;
+	es_packet.es_num = packet->electronic_system_index;
+	es_packet.es_switch_idx = packet->switch_idx;
+	es_packet.es_value = room.m_electrinic_system[packet->electronic_system_index].Get_On_Off_Switch_Value(packet->switch_idx);
+	
+	for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
+	{
+		int player_id = room.in_player[i];
+		m_clients[player_id].do_send(sizeof(es_packet), &es_packet);
+	}
 }
