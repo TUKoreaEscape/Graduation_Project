@@ -599,14 +599,6 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	case CS_PACKET::CS_PACKET_ATTACK:
 	{
 		Process_Attack(user_id);
-
-		TIMER_EVENT ev;
-		ev.event_time = chrono::system_clock::now() + 499ms;
-		ev.event_type = EventType::PLAYER_ATTACK;
-		ev.room_number = m_clients[user_id].get_join_room_number();
-		ev.obj_id = user_id;
-
-		m_timer_queue.push(ev);
 		break;
 	}
 
@@ -614,6 +606,18 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	{
 
 		Process_Door(user_id, p);
+		break;
+	}
+
+	case CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_DOOR:
+	{
+		Process_ElectronicSystem_Open(user_id, p);
+		break;
+	}
+
+	case CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_SWICH:
+	{
+		// 여기선 스위치 조작 처리 해주면됨
 		break;
 	}
 

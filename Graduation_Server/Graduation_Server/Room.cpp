@@ -176,9 +176,21 @@ void Room::Update_Door(const int door_num)
 	m_door_object[door_num].process_door_event();
 }
 
+void Room::Update_ElectronicSystem_Door(const int es_num)
+{
+	m_electrinic_system[es_num].Update_Object();
+}
+
 bool Room::Is_Door_Open(const int door_num)
 {
 	if(m_door_object[door_num].get_state() == ST_OPEN)
+		return true;
+	return false;
+}
+
+bool Room::Is_ElectronicSystem_Open(const int es_num)
+{
+	if (m_electrinic_system[es_num].get_state() == ES_OPEN)
 		return true;
 	return false;
 }

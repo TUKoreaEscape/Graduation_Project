@@ -443,8 +443,18 @@ void cGameServer::Process_Attack(const int user_id)
 	XMFLOAT3 attacker_look{ static_cast<float>(m_clients[user_id].get_look_x()) / 100, static_cast<float>(m_clients[user_id].get_look_y()) / 100, static_cast<float>(m_clients[user_id].get_look_z()) / 100 };
 	BoundingOrientedBox punch = m_clients[user_id].get_bounding_box();
 
-	if(!m_clients[user_id].get_user_attack_animation())
+	if (!m_clients[user_id].get_user_attack_animation())
+	{
 		m_clients[user_id].set_attack_animation(true);
+
+		TIMER_EVENT ev;
+		ev.event_time = chrono::system_clock::now() + 499ms;
+		ev.event_type = EventType::PLAYER_ATTACK;
+		ev.room_number = m_clients[user_id].get_join_room_number();
+		ev.obj_id = user_id;
+
+		m_timer_queue.push(ev);
+	}
 
 	punch.Center = Add(punch.Center, attacker_look);
 	for (auto other_player_id : m_clients[user_id].room_list)
@@ -507,4 +517,51 @@ void cGameServer::Process_Door(const int user_id, void* buff)
 		ev.room_number = m_clients[user_id].get_join_room_number();
 		m_timer_queue.push(ev);
 	}
+}
+
+void cGameServer::Process_ElectronicSystem_Open(const int user_id, void* buff)
+{
+	cs_packet_request_electronic_system_open* packet = reinterpret_cast<cs_packet_request_electronic_system_open*>(buff);
+
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+	bool is_electronioc_system_door_open = room.Is_ElectronicSystem_Open(packet->es_num);
+	room.Update_ElectronicSystem_Door(packet->es_num);
+
+	sc_packet_open_electronic_system_door es_packet;
+	es_packet.size = sizeof(es_packet);
+	es_packet.type = SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_DOOR_UPDATE;
+	es_packet.es_num = packet->es_num;
+	es_packet.es_state = room.Get_EletronicSystem_State(static_cast<int>(packet->es_num));
+
+	m_clients[user_id]._room_list_lock.lock();
+	for (auto& player : m_clients[user_id].room_list)
+		m_clients[player].do_send(sizeof(es_packet), &es_packet);
+	m_clients[user_id]._room_list_lock.unlock();
+
+	if (!is_electronioc_system_door_open)
+	{
+		TIMER_EVENT ev;
+		ev.event_time = chrono::system_clock::now() + 400ms;
+		ev.event_type = EventType::OPEN_ELECTRONIC;
+		ev.obj_id = packet->es_num;
+		ev.room_number = m_clients[user_id].get_join_room_number();
+
+		m_timer_queue.push(ev);
+	}
+	else
+	{
+		TIMER_EVENT ev;
+		ev.event_time = chrono::system_clock::now() + 400ms;
+		ev.event_type = EventType::CLOSE_ELECTRONIC;
+		ev.obj_id = packet->es_num;
+		ev.room_number = m_clients[user_id].get_join_room_number();
+
+		m_timer_queue.push(ev);
+	}
+}
+
+void cGameServer::Process_ElectronicSystem_Control(const int user_id, void* buff)
+{
+	cs_packet_request_eletronic_system_switch_control* packet = reinterpret_cast<cs_packet_request_eletronic_system_switch_control*>(buff);
 }

@@ -83,10 +83,11 @@ public:
 	void	Update_room_time();
 	void	Update_Player_Position();
 	void	Update_Door(const int door_num);
+	void	Update_ElectronicSystem_Door(const int es_num);
 
 public: // 인게임 오브젝트 state 받아야하는 공간
 	Door_State Get_Door_State(const int door_num) { return m_door_object[door_num].get_state(); }
-
+	ES_State   Get_EletronicSystem_State(const int es_num) { return m_electrinic_system[es_num].get_state(); }
 public:
 	void	Reset_Room();
 	void	Start_Game();
@@ -106,6 +107,8 @@ public:
 	bool	All_Player_Loading();
 
 	bool	Is_Door_Open(const int door_num);
+	bool	Is_ElectronicSystem_Open(const int es_num);
+
 	CollisionInfo	is_collision_wall_to_player(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
 	CollisionInfo	is_collision_player_to_player(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
 	CollisionInfo	is_collision_player_to_object(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);

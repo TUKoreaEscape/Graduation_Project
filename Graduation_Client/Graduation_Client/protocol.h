@@ -63,6 +63,8 @@ namespace CS_PACKET
 		CS_PACKET_USE_THIRD_TAGGER_SKILL,
 		CS_PACKET_REQUEST_OPEN_DOOR,
 		CS_PACKET_REQUEST_OPEN_HIDDEN_DOOR,
+		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_DOOR,
+		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_SWICH,
 		CS_PACKET_ATTACK
 	};
 }
@@ -216,7 +218,16 @@ struct cs_packet_request_electronic_system_open {
 	unsigned char	size;
 	unsigned char	type;
 
-	unsigned char	es_num;
+	unsigned short	es_num;
+};
+
+struct cs_packet_request_eletronic_system_switch_control {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned short	electronic_system_index;
+	unsigned short	switch_idx;
+	bool			switch_value;
 };
 
 struct cs_packet_request_electronic_system_fix {
@@ -287,6 +298,8 @@ namespace SC_PACKET
 		SC_PACKET_SELECT_TAGGER,
 		SC_PACKET_TAGGER_SKILL,
 		SC_PACKET_DOOR_UPDATE,
+		SC_PACKET_ELECTRONIC_SYSTEM_DOOR_UPDATE,
+		SC_PACKET_ELECTRONIC_SYSTEM_SWITCH_UPDATE,
 		SC_PACKET_ROOM_INFO,
 		SC_PACKET_VIVOX_DATA,
 		SC_PACKET_CUSTOMIZING,
@@ -482,6 +495,14 @@ struct sc_packet_open_door {
 
 	unsigned char	door_number;
 	unsigned char	door_state;
+};
+
+struct sc_packet_open_electronic_system_door {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned short	es_num;
+	unsigned char	es_state;
 };
 
 struct sc_packet_customizing_update {

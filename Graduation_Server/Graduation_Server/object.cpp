@@ -128,11 +128,26 @@ ElectronicSystem::ElectronicSystem(const unsigned int obj_id, Object_Type type, 
 	m_pos = center;
 	m_extents = extents;
 	m_bounding_box = BoundingOrientedBox{ center, extents, XMFLOAT4(0, 0, 0, 1) };
+	if (m_state_lock == nullptr)
+		m_state_lock = new mutex;
 }
 
 void ElectronicSystem::Update_Object()
 {
+	m_state_lock->lock();
+	if (m_state == ES_CLOSE && m_electronic_door_working == false)
+	{
+		m_state = ES_OPEN;
+		m_electronic_door_working = true;
+		m_state_lock->unlock();
+	}
 
+	else if (m_state == ES_OPEN && m_electronic_door_working == false)
+	{
+		m_state = ES_CLOSE;
+		m_electronic_door_working = true;
+		m_state_lock->unlock();
+	}
 }
 
 void ElectronicSystem::Update_bounding_box_pos(const XMFLOAT3& pos)
@@ -148,6 +163,11 @@ bool ElectronicSystem::Get_On_Off_Switch_Vaild(int idx, bool data[])
 			return false;
 	}
 	return true;
+}
+
+void ElectronicSystem::Release()
+{
+	delete m_state_lock;
 }
 
 EscapeSystem::EscapeSystem()

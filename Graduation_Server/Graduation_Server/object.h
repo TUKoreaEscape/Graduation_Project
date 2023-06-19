@@ -40,11 +40,12 @@ public:
 };
 
 enum Door_State{ST_OPEN, ST_OPENING ,ST_CLOSE};
+enum ES_State{ES_OPEN, ES_CLOSE};
 
 class Door : public GameObject { // 인게임 도어에 관련된 부분 (도어 오픈 시간 차이도 있으므로 체크해줘야함)
 private:
 	int			m_door_id;
-	Door_State	m_state = ST_CLOSE;
+	Door_State	m_state = Door_State::ST_CLOSE;
 
 
 public:
@@ -73,8 +74,13 @@ public:
 
 class ElectronicSystem : public GameObject {
 private:
-	int		m_system_id = -1;
-	bool	m_correct_on_off_switch[15];
+	int			m_system_id = -1;
+	bool		m_correct_on_off_switch[15];
+	ES_State	m_state = ES_State::ES_CLOSE;
+
+public:
+	mutex*		m_state_lock = nullptr;
+	bool		m_electronic_door_working = false;
 public:
 	ElectronicSystem();
 	ElectronicSystem(const unsigned int obj_id, Object_Type type, XMFLOAT3 center, XMFLOAT3 extents);
@@ -86,6 +92,9 @@ public:
 	bool Get_On_Off_Switch_Value(int idx) { return m_correct_on_off_switch[idx]; }
 	void Update_bounding_box_pos(const XMFLOAT3& pos);
 	void Update_Object();
+
+	void Release();
+	ES_State get_state() { return m_state; }
 };
 
 class EscapeSystem : public GameObject {
