@@ -88,6 +88,9 @@ public:
 	virtual void Init() {}
 
 	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList) {};
+	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) {};
+
+	virtual void SetUI(InteractionUI* ui);
 };
 
 class Door : public InteractionObject
@@ -106,7 +109,7 @@ public:
 
 	float OpenTime = 0.0f;
 	float TestTIme = 0.0f;
-	bool CheckDoor(const XMFLOAT3& PlayerPos);
+	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
 
 	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void update(float fElapsedTime);
@@ -116,8 +119,6 @@ public:
 
 	XMFLOAT3 LeftDoorPos;
 	XMFLOAT3 RightDoorPos;
-
-	DoorUI* m_pDoorUI = nullptr;
 
 	float m_fPitch{}, m_fYaw{}, m_fRoll{};
 
@@ -150,11 +151,12 @@ public:
 	virtual ~PowerSwitch();
 	
 	void Init() override;
-	bool IsPlayerNear(const XMFLOAT3& PlayerPos);
+	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
 
 	void Rotate(float fPitch, float fYaw, float fRoll) override;
 
 	void SetOpen(bool Open);
 
 	void render(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
 };

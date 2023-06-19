@@ -113,6 +113,9 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < NUM_DOOR; ++i) {
 			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
 		}
+		for (int i = 0; i < NUM_POWER; ++i) {
+			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->UIrender(pd3dCommandList);
+		}
 		break;
 	}
 }
@@ -797,12 +800,12 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	LoadedModelInfo* pDoorModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Future_Door_Final.bin", nullptr);
-	DoorUI* doorUI = new DoorUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/f.dds");
+	InteractionUI* doorUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/f.dds");
 
 	for (int i = 0; i < NUM_DOOR; ++i) {
 		m_pDoors[i] = new Door();
 		m_pDoors[i]->SetChild(pDoorModel->m_pModelRootObject, true);
-		reinterpret_cast<Door*>(m_pDoors[i])->m_pDoorUI = doorUI;
+		reinterpret_cast<Door*>(m_pDoors[i])->m_pInteractionUI = doorUI;
 	}
 	
 	m_pDoors[0]->SetPosition(XMFLOAT3(-29.73866, 0, 39.6)); 
@@ -824,11 +827,14 @@ void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	LoadedModelInfo* pElecModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Shield.bin", nullptr);
+	InteractionUI* PowerUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/f.dds");
+
 	pElecModel->m_pModelRootObject->SetScale(0.5, 0.5, 0.5);
 	for (int i = 0; i < NUM_POWER; ++i) {
 		m_pPowers[i] = new PowerSwitch();
 		m_pPowers[i]->SetChild(pElecModel->m_pModelRootObject, true);
 		m_pPowers[i]->Init();
+		m_pPowers[i]->SetUI(PowerUI);
 		//m_pPowers[i]->UpdateTransform(nullptr);
 	}
 
@@ -855,12 +861,17 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	bool IsNearDoor = false;
 	for (int i = 0; i < NUM_DOOR; ++i) {
 		m_pDoors[i]->update(elapsedTime);
-		if (reinterpret_cast<Door*>(m_pDoors[i])->CheckDoor(PlayerPos)) {
+		if (reinterpret_cast<Door*>(m_pDoors[i])->IsPlayerNear(PlayerPos)) {
 			
 			m_pPlayer->m_pNearDoor = m_pDoors[i];
 			IsNearDoor = true;
 			//printf("%d 문에 접근\n", i);
 			m_pPlayer->m_door_number = i;
+		}
+	}
+	for (int i = 0; i < NUM_POWER; ++i) {
+		if (m_pPowers[i]->IsPlayerNear(PlayerPos)) {
+			// something else;
 		}
 	}
 	if (IsNearDoor == false) m_pPlayer->m_pNearDoor = nullptr;

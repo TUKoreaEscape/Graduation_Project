@@ -115,7 +115,7 @@ void Door::Rotate(float fPitch, float fYaw, float fRoll)
 
 }
 
-bool Door::CheckDoor(const XMFLOAT3& PlayerPos)
+bool Door::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
 	float minx, maxx, minz, maxz;
 	if (IsRot) {
@@ -204,11 +204,11 @@ void Door::SetPosition(XMFLOAT3 xmf3Position)
 void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (IsNear) {
-		if (m_pDoorUI) {
+		if (m_pInteractionUI) {
 			if (IsRot)
-				m_pDoorUI->Rotate(m_fPitch, m_fYaw, m_fRoll);
-			m_pDoorUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f );
-			m_pDoorUI->BillboardRender(pd3dCommandList);
+				m_pInteractionUI->Rotate(m_fPitch, m_fYaw, m_fRoll);
+			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f );
+			m_pInteractionUI->BillboardRender(pd3dCommandList);
 		}
 	}
 }
@@ -315,6 +315,13 @@ InteractionObject::~InteractionObject()
 {
 }
 
+void InteractionObject::SetUI(InteractionUI* ui)
+{
+	if (m_pInteractionUI) m_pInteractionUI->Release();
+	m_pInteractionUI = ui;
+	if (m_pInteractionUI) m_pInteractionUI->AddRef();
+}
+
 InteractionUI::InteractionUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
 {
 	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
@@ -383,7 +390,8 @@ void PowerSwitch::Init()
 
 bool PowerSwitch::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
-	return false;
+	IsNear = true;
+	return true;
 }
 
 void PowerSwitch::Rotate(float fPitch, float fYaw, float fRoll)
@@ -403,11 +411,11 @@ void PowerSwitch::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (IsOpen) {
 		m_pCup->isNotDraw = true;
-		//if (m_pCup->m_pChild) m_pCup->m_pChild->isNotDraw = true;
+		if (m_pCup->m_pChild) m_pCup->m_pChild->isNotDraw = true;
 	}
 	else {
 		m_pCup->isNotDraw = false;
-		//if (m_pCup->m_pChild) m_pCup->m_pChild->isNotDraw = false;
+		if (m_pCup->m_pChild) m_pCup->m_pChild->isNotDraw = false;
 	}
 	for (int i = 0; i < 15; ++i) {
 		std::string str = "Knob";
@@ -439,4 +447,14 @@ void PowerSwitch::render(ID3D12GraphicsCommandList* pd3dCommandList)
 		FindFrame("Lamp_2")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	}
 	GameObject::render(pd3dCommandList);
+}
+
+void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (IsNear) {
+		if (m_pInteractionUI) {
+			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
+			m_pInteractionUI->BillboardRender(pd3dCommandList);
+		}
+	}
 }
