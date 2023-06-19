@@ -430,6 +430,13 @@ void PowerSwitch::render(ID3D12GraphicsCommandList* pd3dCommandList)
 			}
 		}
 	}
-
+	if (m_bClear) {
+		FindFrame("Lamp_1")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+		FindFrame("Lamp_2")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
+	}
+	else {
+		FindFrame("Lamp_1")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(0.0f, 0.5f, 0.04827571f, 1.0f);
+		FindFrame("Lamp_2")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	}
 	GameObject::render(pd3dCommandList);
 }

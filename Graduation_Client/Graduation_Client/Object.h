@@ -143,6 +143,8 @@ public:
 	float m_fOffKnobPos;
 	float m_fOnKnobPos;
 
+	bool m_bClear = false;
+
 public:
 	PowerSwitch();
 	virtual ~PowerSwitch();
