@@ -395,16 +395,16 @@ bool PowerSwitch::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
 	float minx, maxx, minz, maxz;
 	if (IsRot) {
-		minx = m_xmf4x4ToParent._41;
-		maxx = m_xmf4x4ToParent._41 + 1.0f;
-		minz = m_xmf4x4ToParent._43 - 1.0f;
-		maxz = m_xmf4x4ToParent._43 + 1.0f;
+		minx = m_xmf4x4ToParent._41 - 0.6f;
+		maxx = m_xmf4x4ToParent._41 + 0.6f;
+		minz = m_xmf4x4ToParent._43 + 0.5f;
+		maxz = m_xmf4x4ToParent._43 + 1.5f;
 	}
 	else {
-		minx = m_xmf4x4ToParent._41 - 1.0f;
-		maxx = m_xmf4x4ToParent._41 + 1.0f;
-		minz = m_xmf4x4ToParent._43;
-		maxz = m_xmf4x4ToParent._43 + 1.0f;
+		minx = m_xmf4x4ToParent._41 - 1.5f;
+		maxx = m_xmf4x4ToParent._41 - 0.5f;
+		minz = m_xmf4x4ToParent._43 - 0.6f;
+		maxz = m_xmf4x4ToParent._43 + 0.6f;
 	}
 	if (PlayerPos.x > maxx) {
 		IsNear = false;

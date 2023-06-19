@@ -838,11 +838,13 @@ void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 		//m_pPowers[i]->UpdateTransform(nullptr);
 	}
 
-	m_pPowers[0]->SetPosition(XMFLOAT3(-0.7033535, 1.5, 76.76)); // piano
+//	m_pPowers[0]->SetPosition(XMFLOAT3(-0.7033535, 1.5, 76.76)); // piano
+	m_pPowers[0]->SetPosition(XMFLOAT3(0,1.5,0)); // piano
+
 	//m_pPowers[0]->Rotate(0, -90, 0);
 	m_pPowers[1]->SetPosition(XMFLOAT3(-54.11389, 1.5, -66.95)); // classroom
 	//m_pPowers[1]->Rotate(0, -90, 0);
-	m_pPowers[2]->SetPosition(XMFLOAT3(60.87, 1.5, -69.91)); // porest
+	m_pPowers[2]->SetPosition(XMFLOAT3(60.87, 1.5, -70)); // porest
 	m_pPowers[2]->Rotate(0, -90, 0);
 	m_pPowers[3]->SetPosition(XMFLOAT3(67.6, 1.5, 40.6322)); // broadcastingroom
 	m_pPowers[3]->Rotate(0, 90, 0);
