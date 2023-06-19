@@ -356,7 +356,7 @@ void Network::ProcessPacket(char* ptr)
 		info.hwnd = NULL;
 		info.lpVerb = L"open";
 		info.lpFile = L"voice\\Voice.exe";
-		info.lpParameters = NULL;
+		info.lpParameters = L"addsession -l lobby -audio yes";
 		info.lpDirectory = NULL;
 		info.nShow = SW_HIDE;
 		info.hInstApp = NULL;
@@ -459,6 +459,7 @@ void Network::ProcessPacket(char* ptr)
 		m_pPlayer->SetPosition(packet->data.position, true);
 		//std::cout << "Set Init Pos : (" << packet->data.position.x << ", " << packet->data.position.y << ", " << packet->data.position.z << ") " << std::endl;
 		m_pPlayer->SetVelocity(packet->data.velocity);
+		m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
 		//std::cout << "put player packet recv!" << std::endl;
 		break;
 	}
@@ -476,7 +477,7 @@ void Network::ProcessPacket(char* ptr)
 				Other_Player_Pos[i].id = packet->data.id;
 				m_ppOther[i]->SetPosition(packet->data.position, true);
 				m_ppOther[i]->SetVelocity(packet->data.velocity);
-				m_ppOther[i]->SetPlayerType(TYPE_PLAYER);
+				m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);
 				break;
 			}
 		}
@@ -489,14 +490,16 @@ void Network::ProcessPacket(char* ptr)
 		sc_packet_select_tagger* packet = reinterpret_cast<sc_packet_select_tagger*>(ptr);
 		
 		if (m_pPlayer->GetID() == packet->id)
-		{
 			m_pPlayer->SetPlayerType(TYPE_TAGGER);
-		}
+		else
+			m_pPlayer->SetPlayerType(TYPE_PLAYER);
 
 		for (int i = 0; i < 5; ++i)
 		{
 			if (m_ppOther[i]->GetID() == packet->id)
 				m_ppOther[i]->SetPlayerType(TYPE_TAGGER);
+			else
+				m_ppOther[i]->SetPlayerType(TYPE_PLAYER);
 		}
 
 		std::cout << std::endl;
@@ -565,7 +568,7 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_DOOR_UPDATE:
 	{
-		// 아직 처리할 전력장치 코드가 없음
+		Process_ElectronicSystemDoor_Update(ptr);
 		break;
 	}
 

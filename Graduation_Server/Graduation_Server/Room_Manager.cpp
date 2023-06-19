@@ -24,7 +24,7 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	// 여긴 맵에 존재하는 벽, 고정된 오브젝트의 충돌 정보를 서버에 로드하는 공간입니다.
 //======================= Fixed and Wall Object Read =======================
 	FILE* pFile = nullptr;
-	fopen_s(&pFile, "walls/FixedObjectsBounding0523.bin", "rb");
+	fopen_s(&pFile, "walls/FixedObjectsBounding0619.bin", "rb");
 	if (pFile)
 		rewind(pFile);
 
@@ -111,7 +111,7 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	nObjects = 0;
 	nStrLength = 0;
 	nReads = (unsigned int)fread(&nObjects, sizeof(int), 1, pFile);
-	for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < NUMBER_OF_ELECTRONIC; ++i)
 	{
 		// 여기서 door 추가할거임
 		cout << "Electronic System : " << static_cast<int>((float)i / (float)6 * 100) << "%로드 완료\r";

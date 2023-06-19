@@ -93,14 +93,34 @@ void CommonMovement::update(float elapsedTime)
 				// 술래면 닫음 술래가 아니면 여는 동작만
 				if (reinterpret_cast<InteractionObject*>(Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct)->IsOpen) {
 					if (TYPE_TAGGER == Input::GetInstance()->m_pPlayer->GetType())
+					{
+						Network& network = *Network::GetInstance();
+						cs_packet_request_electronic_system_open packet;
+						packet.size = sizeof(packet);
+						packet.type = CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_DOOR;
+						packet.es_num = Input::GetInstance()->m_pPlayer->m_power_number;
+						packet.is_door_open = false;
+
+						network.send_packet(&packet);
 						Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct->SetOpen(false);
+					}
 					else if (TYPE_PLAYER == Input::GetInstance()->m_pPlayer->GetType()) {
 						// 전력장치 수리
 					}
 				}
 				else {
 					if (TYPE_PLAYER == Input::GetInstance()->m_pPlayer->GetType())
+					{
+						Network& network = *Network::GetInstance();
+						cs_packet_request_electronic_system_open packet;
+						packet.size = sizeof(packet);
+						packet.type = CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_DOOR;
+						packet.es_num = Input::GetInstance()->m_pPlayer->m_power_number;
+						packet.is_door_open = true;
+
+						network.send_packet(&packet);
 						Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct->SetOpen(true);
+					}
 				}
 			}
 		}

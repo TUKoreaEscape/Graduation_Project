@@ -217,7 +217,7 @@ struct cs_packet_request_open_hidden_door {
 struct cs_packet_request_electronic_system_open {
 	unsigned char	size;
 	unsigned char	type;
-
+	bool			is_door_open;
 	unsigned short	es_num;
 };
 

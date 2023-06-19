@@ -139,7 +139,7 @@ void Room::SetLoading(const bool is_loading, const int user_id)
 
 void Room::Set_Electronic_System_ONOFF()
 {
-	for (int i = 0; i < m_electrinic_system.size(); ++i)
+	for (int i = 0; i < NUMBER_OF_ELECTRONIC; ++i)
 	{
 		for (int idx = 0; idx < 15; ++idx)
 			m_electrinic_system[i].init_electrinic_switch_data(idx, rand() % 2);
@@ -176,9 +176,9 @@ void Room::Update_Door(const int door_num)
 	m_door_object[door_num].process_door_event();
 }
 
-void Room::Update_ElectronicSystem_Door(const int es_num)
+void Room::Update_ElectronicSystem_Door(const int es_num, bool value)
 {
-	m_electrinic_system[es_num].Update_Object();
+	m_electrinic_system[es_num].Update_Object(value);
 }
 
 bool Room::Is_Door_Open(const int door_num)

@@ -4,6 +4,7 @@
 #define SOCKET_ERROR_PRINT 0
 #define MAX_USER 30000
 #define NUMBER_OF_DOOR 6
+#define NUMBER_OF_ELECTRONIC 5
 
 #include <iostream>
 #include <WS2tcpip.h>

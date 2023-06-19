@@ -132,22 +132,14 @@ ElectronicSystem::ElectronicSystem(const unsigned int obj_id, Object_Type type, 
 		m_state_lock = new mutex;
 }
 
-void ElectronicSystem::Update_Object()
+void ElectronicSystem::Update_Object(bool value)
 {
 	m_state_lock->lock();
-	if (m_state == ES_CLOSE && m_electronic_door_working == false)
-	{
+	if (value == true)
 		m_state = ES_OPEN;
-		m_electronic_door_working = true;
-		m_state_lock->unlock();
-	}
-
-	else if (m_state == ES_OPEN && m_electronic_door_working == false)
-	{
+	else
 		m_state = ES_CLOSE;
-		m_electronic_door_working = true;
-		m_state_lock->unlock();
-	}
+	m_state_lock->unlock();
 }
 
 void ElectronicSystem::Update_bounding_box_pos(const XMFLOAT3& pos)

@@ -7,10 +7,12 @@
 #include "Server_Timer.h"
 
 #define  DIR_NO 100
-#define  USE_NETWORK 0
+#define  USE_NETWORK 1
 #define	 USE_VOICE 0
 
 class Door;
+class InteractionObject;
+
 struct Custom {
 	HEADS			head;
 	BODIES			body;
@@ -54,6 +56,7 @@ public:
 	Player* m_pPlayer = nullptr;;
 	Player** m_ppOther = nullptr;
 	Door* m_pDoors[6];
+	InteractionObject* m_pPowers[5];
 
 	static Network* GetInstance() {
 		if (NetworkInstance == NULL) {
@@ -76,6 +79,7 @@ public:
 	void Process_Other_Player_Move(char* ptr);
 	void Process_Game_Start(char* ptr);
 	void Process_Door_Update(char* ptr);
+	void Process_ElectronicSystemDoor_Update(char* ptr);
 	void Process_Attack_Packet(char* ptr);
 	void Process_ElectrinicSystem_Init(char* ptr);
 

@@ -526,7 +526,7 @@ void cGameServer::Process_ElectronicSystem_Open(const int user_id, void* buff)
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
 	bool is_electronioc_system_door_open = room.Is_ElectronicSystem_Open(packet->es_num);
-	room.Update_ElectronicSystem_Door(packet->es_num);
+	room.Update_ElectronicSystem_Door(packet->es_num, packet->is_door_open);
 
 	sc_packet_open_electronic_system_door es_packet;
 	es_packet.size = sizeof(es_packet);

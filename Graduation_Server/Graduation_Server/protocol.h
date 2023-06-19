@@ -217,7 +217,7 @@ struct cs_packet_request_open_hidden_door {
 struct cs_packet_request_electronic_system_open {
 	unsigned char	size;
 	unsigned char	type;
-
+	bool			is_door_open;
 	unsigned short	es_num;
 };
 
@@ -479,7 +479,7 @@ struct sc_packet_electronic_system_init {
 	unsigned char	size;
 	unsigned char	type;
 
-	ElectronicSystem_Data data[6];
+	ElectronicSystem_Data data[5];
 };
 
 struct sc_packet_attack {

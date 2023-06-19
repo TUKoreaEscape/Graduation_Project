@@ -83,7 +83,7 @@ public:
 	void	Update_room_time();
 	void	Update_Player_Position();
 	void	Update_Door(const int door_num);
-	void	Update_ElectronicSystem_Door(const int es_num);
+	void	Update_ElectronicSystem_Door(const int es_num, bool value);
 
 public: // 인게임 오브젝트 state 받아야하는 공간
 	Door_State Get_Door_State(const int door_num) { return m_door_object[door_num].get_state(); }

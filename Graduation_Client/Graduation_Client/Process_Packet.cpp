@@ -125,16 +125,17 @@ void Network::Process_Door_Update(char* ptr)
 		m_pDoors[static_cast<int>(packet->door_number)]->SetOpen(false);
 }
 
+void Network::Process_ElectronicSystemDoor_Update(char* ptr)
+{
+	sc_packet_open_electronic_system_door* packet = reinterpret_cast<sc_packet_open_electronic_system_door*>(ptr);
+	if (packet->es_state == 0)
+		m_pPowers[packet->es_num]->SetOpen(true);
+	else
+		m_pPowers[packet->es_num]->SetOpen(false);
+}
+
 void Network::Process_ElectrinicSystem_Init(char* ptr)
 {
 	sc_packet_electronic_system_init* packet = reinterpret_cast<sc_packet_electronic_system_init*>(ptr);
-	
-	for (int i = 0; i < 6; ++i)
-	{
-		std::cout << i + 1 << "번째 switch init : ";
-		for (int idx = 0; idx < 15; ++idx)
-			std::cout << packet->data[i].value[idx] << " ";
-		std::cout << std::endl;
-	}
 	// 해당부분에서 전력장치 수정 해야됨 아직 없음 ㅎ
 }
