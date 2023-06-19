@@ -2,6 +2,7 @@
 #include "Movement.h"
 #include "Input.h"
 #include "Network.h"
+#include "Object.h"
 
 void CommonMovement::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
@@ -86,6 +87,20 @@ void CommonMovement::update(float elapsedTime)
 					network.send_packet(&packet);
 					Input::GetInstance()->m_pPlayer->m_pNearDoor->SetOpen(!DoorState);  
 #endif
+				}
+			}
+			if (Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct) {
+				// 술래면 닫음 술래가 아니면 여는 동작만
+				if (reinterpret_cast<InteractionObject*>(Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct)->IsOpen) {
+					if (TYPE_TAGGER == Input::GetInstance()->m_pPlayer->GetType())
+						Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct->SetOpen(false);
+					else if (TYPE_PLAYER == Input::GetInstance()->m_pPlayer->GetType()) {
+						// 전력장치 수리
+					}
+				}
+				else {
+					if (TYPE_PLAYER == Input::GetInstance()->m_pPlayer->GetType())
+						Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct->SetOpen(true);
 				}
 			}
 		}

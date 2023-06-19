@@ -203,6 +203,7 @@ void Door::SetPosition(XMFLOAT3 xmf3Position)
 
 void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (IsWorking) return;
 	if (IsNear) {
 		if (m_pInteractionUI) {
 			if (IsRot)
@@ -343,6 +344,9 @@ InteractionUI::InteractionUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	pUIMaterial->SetDoorUIShader();
 
 	renderer->SetMaterial(0, pUIMaterial);
+
+	SetScale(0.1f, 0.1f, 0.1f);
+	UpdateTransform(nullptr);
 }
 
 InteractionUI::~InteractionUI()
@@ -368,6 +372,7 @@ void InteractionUI::Rotate(float fPitch, float fYaw, float fRoll)
 
 PowerSwitch::PowerSwitch() : InteractionObject()
 {
+	IsOpen = false;
 }
 
 PowerSwitch::~PowerSwitch()
@@ -376,8 +381,6 @@ PowerSwitch::~PowerSwitch()
 
 void PowerSwitch::Init()
 {
-	IsOpen = true;
-
 	m_bOnAndOff[1] = true;
 	m_bOnAndOff[4] = true;
 	m_bOnAndOff[7] = true;
@@ -390,6 +393,35 @@ void PowerSwitch::Init()
 
 bool PowerSwitch::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
+	float minx, maxx, minz, maxz;
+	if (IsRot) {
+		minx = m_xmf4x4ToParent._41;
+		maxx = m_xmf4x4ToParent._41 + 1.0f;
+		minz = m_xmf4x4ToParent._43 - 1.0f;
+		maxz = m_xmf4x4ToParent._43 + 1.0f;
+	}
+	else {
+		minx = m_xmf4x4ToParent._41 - 1.0f;
+		maxx = m_xmf4x4ToParent._41 + 1.0f;
+		minz = m_xmf4x4ToParent._43;
+		maxz = m_xmf4x4ToParent._43 + 1.0f;
+	}
+	if (PlayerPos.x > maxx) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.x < minx) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.z < minz) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.z > maxz) {
+		IsNear = false;
+		return false;
+	}
 	IsNear = true;
 	return true;
 }
@@ -399,7 +431,11 @@ void PowerSwitch::Rotate(float fPitch, float fYaw, float fRoll)
 	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
 	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
 
-	UpdateTransform(NULL);
+	UpdateTransform(NULL);	
+	
+	m_fPitch = fPitch; m_fYaw = fYaw; m_fRoll = fRoll;
+
+	IsRot = true;
 }
 
 void PowerSwitch::SetOpen(bool Open)
@@ -453,6 +489,8 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (IsNear) {
 		if (m_pInteractionUI) {
+			if (IsRot)
+				m_pInteractionUI->Rotate(m_fPitch, m_fYaw, m_fRoll);
 			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
 			m_pInteractionUI->BillboardRender(pd3dCommandList);
 		}

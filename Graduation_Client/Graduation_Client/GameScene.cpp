@@ -148,7 +148,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 		for (int j = 0; j < 6; ++j)
 			GameObject::SetParts(i + 1, j, 0);
 		m_ppPlayers[i]->PlayerNum = i + 1;
-		m_ppPlayers[i]->SetPlayerType(TYPE_DEAD_PLAYER);
+		m_ppPlayers[i]->SetPlayerType(TYPE_PLAYER_YET);
 	}
 	m_pPlayer = new Player();
 	m_pPlayer->SetChild(pPlayerModel->m_pModelRootObject, true);
@@ -842,7 +842,7 @@ void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	//m_pPowers[0]->Rotate(0, -90, 0);
 	m_pPowers[1]->SetPosition(XMFLOAT3(-54.11389, 1.5, -66.95)); // classroom
 	//m_pPowers[1]->Rotate(0, -90, 0);
-	m_pPowers[2]->SetPosition(XMFLOAT3(60.87, 1.5, -69.61)); // porest
+	m_pPowers[2]->SetPosition(XMFLOAT3(60.87, 1.5, -69.91)); // porest
 	m_pPowers[2]->Rotate(0, -90, 0);
 	m_pPowers[3]->SetPosition(XMFLOAT3(67.6, 1.5, 40.6322)); // broadcastingroom
 	m_pPowers[3]->Rotate(0, 90, 0);
@@ -859,6 +859,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	XMFLOAT3 PlayerPos = m_pPlayer->GetPosition();
 
 	bool IsNearDoor = false;
+	bool IsNearInteractionObject = false;
 	for (int i = 0; i < NUM_DOOR; ++i) {
 		m_pDoors[i]->update(elapsedTime);
 		if (reinterpret_cast<Door*>(m_pDoors[i])->IsPlayerNear(PlayerPos)) {
@@ -871,8 +872,10 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	}
 	for (int i = 0; i < NUM_POWER; ++i) {
 		if (m_pPowers[i]->IsPlayerNear(PlayerPos)) {
-			// something else;
+			m_pPlayer->m_pNearInteractionObejct = m_pPowers[i];
+			IsNearInteractionObject = true;
 		}
 	}
 	if (IsNearDoor == false) m_pPlayer->m_pNearDoor = nullptr;
+	if (IsNearInteractionObject == false) m_pPlayer->m_pNearInteractionObejct = nullptr;
 }

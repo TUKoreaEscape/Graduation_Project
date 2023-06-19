@@ -803,7 +803,7 @@ float4 Outline(VS_SCREEN_RECT_TEXTURED_OUTPUT input)
 	float fEdge = max(fDdgeDepth, fEdgeNormal);
 	float k = gtxtInputTextures[0][int2(input.position.xy)].w;
 	float4 myColor = float4 (0, 0, 0, 1);
-	if (k < 0.1f)
+	if (k < 0.05f)
 		myColor = float4(0, 0, 0, 1);
 	else if (k < 0.3f)
 		myColor = float4(0, 1, 0, 1);

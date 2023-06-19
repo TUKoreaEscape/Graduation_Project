@@ -77,10 +77,13 @@ public:
 class InteractionObject : public GameObject
 {
 public:
+	bool IsRot = false;
 	bool IsNear = false;
 	bool IsWorking = false;
 
 	InteractionUI* m_pInteractionUI = nullptr;
+
+	float m_fPitch{}, m_fYaw{}, m_fRoll{};
 public:
 	InteractionObject();
 	virtual ~InteractionObject();
@@ -103,10 +106,6 @@ public:
 	void Init() override {};
 
 public:
-	bool IsRot = false;
-	bool IsNear = false;
-	bool IsWorking = false;
-
 	float OpenTime = 0.0f;
 	float TestTIme = 0.0f;
 	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
@@ -119,8 +118,6 @@ public:
 
 	XMFLOAT3 LeftDoorPos;
 	XMFLOAT3 RightDoorPos;
-
-	float m_fPitch{}, m_fYaw{}, m_fRoll{};
 
 	void SetOpen(bool Open);
 
