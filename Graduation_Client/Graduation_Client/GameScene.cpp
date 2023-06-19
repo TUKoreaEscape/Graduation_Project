@@ -59,13 +59,10 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 
 	Scene::render(pd3dCommandList);
-	
-	m_pClass->render(pd3dCommandList);
-	m_pPiano->render(pd3dCommandList);
-	m_pBroadcast->render(pd3dCommandList);
-	m_pPorest->render(pd3dCommandList);
-	m_pLobby->render(pd3dCommandList);
 
+	for (int i = 0; i < 3; ++i) {
+		if (m_pPVSObjects[i]) m_pPVSObjects[i]->render(pd3dCommandList);
+	}
 	for (int i = 0; i < NUM_VENT; ++i)
 	{
 		if (Vents[i]) {
@@ -200,7 +197,22 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pCeilling->UpdateTransform(nullptr);
 	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene0523.bin");
 
-	m_pClass = new GameObject();
+	m_pPVSObjects[0] = new GameObject();
+	m_pPVSObjects[0]->SetChild(pClassModel->m_pModelRootObject, true);
+	m_pPVSObjects[0]->UpdateTransform(nullptr);
+	m_pPVSObjects[1] = new GameObject();
+	m_pPVSObjects[1]->SetChild(pPianoModel->m_pModelRootObject, true);
+	m_pPVSObjects[1]->UpdateTransform(nullptr);
+	m_pPVSObjects[2] = new GameObject();
+	m_pPVSObjects[2]->SetChild(pBroadcastModel->m_pModelRootObject, true);
+	m_pPVSObjects[2]->UpdateTransform(nullptr);
+	m_pPVSObjects[3] = new GameObject();
+	m_pPVSObjects[3]->SetChild(pLobbyModel->m_pModelRootObject, true);
+	m_pPVSObjects[3]->UpdateTransform(nullptr);
+	m_pPVSObjects[4] = new GameObject();
+	m_pPVSObjects[4]->SetChild(pHouseModel->m_pModelRootObject, true);
+	m_pPVSObjects[4]->UpdateTransform(nullptr);
+	/*	m_pClass = new GameObject();
 	m_pClass->SetChild(pClassModel->m_pModelRootObject, true);
 	m_pClass->UpdateTransform(nullptr);
 	m_pPiano = new GameObject();
@@ -214,7 +226,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pLobby->UpdateTransform(nullptr);
 	m_pPorest = new GameObject();
 	m_pPorest->SetChild(pHouseModel->m_pModelRootObject, true);
-	m_pPorest->UpdateTransform(nullptr);
+	m_pPorest->UpdateTransform(nullptr);*/
 
 	MakeVents(pd3dDevice, pd3dCommandList);
 	MakeDoors(pd3dDevice, pd3dCommandList);
@@ -287,13 +299,10 @@ void GameScene::ReleaseObjects()
 		}
 		delete[] m_UIRoomSelect;
 	}
-
-	if (m_pClass) m_pClass->Release();
-	if (m_pPiano) m_pPiano->Release();
-	if (m_pBroadcast) m_pBroadcast->Release();
-	if (m_pPorest) m_pPorest->Release();
-	if (m_pLobby) m_pLobby->Release();
-
+	if (m_pPVSObjects)
+		for (int i = 0; i < 5; ++i) {
+			if (m_pPVSObjects[i]) m_pPVSObjects[i]->Release();
+		}
 	if (m_ppBush) {
 		for (int i = 0; i < m_nBush; ++i) {
 			if (m_ppBush[i]) m_ppBush[i]->Release();
@@ -544,6 +553,7 @@ void GameScene::ReleaseUploadBuffers()
 			if (m_ppWalls[i]) m_ppWalls[i]->ReleaseUploadBuffers();
 		}
 	}
+	if (m_pOak) m_pOak->ReleaseUploadBuffers();
 	if (m_ppBush) {
 		for (int i = 0; i < m_nBush; ++i) {
 			if (m_ppBush[i]) m_ppBush[i]->ReleaseUploadBuffers();
@@ -568,12 +578,10 @@ void GameScene::ReleaseUploadBuffers()
 			if (m_UIRoomSelect[i]) m_UIRoomSelect[i]->ReleaseUploadBuffers();
 		}
 	}
-
-	if (m_pClass) m_pClass->ReleaseUploadBuffers();
-	if (m_pPiano) m_pPiano->ReleaseUploadBuffers();
-	if (m_pBroadcast) m_pBroadcast->ReleaseUploadBuffers();
-	if (m_pPorest) m_pPorest->ReleaseUploadBuffers();
-	if (m_pLobby) m_pLobby->ReleaseUploadBuffers();
+	for (int i = 0; i < 5; ++i) {
+		if (m_pPVSObjects[i]) m_pPVSObjects[i]->ReleaseUploadBuffers();
+	}
+	
 }
 
 void GameScene::CreateCbvSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nConstantBufferViews, int nShaderResourceViews)

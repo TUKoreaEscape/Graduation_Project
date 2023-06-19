@@ -41,11 +41,7 @@ public:
 	int m_nWalls;
 	GameObject** m_ppWalls;
 	
-	GameObject* m_pClass = nullptr;
-	GameObject* m_pPiano = nullptr;
-	GameObject* m_pBroadcast = nullptr;
-	GameObject* m_pPorest = nullptr;
-	GameObject* m_pLobby = nullptr;
+	GameObject* m_pPVSObjects[5];
 
 	GameObject* Vents[NUM_VENT];
 
