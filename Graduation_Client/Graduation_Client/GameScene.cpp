@@ -873,6 +873,8 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 		if (m_pPowers[i]->IsPlayerNear(PlayerPos)) {
 			m_pPlayer->m_pNearInteractionObejct = m_pPowers[i];
 			IsNearInteractionObject = true;
+
+			m_pPlayer->m_power_number = i;
 		}
 	}
 	if (IsNearDoor == false) m_pPlayer->m_pNearDoor = nullptr;

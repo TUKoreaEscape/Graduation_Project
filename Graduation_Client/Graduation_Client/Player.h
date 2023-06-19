@@ -136,4 +136,5 @@ protected:
 public:
 	GameObject* m_pNearDoor = nullptr;
 	GameObject* m_pNearInteractionObejct = nullptr;
+	int							m_power_number = -1;
 };
