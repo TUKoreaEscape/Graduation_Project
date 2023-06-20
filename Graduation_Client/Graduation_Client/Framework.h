@@ -35,6 +35,9 @@ private:
 	
 	ID3D12Resource *m_pd3dDepthStencilBuffer;
 	ID3D12DescriptorHeap* m_pd3dDsvDescriptorHeap;
+	ID3D12DescriptorHeap* m_pd3dDsvShadowDescriptorHeap;
+
+	ID3D12Resource* m_pd3dShadowMapBuffer;
 	
 	ID3D12CommandQueue *m_pd3dCommandQueue;
 	//ID3D12CommandAllocator* m_pd3dCommandAllocator;
@@ -44,6 +47,8 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE		m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBuffers];//
 
 	D3D12_CPU_DESCRIPTOR_HANDLE		m_d3dDsvDescriptorCPUHandle;//
+	D3D12_CPU_DESCRIPTOR_HANDLE		m_d3dDsvShadowDescriptorCPUHandle;//
+
 	//D3D12_CPU_DESCRIPTOR_HANDLE* m_d3dDepthStencilBufferSRVCPUHandle;//
 	
 	ID3D12Fence *m_pd3dFence;
@@ -100,6 +105,7 @@ public:
 
 	void CreateRenderTargetViews();
 	void CreateDepthStencilView(); //·»´õ Å¸°Ù ºä¿Í ±íÀÌ-½ºÅÙ½Ç ºä¸¦ »ý¼ºÇÏ´Â ÇÔ¼öÀÌ´Ù. 
+	void CreateShadowDepthStencilView(); //½¦µµ¿ì ¸Ê ±íÀÌ-½ºÅÙ½Ç ºä¸¦ »ý¼ºÇß´Ù.
 	void CreateSwapChainRenderTargetViews();
 
 	void BuildObjects();
