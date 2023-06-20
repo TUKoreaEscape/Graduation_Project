@@ -369,7 +369,6 @@ void Network::ProcessPacket(char* ptr)
 		info.lpParameters = (LPCWSTR&)result_parameter;
 		info.lpDirectory = NULL;
 		info.nShow = SW_HIDE;
-		info.nShow = SW_SHOW;
 		info.hInstApp = NULL;
 
 		ShellExecuteEx(&info); // start process
