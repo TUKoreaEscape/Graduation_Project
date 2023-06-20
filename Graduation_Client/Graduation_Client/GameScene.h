@@ -50,7 +50,7 @@ public:
 	int m_nWalls;
 	GameObject** m_ppWalls;
 	
-	GameObject* m_pPVSObjects[5];
+	GameObject* m_pPVSObjects[6];
 
 	GameObject* Vents[NUM_VENT];
 

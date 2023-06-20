@@ -66,7 +66,7 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	for (int i = 0; i < m_nWalls; ++i)
 	{
-		//if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
+		if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
 	}
 
 	Scene::render(pd3dCommandList);
@@ -142,7 +142,8 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	LoadedModelInfo* pPianoModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPianoRoom.bin", nullptr);
 	LoadedModelInfo* pBroadcastModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InBroadcast.bin", nullptr);
 	LoadedModelInfo* pHouseModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPorest.bin", nullptr);
-	LoadedModelInfo* pLobbyModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/CubeRoom.bin", nullptr);
+	LoadedModelInfo* pLobbyModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InDDD.bin", nullptr);
+	LoadedModelInfo* pCubeModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/CubeRoom.bin", nullptr);
 	LoadedModelInfo* pCeilModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Ceilling.bin", nullptr);
 
 	m_nPlayers = 5;
@@ -207,7 +208,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pCeilling = new GameObject();
 	m_pCeilling->SetChild(pCeilModel->m_pModelRootObject, true);
 	m_pCeilling->UpdateTransform(nullptr);
-	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene0523.bin");
+	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene0621.bin");
 
 	m_pPVSObjects[0] = new GameObject();
 	m_pPVSObjects[0]->SetChild(pClassModel->m_pModelRootObject, true);
@@ -224,6 +225,9 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pPVSObjects[4] = new GameObject();
 	m_pPVSObjects[4]->SetChild(pHouseModel->m_pModelRootObject, true);
 	m_pPVSObjects[4]->UpdateTransform(nullptr);
+	m_pPVSObjects[5] = new GameObject();
+	m_pPVSObjects[5]->SetChild(pCubeModel->m_pModelRootObject, true);
+	m_pPVSObjects[5]->UpdateTransform(nullptr);
 	/*	m_pClass = new GameObject();
 	m_pClass->SetChild(pClassModel->m_pModelRootObject, true);
 	m_pClass->UpdateTransform(nullptr);
@@ -262,6 +266,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	if (pHouseModel) delete pHouseModel;
 	if (pLobbyModel) delete pLobbyModel;
 	if (pCeilModel) delete pCeilModel;
+	if (pCubeModel) delete pCubeModel;
 
 #if USE_NETWORK
 	char id[20]{};
@@ -312,7 +317,7 @@ void GameScene::ReleaseObjects()
 		delete[] m_UIRoomSelect;
 	}
 	if (m_pPVSObjects)
-		for (int i = 0; i < 5; ++i) {
+		for (int i = 0; i < 6; ++i) {
 			if (m_pPVSObjects[i]) m_pPVSObjects[i]->Release();
 		}
 	if (m_ppBush) {
@@ -590,7 +595,7 @@ void GameScene::ReleaseUploadBuffers()
 			if (m_UIRoomSelect[i]) m_UIRoomSelect[i]->ReleaseUploadBuffers();
 		}
 	}
-	for (int i = 0; i < 5; ++i) {
+	for (int i = 0; i < 6; ++i) {
 		if (m_pPVSObjects[i]) m_pPVSObjects[i]->ReleaseUploadBuffers();
 	}
 	
