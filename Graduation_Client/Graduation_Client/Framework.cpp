@@ -61,7 +61,6 @@ bool Framework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	CreateSwapChain();
 	CreateSwapChainRenderTargetViews();
 	CreateDepthStencilView(); //Direct3D 디바이스, 명령 큐와 명령 리스트, 스왑 체인 등을 생성하는 함수를 호출한다.
-	CreateShadowDepthStencilView();
 
 	CreateDirect2DDevice();
 
@@ -86,9 +85,7 @@ void Framework::OnDestroy()
 	for (int i = 0; i < m_nSwapChainBuffers; i++) if (m_ppd3dRenderTargetBuffers[i]) m_ppd3dRenderTargetBuffers[i]->Release();
 	if (m_pd3dRtvDescriptorHeap) m_pd3dRtvDescriptorHeap->Release();
 	if (m_pd3dDepthStencilBuffer) m_pd3dDepthStencilBuffer->Release();
-	if (m_pd3dShadowMapBuffer) m_pd3dShadowMapBuffer->Release();
 	if (m_pd3dDsvDescriptorHeap) m_pd3dDsvDescriptorHeap->Release();
-	if (m_pd3dDsvShadowDescriptorHeap) m_pd3dDsvShadowDescriptorHeap->Release();
 	if (m_pd3dCommandQueue) m_pd3dCommandQueue->Release();
 	if (m_pd3dCommandList) m_pd3dCommandList->Release();
 	if (m_pd3dFence) m_pd3dFence->Release();
@@ -365,47 +362,6 @@ void Framework::CreateDepthStencilView()
 	m_pd3dDevice->CreateDepthStencilView(m_pd3dDepthStencilBuffer, NULL, m_d3dDsvDescriptorCPUHandle); //깊이-스텐실 버퍼 뷰를 생성한다.
 }
 
-void Framework::CreateShadowDepthStencilView()
-{
-	//shadowmap 리소스 생성
-	D3D12_RESOURCE_DESC shadowMapDesc;
-	shadowMapDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	shadowMapDesc.Alignment = 0;
-	shadowMapDesc.Width = m_nWndClientWidth;
-	shadowMapDesc.Height = m_nWndClientHeight;
-	shadowMapDesc.DepthOrArraySize = 1;
-	shadowMapDesc.MipLevels = 1;
-	shadowMapDesc.Format = DXGI_FORMAT_R32_TYPELESS; // 깊이 텍스처 형식
-	shadowMapDesc.SampleDesc.Count = (m_bMsaa4xEnable) ? 4 : 1;
-	shadowMapDesc.SampleDesc.Quality = (m_bMsaa4xEnable) ? (m_nMsaa4xQualityLevels - 1) : 0;
-	shadowMapDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	shadowMapDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-
-	// 텍스처 생성
-	D3D12_HEAP_PROPERTIES d3dHeapShadowProperties;
-	::ZeroMemory(&d3dHeapShadowProperties, sizeof(D3D12_HEAP_PROPERTIES));
-	d3dHeapShadowProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
-	d3dHeapShadowProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	d3dHeapShadowProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	d3dHeapShadowProperties.CreationNodeMask = 1;
-	d3dHeapShadowProperties.VisibleNodeMask = 1;
-	D3D12_CLEAR_VALUE d3dClearValue;
-	d3dClearValue.Format = DXGI_FORMAT_D32_FLOAT;
-	d3dClearValue.DepthStencil.Depth = 1.0f;
-	d3dClearValue.DepthStencil.Stencil = 0;
-	m_pd3dDevice->CreateCommittedResource(&d3dHeapShadowProperties, D3D12_HEAP_FLAG_NONE, &shadowMapDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE,
-		&d3dClearValue, __uuidof(ID3D12Resource), (void**)&m_pd3dShadowMapBuffer);
-
-	// 깊이 스텐실 뷰 생성
-	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
-	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-
-	m_d3dDsvShadowDescriptorCPUHandle = m_pd3dDsvShadowDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	m_pd3dDevice->CreateDepthStencilView(m_pd3dShadowMapBuffer, &dsvDesc, m_d3dDsvShadowDescriptorCPUHandle);
-}
-
 void Framework::CreateSwapChainRenderTargetViews()
 {
 	D3D12_RENDER_TARGET_VIEW_DESC d3dRenderTargetViewDesc;
@@ -533,8 +489,8 @@ void Framework::FrameAdvance()
 		scene->UIrender(m_pd3dCommandList);
 		break;
 	case READY_TO_GAME:
-		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		if (scene) scene->prerender(m_pd3dCommandList);
+		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		//렌더링 코드는 여기에 추가될 것이다.
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 		if (scene) scene->defrender(m_pd3dCommandList);
@@ -545,11 +501,14 @@ void Framework::FrameAdvance()
 		m_pEdgeShader->Render(m_pd3dCommandList);
 		scene->UIrender(m_pd3dCommandList); // Door UI
 		break;
-	case PLAYING_GAME:
-		//게임중에 이제 표시될 것들이 들어가야할 자리
-		//빛, 전력장치, 수리도구들을 게임 시작하면 render를 함.
-		break;
 	}
+	//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
+	//if(Input::GetInstance()->keyBuffer['1'] & 0xF0) m_pEdgeShader->Render(m_pd3dCommandList);
+
+
+	//::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+	/*현재 렌더 타겟에 대한 렌더링이 끝나기를 기다린다. GPU가 렌더 타겟(버퍼)을 더 이상 사용하지 않으면 렌더 타겟
+	의 상태는 프리젠트 상태(D3D12_RESOURCE_STATE_PRESENT)로 바뀔 것이다.*/
 
 	hResult = m_pd3dCommandList->Close(); //명령 리스트를 닫힌 상태로 만든다.
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };

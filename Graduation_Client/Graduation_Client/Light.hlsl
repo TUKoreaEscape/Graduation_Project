@@ -156,8 +156,7 @@ float4 Lighting(float3 vPosition, float3 vNormal)
 			}
 		}
 	}
-	//cColor += (gcGlobalAmbientLight * gMaterial.m_cAmbient); //원래 이거였는데 gMaterial.m_cAmbient 값이 없거나 잘못되어서 gcGlobalAmbientLight이게 적용이 안되고 있었음. 그래서 아래처럼 바꿨음
-	cColor += (gcGlobalAmbientLight);
+	cColor += (gcGlobalAmbientLight * gMaterial.m_cAmbient);
 	cColor.a = gMaterial.m_cDiffuse.a;
 
 	return(cColor);

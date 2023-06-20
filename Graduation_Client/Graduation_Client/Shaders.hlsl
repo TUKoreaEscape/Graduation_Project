@@ -241,8 +241,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSAlpha(VS_STANDARD_OUTPUT input, uint nPrimit
 	float3 uvw = float3(input.uv, nPrimitiveID / 2);
 	output.f4Texture = cAlbedoColor;
 
-	//output.f4Scene = output.f4Color = lerp(output.f4Illumination, output.f4Texture, 0.7f);
-	output.f4Scene = output.f4Color = output.f4Illumination * output.f4Texture;
+	output.f4Scene = output.f4Color = lerp(output.f4Illumination, output.f4Texture, 0.7f);
 
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
@@ -407,8 +406,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTerrain(VS_TERRAIN_OUTPUT input, uint nPrimi
 	//float3 uvw = float3(input.uv0, nPrimitiveID / 2);
 	output.f4Texture = cColor;
 
-	//output.f4Scene = output.f4Color = cColor;
-	output.f4Scene = output.f4Color = output.f4Illumination * output.f4Texture;
+	output.f4Scene = output.f4Color = cColor;
 
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
@@ -469,9 +467,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSSkyBox(VS_SKYBOX_CUBEMAP_OUTPUT input, uint 
 
 	output.f4Texture = cColor;
 
-	//output.f4Scene = output.f4Color = cColor;
-
-	output.f4Scene = output.f4Color = output.f4Illumination * output.f4Texture;
+	output.f4Scene = output.f4Color = cColor;
 
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
@@ -540,8 +536,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWall(VS_WALL_OUTPUT input, uint nPrimitiveID
 	float3 uvw = float3(input.uv, nPrimitiveID / 2);
 	output.f4Texture = cColor;
 
-	output.f4Scene = output.f4Color = output.f4Illumination * output.f4Texture;
-	//output.f4Scene = output.f4Color = lerp(output.f4Illumination, output.f4Texture, 0.7f);
+	output.f4Scene = output.f4Color = lerp(output.f4Illumination, output.f4Texture, 0.7f);
 
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
@@ -652,8 +647,8 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 	input.normalW = normalize(input.normalW);
 	//output.f4Illumination = Lighting(input.positionW, input.normalW);
 
-	output.f4Scene = output.f4Color = output.f4Illumination * output.f4Texture;
-	//output.f4Scene = output.f4Color = lerp(output.f4Illumination, output.f4Texture, 0.7f);
+	//output.f4Scene = output.f4Color = output.f4Illumination * output.f4Texture;
+	output.f4Scene = output.f4Color = lerp(output.f4Illumination, output.f4Texture, 0.7f);
 	//output.f4Normal = float4(input.normalW.xyz * 0.5f + 0.5f, input.position.z);
 	//output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
 
@@ -713,7 +708,7 @@ float4 GetColorFromDepth(float fDepth)
 	float4 cColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	if (fDepth > 1.0f) cColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
-	else cColor = float4(fDepth * 2.2, fDepth * 2.2, fDepth * 2.2, 1.0f);
+	else cColor = float4(fDepth * 1.2, fDepth * 1.2, fDepth * 1.2, 1.0f);
 	return(cColor);
 }
 
@@ -919,46 +914,4 @@ float4 PSDoorUI(VS_UI_OUTPUT input) : SV_TARGET
 {
 	float4 Color = gtxtUITexture.Sample(gssWrap, input.uv);
 	return Color;
-}
-
-Texture2D gtxtShadowTexture : register(t22);
-
-struct VS_Shadow_INPUT
-{
-	float3 position : POSITION;
-	float2 uv : TEXCOORD;
-};
-
-struct VS_Shadow_OUTPUT
-{
-	float4 position : SV_POSITION;
-	float2 uv : TEXCOORD;
-};
-
-VS_Shadow_OUTPUT VSUI(VS_Shadow_INPUT input, uint nVertexID : SV_VertexID)
-{
-	VS_Shadow_OUTPUT output;
-	output.position = float4(input.position, 1.0f);
-	output.uv = input.uv;
-
-	return output;
-}
-
-float4 PSShadow(VS_Shadow_OUTPUT input) : SV_Target
-{
-	// 텍스처 좌표를 샘플링하여 깊이 값을 가져옴
-	float shadowDepth = gtxtShadowTexture.Sample(ShadowMapSampler, input.uv).r;
-
-	// 픽셀의 스크린 좌표를 깊이 값으로 변환하여 비교
-	float screenDepth = input.position.z / input.position.w;
-
-	if (shadowDepth < screenDepth)
-	{
-		// 그림자에 가려진 영역이면 검은색으로 설정
-		return float4(0.0, 0.0, 0.0, 1.0);
-	}
-	else
-	{
-		return // 계산된 색상 값;
-	}
 }

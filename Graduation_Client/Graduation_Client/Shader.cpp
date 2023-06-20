@@ -931,7 +931,7 @@ void LaplacianEdgeShader::OnPrepareRenderTarget(ID3D12GraphicsCommandList* pd3dC
 	for (int i = 0; i < nRenderTargets; i++)
 	{
 		pd3dAllRtvCPUHandles[i] = pd3dRtvCPUHandles[i];
-		pd3dCommandList->ClearRenderTargetView(pd3dRtvCPUHandles[i], Colors::Black, 0, NULL);
+		pd3dCommandList->ClearRenderTargetView(pd3dRtvCPUHandles[i], Colors::Green, 0, NULL);
 	}
 
 	for (int i = 0; i < nResources; i++)
@@ -1143,117 +1143,4 @@ void DoorUIShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 void DoorUIShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nRenderTargets, DXGI_FORMAT* pdxgiRtvFormats, DXGI_FORMAT dxgiDsvFormat)
 {
 	Shader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature, nRenderTargets, pdxgiRtvFormats, dxgiDsvFormat);
-}
-
-
-ShadowShader::ShadowShader()
-{
-}
-
-ShadowShader::~ShadowShader()
-{
-}
-
-D3D12_SHADER_BYTECODE ShadowShader::CreateVertexShader()
-{
-	return(Shader::CompileShaderFromFile(L"Shaders.hlsl", "VSScreenRectSamplingTextured", "vs_5_1", &m_pd3dVertexShaderBlob));
-}
-
-D3D12_SHADER_BYTECODE ShadowShader::CreatePixelShader()
-{
-	return(Shader::CompileShaderFromFile(L"Shaders.hlsl", "PSScreenRectSamplingTextured", "ps_5_1", &m_pd3dPixelShaderBlob));
-}
-
-void ShadowShader::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
-{
-}
-
-void ShadowShader::ReleaseShaderVariables()
-{
-	if (m_pd3dcbDebugOptions) m_pd3dcbDebugOptions->Release();
-}
-
-void ShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
-{
-	m_pcbMappedDebugOptions->m_DebugOptions.x = *((int*)pContext);
-	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbDebugOptions->GetGPUVirtualAddress();
-	pd3dCommandList->SetGraphicsRootConstantBufferView(16, d3dGpuVirtualAddress);
-
-	PostProcessingShader::UpdateShaderVariables(pd3dCommandList);
-}
-
-void ShadowShader::CreateResourcesAndViews(ID3D12Device* pd3dDevice, UINT nResources, DXGI_FORMAT* pdxgiFormats, UINT nWidth, UINT nHeight, D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle, UINT nShaderResources)
-{
-	m_pTexture = new Texture(nResources, RESOURCE_TEXTURE2D, 0, 1);
-
-	D3D12_CLEAR_VALUE d3dClearValue = { DXGI_FORMAT_R8G8B8A8_UNORM, { 0.0f, 0.0f, 1.0f, 1.0f } };
-	for (UINT i = 0; i < nResources; i++)
-	{
-		d3dClearValue.Format = pdxgiFormats[i];
-		m_pTexture->CreateTexture(pd3dDevice, nWidth, nHeight, pdxgiFormats[i], D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, D3D12_RESOURCE_STATE_COMMON, &d3dClearValue, RESOURCE_TEXTURE2D, i);
-	}
-
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, nShaderResources);
-	CreateShaderVariables(pd3dDevice, NULL);
-#ifdef _WITH_SCENE_ROOT_SIGNATURE
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 0, 15);
-#else
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 0, 0);
-#endif
-
-	D3D12_RENDER_TARGET_VIEW_DESC d3dRenderTargetViewDesc;
-	d3dRenderTargetViewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-	d3dRenderTargetViewDesc.Texture2D.MipSlice = 0;
-	d3dRenderTargetViewDesc.Texture2D.PlaneSlice = 0;
-
-	m_pd3dRtvCPUDescriptorHandles = new D3D12_CPU_DESCRIPTOR_HANDLE[nResources];
-
-	for (UINT i = 0; i < nResources; i++)
-	{
-		d3dRenderTargetViewDesc.Format = pdxgiFormats[i];
-		ID3D12Resource* pd3dTextureResource = m_pTexture->GetResource(i);
-		pd3dDevice->CreateRenderTargetView(pd3dTextureResource, &d3dRenderTargetViewDesc, d3dRtvCPUDescriptorHandle);
-		m_pd3dRtvCPUDescriptorHandles[i] = d3dRtvCPUDescriptorHandle;
-		d3dRtvCPUDescriptorHandle.ptr += ::gnRtvDescriptorIncrementSize;
-	}
-}
-
-
-void ShadowShader::OnPrepareRenderTarget(ID3D12GraphicsCommandList* pd3dCommandList, int nRenderTargets, D3D12_CPU_DESCRIPTOR_HANDLE* pd3dRtvCPUHandles, D3D12_CPU_DESCRIPTOR_HANDLE d3dDepthStencilBufferDSVCPUHandle)
-{
-	int nResources = m_pTexture->GetTextures();
-	D3D12_CPU_DESCRIPTOR_HANDLE* pd3dAllRtvCPUHandles = new D3D12_CPU_DESCRIPTOR_HANDLE[nRenderTargets + nResources];
-
-	for (int i = 0; i < nRenderTargets; i++)
-	{
-		pd3dAllRtvCPUHandles[i] = pd3dRtvCPUHandles[i];
-		pd3dCommandList->ClearRenderTargetView(pd3dRtvCPUHandles[i], Colors::Black, 0, NULL);
-	}
-
-	for (int i = 0; i < nResources; i++)
-	{
-		::SynchronizeResourceTransition(pd3dCommandList, GetTextureResource(i), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_RENDER_TARGET);
-
-		D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = GetRtvCPUDescriptorHandle(i);
-		FLOAT pfClearColor[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
-		pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor, 0, NULL);
-		pd3dAllRtvCPUHandles[nRenderTargets + i] = d3dRtvCPUDescriptorHandle;
-	}
-	pd3dCommandList->OMSetRenderTargets(nRenderTargets + nResources, pd3dAllRtvCPUHandles, FALSE, &d3dDepthStencilBufferDSVCPUHandle);
-
-	if (pd3dAllRtvCPUHandles) delete[] pd3dAllRtvCPUHandles;
-}
-
-void ShadowShader::OnPostRenderTarget(ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	int nResources = m_pTexture->GetTextures();
-	for (int i = 0; i < nResources; i++)
-	{
-		::SynchronizeResourceTransition(pd3dCommandList, GetTextureResource(i), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_COMMON);
-	}
-}
-
-void ShadowShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	PostProcessingShader::Render(pd3dCommandList);
 }
