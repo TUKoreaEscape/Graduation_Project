@@ -8,7 +8,7 @@
 
 #define  DIR_NO 100
 #define  USE_NETWORK 1
-#define	 USE_VOICE 0
+#define	 USE_VOICE 1
 
 class Door;
 class InteractionObject;
@@ -32,7 +32,7 @@ class Network {
 private:
 	static Network* NetworkInstance;
 	SOCKET			m_socket;
-	const char*		SERVER_ADDR = "127.0.0.1";
+	const char*		SERVER_ADDR = "172.30.1.65";
 	Server_Timer	m_server_counter;
 	Custom			data;
 
@@ -44,6 +44,7 @@ public:
 	std::mutex other_pos_lock;
 	bool	m_recv_move = false;
 	int		m_my_id = -1;
+	int		m_join_room_number = -1;
 
 	std::thread send_thread;
 	//임시사용 변수입니다.

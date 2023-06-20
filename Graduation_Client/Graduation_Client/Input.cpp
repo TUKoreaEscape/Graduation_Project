@@ -169,6 +169,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 					//std::cout << i+1  << " ¹æ Å¬¸¯!" << std::endl;
 					Network& network = *Network::GetInstance();
 					network.Send_Select_Room(i);
+					network.m_join_room_number = i;
 				}
 			}
 			//InputRoomInfo();

@@ -350,15 +350,26 @@ void Network::ProcessPacket(char* ptr)
 		//std::cout << "规 立加 己傍" << std::endl;
 		m_join_room = true;
 		send_thread = std::thread{ &Network::Debug_send_thread, this };
+
+		
 #if USE_VOICE
+		std::wstring parameter = L"addsession -l ";
+		std::wstring room_parameter = std::to_wstring(m_join_room_number);
+		std::wstring room_parameter2 = L"lobby";
+		std::wstring option_parameter = L" -audio yes";
+
+		std::wstring result_parameter = parameter + room_parameter + room_parameter2 + option_parameter;
+
+		std::wcout << result_parameter << std::endl;
 		info.cbSize = sizeof(SHELLEXECUTEINFO);
 		info.fMask = SEE_MASK_NOCLOSEPROCESS;
 		info.hwnd = NULL;
 		info.lpVerb = L"open";
 		info.lpFile = L"voice\\Voice.exe";
-		info.lpParameters = L"addsession -l lobby -audio yes";
+		info.lpParameters = (LPCWSTR&)result_parameter;
 		info.lpDirectory = NULL;
 		info.nShow = SW_HIDE;
+		info.nShow = SW_SHOW;
 		info.hInstApp = NULL;
 
 		ShellExecuteEx(&info); // start process
@@ -381,12 +392,20 @@ void Network::ProcessPacket(char* ptr)
 		m_join_room = true;
 		send_thread = std::thread{ &Network::Debug_send_thread, this };
 #if USE_VOICE
+		std::wstring parameter = L"addsession -l ";
+		std::wstring room_parameter = std::to_wstring(m_join_room_number);
+		std::wstring room_parameter2 = L"lobby";
+		std::wstring option_parameter = L" -audio yes";
+
+		std::wstring result_parameter = parameter + room_parameter + room_parameter2 + option_parameter;
+
+		std::wcout << result_parameter << std::endl;
 		info.cbSize = sizeof(SHELLEXECUTEINFO);
 		info.fMask = SEE_MASK_NOCLOSEPROCESS;
 		info.hwnd = NULL;
 		info.lpVerb = L"open";
 		info.lpFile = L"voice\\Voice.exe";
-		info.lpParameters = NULL;
+		info.lpParameters = (LPCWSTR&)result_parameter;
 		info.lpDirectory = NULL;
 		info.nShow = SW_HIDE;
 		info.hInstApp = NULL;
