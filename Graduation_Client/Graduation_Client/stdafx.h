@@ -58,6 +58,7 @@ using Microsoft::WRL::ComPtr;
 #include <WinSock2.h>
 
 #include <unordered_map>
+#include <set>
 
 #pragma comment(lib, "ws2_32.lib")
 //#define _WITH_DEBUG_FRAME_HIERARCHY

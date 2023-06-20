@@ -8,6 +8,15 @@
 #include "Network.h"
 #include "Game_state.h"
 
+enum class PVSROOM {
+	CLASS_ROOM = 0,
+	PIANO_ROOM,
+	BROADCASTING_ROOM,
+	LOBBY_ROOM,
+	FOREST,
+	CUBE_ROOM
+};
+
 class InteractionObject;
 //GameScene과 Scene을 분리해놓은 이유
 //GameScene에서 게임내의 플레이어 생성, 오브젝트 배치, 상태 등을 따로 관리하기 위해.
@@ -41,11 +50,7 @@ public:
 	int m_nWalls;
 	GameObject** m_ppWalls;
 	
-	GameObject* m_pClass = nullptr;
-	GameObject* m_pPiano = nullptr;
-	GameObject* m_pBroadcast = nullptr;
-	GameObject* m_pPorest = nullptr;
-	GameObject* m_pLobby = nullptr;
+	GameObject* m_pPVSObjects[6];
 
 	GameObject* Vents[NUM_VENT];
 
@@ -60,7 +65,9 @@ public:
 	Network* m_network;
 	std::thread recv_thread;
 
-
+	std::set<PVSROOM> m_sPVS[6];
+	PVSROOM m_pvsCamera;
+	
 protected:
 	static ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap;
 
@@ -114,4 +121,6 @@ public:
 	void MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+
+	void CheckCameraPos(const XMFLOAT3 camera);
 };
