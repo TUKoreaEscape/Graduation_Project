@@ -16,6 +16,16 @@ namespace CLIENT_ROLE
 	};
 }
 
+namespace GAME_ITEM
+{
+	enum ITEM {
+		ITEM_HAMMER,
+		ITEM_DRILL,
+		ITEM_WRENCH,
+		ITEM_PLIERS
+	};
+}
+
 enum LOGIN_STATE {N_LOGIN, Y_LOGIN};
 
 class CLIENT {
@@ -51,6 +61,10 @@ private:
 	bool					m_first_skill_able = false;
 	bool					m_second_skill_able = false;
 	bool					m_third_skill_able = false;
+
+private: // 아이템 부분
+	bool					m_life_card_own = false;
+	bool					m_item_own[4]{ false };
 
 public:
 	unordered_set <int> room_list; 
@@ -133,6 +147,12 @@ public:
 	void				update_bounding_box_pos(const XMFLOAT3 pos);
 	void				update_bounding_box_orientation(const XMFLOAT4 orientation);
 	void				error_display(int error_number);
+
+	// 아이템 관련 함수
+
+	void				set_item_own(GAME_ITEM::ITEM item, bool value) { m_item_own[item] = value; }
+	bool				get_item_own(GAME_ITEM::ITEM item) { return m_item_own[item]; }
+
 	
 
 	// 네트워크용 함수 2개
