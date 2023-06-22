@@ -2,29 +2,6 @@
 #include "stdafx.h"
 #include <codecvt>
 #include "User_Custom.h"
-namespace CLIENT_STATE
-{
-	enum STATE {
-		ST_FREE, ST_ACCEPT, ST_LOBBY, ST_GAMEROOM, ST_INGAME
-	};
-}
-
-namespace CLIENT_ROLE
-{
-	enum STATE {
-		ROLE_NONE, ROLE_RUNNER,  ROLE_TAGGER
-	};
-}
-
-namespace GAME_ITEM
-{
-	enum ITEM {
-		ITEM_HAMMER,
-		ITEM_DRILL,
-		ITEM_WRENCH,
-		ITEM_PLIERS
-	};
-}
 
 enum LOGIN_STATE {N_LOGIN, Y_LOGIN};
 

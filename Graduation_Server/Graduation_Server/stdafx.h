@@ -111,3 +111,27 @@ inline XMFLOAT4 Multiply(float fScalar, XMFLOAT4& xmf4Vector)
 	XMStoreFloat4(&xmf4Result, fScalar * XMLoadFloat4(&xmf4Vector));
 	return(xmf4Result);
 }
+
+namespace CLIENT_STATE
+{
+	enum STATE {
+		ST_FREE, ST_ACCEPT, ST_LOBBY, ST_GAMEROOM, ST_INGAME
+	};
+}
+
+namespace CLIENT_ROLE
+{
+	enum STATE {
+		ROLE_NONE, ROLE_RUNNER, ROLE_TAGGER
+	};
+}
+
+namespace GAME_ITEM
+{
+	enum ITEM {
+		ITEM_HAMMER,
+		ITEM_DRILL,
+		ITEM_WRENCH,
+		ITEM_PLIERS
+	};
+}

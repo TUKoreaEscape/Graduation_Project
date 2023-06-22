@@ -184,3 +184,42 @@ void EscapeSystem::Update_Object()
 {
 
 }
+
+GameItem::GameItem()
+{
+}
+
+GameItem::GameItem(GAME_ITEM::ITEM item_type, const XMFLOAT3& center, const XMFLOAT3& extents)
+{
+	m_item_type = item_type;
+	m_bounding_box = BoundingOrientedBox(center, extents, XMFLOAT4(0, 0, 0, 1));
+	m_state_lock = new mutex;
+}
+
+void GameItem::Update_bounding_box_pos(const XMFLOAT3& pos)
+{
+	m_bounding_box.Center = pos;
+}
+
+void GameItem::Update_Object()
+{
+
+}
+
+bool GameItem::Pict_Item()
+{
+	m_state_lock->lock();
+	if (m_show == true)
+	{
+		m_show == false;
+		m_state_lock->unlock();
+		return true;
+	}
+	m_state_lock->unlock();
+	return false;
+}
+
+void GameItem::Release()
+{
+	delete m_state_lock;
+}

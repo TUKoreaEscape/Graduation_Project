@@ -75,7 +75,7 @@ public:
 class ElectronicSystem : public GameObject {
 private:
 	int			m_system_id = -1;
-	bool		m_correct_on_off_switch[15];
+	bool		m_correct_on_off_switch[15]{false};
 	ES_State	m_state = ES_State::ES_CLOSE;
 
 public:
@@ -100,7 +100,7 @@ public:
 
 class EscapeSystem : public GameObject {
 private:
-	int		m_system_id;
+	int		m_system_id = -1;
 
 public:
 	EscapeSystem();
@@ -109,4 +109,22 @@ public:
 
 	void Update_bounding_box_pos(const XMFLOAT3& pos);
 	void Update_Object();
+};
+
+class GameItem : public GameObject {
+private:
+	GAME_ITEM::ITEM m_item_type;
+	bool			m_own = false;
+	bool			m_show = false;
+
+	mutex*			m_state_lock;
+public:
+	GameItem();
+	GameItem(GAME_ITEM::ITEM item_type, const XMFLOAT3& center, const XMFLOAT3& extents);
+	~GameItem() = default;
+
+	void Update_bounding_box_pos(const XMFLOAT3& pos);
+	bool Pict_Item();
+	void Update_Object();
+	void Release();
 };

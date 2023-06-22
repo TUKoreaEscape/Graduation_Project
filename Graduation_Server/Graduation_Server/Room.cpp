@@ -188,6 +188,11 @@ bool Room::Is_Door_Open(const int door_num)
 	return false;
 }
 
+bool Room::Pick_Item(const int item_type)
+{
+	return m_fix_item[item_type].Pict_Item();
+}
+
 bool Room::Is_ElectronicSystem_Open(const int es_num)
 {
 	if (m_electrinic_system[es_num].get_state() == ES_OPEN)

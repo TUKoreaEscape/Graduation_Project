@@ -65,7 +65,8 @@ namespace CS_PACKET
 		CS_PACKET_REQUEST_OPEN_HIDDEN_DOOR,
 		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_DOOR,
 		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_SWICH,
-		CS_PACKET_ATTACK
+		CS_PACKET_ATTACK,
+		CS_PACKET_PICK_ITEM
 	};
 }
 
@@ -235,6 +236,13 @@ struct cs_packet_request_electronic_system_fix {
 	unsigned char	type;
 
 	unsigned char	fix_item_info;
+};
+
+struct cs_packet_pick_fix_item {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned short	item_type;
 };
 
 struct cs_packet_request_exit_room {
@@ -479,7 +487,7 @@ struct sc_packet_electronic_system_init {
 	unsigned char	size;
 	unsigned char	type;
 
-	ElectronicSystem_Data data[6];
+	ElectronicSystem_Data data[5];
 };
 
 struct sc_packet_attack {

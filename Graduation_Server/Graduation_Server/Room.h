@@ -27,6 +27,7 @@ public:
 	vector<GameObject>				m_game_wall_and_fix_object;
 	vector<Door>					m_door_object;
 	vector<ElectronicSystem>		m_electrinic_system;
+	vector<GameItem>				m_fix_item;
 
 private:
 	chrono::system_clock::time_point start_time;
@@ -93,6 +94,8 @@ public:
 	void	Start_Game();
 	void	End_Game();
 
+public: // 인게임 아이템관련 함수
+	bool	Pick_Item(const int item_type);
 
 private:
 

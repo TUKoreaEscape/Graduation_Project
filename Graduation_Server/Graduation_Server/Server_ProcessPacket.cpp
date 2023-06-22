@@ -584,3 +584,17 @@ void cGameServer::Process_ElectronicSystem_Control(const int user_id, void* buff
 		m_clients[player_id].do_send(sizeof(es_packet), &es_packet);
 	}
 }
+
+void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
+{
+	cs_packet_pick_fix_item* packet = reinterpret_cast<cs_packet_pick_fix_item*>(buff);
+
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+	bool ret = room.Pick_Item(packet->item_type);
+
+	if (ret)
+		m_clients[user_id].set_item_own(static_cast<GAME_ITEM::ITEM>(packet->item_type), true);
+
+	// 이제 여기에 아이템 획득유무를 나타내고 맵에 보이는걸 비활성화 해야함
+}
