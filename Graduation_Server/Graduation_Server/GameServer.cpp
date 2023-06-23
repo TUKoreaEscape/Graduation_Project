@@ -533,7 +533,13 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_PACKET_STRESS_LOGIN:
 	{
-		m_clients[user_id].set_login_state(Y_LOGIN);
+		m_clients[user_id].m_customizing = new Customizing_Info;
+		m_clients[user_id].m_customizing->Set_Head_Custom(static_cast<HEADS>(0));
+		m_clients[user_id].m_customizing->Set_Body_Custom(static_cast<BODIES>(0));
+		m_clients[user_id].m_customizing->Set_Body_Part_Custom(static_cast<BODYPARTS>(0));
+		m_clients[user_id].m_customizing->Set_Eyes_Custom(static_cast<EYES>(0));
+		m_clients[user_id].m_customizing->Set_Gloves_Custom(static_cast<GLOVES>(0));
+		m_clients[user_id].m_customizing->Set_Mouthandnoses_Custom(static_cast<MOUTHANDNOSES>(0));
 		send_login_ok_packet(user_id);
 		break;
 	}

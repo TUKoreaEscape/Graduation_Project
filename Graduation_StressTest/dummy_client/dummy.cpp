@@ -19,7 +19,7 @@ using namespace chrono;
 
 extern HWND		hWnd;
 
-const static int MAX_TEST = 2000;
+const static int MAX_TEST = 20;
 const static int MAX_CLIENTS = MAX_TEST * 2;
 const static int INVALID_ID = -1;
 const static int MAX_PACKET_SIZE = 255;
@@ -55,6 +55,8 @@ struct CLIENT {
 	int prev_packet_data;
 	int curr_packet_size;
 	high_resolution_clock::time_point last_move_time;
+	int	join_room;
+	bool join = false;
 };
 
 array<int, MAX_CLIENTS> client_map;
@@ -123,23 +125,55 @@ void ProcessPacket(int ci, unsigned char packet[])
 {
 	switch (packet[1]) {
 	case SC_PACKET::SC_PACKET_LOGINOK:
-		
+	{
+		if (ci % 6 == 0)
+		{
+			active_clients++;
+			cs_packet_create_room create_packet;
+			create_packet.size = sizeof(packet);
+			create_packet.type = CS_PACKET::CS_PACKET_CREATE_ROOM;
+			create_packet.room_number = ci / 6;
+			SendPacket(ci, &create_packet);
+		}
+		else
+		{
+			cs_packet_join_room create_packet;
+			create_packet.size = sizeof(create_packet);
+			create_packet.type = CS_PACKET::CS_PACKET_JOIN_ROOM;
+			create_packet.room_number = ci / 6;
+			SendPacket(ci, &create_packet);
+		}
 		break;
-
+	}
 	case SC_PACKET::SC_PACKET_JOIN_ROOM_FAIL:
 
 		break;
 
 	case SC_PACKET::SC_PACKET_CREATE_ROOM_OK:
+	{
+		g_clients[ci].join = true;
+		cs_packet_ready send_packet;
 
+		send_packet.size = sizeof(send_packet);
+		send_packet.type = CS_PACKET::CS_PACKET_READY;
+		send_packet.ready_type = true;
+
+		SendPacket(ci, &send_packet);
 		break;
-
+	}
 	case SC_PACKET::SC_PACKET_JOIN_ROOM_SUCCESS:
+		g_clients[ci].join = true;
+		cs_packet_ready send_packet;
 
+		send_packet.size = sizeof(send_packet);
+		send_packet.type = CS_PACKET::CS_PACKET_READY;
+		send_packet.ready_type = true;
+
+		SendPacket(ci, &send_packet);
 		break;
 		
 	case SC_PACKET::SC_PACKET_CALCULATE_MOVE:
-
+		
 		break;
 	default: 
 		//MessageBox(hWnd, L"Unknown Packet Type", L"ERROR", 0);
@@ -323,11 +357,14 @@ void Test_Thread()
 
 		for (int i = 0; i < num_connections; ++i) {
 			if (false == g_clients[i].connected) continue;
+			if (g_clients[i].join == false) continue;
 			if (g_clients[i].last_move_time + 1s > high_resolution_clock::now()) continue;
 			g_clients[i].last_move_time = high_resolution_clock::now();
 			cs_packet_move my_packet;
 			my_packet.size = sizeof(my_packet);
 			my_packet.type = CS_PACKET::CS_PACKET_MOVE;
+			my_packet.input_key = 'w';
+			my_packet.look;
 			SendPacket(i, &my_packet);
 		}
 	}
@@ -349,7 +386,7 @@ void InitializeNetwork()
 
 	g_hiocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, NULL, 0);
 
-	for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < 4; ++i)
 		worker_threads.push_back(new std::thread{ Worker_Thread });
 
 	test_thread = thread{ Test_Thread };
