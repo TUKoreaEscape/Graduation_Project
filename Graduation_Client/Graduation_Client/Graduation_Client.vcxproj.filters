@@ -215,6 +215,9 @@
     <ClCompile Include="UI.cpp">
       <Filter>Engine\Framework</Filter>
     </ClCompile>
+    <ClCompile Include="Send_Packet.cpp">
+      <Filter>Client\Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Graduation_Client.rc">
