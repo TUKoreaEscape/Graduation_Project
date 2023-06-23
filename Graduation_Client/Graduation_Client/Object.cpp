@@ -72,7 +72,7 @@ HeightMapTerrain::~HeightMapTerrain(void)
 	if (m_pHeightMapImage) delete m_pHeightMapImage;
 }
 
-Vent::Vent() : GameObject()
+Vent::Vent() : InteractionObject()
 {
 }
 
@@ -86,6 +86,19 @@ void Vent::Rotate(float fPitch, float fYaw, float fRoll)
 	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
 
 	UpdateTransform(NULL);
+}
+
+bool Vent::IsPlayerNear(const XMFLOAT3& PlayerPos)
+{
+	return false;
+}
+
+void Vent::render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void Vent::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
 }
 
 Door::Door() : InteractionObject()

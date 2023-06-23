@@ -41,15 +41,6 @@ public:
 	float GetLength() { return(m_nLength * m_xmf3Scale.z); }
 };
 
-class Vent : public GameObject
-{
-public:
-	Vent();
-	virtual ~Vent();
-
-	void Rotate(float fPitch, float fYaw, float fRoll);
-};
-
 class DoorUI : public GameObject
 {
 public:
@@ -156,4 +147,13 @@ public:
 
 	void render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
+};
+
+class Vent : public InteractionObject
+{
+public:
+	Vent();
+	virtual ~Vent();
+
+	void Rotate(float fPitch, float fYaw, float fRoll);
 };
