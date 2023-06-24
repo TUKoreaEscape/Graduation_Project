@@ -19,7 +19,7 @@ using namespace chrono;
 
 extern HWND		hWnd;
 
-const static int MAX_TEST = 20;
+const static int MAX_TEST = 3000;
 const static int MAX_CLIENTS = MAX_TEST * 2;
 const static int INVALID_ID = -1;
 const static int MAX_PACKET_SIZE = 255;
@@ -96,6 +96,7 @@ void DisconnectClient(int ci)
 	bool status = true;
 	if (true == atomic_compare_exchange_strong(&g_clients[ci].connected, &status, false)) {
 		closesocket(g_clients[ci].client_socket);
+		
 		active_clients--;
 	}
 	// cout << "Client [" << ci << "] Disconnected!\n";
@@ -128,7 +129,6 @@ void ProcessPacket(int ci, unsigned char packet[])
 	{
 		if (ci % 6 == 0)
 		{
-			active_clients++;
 			cs_packet_create_room create_packet;
 			create_packet.size = sizeof(packet);
 			create_packet.type = CS_PACKET::CS_PACKET_CREATE_ROOM;
@@ -159,6 +159,7 @@ void ProcessPacket(int ci, unsigned char packet[])
 		send_packet.ready_type = true;
 
 		SendPacket(ci, &send_packet);
+		g_clients[ci].last_move_time = high_resolution_clock::now();
 		break;
 	}
 	case SC_PACKET::SC_PACKET_JOIN_ROOM_SUCCESS:
@@ -170,11 +171,21 @@ void ProcessPacket(int ci, unsigned char packet[])
 		send_packet.ready_type = true;
 
 		SendPacket(ci, &send_packet);
+		g_clients[ci].last_move_time = high_resolution_clock::now();
 		break;
 		
 	case SC_PACKET::SC_PACKET_CALCULATE_MOVE:
-		
+	{
+		sc_packet_calculate_move_test* move_packet = reinterpret_cast<sc_packet_calculate_move_test*>(packet);
+
+		if (0 != move_packet->move_time) {
+			auto d_ms = duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count() - move_packet->move_time;
+			if (global_delay < d_ms) global_delay++;
+			else if (global_delay > d_ms) global_delay--;
+		}
 		break;
+	}
+
 	default: 
 		//MessageBox(hWnd, L"Unknown Packet Type", L"ERROR", 0);
 		//while (true);
@@ -343,8 +354,9 @@ void Adjust_Number_Of_Client()
 			error_display("RECV ERROR", err_no);
 			goto fail_to_connect;
 		}
-	}
+	}g_clients[num_connections].connected = true;
 	num_connections++;
+	active_clients++;
 fail_to_connect:
 	return;
 }
@@ -354,17 +366,17 @@ void Test_Thread()
 	while (true) {
 		//Sleep(max(20, global_delay));
 		Adjust_Number_Of_Client();
-
 		for (int i = 0; i < num_connections; ++i) {
 			if (false == g_clients[i].connected) continue;
 			if (g_clients[i].join == false) continue;
 			if (g_clients[i].last_move_time + 1s > high_resolution_clock::now()) continue;
 			g_clients[i].last_move_time = high_resolution_clock::now();
-			cs_packet_move my_packet;
+			cs_packet_move_test my_packet;
 			my_packet.size = sizeof(my_packet);
 			my_packet.type = CS_PACKET::CS_PACKET_MOVE;
 			my_packet.input_key = 'w';
 			my_packet.look;
+			my_packet.move_time = static_cast<unsigned>(duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count());
 			SendPacket(i, &my_packet);
 		}
 	}
