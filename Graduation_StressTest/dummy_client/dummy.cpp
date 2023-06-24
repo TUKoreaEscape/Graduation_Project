@@ -364,12 +364,12 @@ fail_to_connect:
 void Test_Thread()
 {
 	while (true) {
-		//Sleep(max(20, global_delay));
+		Sleep(max(100, global_delay));
 		Adjust_Number_Of_Client();
 		for (int i = 0; i < num_connections; ++i) {
 			if (false == g_clients[i].connected) continue;
 			if (g_clients[i].join == false) continue;
-			if (g_clients[i].last_move_time + 1s > high_resolution_clock::now()) continue;
+			if (g_clients[i].last_move_time + 0.016s > high_resolution_clock::now()) continue;
 			g_clients[i].last_move_time = high_resolution_clock::now();
 			cs_packet_move_test my_packet;
 			my_packet.size = sizeof(my_packet);
