@@ -319,7 +319,7 @@ void Adjust_Number_Of_Client()
 	ZeroMemory(&ServerAddr, sizeof(SOCKADDR_IN));
 	ServerAddr.sin_family = AF_INET;
 	ServerAddr.sin_port = htons(SERVER_PORT);
-	ServerAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	ServerAddr.sin_addr.s_addr = inet_addr("172.30.1.57");
 
 
 	int Result = WSAConnect(g_clients[num_connections].client_socket, (sockaddr*)&ServerAddr, sizeof(ServerAddr), NULL, NULL, NULL, NULL);
@@ -365,13 +365,19 @@ fail_to_connect:
 
 void Test_Thread()
 {
+	chrono::steady_clock::time_point last_add = chrono::steady_clock::now();
 	while (true) {
-		Sleep(max(100, global_delay));
-		Adjust_Number_Of_Client();
+
+		//Sleep(max(0, global_delay));
+		if (last_add + 16ms < high_resolution_clock::now()) {
+			Adjust_Number_Of_Client();
+			last_add = high_resolution_clock::now();
+		}
+
 		for (int i = 0; i < num_connections; ++i) {
 			if (false == g_clients[i].connected) continue;
 			if (g_clients[i].join == false) continue;
-			if (g_clients[i].last_move_time + 0.016s > high_resolution_clock::now()) continue;
+			if (g_clients[i].last_move_time + 16ms > high_resolution_clock::now()) continue;
 			g_clients[i].last_move_time = high_resolution_clock::now();
 			cs_packet_move_test my_packet;
 			my_packet.size = sizeof(my_packet);
