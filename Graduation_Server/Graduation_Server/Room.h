@@ -96,7 +96,7 @@ public:
 
 public: // 인게임 아이템관련 함수
 	bool	Pick_Item(const int item_type);
-
+	bool	Is_near(XMFLOAT3 player_pos, XMFLOAT3 object_pos);
 private:
 
 public:

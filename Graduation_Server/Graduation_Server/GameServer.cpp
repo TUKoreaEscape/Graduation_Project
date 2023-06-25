@@ -452,13 +452,14 @@ int cGameServer::get_new_id()
 {
 	for (int i = 0; i < MAX_USER; ++i)
 	{
+		m_clients[i]._state_lock.lock();
 		if (CLIENT_STATE::ST_FREE == m_clients[i].get_state())
 		{
-			m_clients[i]._state_lock.lock();
 			m_clients[i].set_state(CLIENT_STATE::ST_ACCEPT);
 			m_clients[i]._state_lock.unlock();
 			return i;
 		}
+		m_clients[i]._state_lock.unlock();
 	}
 
 	std::cout << "Maximum Number of Clients Overflow! \n";

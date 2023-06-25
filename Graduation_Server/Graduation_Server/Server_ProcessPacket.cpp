@@ -23,7 +23,6 @@ void cGameServer::Process_Create_ID(int c_id, void* buff) // 요청받은 ID생성패킷
 
 void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터 이동을 처리
 {
-	//auto start_time = chrono::high_resolution_clock::now();
 	cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(buff);
 	m_clients[user_id].set_user_velocity(packet->velocity);
 	m_clients[user_id].set_user_yaw(packet->yaw);
@@ -40,51 +39,27 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	XMFLOAT3 calculate_player_position = Add(current_player_position, current_shift);
 	bool collision_up_face = false;
 
-	//m_clients[user_id]._pos_lock.lock();
-	//m_clients[user_id].set_user_position(calculate_player_position);
-	//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 	if (m_clients[user_id].get_user_position().y < 0)
-	{
 		calculate_player_position.y = 0;
-		//m_clients[user_id].set_user_position(calculate_player_position);
-		//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
-	}
-	//cout << "적용전 캐릭터 좌표 : " << m_clients[user_id].get_user_position().x << ", " << m_clients[user_id].get_user_position().y << ", " << m_clients[user_id].get_user_position().z << endl;
-
+	
 	if (m_clients[user_id].get_join_room_number() >= 0) {
 		CollisionInfo player_check = join_room.is_collision_player_to_player(user_id, current_player_position, current_shift);
 		if (player_check.is_collision)
 		{
-			//cout << "슬라이딩벡터 : " << player_check.SlidingVector.x << ", " << player_check.SlidingVector.y << ", " << player_check.SlidingVector.z << endl;
-			//calculate_player_position = current_player_position;
 			calculate_player_position = Add(current_player_position, player_check.SlidingVector);
-			//m_clients[user_id].set_user_position(calculate_player_position);
-			//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 			if (m_clients[user_id].get_user_position().y < 0)
-			{
 				calculate_player_position.y = 0;
-				//m_clients[user_id].set_user_position(calculate_player_position);
-				//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
-			}
 			current_shift = player_check.SlidingVector;
 			if (player_check.collision_face_num == 4)
 				collision_up_face = true;
-			//cout << "적용후 캐릭터 좌표 : " << m_clients[user_id].get_user_position().x << ", " << m_clients[user_id].get_user_position().y << ", " << m_clients[user_id].get_user_position().z << endl;
 		}
 
 		CollisionInfo wall_check = join_room.is_collision_wall_to_player(user_id, current_player_position, current_shift);
 		if (wall_check.is_collision)
 		{
-			//calculate_player_position = current_player_position;
 			calculate_player_position = Add(current_player_position, wall_check.SlidingVector);
-			//m_clients[user_id].set_user_position(calculate_player_position);
-			//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 			if (m_clients[user_id].get_user_position().y < 0)
-			{
 				calculate_player_position.y = 0;
-				//m_clients[user_id].set_user_position(calculate_player_position);
-				//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
-			}
 			current_shift = wall_check.SlidingVector;
 			if (wall_check.collision_face_num == 4)
 				collision_up_face = true;
@@ -93,16 +68,9 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 		CollisionInfo door_check = join_room.is_collision_player_to_door(user_id, current_player_position, current_shift);
 		if (door_check.is_collision)
 		{
-			//calculate_player_position = current_player_position;
 			calculate_player_position = Add(current_player_position, door_check.SlidingVector);
-			//m_clients[user_id].set_user_position(calculate_player_position);
-			//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 			if (m_clients[user_id].get_user_position().y < 0)
-			{
 				calculate_player_position.y = 0;
-				//[user_id].set_user_position(calculate_player_position);
-				//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
-			}
 			current_shift = door_check.SlidingVector;
 			if (door_check.collision_face_num == 4)
 				collision_up_face = true;
@@ -116,7 +84,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 				collision_up_face = true;
 		}
 	}
-	//m_clients[user_id]._pos_lock.unlock();
+
 	m_clients[user_id].set_user_position(calculate_player_position);
 	m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 	m_clients[user_id].set_collied_up_face(collision_up_face);

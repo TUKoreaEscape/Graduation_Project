@@ -434,13 +434,7 @@ struct sc_packet_voice_data {
 struct sc_packet_move {
 	unsigned char	size;
 	unsigned char	type;
-	unsigned short	id;
-
-	unsigned char	input_key;
-
-	Look		look;
-	Right		right;
-	Position	pos;
+	UserData		data;
 };
 
 struct sc_packet_calculate_move {

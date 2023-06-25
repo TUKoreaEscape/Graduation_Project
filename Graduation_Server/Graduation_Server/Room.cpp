@@ -309,15 +309,17 @@ CollisionInfo Room::is_collision_player_to_player(const int& player_id, const XM
 	BoundingOrientedBox player_bounding_box = client.get_bounding_box();
 	for (int i = 0; i < Number_of_users; ++i)
 	{
-		if (in_player[i] != player_id && in_player[i] != -1)
-		{
-			CLIENT& other_player = *server.get_client_info(in_player[i]);
-			BoundingOrientedBox other_player_bounding_box = other_player.get_bounding_box();
+		if (in_player[i] == player_id)
+			continue;
+		if (in_player[i] == -1)
+			continue;
 
-			if (player_bounding_box.Intersects(other_player_bounding_box)) {
-				collied_id = in_player[i];
-				break;
-			}
+		CLIENT& other_player = *server.get_client_info(in_player[i]);
+		BoundingOrientedBox other_player_bounding_box = other_player.get_bounding_box();
+
+		if (player_bounding_box.Intersects(other_player_bounding_box)) {
+			collied_id = in_player[i];
+			break;
 		}
 	}
 
@@ -373,6 +375,8 @@ CollisionInfo Room::is_collision_wall_to_player(const int& player_id, const XMFL
 	int collied_face_num = -1;
 	for (auto& object : m_game_wall_and_fix_object) // 모든벽을 체크 후 값을 더해주는 방식이 좋아보임!
 	{
+		if (false == Is_near(current_position, object.Get_center()))
+			continue;
 		if (check_box.Intersects(object.Get_BoundingBox()))
 		{
 			cl.set_user_position(tmp_position);
@@ -413,4 +417,9 @@ CollisionInfo Room::is_collision_wall_to_player(const int& player_id, const XMFL
 	return return_data;
 }
 
-
+bool Room::Is_near(XMFLOAT3 player_pos, XMFLOAT3 object_pos)
+{
+	if (22 < abs(player_pos.x - object_pos.x)) return false;
+	if (22 < abs(player_pos.z - object_pos.z)) return false;
+	return true;
+}

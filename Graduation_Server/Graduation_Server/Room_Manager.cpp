@@ -54,11 +54,9 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 		nReads = (unsigned int)fread(AABBCenter, sizeof(float), 3, pFile);
 		nReads = (unsigned int)fread(AABBExtents, sizeof(float), 3, pFile);
 		nReads = (unsigned int)fread(AABBQuats, sizeof(float), 4, pFile);
-
+		cout << "Object - " << i + 1 << " - " << pstrGameObjectName << " Center - (" << AABBCenter[0] << ", " << AABBCenter[1] << ", " << AABBCenter[2] << "), Extents - (" << AABBExtents[0] << ", " << AABBExtents[1] << ", " << AABBExtents[2] << ")" << endl;
 		for (auto& _room : a_in_game_room) {
 			_room.add_game_walls(Object_Type::OB_WALL, XMFLOAT3(AABBCenter[0], AABBCenter[1], AABBCenter[2]), XMFLOAT3(AABBExtents[0], AABBExtents[1], AABBExtents[2]));
-			//cout << "Wall - " << i + 1 << " - " << pstrGameObjectName << " Center - (" << AABBCenter[0] << ", " << AABBCenter[1] << ", " << AABBCenter[2] << "), Extents - (" << AABBExtents[0] << ", " << AABBExtents[1] << ", " << AABBExtents[2] << ")" << endl;
-
 		}
 	}
 	cout << "Walls and Fixed Object File Load Success!" << endl;
@@ -140,9 +138,10 @@ int RoomManager::Create_room(int user_id, int room_number) // 방생성을 요청받을�
 {
 	int return_create_room_number = -1;
 
-	a_in_game_room[room_number]._room_state_lock.lock();
+
 	if (a_in_game_room[room_number]._room_state == GAME_ROOM_STATE::FREE)
 	{
+		a_in_game_room[room_number]._room_state_lock.lock();
 		a_in_game_room[room_number].Create_Room(user_id, room_number, GAME_ROOM_STATE::READY);
 		a_in_game_room[room_number]._room_state_lock.unlock();
 		return_create_room_number = room_number;
