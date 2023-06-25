@@ -23,6 +23,7 @@ void cGameServer::Process_Create_ID(int c_id, void* buff) // 요청받은 ID생성패킷
 
 void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터 이동을 처리
 {
+	auto start_time = chrono::steady_clock::now();
 	cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(buff);
 	m_clients[user_id].set_user_velocity(packet->velocity);
 	m_clients[user_id].set_user_yaw(packet->yaw);
@@ -41,7 +42,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 
 	if (m_clients[user_id].get_user_position().y < 0)
 		calculate_player_position.y = 0;
-	
+
 	if (m_clients[user_id].get_join_room_number() >= 0) {
 		CollisionInfo player_check = join_room.is_collision_player_to_player(user_id, current_player_position, current_shift);
 		if (player_check.is_collision)
@@ -62,6 +63,17 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 				calculate_player_position.y = 0;
 			current_shift = wall_check.SlidingVector;
 			if (wall_check.collision_face_num == 4)
+				collision_up_face = true;
+		}
+
+		CollisionInfo fix_object_check = join_room.is_collision_fix_object_to_player(user_id, current_player_position, current_shift);
+		if (fix_object_check.is_collision)
+		{
+			calculate_player_position = Add(current_player_position, fix_object_check.SlidingVector);
+			if (m_clients[user_id].get_user_position().y < 0)
+				calculate_player_position.y = 0;
+			current_shift = fix_object_check.SlidingVector;
+			if (fix_object_check.collision_face_num == 4)
 				collision_up_face = true;
 		}
 
@@ -105,6 +117,9 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	}
 	else
 		m_clients[user_id].m_befor_send_move = false;
+	auto end_time = chrono::steady_clock::now();
+
+	//cout << chrono::duration_cast<chrono::milliseconds>(end_time - start_time).count() << "ms" << endl;
 }
 
 void cGameServer::Process_Chat(const int user_id, void* buff)
@@ -131,9 +146,9 @@ void cGameServer::Process_Create_Room(const unsigned int _user_id, void* buff) /
 	cs_packet_create_room* packet = reinterpret_cast<cs_packet_create_room*>(buff);
 
 	m_clients[_user_id].set_join_room_number(m_room_manager->Create_room(_user_id, packet->room_number));
-	//m_clients[_user_id]._state_lock.lock();
+	m_clients[_user_id]._state_lock.lock();
 	m_clients[_user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
-	//m_clients[_user_id]._state_lock.unlock();
+	m_clients[_user_id]._state_lock.unlock();
 	send_create_room_ok_packet(_user_id, m_clients[_user_id].get_join_room_number());
 	send_put_player_data(_user_id);
 	m_clients[_user_id].set_bounding_box(m_clients[_user_id].get_user_position(), XMFLOAT3(0.7f, 1.f, 0.7f), XMFLOAT4(0, 0, 0, 1));
@@ -170,20 +185,22 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 		if (m_room_manager->Join_room(user_id, packet->room_number))
 		{
 			m_clients[user_id].set_join_room_number(packet->room_number);
+			m_clients[user_id]._state_lock.lock();
 			m_clients[user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
+			m_clients[user_id]._state_lock.unlock();
 			send_put_player_data(user_id);
 			Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
-			m_clients[user_id]._room_list_lock.lock();
 			for (int i = 0; i < 6; ++i)
 			{
 				if (room.Get_Join_Member(i) != -1 && room.Get_Join_Member(i) != user_id)
 				{
+					m_clients[user_id]._room_list_lock.lock();
 					m_clients[user_id].room_list.insert(room.Get_Join_Member(i));
 					send_put_other_player(room.Get_Join_Member(i), user_id);
+					m_clients[user_id]._room_list_lock.unlock();
 				}
 			}
-			m_clients[user_id]._room_list_lock.unlock();
 
 			// 이제 여기에 그 방에 존재하는 모든 사람에게 누가 접속했는지 정보를 전달해야함!
 			for (int i = 0; i < 6; ++i)
@@ -206,9 +223,9 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 			update_room_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO_UPDATE;
 			update_room_packet.join_member = m_room_manager->Get_Room_Info(packet->room_number)->Get_Number_of_users();
 			update_room_packet.room_number = packet->room_number;
-			//m_room_manager->Get_Room_Info(packet->room_number)->_room_state_lock.lock();
+			m_room_manager->Get_Room_Info(packet->room_number)->_room_state_lock.lock();
 			update_room_packet.state = m_room_manager->Get_Room_Info(packet->room_number)->_room_state;
-			//m_room_manager->Get_Room_Info(packet->room_number)->_room_state_lock.unlock();
+			m_room_manager->Get_Room_Info(packet->room_number)->_room_state_lock.unlock();
 
 			for (auto& cl : m_clients)
 			{

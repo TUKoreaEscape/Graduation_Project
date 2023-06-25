@@ -2,7 +2,7 @@
 
 void cGameServer::Process_Move_Test(const int user_id, void* buff)
 {
-	//auto start_time = chrono::high_resolution_clock::now();
+	auto start_time = chrono::steady_clock::now();
 	cs_packet_move_test* packet = reinterpret_cast<cs_packet_move_test*>(buff);
 	m_clients[user_id].set_user_velocity(packet->velocity);
 	m_clients[user_id].set_user_yaw(packet->yaw);
@@ -22,52 +22,60 @@ void cGameServer::Process_Move_Test(const int user_id, void* buff)
 	if (m_clients[user_id].get_user_position().y < 0)
 		calculate_player_position.y = 0;
 
+	if (m_clients[user_id].get_join_room_number() >= 0) {
+		CollisionInfo player_check = join_room.is_collision_player_to_player(user_id, current_player_position, current_shift);
+		if (player_check.is_collision)
+		{
+			calculate_player_position = Add(current_player_position, player_check.SlidingVector);
+			if (m_clients[user_id].get_user_position().y < 0)
+				calculate_player_position.y = 0;
+			current_shift = player_check.SlidingVector;
+			if (player_check.collision_face_num == 4)
+				collision_up_face = true;
+		}
 
-	CollisionInfo player_check = join_room.is_collision_player_to_player(user_id, current_player_position, current_shift);
-	if (player_check.is_collision)
-	{
-		calculate_player_position = Add(current_player_position, player_check.SlidingVector);
-		if (m_clients[user_id].get_user_position().y < 0)
-			calculate_player_position.y = 0;
-		current_shift = player_check.SlidingVector;
-		if (player_check.collision_face_num == 4)
-			collision_up_face = true;
+		CollisionInfo wall_check = join_room.is_collision_wall_to_player(user_id, current_player_position, current_shift);
+		if (wall_check.is_collision)
+		{
+			calculate_player_position = Add(current_player_position, wall_check.SlidingVector);
+			if (m_clients[user_id].get_user_position().y < 0)
+				calculate_player_position.y = 0;
+			current_shift = wall_check.SlidingVector;
+			if (wall_check.collision_face_num == 4)
+				collision_up_face = true;
+		}
+
+		CollisionInfo fix_object_check = join_room.is_collision_fix_object_to_player(user_id, current_player_position, current_shift);
+		if (fix_object_check.is_collision)
+		{
+			calculate_player_position = Add(current_player_position, fix_object_check.SlidingVector);
+			if (m_clients[user_id].get_user_position().y < 0)
+				calculate_player_position.y = 0;
+			current_shift = fix_object_check.SlidingVector;
+			if (fix_object_check.collision_face_num == 4)
+				collision_up_face = true;
+		}
+
+		CollisionInfo door_check = join_room.is_collision_player_to_door(user_id, current_player_position, current_shift);
+		if (door_check.is_collision)
+		{
+			calculate_player_position = Add(current_player_position, door_check.SlidingVector);
+			if (m_clients[user_id].get_user_position().y < 0)
+				calculate_player_position.y = 0;
+			current_shift = door_check.SlidingVector;
+			if (door_check.collision_face_num == 4)
+				collision_up_face = true;
+		}
+
+		CollisionInfo object_check = join_room.is_collision_player_to_object(user_id, current_player_position, current_shift);
+		if (object_check.is_collision)
+		{
+			// 이쪽은 오브젝트와 충돌한것을 처리하는 부분입니다.
+			if (object_check.collision_face_num == 4)
+				collision_up_face = true;
+		}
 	}
 
-	CollisionInfo wall_check = join_room.is_collision_wall_to_player(user_id, current_player_position, current_shift);
-	if (wall_check.is_collision)
-	{
-		calculate_player_position = Add(current_player_position, wall_check.SlidingVector);
-		if (m_clients[user_id].get_user_position().y < 0)
-			calculate_player_position.y = 0;
-		current_shift = wall_check.SlidingVector;
-		if (wall_check.collision_face_num == 4)
-			collision_up_face = true;
-	}
-
-	CollisionInfo door_check = join_room.is_collision_player_to_door(user_id, current_player_position, current_shift);
-	if (door_check.is_collision)
-	{
-		//calculate_player_position = current_player_position;
-		calculate_player_position = Add(current_player_position, door_check.SlidingVector);
-		//m_clients[user_id].set_user_position(calculate_player_position);
-		//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
-		if (m_clients[user_id].get_user_position().y < 0)
-			calculate_player_position.y = 0;
-		current_shift = door_check.SlidingVector;
-		if (door_check.collision_face_num == 4)
-			collision_up_face = true;
-	}
-
-	CollisionInfo object_check = join_room.is_collision_player_to_object(user_id, current_player_position, current_shift);
-	if (object_check.is_collision)
-	{
-		// 이쪽은 오브젝트와 충돌한것을 처리하는 부분입니다.
-		if (object_check.collision_face_num == 4)
-			collision_up_face = true;
-	}
-
-	//m_clients[user_id]._pos_lock.unlock();
 	m_clients[user_id].set_user_position(calculate_player_position);
 	m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 	m_clients[user_id].set_collied_up_face(collision_up_face);
@@ -100,7 +108,7 @@ void cGameServer::Process_Move_Test(const int user_id, void* buff)
 	}
 	else
 		m_clients[user_id].m_befor_send_move = false;
+	auto end_time = chrono::steady_clock::now();
 
-	//auto end_time = chrono::high_resolution_clock::now();
-	//cout << chrono::duration_cast<chrono::microseconds>(end_time - start_time).count() << "ms" << endl;
+	//cout << chrono::duration_cast<chrono::milliseconds>(end_time - start_time).count() << "ms" << endl;
 }

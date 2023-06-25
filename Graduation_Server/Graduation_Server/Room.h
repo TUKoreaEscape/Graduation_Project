@@ -24,7 +24,8 @@ private:
 public:
 	array<BoundingOrientedBox, 6>	in_player_bounding_box;
 	vector<GameObject>				m_game_object;
-	vector<GameObject>				m_game_wall_and_fix_object;
+	vector<GameObject>				m_game_fix_object;
+	vector<GameObject>				m_game_wall;
 	vector<Door>					m_door_object;
 	vector<ElectronicSystem>		m_electrinic_system;
 	vector<GameItem>				m_fix_item;
@@ -72,6 +73,8 @@ public:
 	void	add_game_walls(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents);
 	void	add_game_doors(const unsigned int door_id, Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents);
 	void	add_game_ElectronicSystem(const unsigned int id, Object_Type ob_type, XMFLOAT3& center, XMFLOAT3& extents);
+	void	add_fix_objects(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents);
+
 	void	Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE room_state);
 	void	SetReady(const bool is_ready, const int user_id);
 	void	SetLoading(const bool is_loading, const int user_id);
@@ -96,7 +99,7 @@ public:
 
 public: // 인게임 아이템관련 함수
 	bool	Pick_Item(const int item_type);
-	bool	Is_near(XMFLOAT3 player_pos, XMFLOAT3 object_pos);
+	bool	Is_near(XMFLOAT3 player_pos, XMFLOAT3 object_pos, int range);
 private:
 
 public:
@@ -114,6 +117,7 @@ public:
 
 	CollisionInfo	is_collision_wall_to_player(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
 	CollisionInfo	is_collision_player_to_player(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
+	CollisionInfo	is_collision_fix_object_to_player(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
 	CollisionInfo	is_collision_player_to_object(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
 	CollisionInfo	is_collision_player_to_door(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
 

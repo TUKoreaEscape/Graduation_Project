@@ -24,7 +24,7 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	// 여긴 맵에 존재하는 벽, 고정된 오브젝트의 충돌 정보를 서버에 로드하는 공간입니다.
 //======================= Fixed and Wall Object Read =======================
 	FILE* pFile = nullptr;
-	fopen_s(&pFile, "walls/FixedObjectsBounding0619.bin", "rb");
+	fopen_s(&pFile, "walls/FixedObjectsBounding0625.bin", "rb");
 	if (pFile)
 		rewind(pFile);
 
@@ -35,6 +35,33 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	char pstrGameObjectName[64] = { '\0' };
 	nReads = (unsigned int)fread(&nObjects, sizeof(int), 1, pFile);
 	system("cls");
+	for (int i = 0; i < nObjects; ++i)
+	{
+		cout << "Walls BoundingBox : " << static_cast<int>((float)i / (float)nObjects * 100) << "%로드 완료\r";
+		nReads = (unsigned int)fread(&nStrLength, sizeof(unsigned char), 1, pFile);
+		nReads = (unsigned int)fread(&pstrToken, sizeof(char), nStrLength, pFile); // <Wall>:
+		nReads = (unsigned int)fread(&nStrLength, sizeof(unsigned char), 1, pFile);
+		nReads = (unsigned int)fread(&pstrGameObjectName, sizeof(char), nStrLength, pFile);
+
+		pstrGameObjectName[nStrLength] = '\0';
+
+		float AABBCenter[3]{};
+		float AABBExtents[3]{};
+		float AABBQuats[4]{};
+
+		nReads = (unsigned int)fread(&nStrLength, sizeof(unsigned char), 1, pFile);
+		nReads = (unsigned int)fread(pstrToken, sizeof(char), nStrLength, pFile); //"<BoundingBox>:"
+		nReads = (unsigned int)fread(AABBCenter, sizeof(float), 3, pFile);
+		nReads = (unsigned int)fread(AABBExtents, sizeof(float), 3, pFile);
+		nReads = (unsigned int)fread(AABBQuats, sizeof(float), 4, pFile);
+		//cout << "Object - " << i + 1 << " - " << pstrGameObjectName << " Center - (" << AABBCenter[0] << ", " << AABBCenter[1] << ", " << AABBCenter[2] << "), Extents - (" << AABBExtents[0] << ", " << AABBExtents[1] << ", " << AABBExtents[2] << ")" << endl;
+		for (auto& _room : a_in_game_room) {
+			_room.add_game_walls(Object_Type::OB_WALL, XMFLOAT3(AABBCenter[0], AABBCenter[1], AABBCenter[2]), XMFLOAT3(AABBExtents[0], AABBExtents[1], AABBExtents[2]));
+		}
+	}
+	cout << "Walls and Fixed Object File Load Success!" << endl;
+
+	nReads = (unsigned int)fread(&nObjects, sizeof(int), 1, pFile);
 	for (int i = 0; i < nObjects; ++i)
 	{
 		cout << "FixedObjects BoundingBox : " << static_cast<int>((float)i / (float)nObjects * 100) << "%로드 완료\r";
@@ -54,12 +81,11 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 		nReads = (unsigned int)fread(AABBCenter, sizeof(float), 3, pFile);
 		nReads = (unsigned int)fread(AABBExtents, sizeof(float), 3, pFile);
 		nReads = (unsigned int)fread(AABBQuats, sizeof(float), 4, pFile);
-		cout << "Object - " << i + 1 << " - " << pstrGameObjectName << " Center - (" << AABBCenter[0] << ", " << AABBCenter[1] << ", " << AABBCenter[2] << "), Extents - (" << AABBExtents[0] << ", " << AABBExtents[1] << ", " << AABBExtents[2] << ")" << endl;
+		//cout << "Object - " << i + 1 << " - " << pstrGameObjectName << " Center - (" << AABBCenter[0] << ", " << AABBCenter[1] << ", " << AABBCenter[2] << "), Extents - (" << AABBExtents[0] << ", " << AABBExtents[1] << ", " << AABBExtents[2] << ")" << endl;
 		for (auto& _room : a_in_game_room) {
-			_room.add_game_walls(Object_Type::OB_WALL, XMFLOAT3(AABBCenter[0], AABBCenter[1], AABBCenter[2]), XMFLOAT3(AABBExtents[0], AABBExtents[1], AABBExtents[2]));
+			_room.add_fix_objects(Object_Type::OB_FIX, XMFLOAT3(AABBCenter[0], AABBCenter[1], AABBCenter[2]), XMFLOAT3(AABBExtents[0], AABBExtents[1], AABBExtents[2]));
 		}
 	}
-	cout << "Walls and Fixed Object File Load Success!" << endl;
 
 
 

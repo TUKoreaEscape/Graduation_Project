@@ -119,6 +119,8 @@ void cGameServer::WorkerThread()
 		case OP_TYPE::OP_RECV:
 			if (num_byte == 0)
 				Disconnect(client_id);
+			if (num_byte > 400)
+				Disconnect(client_id);
 			Recv(exp_over, client_id, num_byte);
 			break;
 
