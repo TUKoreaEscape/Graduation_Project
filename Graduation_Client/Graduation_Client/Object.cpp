@@ -86,6 +86,60 @@ void Vent::Rotate(float fPitch, float fYaw, float fRoll)
 	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
 
 	UpdateTransform(NULL);
+
+	IsRot = true;
+}
+
+void Vent::SetOpen(bool open)
+{
+	if (open) {
+		if (IsOpen) return;
+
+		if (IsRot) {
+			m_xmf4x4ToParent._41 -= 1.9f;
+			m_xmf4x4ToParent._43 += 1.9f;
+			XMMATRIX mtxRotate = XMMatrixRotationY(90);
+			m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
+			m_xmf4x4ToParent._41 += 1.9f;
+			m_xmf4x4ToParent._43 -= 1.9f;
+
+			UpdateTransform(NULL);
+		}
+		else {
+			m_xmf4x4ToParent._41 -= 1.9f;
+			m_xmf4x4ToParent._43 -= 1.9f;
+			XMMATRIX mtxRotate = XMMatrixRotationY(90);
+			m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
+			m_xmf4x4ToParent._41 += 1.9f;
+			m_xmf4x4ToParent._43 += 1.9f;
+
+			UpdateTransform(NULL);
+		}
+	}
+	else {
+		if (IsOpen == false) return;
+
+		if (IsRot) {
+			m_xmf4x4ToParent._41 -= 1.9f;
+			m_xmf4x4ToParent._43 += 1.9f;
+			XMMATRIX mtxRotate = XMMatrixRotationY(-90);
+			m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
+			m_xmf4x4ToParent._41 += 1.9f;
+			m_xmf4x4ToParent._43 -= 1.9f;
+
+			UpdateTransform(NULL);
+		}
+		else {
+			m_xmf4x4ToParent._41 -= 1.9f;
+			m_xmf4x4ToParent._43 -= 1.9f;
+			XMMATRIX mtxRotate = XMMatrixRotationY(-90);
+			m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
+			m_xmf4x4ToParent._41 += 1.9f;
+			m_xmf4x4ToParent._43 += 1.9f;
+
+			UpdateTransform(NULL);
+		}
+	}
 }
 
 bool Vent::IsPlayerNear(const XMFLOAT3& PlayerPos)
@@ -95,9 +149,14 @@ bool Vent::IsPlayerNear(const XMFLOAT3& PlayerPos)
 
 void Vent::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	GameObject::render(pd3dCommandList);
 }
 
 void Vent::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void Vent::Move(float fxOffset, float fyOffset, float fzOffset)
 {
 }
 

@@ -820,6 +820,7 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	Vents[7]->SetPosition(XMFLOAT3(35.96133, 1.0061, 23.56689));
 	for (int i = 0; i < NUM_VENT; ++i) {
 		Vents[i]->UpdateTransform(nullptr);
+		Vents[i]->SetOpen(true);
 	}
 
 	if (pVentModel) delete pVentModel;
