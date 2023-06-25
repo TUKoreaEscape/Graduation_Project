@@ -30,7 +30,7 @@ const static int MAX_BUFF_SIZE = 255;
 #include "protocol.h"
 
 HANDLE g_hiocp;
-
+int		test_num = 0;
 enum OPTYPE { OP_SEND, OP_RECV, OP_DO_MOVE };
 
 high_resolution_clock::time_point last_connect_time;
@@ -122,6 +122,8 @@ void SendPacket(int cl, void* packet)
 	// std::cout << "Send Packet [" << ptype << "] To Client : " << cl << std::endl;
 }
 
+int room_value = 1000;
+
 void ProcessPacket(int ci, unsigned char packet[])
 {
 	switch (packet[1]) {
@@ -132,7 +134,7 @@ void ProcessPacket(int ci, unsigned char packet[])
 			cs_packet_create_room create_packet;
 			create_packet.size = sizeof(packet);
 			create_packet.type = CS_PACKET::CS_PACKET_CREATE_ROOM;
-			create_packet.room_number = ci / 6;
+			create_packet.room_number = ci / 6 + room_value * (test_num - 1);
 			SendPacket(ci, &create_packet);
 		}
 		else
@@ -140,7 +142,7 @@ void ProcessPacket(int ci, unsigned char packet[])
 			cs_packet_join_room create_packet;
 			create_packet.size = sizeof(create_packet);
 			create_packet.type = CS_PACKET::CS_PACKET_JOIN_ROOM;
-			create_packet.room_number = ci / 6;
+			create_packet.room_number = ci / 6 + room_value * (test_num - 1);
 			SendPacket(ci, &create_packet);
 		}
 		break;
@@ -388,6 +390,8 @@ void InitializeNetwork()
 		cl.connected = false;
 		cl.id = INVALID_ID;
 	}
+	cout << "동접테스트기 번호를 입력(1 ~ 3) : ";
+	cin >> test_num;
 
 	for (auto& cl : client_map) cl = -1;
 	num_connections = 0;
@@ -398,10 +402,16 @@ void InitializeNetwork()
 
 	g_hiocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, NULL, 0);
 
+
+
+	system("cls");
+	cout << "동접 테스트기를 시작합니다." << endl;
 	for (int i = 0; i < 4; ++i)
 		worker_threads.push_back(new std::thread{ Worker_Thread });
+	cout << "Worker_Thread Start!!! (4 threads)" << endl;
 
 	test_thread = thread{ Test_Thread };
+	cout << "Test_Thread Start!!!" << endl;
 }
 
 void ShutdownNetwork()

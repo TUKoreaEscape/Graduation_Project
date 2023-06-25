@@ -5,7 +5,6 @@ void cGameServer::Timer()
 	TIMER_EVENT ev{};
 
 	std::priority_queue<TIMER_EVENT> timer_queue;
-	std::priority_queue<TIMER_EVENT> timer_queue_pos_update;
 
 	while (true)
 	{
@@ -16,14 +15,6 @@ void cGameServer::Timer()
 			if (timer_queue.top().event_time <= current_time) {
 				ev = timer_queue.top();
 				timer_queue.pop();
-				Process_Event(ev);
-			}
-		}
-
-		if (!timer_queue_pos_update.empty()) {
-			if (timer_queue_pos_update.top().event_time <= current_time) {
-				ev = timer_queue_pos_update.top();
-				timer_queue_pos_update.pop();
 				Process_Event(ev);
 			}
 		}
@@ -41,11 +32,6 @@ void cGameServer::Timer()
 					//m_room_manager->Get_Room_Info(ev.room_number)->_room_state_lock.lock();
 					if (m_room_manager->Get_Room_Info(ev.room_number)->_room_state == GAME_ROOM_STATE::PLAYING || m_room_manager->Get_Room_Info(ev.room_number)->_room_state == GAME_ROOM_STATE::READY)
 					{
-						if (ev.event_type == EventType::UPDATE_MOVE) {
-							timer_queue_pos_update.push(ev);
-							std::this_thread::sleep_for(4ms);
-							continue;
-						}
 						timer_queue.push(ev);
 						std::this_thread::sleep_for(4ms);
 						continue;
