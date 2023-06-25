@@ -34,6 +34,10 @@ private:
 	unsigned char			m_input_key{};
 	BoundingOrientedBox		m_bounding_box{};
 
+public:
+	bool					m_is_stresstest_npc = false;
+	bool					m_befor_send_move = false;
+
 private:
 	bool					m_first_skill_able = false;
 	bool					m_second_skill_able = false;

@@ -140,6 +140,7 @@
     <ClCompile Include="Room_Manager.cpp" />
     <ClCompile Include="Room_Update_Session.cpp" />
     <ClCompile Include="Server_ProcessPacket.cpp" />
+    <ClCompile Include="Server_ProcessPacket_StressTest.cpp" />
     <ClCompile Include="Server_SendPacket.cpp" />
     <ClCompile Include="Server_Timer.cpp" />
     <ClCompile Include="Update_Func.cpp" />

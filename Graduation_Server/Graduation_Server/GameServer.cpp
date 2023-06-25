@@ -54,7 +54,14 @@ void cGameServer::StartServer()
 		m_event_thread.emplace_back(std::thread(&cGameServer::Timer, this));
 	std::cout << "Server Event_Thread Working! (1 threads) \n";
 	std::cout << "Server Start!!! \n\n";
-	cout << "Number of users accessing the server : " << join_member << "\r";
+	cout << "Number of users accessing the server : " << join_member << "             " << "\r";
+
+	TIMER_EVENT ev;
+	ev.event_type = EventType::CHECK_NUM_OF_SERVER_ACCEPT_USER;
+	ev.event_time = chrono::system_clock::now() + 5s;
+
+	m_timer_queue.push(ev);
+
 	for (auto& worker : m_worker_threads)
 		worker.join();
 	
@@ -131,18 +138,19 @@ void cGameServer::WorkerThread()
 		case OP_TYPE::OP_UPDATE_PLAYER_MOVE:
 		{
 			Update_OtherPlayer(iocp_key, SET_SERVER_UPDATE_FRAME);
-
-			m_room_manager->Get_Room_Info(iocp_key)->_room_state_lock.lock();
+			cout << "ÀÌ°Åµé¾î¿È" << endl;
+			//m_room_manager->Get_Room_Info(iocp_key)->_room_state_lock.lock();
 			if (m_room_manager->Get_Room_Info(iocp_key)->_room_state == GAME_ROOM_STATE::PLAYING || m_room_manager->Get_Room_Info(iocp_key)->_room_state == GAME_ROOM_STATE::READY)
 			{
 				TIMER_EVENT ev;
 				ev.room_number = iocp_key;
 				ev.cool_time = (float)((float)1 / SET_SERVER_UPDATE_FRAME);
-				ev.event_time = chrono::system_clock::now() + static_cast<std::chrono::seconds>(1 / SET_SERVER_UPDATE_FRAME);
+				float next_set = 1 / SET_SERVER_UPDATE_FRAME;
+				ev.event_time = chrono::system_clock::now() + 33ms;
 				ev.event_type = EventType::UPDATE_MOVE;
 				m_timer_queue.push(ev);
 			}
-			m_room_manager->Get_Room_Info(iocp_key)->_room_state_lock.unlock();
+			//m_room_manager->Get_Room_Info(iocp_key)->_room_state_lock.unlock();
 			delete exp_over;
 			break;
 		}
@@ -162,6 +170,12 @@ void cGameServer::WorkerThread()
 			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
 				m_clients[rl.in_player[i]].do_send(sizeof(packet), &packet);
 			delete exp_over;
+
+			TIMER_EVENT next_ev;
+			next_ev.room_number = iocp_key;
+			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(FIRST_SKILL_ENABLE_TIME);
+			next_ev.event_type = EventType::OPEN_TAGGER_SKILL_FIRST;
+			m_timer_queue.push(next_ev);
 			break;
 		}
 
@@ -179,6 +193,12 @@ void cGameServer::WorkerThread()
 
 			m_clients[rl.Get_Tagger_ID()].do_send(sizeof(packet), &packet);
 			delete exp_over;
+
+			TIMER_EVENT next_ev;
+			next_ev.room_number = iocp_key;
+			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(SECOND_SKILL_ENABLE_TIME);
+			next_ev.event_type = EventType::OPEN_TAGGER_SKILL_SECOND;
+			m_timer_queue.push(next_ev);
 			break;
 		}
 
@@ -196,6 +216,13 @@ void cGameServer::WorkerThread()
 
 			m_clients[rl.Get_Tagger_ID()].do_send(sizeof(packet), &packet);
 			delete exp_over;
+
+
+			TIMER_EVENT next_ev;
+			next_ev.room_number = iocp_key;
+			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(THIRD_SKILL_ENABLE_TIME);
+			next_ev.event_type = EventType::OPEN_TAGGER_SKILL_THIRD;
+			m_timer_queue.push(next_ev);
 			break;
 		}
 
@@ -257,7 +284,7 @@ void cGameServer::Accept(EXP_OVER* exp_over)
 #if DEBUG
 		//cout << "Accept Client! new_id : " << new_id << endl;
 		join_member++;
-		cout << "Number of users accessing the server : " << join_member << "\r";
+		cout << "Number of users accessing the server : " << join_member << "              " << "\r";
 #endif
 		SOCKET c_socket = *(reinterpret_cast<SOCKET*>(exp_over->m_buf));
 		m_clients[new_id]._socket = c_socket;
@@ -312,11 +339,14 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 
 	string cl_name{};
 
-	char client_name[20];
-	cl.get_client_name(*client_name, sizeof(client_name));
-	cl_name = client_name;
+	if (!cl.m_is_stresstest_npc)
+	{
+		char client_name[20];
+		cl.get_client_name(*client_name, sizeof(client_name));
+		cl_name = client_name;
+	}
 
-	if (!cl_name.empty()) {
+	if (!cl_name.empty() && cl.m_is_stresstest_npc != true) {
 		wstring convertID = stringToWstring(cl_name);
 		Custom custom_data;
 		custom_data.body = cl.m_customizing->Get_Body_Custom();
@@ -338,17 +368,20 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 	if (cl.get_join_room_number() != -1) {
 		int disconnect_room_number = cl.get_join_room_number();
 		Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
+		rl.in_player_lock.lock();
 		for (int i = 0; i < 6; ++i)
 		{
 			if (rl.Get_Join_Member(i) != _user_id && rl.Get_Join_Member(i) != -1)
 			{
 				int rl_id = rl.Get_Join_Member(i);
 				m_clients[rl_id]._room_list_lock.lock();
-				m_clients[rl_id].room_list.erase(m_clients[rl_id].room_list.find(_user_id));
+				if(m_clients[rl_id].room_list.size() != 0)
+					m_clients[rl_id].room_list.erase(m_clients[rl_id].room_list.find(_user_id));
 				m_clients[rl_id]._room_list_lock.unlock();
 			}
 		}
 		rl.Exit_Player(_user_id);
+		rl.in_player_lock.unlock();
 
 		sc_packet_update_room update_room_packet;
 		update_room_packet.size = sizeof(update_room_packet);
@@ -377,12 +410,15 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_OTHER_PLAYER_DISCONNECT;
 	packet.id = _user_id;
+	cl._room_list_lock.lock();
 	for (auto p : cl.room_list)
 	{
-		m_clients[p].do_send(sizeof(packet), &packet);
+		//m_clients[p]._state_lock.lock();
+		if(m_clients[p].get_state() == CLIENT_STATE::ST_GAMEROOM || m_clients[p].get_state() == CLIENT_STATE::ST_INGAME)
+			m_clients[p].do_send(sizeof(packet), &packet);
+		//m_clients[p]._state_lock.unlock();
 	}
 	//==============================================================
-	cl._room_list_lock.lock();
 	cl.room_list.clear();
 	cl._room_list_lock.unlock();
 	cl.set_user_position({ 0,5,0 });
@@ -416,14 +452,13 @@ int cGameServer::get_new_id()
 {
 	for (int i = 0; i < MAX_USER; ++i)
 	{
-		m_clients[i]._state_lock.lock();
 		if (CLIENT_STATE::ST_FREE == m_clients[i].get_state())
 		{
+			m_clients[i]._state_lock.lock();
 			m_clients[i].set_state(CLIENT_STATE::ST_ACCEPT);
 			m_clients[i]._state_lock.unlock();
 			return i;
 		}
-		m_clients[i]._state_lock.unlock();
 	}
 
 	std::cout << "Maximum Number of Clients Overflow! \n";
@@ -540,14 +575,23 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		m_clients[user_id].m_customizing->Set_Eyes_Custom(static_cast<EYES>(0));
 		m_clients[user_id].m_customizing->Set_Gloves_Custom(static_cast<GLOVES>(0));
 		m_clients[user_id].m_customizing->Set_Mouthandnoses_Custom(static_cast<MOUTHANDNOSES>(0));
+		m_clients[user_id].m_is_stresstest_npc = true;
 		send_login_ok_packet(user_id);
 		break;
 	}
 
 	case CS_PACKET::CS_PACKET_MOVE:
 	{
-		if(m_clients[user_id].get_login_state() == Y_LOGIN && m_clients[user_id].get_join_room_number() != -1)
-			Process_Move(user_id, p);
+		if (m_clients[user_id].get_login_state() == Y_LOGIN && m_clients[user_id].get_join_room_number() != -1)
+		{
+			if (!m_clients[user_id].m_is_stresstest_npc)
+				Process_Move(user_id, p);
+			else
+				Process_Move_Test(user_id, p);
+		}
+
+		else if (m_clients[user_id].m_is_stresstest_npc)
+			Process_Move_Test(user_id, p);
 		break;
 	}
 

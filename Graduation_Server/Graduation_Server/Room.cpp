@@ -23,12 +23,12 @@ void Room::Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE r
 
 	cGameServer& server = *cGameServer::GetInstance();
 
-	TIMER_EVENT ev;
-	ev.room_number = room_number;
-	ev.event_type = EventType::UPDATE_MOVE;
-	ev.cool_time = (float)((float)1 / SET_SERVER_UPDATE_FRAME);
-	ev.event_time = chrono::system_clock::now();
-	server.m_timer_queue.push(ev);
+	//TIMER_EVENT ev;
+	//ev.room_number = room_number;
+	//ev.event_type = EventType::UPDATE_MOVE;
+	//ev.cool_time = (float)((float)1 / SET_SERVER_UPDATE_FRAME);
+	//ev.event_time = chrono::system_clock::now();
+	//server.m_timer_queue.push(ev);
 }
 
 bool Room::Join_Player(int user_id)
@@ -113,13 +113,12 @@ void Room::SetReady(const bool is_ready, const int user_id)
 {
 	for (int i = 0; i < in_player.size(); ++i)
 	{
-		in_player_lock.lock();
 		if (in_player[i] == user_id) {
+			in_player_lock.lock();
 			in_player_ready[i] = is_ready;
 			in_player_lock.unlock();
 			break;
 		}
-		in_player_lock.unlock();
 	}
 }
 
@@ -127,13 +126,12 @@ void Room::SetLoading(const bool is_loading, const int user_id)
 {
 	for (int i = 0; i < in_player_loading_success.size(); ++i)
 	{
-		in_player_lock.lock();
 		if (in_player[i] == user_id) {
+			in_player_lock.lock();
 			in_player_loading_success[i] = is_loading;
 			in_player_lock.unlock();
 			break;
 		}
-		in_player_lock.unlock();
 	}
 }
 

@@ -23,6 +23,76 @@ void Network::Process_Player_Move(char* ptr)
 	pos_lock.unlock();
 }
 
+void Network::Process_Other_Move(char* ptr)
+{
+	sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(ptr);
+
+	for (int i = 0; i < 5; ++i)
+	{
+		if (packet->data.id != m_ppOther[i]->GetID())
+			continue;
+		XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->data.position.x) / 10000.f, static_cast<float>(packet->data.position.y) / 10000.f, static_cast<float>(packet->data.position.z) / 10000.f);
+		XMFLOAT3 conversion_look = XMFLOAT3(static_cast<float>(packet->data.look.x) / 100.f, static_cast<float>(packet->data.look.y) / 100.f, static_cast<float>(packet->data.look.z) / 100.f);
+		XMFLOAT3 conversion_right = XMFLOAT3(static_cast<float>(packet->data.right.x) / 100.f, static_cast<float>(packet->data.right.y) / 100.f, static_cast<float>(packet->data.right.z) / 100.f);
+
+		Other_Player_Pos[i].pos_lock.lock();
+		Other_Player_Pos[i].Other_Pos = conversion_position;
+		m_ppOther[i]->SetIsColledUpFace(packet->data.is_collision_up_face);
+		Other_Player_Pos[i].pos_lock.unlock();
+		m_ppOther[i]->m_xmf3Look = conversion_look;
+		m_ppOther[i]->m_xmf3Right = conversion_right;
+		if (packet->data.input_key == DIR_FORWARD)
+		{
+			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_ppOther[i]->SetTrackAnimationSet(0, 1);
+		}
+		if (packet->data.input_key == DIR_BACKWARD)
+		{
+			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_ppOther[i]->SetTrackAnimationSet(0, 2);
+		}
+		if (packet->data.input_key == DIR_LEFT)
+		{
+			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_ppOther[i]->SetTrackAnimationSet(0, 3);
+		}
+		if (packet->data.input_key == DIR_RIGHT)
+		{
+			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_ppOther[i]->SetTrackAnimationSet(0, 4);
+		}
+		if (packet->data.input_key == DIR_UP)
+		{
+			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_ppOther[i]->SetTrackAnimationSet(0, 5);
+		}
+
+		if (packet->data.input_key == DIR_EMPTY)
+		{
+			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_ppOther[i]->SetTrackAnimationSet(0, 0);
+		}
+
+		if (packet->data.is_jump == true)
+		{
+			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_ppOther[i]->SetTrackAnimationSet(0, 6);
+		}
+
+		if (packet->data.is_victim == true)
+		{
+			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_ppOther[i]->SetTrackAnimationSet(0, 8);
+		}
+
+		if (packet->data.is_attack == true)
+		{
+			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_ppOther[i]->SetTrackAnimationSet(0, 7);
+		}
+	}
+}
+
 void Network::Process_Other_Player_Move(char* ptr)
 {
 	sc_other_player_move* packet = reinterpret_cast<sc_other_player_move*>(ptr);

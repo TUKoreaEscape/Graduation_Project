@@ -40,14 +40,14 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	XMFLOAT3 calculate_player_position = Add(current_player_position, current_shift);
 	bool collision_up_face = false;
 
-	m_clients[user_id]._pos_lock.lock();
-	m_clients[user_id].set_user_position(calculate_player_position);
-	m_clients[user_id].update_bounding_box_pos(calculate_player_position);
+	//m_clients[user_id]._pos_lock.lock();
+	//m_clients[user_id].set_user_position(calculate_player_position);
+	//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 	if (m_clients[user_id].get_user_position().y < 0)
 	{
 		calculate_player_position.y = 0;
-		m_clients[user_id].set_user_position(calculate_player_position);
-		m_clients[user_id].update_bounding_box_pos(calculate_player_position);
+		//m_clients[user_id].set_user_position(calculate_player_position);
+		//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 	}
 	//cout << "적용전 캐릭터 좌표 : " << m_clients[user_id].get_user_position().x << ", " << m_clients[user_id].get_user_position().y << ", " << m_clients[user_id].get_user_position().z << endl;
 
@@ -56,34 +56,34 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 		if (player_check.is_collision)
 		{
 			//cout << "슬라이딩벡터 : " << player_check.SlidingVector.x << ", " << player_check.SlidingVector.y << ", " << player_check.SlidingVector.z << endl;
-			calculate_player_position = current_player_position;
+			//calculate_player_position = current_player_position;
 			calculate_player_position = Add(current_player_position, player_check.SlidingVector);
-			m_clients[user_id].set_user_position(calculate_player_position);
-			m_clients[user_id].update_bounding_box_pos(calculate_player_position);
+			//m_clients[user_id].set_user_position(calculate_player_position);
+			//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 			if (m_clients[user_id].get_user_position().y < 0)
 			{
 				calculate_player_position.y = 0;
-				m_clients[user_id].set_user_position(calculate_player_position);
-				m_clients[user_id].update_bounding_box_pos(calculate_player_position);
+				//m_clients[user_id].set_user_position(calculate_player_position);
+				//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 			}
 			current_shift = player_check.SlidingVector;
 			if (player_check.collision_face_num == 4)
 				collision_up_face = true;
 			//cout << "적용후 캐릭터 좌표 : " << m_clients[user_id].get_user_position().x << ", " << m_clients[user_id].get_user_position().y << ", " << m_clients[user_id].get_user_position().z << endl;
 		}
-		
+
 		CollisionInfo wall_check = join_room.is_collision_wall_to_player(user_id, current_player_position, current_shift);
 		if (wall_check.is_collision)
 		{
-			calculate_player_position = current_player_position;
+			//calculate_player_position = current_player_position;
 			calculate_player_position = Add(current_player_position, wall_check.SlidingVector);
-			m_clients[user_id].set_user_position(calculate_player_position);
-			m_clients[user_id].update_bounding_box_pos(calculate_player_position);
+			//m_clients[user_id].set_user_position(calculate_player_position);
+			//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 			if (m_clients[user_id].get_user_position().y < 0)
 			{
 				calculate_player_position.y = 0;
-				m_clients[user_id].set_user_position(calculate_player_position);
-				m_clients[user_id].update_bounding_box_pos(calculate_player_position);
+				//m_clients[user_id].set_user_position(calculate_player_position);
+				//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 			}
 			current_shift = wall_check.SlidingVector;
 			if (wall_check.collision_face_num == 4)
@@ -93,15 +93,15 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 		CollisionInfo door_check = join_room.is_collision_player_to_door(user_id, current_player_position, current_shift);
 		if (door_check.is_collision)
 		{
-			calculate_player_position = current_player_position;
+			//calculate_player_position = current_player_position;
 			calculate_player_position = Add(current_player_position, door_check.SlidingVector);
-			m_clients[user_id].set_user_position(calculate_player_position);
-			m_clients[user_id].update_bounding_box_pos(calculate_player_position);
+			//m_clients[user_id].set_user_position(calculate_player_position);
+			//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 			if (m_clients[user_id].get_user_position().y < 0)
 			{
 				calculate_player_position.y = 0;
-				m_clients[user_id].set_user_position(calculate_player_position);
-				m_clients[user_id].update_bounding_box_pos(calculate_player_position);
+				//[user_id].set_user_position(calculate_player_position);
+				//m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 			}
 			current_shift = door_check.SlidingVector;
 			if (door_check.collision_face_num == 4)
@@ -116,13 +116,27 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 				collision_up_face = true;
 		}
 	}
-	m_clients[user_id]._pos_lock.unlock();
+	//m_clients[user_id]._pos_lock.unlock();
+	m_clients[user_id].set_user_position(calculate_player_position);
+	m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 	m_clients[user_id].set_collied_up_face(collision_up_face);
-	send_calculate_move_packet(user_id); // -> 이동에 대한걸 처리하여 클라에게 보내줌
-	//auto end_time = chrono::high_resolution_clock::now();
 
-	
-	//cout << "이동처리 걸린 시간 : " << std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() << "us" << endl;
+	send_calculate_move_packet(user_id); // -> 이동에 대한걸 처리하여 클라에게 보내줌
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+	if (m_clients[user_id].m_befor_send_move == false)
+	{
+		m_clients[user_id].m_befor_send_move = true;
+		for (auto p : room.in_player)
+		{
+			if (p == user_id)
+				continue;
+			if (p == -1)
+				continue;
+			send_move_packet(p, user_id);
+		}
+	}
+	else
+		m_clients[user_id].m_befor_send_move = false;
 }
 
 void cGameServer::Process_Chat(const int user_id, void* buff)
@@ -149,9 +163,9 @@ void cGameServer::Process_Create_Room(const unsigned int _user_id, void* buff) /
 	cs_packet_create_room* packet = reinterpret_cast<cs_packet_create_room*>(buff);
 
 	m_clients[_user_id].set_join_room_number(m_room_manager->Create_room(_user_id, packet->room_number));
-	m_clients[_user_id]._state_lock.lock();
+	//m_clients[_user_id]._state_lock.lock();
 	m_clients[_user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
-	m_clients[_user_id]._state_lock.unlock();
+	//m_clients[_user_id]._state_lock.unlock();
 	send_create_room_ok_packet(_user_id, m_clients[_user_id].get_join_room_number());
 	send_put_player_data(_user_id);
 	m_clients[_user_id].set_bounding_box(m_clients[_user_id].get_user_position(), XMFLOAT3(0.7f, 1.f, 0.7f), XMFLOAT4(0, 0, 0, 1));
@@ -192,17 +206,16 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 			send_put_player_data(user_id);
 			Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
+			m_clients[user_id]._room_list_lock.lock();
 			for (int i = 0; i < 6; ++i)
 			{
 				if (room.Get_Join_Member(i) != -1 && room.Get_Join_Member(i) != user_id)
 				{
-					m_clients[user_id]._room_list_lock.lock();
 					m_clients[user_id].room_list.insert(room.Get_Join_Member(i));
-					m_clients[user_id]._room_list_lock.unlock();
 					send_put_other_player(room.Get_Join_Member(i), user_id);
 				}
 			}
-
+			m_clients[user_id]._room_list_lock.unlock();
 
 			// 이제 여기에 그 방에 존재하는 모든 사람에게 누가 접속했는지 정보를 전달해야함!
 			for (int i = 0; i < 6; ++i)
@@ -225,9 +238,9 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 			update_room_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO_UPDATE;
 			update_room_packet.join_member = m_room_manager->Get_Room_Info(packet->room_number)->Get_Number_of_users();
 			update_room_packet.room_number = packet->room_number;
-			m_room_manager->Get_Room_Info(packet->room_number)->_room_state_lock.lock();
+			//m_room_manager->Get_Room_Info(packet->room_number)->_room_state_lock.lock();
 			update_room_packet.state = m_room_manager->Get_Room_Info(packet->room_number)->_room_state;
-			m_room_manager->Get_Room_Info(packet->room_number)->_room_state_lock.unlock();
+			//m_room_manager->Get_Room_Info(packet->room_number)->_room_state_lock.unlock();
 
 			for (auto& cl : m_clients)
 			{
@@ -494,10 +507,10 @@ void cGameServer::Process_Door(const int user_id, void* buff)
 	door_packet.door_state = room.Get_Door_State(static_cast<int>(packet->door_num));
 
 	//m_clients[user_id].do_send(sizeof(door_packet), &door_packet);
-	m_clients[user_id]._room_list_lock.lock();
+	//m_clients[user_id]._room_list_lock.lock();
 	for (auto& player : m_clients[user_id].room_list)
 		m_clients[player].do_send(sizeof(door_packet), &door_packet);
-	m_clients[user_id]._room_list_lock.unlock();
+	//m_clients[user_id]._room_list_lock.unlock();
 
 	if (!is_door_open)
 	{
@@ -534,10 +547,10 @@ void cGameServer::Process_ElectronicSystem_Open(const int user_id, void* buff)
 	es_packet.es_num = packet->es_num;
 	es_packet.es_state = room.Get_EletronicSystem_State(static_cast<int>(packet->es_num));
 
-	m_clients[user_id]._room_list_lock.lock();
+	//m_clients[user_id]._room_list_lock.lock();
 	for (auto& player : m_clients[user_id].room_list)
 		m_clients[player].do_send(sizeof(es_packet), &es_packet);
-	m_clients[user_id]._room_list_lock.unlock();
+	//m_clients[user_id]._room_list_lock.unlock();
 
 	if (!is_electronioc_system_door_open)
 	{
@@ -567,9 +580,9 @@ void cGameServer::Process_ElectronicSystem_Control(const int user_id, void* buff
 
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
-	room.m_electrinic_system[packet->electronic_system_index].m_state_lock->lock();
+	//room.m_electrinic_system[packet->electronic_system_index].m_state_lock->lock();
 	room.m_electrinic_system[packet->electronic_system_index].Set_On_Off_Switch_Value(packet->switch_idx, packet->switch_value);
-	room.m_electrinic_system[packet->electronic_system_index].m_state_lock->unlock();
+	//room.m_electrinic_system[packet->electronic_system_index].m_state_lock->unlock();
 
 	sc_packet_electronic_system_update_value es_packet;
 	es_packet.size = sizeof(es_packet);

@@ -13,7 +13,7 @@
 #define FIRST_SKILL_ENABLE_TIME 180
 #define SECOND_SKILL_ENABLE_TIME 240
 #define THIRD_SKILL_ENABLE_TIME 240
-#define SET_SERVER_UPDATE_FRAME 45
+#define SET_SERVER_UPDATE_FRAME 30
 
 class EXP_OVER;
 class CLIENT;
@@ -22,6 +22,7 @@ class RoomManager;
 
 enum class EventType : char
 {
+	CHECK_NUM_OF_SERVER_ACCEPT_USER,
 	OPEN_DOOR,
 	CLOSE_DOOR,
 	OPEN_ELECTRONIC,
@@ -89,8 +90,7 @@ public:
 	void	send_join_room_success_packet(const unsigned int user_id);	// 방 접속에 성공했음을 알리는 패킷입니다.
 	void	send_join_room_fail_packet(const unsigned int user_id);	// 방 접속에 실패했음을 알리는 패킷입니다.
 
-	void	send_move_packet(const unsigned int id, const unsigned int moved_id, cs_packet_move recv_packet, XMFLOAT3 calculate_pos); // 한 클라이언트의 이동을 계산하여 다른 클라이언트에게 전송합니다.
-	void	send_move_packet(const unsigned int id, const unsigned int moved_id); // 현재는 사용하지 않습니다/
+	void	send_move_packet(const unsigned int id, const unsigned int moved_id); // 이동을 처리합니다.
 	void	send_calculate_move_packet(const unsigned int id); // 이동을 요청한 클라이언트에게 좌표를 계산하여 넘겨줍니다.
 
 	void	send_game_start_packet(const unsigned int id); // 게임이 시작된것을 패킷으로 전송함
@@ -124,7 +124,11 @@ public:
 	// voice chat data를 전송하는 부분!
 	void	Process_Voice_Data(int user_id);
 
+	// stress test용
+	void	Process_Move_Test(const int user_id, void* buff);
+
 	void	Timer();
+	void	Second_Timer();
 	int		get_new_id();
 	CLIENT*	get_client_info(const int player_id);
 	CollisionInfo GetCollisionInfo(const BoundingOrientedBox& other, const BoundingOrientedBox& moved);
@@ -135,6 +139,7 @@ public:
 	DataBase						*m_database = nullptr;
 
 	concurrency::concurrent_priority_queue<TIMER_EVENT> m_timer_queue;
+	std::priority_queue<TIMER_EVENT>					timer_queue;
 protected:
 	std::queue<CLIENT>				request_querry;
 

@@ -434,13 +434,7 @@ struct sc_packet_voice_data {
 struct sc_packet_move {
 	unsigned char	size;
 	unsigned char	type;
-	unsigned short	id;
-
-	unsigned char	input_key;
-
-	Look		look;
-	Right		right;
-	Position	pos;
+	UserData		data;
 };
 
 struct sc_packet_calculate_move {
@@ -550,5 +544,32 @@ struct sc_packet_game_end {
 	unsigned char	type;
 
 	bool			is_tagger_win;
+};
+
+// 여긴 StressTest용 패킷입니다
+
+struct cs_packet_move_test {
+	unsigned char		size;
+	unsigned char		type;
+
+	unsigned char		input_key;
+	bool				is_jump;
+	float				yaw;
+	Look				look;
+	Right				right;
+	DirectX::XMFLOAT3	velocity;
+	DirectX::XMFLOAT3	xmf3Shift;
+
+	int				move_time;
+};
+
+struct sc_packet_calculate_move_test {
+	unsigned char	size;
+	unsigned char	type;
+	short			id;
+	Position		pos;
+	bool			is_collision_up_face;
+
+	int				move_time;
 };
 #pragma pack(pop)
