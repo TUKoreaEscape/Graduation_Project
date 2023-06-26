@@ -116,7 +116,7 @@ void cGameServer::send_move_packet(const unsigned int id, const unsigned int mov
 	move_packet.data.is_attack = m_clients[moved_id].get_user_attack_animation();
 	move_packet.data.is_victim = m_clients[moved_id].get_user_victim_animation();
 	move_packet.data.is_collision_up_face = m_clients[moved_id].get_user_collied_up_face();
-	move_packet.data.active = true;
+	move_packet.data.active = m_clients[moved_id].get_life_chip();
 
 	m_clients[id].do_send(sizeof(move_packet), &move_packet);
 }
@@ -132,6 +132,17 @@ void cGameServer::send_calculate_move_packet(const unsigned int id) // 이동을 요
 	packet.pos.y = static_cast<int>(m_clients[id].get_user_position().y * 10000);
 	packet.pos.z = static_cast<int>(m_clients[id].get_user_position().z * 10000);
 	packet.is_collision_up_face = m_clients[id].get_user_collied_up_face();
+
+	m_clients[id].do_send(sizeof(packet), &packet);
+}
+
+void cGameServer::send_life_chip_update(const unsigned int id)
+{
+	sc_packet_life_chip_update packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_LIFE_CHIP_UPDATE;
+	packet.id = id;
+	packet.life_chip = m_clients[id].get_life_chip();
 
 	m_clients[id].do_send(sizeof(packet), &packet);
 }

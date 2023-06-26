@@ -173,6 +173,27 @@ void cGameServer::WorkerThread()
 				m_clients[rl.in_player[i]].do_send(sizeof(packet), &packet);
 			delete exp_over;
 
+			sc_packet_life_chip_update life_packet;
+			life_packet.size = sizeof(life_packet);
+			life_packet.type = SC_PACKET::SC_PACKET_LIFE_CHIP_UPDATE;
+
+			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
+			{
+				if (rl.in_player[i] == -1)
+					continue;
+				if (rl.in_player[i] == tagger_id)
+				{
+					life_packet.id = rl.in_player[i];
+					life_packet.life_chip = false;
+				}
+				else
+				{
+					life_packet.id = rl.in_player[i];
+					life_packet.life_chip = true;
+				}
+				m_clients[rl.in_player[i]].do_send(sizeof(life_packet), &life_packet);
+			}
+
 			TIMER_EVENT next_ev;
 			next_ev.room_number = iocp_key;
 			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(FIRST_SKILL_ENABLE_TIME);
@@ -559,6 +580,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	case CS_PACKET::CS_PACKET_LOGIN:
 	{
 		// 로그인 처리
+		m_clients[user_id].m_is_stresstest_npc = false;
 		Process_User_Login(user_id, p);
 		break;
 	}

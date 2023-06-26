@@ -44,7 +44,7 @@ private:
 	bool					m_third_skill_able = false;
 
 private: // 아이템 부분
-	bool					m_life_card_own = false;
+	bool					m_life_chip = false;
 	bool					m_item_own[4]{ false };
 
 public:
@@ -133,7 +133,8 @@ public:
 
 	void				set_item_own(GAME_ITEM::ITEM item, bool value) { m_item_own[item] = value; }
 	bool				get_item_own(GAME_ITEM::ITEM item) { return m_item_own[item]; }
-
+	void				set_life_chip(bool value) { m_life_chip = value; }
+	bool				get_life_chip() { return m_life_chip; }
 	
 
 	// 네트워크용 함수 2개

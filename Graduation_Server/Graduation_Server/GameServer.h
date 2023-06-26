@@ -93,6 +93,8 @@ public:
 	void	send_move_packet(const unsigned int id, const unsigned int moved_id); // 이동을 처리합니다.
 	void	send_calculate_move_packet(const unsigned int id); // 이동을 요청한 클라이언트에게 좌표를 계산하여 넘겨줍니다.
 
+	void	send_life_chip_update(const unsigned int id);
+
 	void	send_game_start_packet(const unsigned int id); // 게임이 시작된것을 패킷으로 전송함
 	void	send_put_player_data(const unsigned int recv_id);
 	void	send_put_other_player(const unsigned int put_id, const unsigned int recv_id);  
@@ -128,7 +130,6 @@ public:
 	void	Process_Move_Test(const int user_id, void* buff);
 
 	void	Timer();
-	void	Second_Timer();
 	int		get_new_id();
 	CLIENT*	get_client_info(const int player_id);
 	CollisionInfo GetCollisionInfo(const BoundingOrientedBox& other, const BoundingOrientedBox& moved);

@@ -471,10 +471,15 @@ void cGameServer::Process_Attack(const int user_id)
 				ev.obj_id = other_player_id;
 
 				m_timer_queue.push(ev);
+
+				if (m_clients[other_player_id].get_life_chip())
+				{
+					m_clients[other_player_id].set_life_chip(false);
+					send_life_chip_update(other_player_id);
+				}
 			}
 		}
 	}
-
 }
 
 void cGameServer::Process_Door(const int user_id, void* buff)

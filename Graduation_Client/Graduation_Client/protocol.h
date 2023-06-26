@@ -304,6 +304,7 @@ namespace SC_PACKET
 		SC_PACKET_MOVE,
 		SC_PACKET_ELECTRONIC_SWITCH_INIT,
 		SC_PACKET_CALCULATE_MOVE,
+		SC_PACKET_LIFE_CHIP_UPDATE,
 		SC_PACKET_SELECT_TAGGER,
 		SC_PACKET_TAGGER_SKILL,
 		SC_PACKET_DOOR_UPDATE,
@@ -443,6 +444,14 @@ struct sc_packet_calculate_move {
 	short			id;
 	Position		pos;
 	bool			is_collision_up_face;
+};
+
+struct sc_packet_life_chip_update {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			id;
+	bool			life_chip;
 };
 
 struct sc_packet_select_tagger {
