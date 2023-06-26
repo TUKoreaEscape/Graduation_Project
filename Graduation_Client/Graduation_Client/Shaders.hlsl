@@ -921,5 +921,5 @@ float4 PSDoorUI(VS_UI_OUTPUT input) : SV_TARGET
 	return Color;
 }
 
-Texture2D gShadowMap : register(t1);
+Texture2D gShadowMap : register(t22);
 SamplerComparisonState gsamShadow : register(s2);
