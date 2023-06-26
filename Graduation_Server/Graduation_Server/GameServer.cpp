@@ -139,13 +139,13 @@ void cGameServer::WorkerThread()
 
 		case OP_TYPE::OP_UPDATE_PLAYER_MOVE:
 		{
-			Update_OtherPlayer(iocp_key, SET_SERVER_UPDATE_FRAME);
+			Update_OtherPlayer(static_cast<int>(iocp_key), SET_SERVER_UPDATE_FRAME);
 			cout << "이거들어옴" << endl;
 			//m_room_manager->Get_Room_Info(iocp_key)->_room_state_lock.lock();
-			if (m_room_manager->Get_Room_Info(iocp_key)->_room_state == GAME_ROOM_STATE::PLAYING || m_room_manager->Get_Room_Info(iocp_key)->_room_state == GAME_ROOM_STATE::READY)
+			if (m_room_manager->Get_Room_Info(static_cast<int>(iocp_key))->_room_state == GAME_ROOM_STATE::PLAYING || m_room_manager->Get_Room_Info(static_cast<int>(iocp_key))->_room_state == GAME_ROOM_STATE::READY)
 			{
 				TIMER_EVENT ev;
-				ev.room_number = iocp_key;
+				ev.room_number = static_cast<int>(iocp_key);
 				ev.cool_time = (float)((float)1 / SET_SERVER_UPDATE_FRAME);
 				float next_set = 1 / SET_SERVER_UPDATE_FRAME;
 				ev.event_time = chrono::system_clock::now() + 33ms;
@@ -159,7 +159,7 @@ void cGameServer::WorkerThread()
 
 		case OP_TYPE::OP_SELECT_TAGGER:
 		{
-			Room& rl = *m_room_manager->Get_Room_Info(iocp_key);
+			Room& rl = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
 			int tagger_id = rl.Select_Tagger();
 			sc_packet_select_tagger packet;
 			packet.size = sizeof(packet);
@@ -195,7 +195,7 @@ void cGameServer::WorkerThread()
 			}
 
 			TIMER_EVENT next_ev;
-			next_ev.room_number = iocp_key;
+			next_ev.room_number = static_cast<int>(iocp_key);
 			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(FIRST_SKILL_ENABLE_TIME);
 			next_ev.event_type = EventType::OPEN_TAGGER_SKILL_FIRST;
 			m_timer_queue.push(next_ev);
@@ -204,7 +204,7 @@ void cGameServer::WorkerThread()
 
 		case OP_TYPE::OP_FIRST_TAGGER_SKILL_OPEN:
 		{
-			Room& rl = *m_room_manager->Get_Room_Info(iocp_key);
+			Room& rl = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
 			m_clients[rl.Get_Tagger_ID()].set_first_skill_enable();
 
 			sc_packet_tagger_skill packet;
@@ -218,7 +218,7 @@ void cGameServer::WorkerThread()
 			delete exp_over;
 
 			TIMER_EVENT next_ev;
-			next_ev.room_number = iocp_key;
+			next_ev.room_number = static_cast<int>(iocp_key);
 			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(SECOND_SKILL_ENABLE_TIME);
 			next_ev.event_type = EventType::OPEN_TAGGER_SKILL_SECOND;
 			m_timer_queue.push(next_ev);
@@ -227,7 +227,7 @@ void cGameServer::WorkerThread()
 
 		case OP_TYPE::OP_SECOND_TAGGER_SKILL_OPEN:
 		{
-			Room& rl = *m_room_manager->Get_Room_Info(iocp_key);
+			Room& rl = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
 			m_clients[rl.Get_Tagger_ID()].set_second_skill_enable();
 
 			sc_packet_tagger_skill packet;
@@ -242,7 +242,7 @@ void cGameServer::WorkerThread()
 
 
 			TIMER_EVENT next_ev;
-			next_ev.room_number = iocp_key;
+			next_ev.room_number = static_cast<int>(iocp_key);
 			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(THIRD_SKILL_ENABLE_TIME);
 			next_ev.event_type = EventType::OPEN_TAGGER_SKILL_THIRD;
 			m_timer_queue.push(next_ev);
@@ -251,7 +251,7 @@ void cGameServer::WorkerThread()
 
 		case OP_TYPE::OP_THIRD_TAGGER_SKILL_OPEN:
 		{
-			Room& rl = *m_room_manager->Get_Room_Info(iocp_key);
+			Room& rl = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
 			m_clients[rl.Get_Tagger_ID()].set_third_skill_enable();
 
 			sc_packet_tagger_skill packet;
@@ -268,7 +268,7 @@ void cGameServer::WorkerThread()
 
 		case OP_TYPE::OP_GAME_END:
 		{
-			Room& rl = *m_room_manager->Get_Room_Info(iocp_key);
+			Room& rl = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
 			rl._room_state_lock.lock();
 			rl._room_state = GAME_ROOM_STATE::END;
 			rl._room_state_lock.unlock();
@@ -700,6 +700,7 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	case CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_SWICH:
 	{
 		// 여기선 스위치 조작 처리 해주면됨
+		Process_ElectronicSystem_Control(user_id, p);
 		break;
 	}
 

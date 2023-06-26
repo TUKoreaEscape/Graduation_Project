@@ -70,7 +70,10 @@ void cGameServer::Process_Move_Test(const int user_id, void* buff)
 		CollisionInfo object_check = join_room.is_collision_player_to_object(user_id, current_player_position, current_shift);
 		if (object_check.is_collision)
 		{
-			// 이쪽은 오브젝트와 충돌한것을 처리하는 부분입니다.
+			calculate_player_position = Add(current_player_position, object_check.SlidingVector);
+			if (m_clients[user_id].get_user_position().y < 0)
+				calculate_player_position.y = 0;
+			current_shift = object_check.SlidingVector;
 			if (object_check.collision_face_num == 4)
 				collision_up_face = true;
 		}
@@ -110,5 +113,5 @@ void cGameServer::Process_Move_Test(const int user_id, void* buff)
 		m_clients[user_id].m_befor_send_move = false;
 	auto end_time = chrono::steady_clock::now();
 
-	//cout << chrono::duration_cast<chrono::milliseconds>(end_time - start_time).count() << "ms" << endl;
+	//cout << chrono::duration_cast<chrono::microseconds>(end_time - start_time).count() << "us" << endl;
 }

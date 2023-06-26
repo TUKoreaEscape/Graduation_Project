@@ -19,7 +19,7 @@ using namespace chrono;
 
 extern HWND		hWnd;
 
-const static int MAX_TEST = 3000;
+const static int MAX_TEST = 5;
 const static int MAX_CLIENTS = MAX_TEST * 2;
 const static int INVALID_ID = -1;
 const static int MAX_PACKET_SIZE = 255;
@@ -377,8 +377,16 @@ void Test_Thread()
 			cs_packet_move_test my_packet;
 			my_packet.size = sizeof(my_packet);
 			my_packet.type = CS_PACKET::CS_PACKET_MOVE;
-			my_packet.input_key = 'w';
-			my_packet.look;
+			my_packet.input_key = 0x01;
+			my_packet.look.x = 0;
+			my_packet.look.y = 0;
+			my_packet.look.z = 100;
+			my_packet.right.x = 100;
+			my_packet.right.y = 0;
+			my_packet.right.z = 0;
+			my_packet.xmf3Shift.x = 0;
+			my_packet.xmf3Shift.y = -0.166667;
+			my_packet.xmf3Shift.z = 0.125;
 			my_packet.move_time = static_cast<unsigned>(duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count());
 			SendPacket(i, &my_packet);
 		}

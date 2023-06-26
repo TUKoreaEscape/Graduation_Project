@@ -208,3 +208,9 @@ void Network::Process_ElectrinicSystem_Init(char* ptr)
 	sc_packet_electronic_system_init* packet = reinterpret_cast<sc_packet_electronic_system_init*>(ptr);
 	// 해당부분에서 전력장치 수정 해야됨 아직 없음 ㅎ
 }
+
+void Network::Process_LifeChip_Update(char* ptr)
+{
+	sc_packet_life_chip_update* packet = reinterpret_cast<sc_packet_life_chip_update*>(ptr);
+	m_lifechip = packet->life_chip;
+}

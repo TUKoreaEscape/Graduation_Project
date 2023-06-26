@@ -455,6 +455,12 @@ void Network::ProcessPacket(char* ptr)
 		break;
 	}
 
+	case SC_PACKET::SC_PACKET_LIFE_CHIP_UPDATE:
+	{
+		Process_LifeChip_Update(ptr);
+		break;
+	}
+
 	case SC_PACKET::SC_PACKET_CUSTOMIZING:
 	{
 		sc_packet_customizing_update* packet = reinterpret_cast<sc_packet_customizing_update*>(ptr);

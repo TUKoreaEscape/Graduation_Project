@@ -35,7 +35,7 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	char pstrGameObjectName[64] = { '\0' };
 	nReads = (unsigned int)fread(&nObjects, sizeof(int), 1, pFile);
 	system("cls");
-	for (int i = 0; i < nObjects; ++i)
+	for (unsigned int i = 0; i < nObjects; ++i)
 	{
 		cout << "Walls BoundingBox : " << static_cast<int>((float)i / (float)nObjects * 100) << "%로드 완료\r";
 		nReads = (unsigned int)fread(&nStrLength, sizeof(unsigned char), 1, pFile);
@@ -62,7 +62,7 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	cout << "Walls and Fixed Object File Load Success!" << endl;
 
 	nReads = (unsigned int)fread(&nObjects, sizeof(int), 1, pFile);
-	for (int i = 0; i < nObjects; ++i)
+	for (unsigned int i = 0; i < nObjects; ++i)
 	{
 		cout << "FixedObjects BoundingBox : " << static_cast<int>((float)i / (float)nObjects * 100) << "%로드 완료\r";
 		nReads = (unsigned int)fread(&nStrLength, sizeof(unsigned char), 1, pFile);
@@ -97,7 +97,7 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	nObjects = 0;
 	nStrLength = 0;
 	nReads = (unsigned int)fread(&nObjects, sizeof(int), 1, pFile);
-	for (int i = 0; i < nObjects; ++i)
+	for (unsigned int i = 0; i < nObjects; ++i)
 	{
 		// 여기서 door 추가할거임
 		cout << "Doors BoundingBox : " << static_cast<int>((float)i / (float)6 * 100) << "%로드 완료\r";

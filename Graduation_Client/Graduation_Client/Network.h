@@ -39,6 +39,7 @@ private:
 	SHELLEXECUTEINFO	info;
 	HWND				hwnd_ExtMixerWin;
 	bool				m_shutdown = false;
+	bool				m_lifechip = false;
 public:
 	std::mutex pos_lock;
 	std::mutex other_pos_lock;
@@ -80,6 +81,7 @@ public:
 	void Process_Other_Player_Move(char* ptr);
 	void Process_Other_Move(char* ptr);
 	void Process_Game_Start(char* ptr);
+	void Process_LifeChip_Update(char* ptr);
 	void Process_Door_Update(char* ptr);
 	void Process_ElectronicSystemDoor_Update(char* ptr);
 	void Process_Attack_Packet(char* ptr);
