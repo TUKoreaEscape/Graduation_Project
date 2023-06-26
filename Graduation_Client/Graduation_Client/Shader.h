@@ -294,3 +294,40 @@ public:
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nRenderTargets, DXGI_FORMAT* pdxgiRtvFormats, DXGI_FORMAT dxgiDsvFormat);
 };
+
+class ShadowShader : public PostProcessingShader
+{
+public:
+	ShadowShader(ID3D12Device* device, UINT width, UINT height);
+	virtual ~ShadowShader();
+
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
+
+	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
+	virtual void ReleaseShaderVariables();
+
+	virtual void CreateResourcesAndViews(ID3D12Device* pd3dDevice, UINT nResources, DXGI_FORMAT* pdxgiFormats, UINT nWidth, UINT nHeight, D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle, UINT nShaderResources);
+
+	virtual void OnPrepareRenderTarget(ID3D12GraphicsCommandList* pd3dCommandList, int nRenderTargets, D3D12_CPU_DESCRIPTOR_HANDLE* pd3dRtvCPUHandles, D3D12_CPU_DESCRIPTOR_HANDLE d3dDepthStencilBufferDSVCPUHandle);
+	virtual void OnPostRenderTarget(ID3D12GraphicsCommandList* pd3dCommandList);
+
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
+protected:
+	ID3D12Device* m_pd3dDevice = nullptr;
+
+	D3D12_VIEWPORT m_Viewport;
+	D3D12_RECT m_ScissorRect;
+
+	UINT m_Width = 0;
+	UINT m_Height = 0;
+	DXGI_FORMAT m_Format = DXGI_FORMAT_R24G8_TYPELESS;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE m_hCpuSrv;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_hGpuSrv;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE m_d3dDsvShadowDescriptorCPUHandle;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_ShadowMap = nullptr;
+};

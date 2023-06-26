@@ -170,6 +170,15 @@ void Framework::CreateRtvAndDsvDescriptorHeaps()
 	d3dDescriptorHeapDesc.NumDescriptors = 1;
 	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 	hResult = m_pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pd3dDsvDescriptorHeap);
+
+	//그림자 맵 렌더 타겟을 위한 디스크립터 힙 생성
+	d3dDescriptorHeapDesc;
+	::ZeroMemory(&d3dDescriptorHeapDesc, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
+	d3dDescriptorHeapDesc.NumDescriptors = 1;
+	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+	d3dDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	d3dDescriptorHeapDesc.NodeMask = 0;
+	hResult = m_pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pd3dShadowDsvDescriptorHeap);
 }
 
 void Framework::CreateDirect3DDevice()
@@ -360,6 +369,45 @@ void Framework::CreateDepthStencilView()
 
 	m_d3dDsvDescriptorCPUHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_pd3dDevice->CreateDepthStencilView(m_pd3dDepthStencilBuffer, NULL, m_d3dDsvDescriptorCPUHandle); //깊이-스텐실 버퍼 뷰를 생성한다.
+
+	//그림자 맵 텍스처를 생성하기 위한 리소스 설명자.
+	D3D12_RESOURCE_DESC shadowMapDesc;
+	shadowMapDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	shadowMapDesc.Alignment = 0;
+	shadowMapDesc.Width = m_nWndClientWidth;
+	shadowMapDesc.Height = m_nWndClientHeight;
+	shadowMapDesc.DepthOrArraySize = 1;
+	shadowMapDesc.MipLevels = 1;
+	shadowMapDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+	shadowMapDesc.SampleDesc.Count = 1;
+	shadowMapDesc.SampleDesc.Quality = 0;
+	shadowMapDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	shadowMapDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+
+	D3D12_HEAP_PROPERTIES d3dHeapShadowProperties;
+	::ZeroMemory(&d3dHeapShadowProperties, sizeof(D3D12_HEAP_PROPERTIES));
+	d3dHeapShadowProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+	d3dHeapShadowProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	d3dHeapShadowProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	d3dHeapShadowProperties.CreationNodeMask = 1;
+	d3dHeapShadowProperties.VisibleNodeMask = 1;
+
+	//그림자 맵 텍스처의 초기값을 지정
+	d3dClearValue;
+	d3dClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+	d3dClearValue.DepthStencil.Depth = 1.0f;
+	d3dClearValue.DepthStencil.Stencil = 0;
+	m_pd3dDevice->CreateCommittedResource(&d3dHeapShadowProperties, D3D12_HEAP_FLAG_NONE, &shadowMapDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE,
+		&d3dClearValue, __uuidof(ID3D12Resource), (void**)&m_pd3dShadowDepthStencilBuffer);
+
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+
+	m_d3dDsvShadowDescriptorCPUHandle = m_pd3dShadowDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	m_pd3dDevice->CreateDepthStencilView(m_pd3dShadowDepthStencilBuffer, &dsvDesc, m_d3dDsvShadowDescriptorCPUHandle);
 }
 
 void Framework::CreateSwapChainRenderTargetViews()
@@ -489,6 +537,8 @@ void Framework::FrameAdvance()
 		scene->UIrender(m_pd3dCommandList);
 		break;
 	case READY_TO_GAME:
+		//그림자 렌더링 코드
+
 		if (scene) scene->prerender(m_pd3dCommandList);
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		//렌더링 코드는 여기에 추가될 것이다.

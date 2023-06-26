@@ -187,6 +187,12 @@ void Camera::SetViewportsAndScissorRects(ID3D12GraphicsCommandList* pd3dCommandL
 	pd3dCommandList->RSSetScissorRects(1, &m_d3dScissorRect);
 }
 
+void Camera::SetShadowMapViewportsAndScissorRects(ID3D12GraphicsCommandList* pd3dCommandList, D3D12_VIEWPORT Viewport, D3D12_RECT ScissorRect)
+{
+	pd3dCommandList->RSSetViewports(1, &Viewport);
+	pd3dCommandList->RSSetScissorRects(1, &ScissorRect);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //// SpaceShipCamera
 //

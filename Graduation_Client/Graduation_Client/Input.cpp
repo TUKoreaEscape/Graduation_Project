@@ -26,8 +26,8 @@ void Input::Update(HWND hWnd)
 	if (cxDelta || cyDelta)
 	{
 		if (m_pPlayer) {
-			if (keyBuffer[VK_RBUTTON] & 0xF0) m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
-			else m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+			//if (keyBuffer[VK_RBUTTON] & 0xF0) m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
+			m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
 		}
 	}
 }

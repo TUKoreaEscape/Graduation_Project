@@ -31,6 +31,10 @@ private:
 	ID3D12Resource *m_ppd3dRenderTargetBuffers[m_nSwapChainBuffers];
 	//ID3D12Resource* m_ppd3dSwapChainBackBuffers[m_nSwapChainBuffers];
 
+	ID3D12Resource* m_pd3dShadowDepthStencilBuffer;
+
+	ID3D12DescriptorHeap* m_pd3dShadowDsvDescriptorHeap;
+
 	ID3D12DescriptorHeap* m_pd3dRtvDescriptorHeap;
 	
 	ID3D12Resource *m_pd3dDepthStencilBuffer;
@@ -44,6 +48,8 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE		m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBuffers];//
 
 	D3D12_CPU_DESCRIPTOR_HANDLE		m_d3dDsvDescriptorCPUHandle;//
+	D3D12_CPU_DESCRIPTOR_HANDLE		m_d3dDsvShadowDescriptorCPUHandle;
+
 	//D3D12_CPU_DESCRIPTOR_HANDLE* m_d3dDepthStencilBufferSRVCPUHandle;//
 	
 	ID3D12Fence *m_pd3dFence;

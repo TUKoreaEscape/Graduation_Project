@@ -70,6 +70,7 @@ public:
 	void SetScissorRect(LONG xLeft, LONG yTop, LONG xRight, LONG yBottom);
 
 	virtual void SetViewportsAndScissorRects(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void SetShadowMapViewportsAndScissorRects(ID3D12GraphicsCommandList* pd3dCommandList, D3D12_VIEWPORT Viewport, D3D12_RECT ScissorRect);
 
 	void SetPlayer(Player* pPlayer) { m_pPlayer = pPlayer; }
 	Player* GetPlayer() { return(m_pPlayer); }
