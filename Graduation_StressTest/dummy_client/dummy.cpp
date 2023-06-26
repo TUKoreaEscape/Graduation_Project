@@ -367,12 +367,7 @@ void Test_Thread()
 {
 	chrono::steady_clock::time_point last_add = chrono::steady_clock::now();
 	while (true) {
-
-		//Sleep(max(0, global_delay));
-		if (last_add + 16ms < high_resolution_clock::now()) {
-			Adjust_Number_Of_Client();
-			last_add = high_resolution_clock::now();
-		}
+		Adjust_Number_Of_Client();
 
 		for (int i = 0; i < num_connections; ++i) {
 			if (false == g_clients[i].connected) continue;
@@ -412,9 +407,9 @@ void InitializeNetwork()
 
 	system("cls");
 	cout << "동접 테스트기를 시작합니다." << endl;
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 6; ++i)
 		worker_threads.push_back(new std::thread{ Worker_Thread });
-	cout << "Worker_Thread Start!!! (4 threads)" << endl;
+	cout << "Worker_Thread Start!!! (6 threads)" << endl;
 
 	test_thread = thread{ Test_Thread };
 	cout << "Test_Thread Start!!!" << endl;
