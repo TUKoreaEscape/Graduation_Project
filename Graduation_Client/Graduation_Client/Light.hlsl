@@ -156,9 +156,137 @@ float4 Lighting(float3 vPosition, float3 vNormal)
 			}
 		}
 	}
-	cColor += (gcGlobalAmbientLight * gMaterial.m_cAmbient);
+	//cColor += (gcGlobalAmbientLight * gMaterial.m_cAmbient);
+	cColor += (gcGlobalAmbientLight);
 	cColor.a = gMaterial.m_cDiffuse.a;
 
 	return(cColor);
 }
 
+float4 DeferredDirectionalLight(int nIndex, float3 vNormal, float3 vToCamera, float3 diffuse, float3 specular, float power)
+{
+	float3 vToLight = -gLights[nIndex].m_vDirection;
+	float fDiffuseFactor = dot(vToLight, vNormal);
+	float fSpecularFactor = 0.0f;
+	if (fDiffuseFactor > 0.0f)
+	{
+		if (power != 0.0f)
+		{
+#ifdef _WITH_REFLECT
+			float3 vReflect = reflect(-vToLight, vNormal);
+			fSpecularFactor = pow(max(dot(vReflect, vToCamera), 0.0f), power);
+#else
+#ifdef _WITH_LOCAL_VIEWER_HIGHLIGHTING
+			float3 vHalf = normalize(vToCamera + vToLight);
+#else
+			float3 vHalf = float3(0.0f, 1.0f, 0.0f);
+#endif
+			fSpecularFactor = pow(max(dot(vHalf, vNormal), 0.0f), power);
+#endif
+		}
+	}
+
+	return((gLights[nIndex].m_cDiffuse * fDiffuseFactor * float4(diffuse, 1.0f)) + (gLights[nIndex].m_cSpecular * fSpecularFactor * float4(specular, power)));
+}
+
+float4 DeferredPointLight(int nIndex, float3 vPosition, float3 vNormal, float3 vToCamera, float3 diffuse, float3 specular, float power)
+{
+	float3 vToLight = gLights[nIndex].m_vPosition - vPosition;
+	float fDistance = length(vToLight);
+	if (fDistance <= gLights[nIndex].m_fRange)
+	{
+		float fSpecularFactor = 0.0f;
+		vToLight /= fDistance;
+		float fDiffuseFactor = dot(vToLight, vNormal);
+		if (fDiffuseFactor > 0.0f)
+		{
+			if (power != 0.0f)
+			{
+#ifdef _WITH_REFLECT
+				float3 vReflect = reflect(-vToLight, vNormal);
+				fSpecularFactor = pow(max(dot(vReflect, vToCamera), 0.0f), power);
+#else
+#ifdef _WITH_LOCAL_VIEWER_HIGHLIGHTING
+				float3 vHalf = normalize(vToCamera + vToLight);
+#else
+				float3 vHalf = float3(0.0f, 1.0f, 0.0f);
+#endif
+				fSpecularFactor = pow(max(dot(vHalf, vNormal), 0.0f), power);
+#endif
+			}
+		}
+		float fAttenuationFactor = 1.0f / dot(gLights[nIndex].m_vAttenuation, float3(1.0f, fDistance, fDistance * fDistance));
+		return float4(1.0f, 0.0f, 0.0f, 1.0f);
+		return(((gLights[nIndex].m_cDiffuse * fDiffuseFactor * float4(diffuse, 1.0f)) + (gLights[nIndex].m_cSpecular * fSpecularFactor * float4(specular,power))) * fAttenuationFactor);
+	}
+	return(float4(0.0f, 0.0f, 0.0f, 0.0f));
+}
+
+float4 DeferredSpotLight(int nIndex, float3 vPosition, float3 vNormal, float3 vToCamera, float3 diffuse, float3 specular, float power)
+{
+	float3 vToLight = gLights[nIndex].m_vPosition - vPosition;
+	float fDistance = length(vToLight);
+	if (fDistance <= gLights[nIndex].m_fRange)
+	{
+		float fSpecularFactor = 0.0f;
+		vToLight /= fDistance;
+		float fDiffuseFactor = dot(vToLight, vNormal);
+		if (fDiffuseFactor > 0.0f)
+		{
+			if (power != 0.0f)
+			{
+#ifdef _WITH_REFLECT
+				float3 vReflect = reflect(-vToLight, vNormal);
+				fSpecularFactor = pow(max(dot(vReflect, vToCamera), 0.0f), power);
+#else
+#ifdef _WITH_LOCAL_VIEWER_HIGHLIGHTING
+				float3 vHalf = normalize(vToCamera + vToLight);
+#else
+				float3 vHalf = float3(0.0f, 1.0f, 0.0f);
+#endif
+				fSpecularFactor = pow(max(dot(vHalf, vNormal), 0.0f), power);
+#endif
+			}
+		}
+#ifdef _WITH_THETA_PHI_CONES
+		float fAlpha = max(dot(-vToLight, gLights[nIndex].m_vDirection), 0.0f);
+		float fSpotFactor = pow(max(((fAlpha - gLights[nIndex].m_fPhi) / (gLights[nIndex].m_fTheta - gLights[nIndex].m_fPhi)), 0.0f), gLights[nIndex].m_fFalloff);
+#else
+		float fSpotFactor = pow(max(dot(-vToLight, gLights[i].m_vDirection), 0.0f), gLights[i].m_fFalloff);
+#endif
+		float fAttenuationFactor = 1.0f / dot(gLights[nIndex].m_vAttenuation, float3(1.0f, fDistance, fDistance * fDistance));
+
+		return(((gLights[nIndex].m_cAmbient) + (gLights[nIndex].m_cDiffuse * fDiffuseFactor * float4(diffuse, 1.0f)) + (gLights[nIndex].m_cSpecular * fSpecularFactor * float4(specular, power))) * fAttenuationFactor * fSpotFactor);
+	}
+	return(float4(0.0f, 0.0f, 0.0f, 0.0f));
+}
+
+float4 DeferredLighting(float3 vPosition, float3 vNormal, float3 diffuse, float3 specular, float power)
+{
+
+	float3 vCameraPosition = float3(gvCameraPosition.x, gvCameraPosition.y, gvCameraPosition.z);
+	float3 vToCamera = normalize(vCameraPosition - vPosition);
+
+	float4 cColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	[unroll(MAX_LIGHTS)] for (int i = 0; i < gnLights; i++)
+	{
+		if (gLights[i].m_bEnable)
+		{
+			if (gLights[i].m_nType == DIRECTIONAL_LIGHT)
+			{
+				cColor += DeferredDirectionalLight(i, vNormal, vToCamera, diffuse, specular, power);
+			}
+			else if (gLights[i].m_nType == POINT_LIGHT)
+			{
+				cColor += DeferredPointLight(i, vPosition, vNormal, vToCamera, diffuse, specular, power);
+			}
+			else if (gLights[i].m_nType == SPOT_LIGHT)
+			{
+				cColor += DeferredSpotLight(i, vPosition, vNormal, vToCamera, diffuse, specular, power);
+			}
+		}
+	}
+	cColor += gcGlobalAmbientLight;
+	cColor.a = 1.0f;
+	return(cColor);
+}

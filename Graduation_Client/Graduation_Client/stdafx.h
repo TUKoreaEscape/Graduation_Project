@@ -63,6 +63,7 @@ using Microsoft::WRL::ComPtr;
 #pragma comment(lib, "ws2_32.lib")
 //#define _WITH_DEBUG_FRAME_HIERARCHY
 
+#define _DEBUG
 
 //#define _WITH_CB_GAMEOBJECT_32BIT_CONSTANTS
 //#define _WITH_CB_GAMEOBJECT_ROOT_DESCRIPTOR
