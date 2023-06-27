@@ -143,7 +143,7 @@ public:
 	virtual bool GetIsWorking() { return false; }
 
 	virtual	void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f) {};
-	virtual void Interaction() {};
+	virtual void Interaction(int playerType) {};
 };
 
 template<typename T>

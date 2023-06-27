@@ -72,9 +72,13 @@ public:
 	bool IsNear = false;
 	bool IsWorking = false;
 
+	bool IsInteraction = false;
+
 	InteractionUI* m_pInteractionUI = nullptr;
 
 	float m_fPitch{}, m_fYaw{}, m_fRoll{};
+
+	float m_fCooltime;
 public:
 	InteractionObject();
 	virtual ~InteractionObject();
@@ -83,6 +87,8 @@ public:
 
 	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList) {};
 	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) {};
+
+	virtual void Interaction(int playerType) override {};
 
 	virtual void SetUI(InteractionUI* ui);
 };
@@ -106,6 +112,8 @@ public:
 	virtual void SetPosition(XMFLOAT3 xmf3Position);
 
 	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList);
+
+	void Interaction(int playerType) override;
 
 	XMFLOAT3 LeftDoorPos;
 	XMFLOAT3 RightDoorPos;
@@ -147,6 +155,8 @@ public:
 
 	void render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
+
+	void Interaction(int playerType) override;
 };
 
 class Vent : public InteractionObject
@@ -168,7 +178,7 @@ public:
 	void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f) override;
 
 	virtual void SetPosition(XMFLOAT3 xmf3Position) override;
-	void Interaction() override;
+	void Interaction(int playerType) override;
 public:
 	XMFLOAT3 m_xmf3OpenPosition;
 	XMFLOAT3 m_xmf3ClosePosition;
@@ -185,7 +195,7 @@ public:
 	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
 	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
 
-	void Interaction() override;
+	void Interaction(int playerType) override;
 
 public:
 	int m_ItemType = -1;

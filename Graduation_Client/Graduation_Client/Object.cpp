@@ -177,8 +177,18 @@ void Vent::SetPosition(XMFLOAT3 xmf3Position)
 	GameObject::SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
 }
 
-void Vent::Interaction()
+void Vent::Interaction(int playerType)
 {
+	switch (playerType) {
+	case TYPE_TAGGER:
+		break;
+	case TYPE_PLAYER_YET:
+		break;
+	case TYPE_PLAYER:
+		break;
+	case TYPE_DEAD_PLAYER:
+		break;
+	}
 	if (IsOpen) {
 		SetOpen(false);
 	}
@@ -273,6 +283,16 @@ void Door::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Door::update(float fElapsedTime)
 {
+	if (IsInteraction) {
+		if (IsNear) {
+			if (!IsWorking)
+				m_fCooltime += fElapsedTime;
+		}
+		else {
+			IsInteraction = false;
+			m_fCooltime = 0;
+		}
+	}
 	if (IsOpen) {
 		OpenTime += fElapsedTime;
 		if (OpenTime >= 1.6f) {
@@ -307,6 +327,40 @@ void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		if (m_pInteractionUI) {
 			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f );
 			m_pInteractionUI->BillboardRender(pd3dCommandList, m_fPitch, m_fYaw, m_fRoll);
+		}
+	}
+}
+
+void Door::Interaction(int playerType)
+{
+	IsInteraction = true;
+	if (IsOpen) {
+		switch (playerType) {
+		case TYPE_TAGGER:
+			break;
+		case TYPE_PLAYER_YET:
+		case TYPE_PLAYER:
+			SetOpen(false);
+			m_fCooltime = 0;
+			break;
+		case TYPE_DEAD_PLAYER:
+			IsInteraction = false;
+			m_fCooltime = 0;
+			break;
+		}
+	}
+	else {
+		switch (playerType) {
+		case TYPE_TAGGER:
+		case TYPE_PLAYER_YET:
+		case TYPE_PLAYER:
+			if (m_fCooltime > 3.0) {
+				SetOpen(true);
+				m_fCooltime = 0;
+			}
+			break;
+		case TYPE_DEAD_PLAYER:
+			break;
 		}
 	}
 }
@@ -601,6 +655,10 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 }
 
+void PowerSwitch::Interaction(int playerType)
+{
+}
+
 Item::Item()
 {
 }
@@ -622,6 +680,16 @@ void Item::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 }
 
-void Item::Interaction()
+void Item::Interaction(int playerType)
 {
+	switch (playerType) {
+	case TYPE_TAGGER:
+		break;
+	case TYPE_PLAYER_YET:
+		break;
+	case TYPE_PLAYER:
+		break;
+	case TYPE_DEAD_PLAYER:
+		break;
+	}
 }
