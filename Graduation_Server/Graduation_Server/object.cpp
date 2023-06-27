@@ -187,13 +187,20 @@ void EscapeSystem::Update_Object()
 
 GameItem::GameItem()
 {
-
+	m_state_lock = new mutex;
 }
 
 GameItem::GameItem(GAME_ITEM::ITEM item_type, const XMFLOAT3& extents)
 {
 	m_item_type = item_type;
 	m_state_lock = new mutex;
+}
+
+void GameItem::init()
+{
+	m_own = false;
+	m_item_type = GAME_ITEM::ITEM_NONE;
+	m_item_box_index = -1;
 }
 
 void GameItem::Update_bounding_box_pos(const XMFLOAT3& pos)

@@ -605,25 +605,39 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
-	bool ret = room.Pick_Item(packet->index);
+	int item_index = -1;
+	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
+	{
+		if (packet->index == room.m_fix_item[i].Get_Item_box_index())
+		{
+			item_index = room.m_fix_item[i].Get_Item_box_index();
+			break;
+		}
+	}
+
+	if (item_index == -1)
+		return;
+
+	bool ret = room.Pick_Item(item_index);
 
 	if (ret == false)
 		return;
 
-	if(room.m_fix_item[packet->index].Get_Item_Type() == GAME_ITEM::ITEM_DRILL)
+	if(room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_DRILL)
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_DRILL, true);
-	else if (room.m_fix_item[packet->index].Get_Item_Type() == GAME_ITEM::ITEM_HAMMER)
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_HAMMER)
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_HAMMER, true);
-	else if (room.m_fix_item[packet->index].Get_Item_Type() == GAME_ITEM::ITEM_PLIERS)
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_PLIERS)
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_PLIERS, true);
-	else if (room.m_fix_item[packet->index].Get_Item_Type() == GAME_ITEM::ITEM_WRENCH)
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_WRENCH)
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_WRENCH, true);
 
 	sc_packet_pick_fix_item_update item_packet;
 	item_packet.size = sizeof(item_packet);
 	item_packet.type = SC_PACKET::SC_PACKET_PICK_ITEM_UPDATE;
 	item_packet.own_id = user_id;
-	item_packet.item_type = packet->index;
+	item_packet.item_type = room.m_fix_item[item_index].Get_Item_Type();
+	item_packet.box_index = packet->index;
 	item_packet.item_show = false;
 
 	for (auto player_id : room.in_player)

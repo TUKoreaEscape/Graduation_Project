@@ -85,8 +85,10 @@ void Room::init_fix_object_and_life_chip()
 {
 	int temp[MAX_INGAME_ITEM];
 	srand(time(NULL));
-	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
+	for (int i = 0; i < MAX_INGAME_ITEM; ++i) {
 		temp[i] = -1;
+		m_fix_item[i].init();
+	}
 
 	for (int i = 0; i < MAX_INGAME_ITEM; ++i) {
 		int t = rand() % MAX_INGAME_ITEM;

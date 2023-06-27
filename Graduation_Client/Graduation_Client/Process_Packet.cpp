@@ -223,18 +223,19 @@ void Network::Process_Pick_Item_Init(char* ptr)
 
 	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
 	{
+		std::cout << "Item [" << packet->data[i].item_box_index << "] Type : ";
 		if (packet->data[i].item_type == GAME_ITEM::ITEM_LIFECHIP)
-			continue;
+			std::cout << "ITEM_LIFECHIP" << std::endl;
 		if (packet->data[i].item_type == GAME_ITEM::ITEM_DRILL)
-			continue;
+			std::cout << "ITEM_DRILL" << std::endl;
 		if (packet->data[i].item_type == GAME_ITEM::ITEM_HAMMER)
-			continue;
+			std::cout << "ITEM_HAMMER" << std::endl;
 		if (packet->data[i].item_type == GAME_ITEM::ITEM_NONE)
-			continue;
+			std::cout << "ITEM_NONE" << std::endl;
 		if (packet->data[i].item_type == GAME_ITEM::ITEM_PLIERS)
-			continue;
+			std::cout << "ITEM_PLIERS" << std::endl;
 		if (packet->data[i].item_type == GAME_ITEM::ITEM_WRENCH)
-			continue;
+			std::cout << "ITEM_WRENCH" << std::endl;
 	}
 }
 

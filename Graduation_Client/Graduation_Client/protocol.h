@@ -558,7 +558,8 @@ struct sc_packet_pick_fix_item_update {
 	unsigned char	type;
 
 	unsigned short	own_id;
-	unsigned short	item_type;
+	unsigned short	box_index;
+	GAME_ITEM::ITEM item_type;
 	bool			item_show;
 };
 
