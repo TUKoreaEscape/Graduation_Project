@@ -94,18 +94,17 @@ void Vent::SetOpen(bool open)
 {
 	if (open) {
 		if (IsOpen) return;
-		XMMATRIX mtxRotate = XMMatrixRotationY(90);
-		m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
+		Rotate(0, 90, 0);
 		SetPosition(m_xmf3OpenPosition);
 		UpdateTransform(NULL);
+		IsOpen = true;
 	}
 	else {
 		if (IsOpen == false) return;
-		
-		XMMATRIX mtxRotate = XMMatrixRotationY(-90);
-		m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
+		Rotate(0, -90, 0);
 		SetPosition(m_xmf3ClosePosition);
 		UpdateTransform(NULL);
+		IsOpen = false;
 	}
 }
 
@@ -117,7 +116,37 @@ void Vent::SetOpenPos(const XMFLOAT3& pos)
 
 bool Vent::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
-	return false;
+	float minx, maxx, minz, maxz;
+	if (IsRot) {
+		minx = m_xmf4x4ToParent._41 - 1.75f;
+		maxx = m_xmf4x4ToParent._41 + 1.75f;
+		minz = m_xmf4x4ToParent._43 - 2.0f;
+		maxz = m_xmf4x4ToParent._43 + 2.0f;
+	}
+	else {
+		minx = m_xmf4x4ToParent._41 - 2.0f;
+		maxx = m_xmf4x4ToParent._41 + 2.0f;
+		minz = m_xmf4x4ToParent._43 - 1.75f;
+		maxz = m_xmf4x4ToParent._43 + 1.75f;
+	}
+	if (PlayerPos.x > maxx) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.x < minx) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.z < minz) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.z > maxz) {
+		IsNear = false;
+		return false;
+	}
+	IsNear = true;
+	return true;
 }
 
 void Vent::render(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -127,6 +156,15 @@ void Vent::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Vent::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (IsNear) {
+		if (m_pInteractionUI) {
+			if (IsRot)
+				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 0.5f, m_xmf4x4ToParent._43);
+			else
+				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_fPitch, m_fYaw, m_fRoll);
+		}
+	}
 }
 
 void Vent::Move(float fxOffset, float fyOffset, float fzOffset)
@@ -137,6 +175,16 @@ void Vent::SetPosition(XMFLOAT3 xmf3Position)
 {
 	m_xmf3Position = xmf3Position;
 	GameObject::SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
+}
+
+void Vent::Interaction()
+{
+	if (IsOpen) {
+		SetOpen(false);
+	}
+	else {
+		SetOpen(true);
+	}
 }
 
 Door::Door() : InteractionObject()

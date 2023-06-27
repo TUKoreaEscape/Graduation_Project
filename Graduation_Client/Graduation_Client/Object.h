@@ -168,6 +168,7 @@ public:
 	void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f) override;
 
 	virtual void SetPosition(XMFLOAT3 xmf3Position) override;
+	void Interaction() override;
 public:
 	XMFLOAT3 m_xmf3OpenPosition;
 	XMFLOAT3 m_xmf3ClosePosition;

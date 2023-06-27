@@ -125,6 +125,9 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < NUM_POWER; ++i) {
 			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->UIrender(pd3dCommandList);
 		}
+		for (int i = 0; i < NUM_VENT; ++i) {
+			reinterpret_cast<Vent*>(Vents[i])->UIrender(pd3dCommandList);
+		}
 		break;
 	}
 }
@@ -803,10 +806,12 @@ void GameScene::LoadSceneBushFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	LoadedModelInfo* pVentModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/airvent.bin", nullptr);
+	InteractionUI* VentUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/f.dds");
 
 	for (int i = 0; i < NUM_VENT; ++i) {
 		Vents[i] = new Vent();
 		Vents[i]->SetChild(pVentModel->m_pModelRootObject, true);
+		reinterpret_cast<Vent*>(Vents[i])->m_pInteractionUI = VentUI;
 	}
 	Vents[0]->SetPosition(XMFLOAT3(97.2155, 1.0061, 40.43311));
 	reinterpret_cast<Vent*>(Vents[0])->SetOpenPos(XMFLOAT3(98.94085, 1.0061, 42.29158));
@@ -828,7 +833,6 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	reinterpret_cast<Vent*>(Vents[7])->SetOpenPos(XMFLOAT3(34.23397, 90, 21.70837));
 	for (int i = 0; i < NUM_VENT; ++i) {
 		Vents[i]->UpdateTransform(nullptr);
-		Vents[i]->SetOpen(true);
 	}
 
 	if (pVentModel) delete pVentModel;
@@ -896,6 +900,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 
 	bool IsNearDoor = false;
 	bool IsNearInteractionObject = false;
+	bool IsNearVent = false;
 	for (int i = 0; i < NUM_DOOR; ++i) {
 		m_pDoors[i]->update(elapsedTime);
 		if (reinterpret_cast<Door*>(m_pDoors[i])->IsPlayerNear(PlayerPos)) {
@@ -914,8 +919,17 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 			m_pPlayer->m_power_number = i;
 		}
 	}
+	for (int i = 0; i < NUM_VENT; ++i) {
+		if (reinterpret_cast<Vent*>(Vents[i])->IsPlayerNear(PlayerPos)) {
+			m_pPlayer->m_pNearVent = Vents[i];
+			IsNearVent = true;
+
+			m_pPlayer->m_vent_number = i;
+		}
+	}
 	if (IsNearDoor == false) m_pPlayer->m_pNearDoor = nullptr;
 	if (IsNearInteractionObject == false) m_pPlayer->m_pNearInteractionObejct = nullptr;
+	if (IsNearVent == false) m_pPlayer->m_pNearVent = nullptr;
 }
 
 bool InArea(int startX, int startZ, int width, int length, float x, float z)

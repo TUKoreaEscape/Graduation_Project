@@ -123,6 +123,9 @@ void CommonMovement::update(float elapsedTime)
 					}
 				}
 			}
+			if (Input::GetInstance()->m_pPlayer->m_pNearVent) {
+				Input::GetInstance()->m_pPlayer->m_pNearVent->Interaction();
+			}
 		}
 
 		if (dwDirection)
