@@ -158,11 +158,17 @@ public:
 	void Rotate(float fPitch, float fYaw, float fRoll);
 
 	void SetOpen(bool open);
-	
+	void SetOpenPos(const XMFLOAT3& pos);
+
 	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
 
 	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
 	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
 
 	void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f) override;
+
+	virtual void SetPosition(XMFLOAT3 xmf3Position) override;
+public:
+	XMFLOAT3 m_xmf3OpenPosition;
+	XMFLOAT3 m_xmf3ClosePosition;
 };

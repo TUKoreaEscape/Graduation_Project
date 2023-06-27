@@ -94,52 +94,25 @@ void Vent::SetOpen(bool open)
 {
 	if (open) {
 		if (IsOpen) return;
-
-		if (IsRot) {
-			m_xmf4x4ToParent._41 -= 1.9f;
-			m_xmf4x4ToParent._43 += 1.9f;
-			XMMATRIX mtxRotate = XMMatrixRotationY(90);
-			m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
-			m_xmf4x4ToParent._41 += 1.9f;
-			m_xmf4x4ToParent._43 -= 1.9f;
-
-			UpdateTransform(NULL);
-		}
-		else {
-			m_xmf4x4ToParent._41 -= 1.9f;
-			m_xmf4x4ToParent._43 -= 1.9f;
-			XMMATRIX mtxRotate = XMMatrixRotationY(90);
-			m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
-			m_xmf4x4ToParent._41 += 1.9f;
-			m_xmf4x4ToParent._43 += 1.9f;
-
-			UpdateTransform(NULL);
-		}
+		XMMATRIX mtxRotate = XMMatrixRotationY(90);
+		m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
+		SetPosition(m_xmf3OpenPosition);
+		UpdateTransform(NULL);
 	}
 	else {
 		if (IsOpen == false) return;
-
-		if (IsRot) {
-			m_xmf4x4ToParent._41 -= 1.9f;
-			m_xmf4x4ToParent._43 += 1.9f;
-			XMMATRIX mtxRotate = XMMatrixRotationY(-90);
-			m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
-			m_xmf4x4ToParent._41 += 1.9f;
-			m_xmf4x4ToParent._43 -= 1.9f;
-
-			UpdateTransform(NULL);
-		}
-		else {
-			m_xmf4x4ToParent._41 -= 1.9f;
-			m_xmf4x4ToParent._43 -= 1.9f;
-			XMMATRIX mtxRotate = XMMatrixRotationY(-90);
-			m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
-			m_xmf4x4ToParent._41 += 1.9f;
-			m_xmf4x4ToParent._43 += 1.9f;
-
-			UpdateTransform(NULL);
-		}
+		
+		XMMATRIX mtxRotate = XMMatrixRotationY(-90);
+		m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
+		SetPosition(m_xmf3ClosePosition);
+		UpdateTransform(NULL);
 	}
+}
+
+void Vent::SetOpenPos(const XMFLOAT3& pos)
+{
+	m_xmf3ClosePosition = m_xmf3Position;
+	m_xmf3OpenPosition = pos;
 }
 
 bool Vent::IsPlayerNear(const XMFLOAT3& PlayerPos)
@@ -158,6 +131,12 @@ void Vent::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Vent::Move(float fxOffset, float fyOffset, float fzOffset)
 {
+}
+
+void Vent::SetPosition(XMFLOAT3 xmf3Position)
+{
+	m_xmf3Position = xmf3Position;
+	GameObject::SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
 }
 
 Door::Door() : InteractionObject()
