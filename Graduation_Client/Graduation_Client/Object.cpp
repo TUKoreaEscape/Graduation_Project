@@ -600,3 +600,28 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		}
 	}
 }
+
+Item::Item()
+{
+}
+
+Item::~Item()
+{
+}
+
+bool Item::IsPlayerNear(const XMFLOAT3& PlayerPos)
+{
+	return false;
+}
+
+void Item::render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void Item::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void Item::Interaction()
+{
+}

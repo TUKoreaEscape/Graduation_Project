@@ -173,3 +173,21 @@ public:
 	XMFLOAT3 m_xmf3OpenPosition;
 	XMFLOAT3 m_xmf3ClosePosition;
 };
+
+class Item : public InteractionObject
+{
+public:
+	Item();
+	virtual ~Item();
+
+	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
+
+	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
+	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
+
+	void Interaction() override;
+
+public:
+	int m_ItemType = -1;
+	bool m_bShow = false;
+};
