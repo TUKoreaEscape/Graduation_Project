@@ -116,15 +116,25 @@ private:
 	GAME_ITEM::ITEM m_item_type;
 	bool			m_own = false;
 	bool			m_show = false;
+	
+	short			m_item_box_index;
 
 	mutex*			m_state_lock;
 public:
 	GameItem();
-	GameItem(GAME_ITEM::ITEM item_type, const XMFLOAT3& center, const XMFLOAT3& extents);
+	GameItem(GAME_ITEM::ITEM item_type, const XMFLOAT3& extents);
 	~GameItem() = default;
 
-	void Update_bounding_box_pos(const XMFLOAT3& pos);
-	bool Pict_Item();
-	void Update_Object();
-	void Release();
+	void				init();
+
+	void				Set_Item_box_index(const unsigned short index) { m_item_box_index = index; }
+	void				Set_Item_Type(GAME_ITEM::ITEM item_type) { m_item_type = item_type; }
+
+	short				Get_Item_box_index() const{ return m_item_box_index; }
+	GAME_ITEM::ITEM		Get_Item_Type() { return m_item_type; }
+
+	void				Update_bounding_box_pos(const XMFLOAT3& pos);
+	bool				Pict_Item();
+	void				Update_Object();
+	void				Release();
 };

@@ -457,6 +457,7 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_LIFE_CHIP_UPDATE:
 	{
+		// 게임 시작시 생명칩을 활성화 시켜줘야하므로 존재함.
 		Process_LifeChip_Update(ptr);
 		break;
 	}
@@ -528,6 +529,17 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_DOOR_UPDATE:
 	{
 		Process_Door_Update(ptr);
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_PICK_ITEM_INIT:
+	{
+		Process_Pick_Item_Init(ptr);
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_PICK_ITEM_UPDATE:
+	{
 		break;
 	}
 

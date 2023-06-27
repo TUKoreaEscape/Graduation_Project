@@ -22,7 +22,7 @@ void Room::Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE r
 	remain_user = 6 - Number_of_users;
 
 	cGameServer& server = *cGameServer::GetInstance();
-
+	//init_fix_object_and_life_chip();
 	//TIMER_EVENT ev;
 	//ev.room_number = room_number;
 	//ev.event_type = EventType::UPDATE_MOVE;
@@ -79,6 +79,53 @@ char* Room::Get_Room_Name(char room_name[], int size)
 {
 	strcpy_s(room_name, size, m_room_name);
 	return room_name;
+}
+
+void Room::init_fix_object_and_life_chip()
+{
+	int temp[MAX_INGAME_ITEM];
+	srand(time(NULL));
+	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
+		temp[i] = -1;
+
+	for (int i = 0; i < MAX_INGAME_ITEM; ++i) {
+		int t = rand() % MAX_INGAME_ITEM;
+		int* p;
+		while (true) {
+			p = find(temp, temp + MAX_INGAME_ITEM, t);
+			if (p == temp + MAX_INGAME_ITEM)
+			{
+				m_fix_item[i].Set_Item_box_index(t);
+				temp[i] = t;
+				break;
+			}
+			else {
+				t += 1;
+				if (t == MAX_INGAME_ITEM)
+					t = 0;
+			}
+		}
+	}
+
+	m_fix_item[0].Set_Item_Type(GAME_ITEM::ITEM_DRILL);
+	m_fix_item[1].Set_Item_Type(GAME_ITEM::ITEM_HAMMER);
+	m_fix_item[12].Set_Item_Type(GAME_ITEM::ITEM_PLIERS);
+	m_fix_item[13].Set_Item_Type(GAME_ITEM::ITEM_WRENCH);
+
+	for (int i = 2; i < MAX_INGAME_ITEM - 2; ++i)
+		m_fix_item[i].Set_Item_Type(GAME_ITEM::ITEM_LIFECHIP);
+
+	sc_packet_pick_item_init item_init_packet;
+	item_init_packet.size = sizeof(item_init_packet);
+	item_init_packet.type = SC_PACKET::SC_PACKET_PICK_ITEM_INIT;
+	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
+	{
+		item_init_packet.data[i].item_box_index = m_fix_item[i].Get_Item_box_index();
+		item_init_packet.data[i].item_type = m_fix_item[i].Get_Item_Type();
+	}
+
+	for (auto player_id : in_player)
+		cGameServer::GetInstance()->m_clients[player_id].do_send(sizeof(item_init_packet), &item_init_packet);
 }
 
 void Room::add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation)
@@ -191,9 +238,9 @@ bool Room::Is_Door_Open(const int door_num)
 	return false;
 }
 
-bool Room::Pick_Item(const int item_type)
+bool Room::Pick_Item(const int box_id)
 {
-	return m_fix_item[item_type].Pict_Item();
+	return m_fix_item[box_id].Pict_Item();
 }
 
 bool Room::Is_ElectronicSystem_Open(const int es_num)

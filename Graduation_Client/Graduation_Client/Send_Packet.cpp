@@ -71,12 +71,12 @@ void Network::Send_Loading_Success_Packet()
 	send_packet(&packet);
 }
 
-void Network::Send_Picking_Fix_Object_Packet(short item_type)
+void Network::Send_Picking_Fix_Object_Packet(short index)
 {
 	cs_packet_pick_fix_item packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET::CS_PACKET_PICK_ITEM;
-	packet.item_type = item_type;
+	packet.index = index;
 
 	send_packet(&packet);
 	// 이쪽은 생명칩 OR 다른 오브젝트가 주변에 있을때 획득요청을 합니다.

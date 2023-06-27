@@ -127,6 +127,12 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 			_room.add_game_doors(i, OB_DOOR, center_pos, Extents);
 		}
 	}
+
+	for (auto& _room : a_in_game_room)
+	{
+		for (int i = 0; i < MAX_INGAME_ITEM; ++i)
+			_room.m_fix_item.emplace_back();
+	}
 	cout << "Doors BoundingBox : " << "100" << "%로드 완료\r";
 	cout << "Door Load Success!                                       " << endl;
 

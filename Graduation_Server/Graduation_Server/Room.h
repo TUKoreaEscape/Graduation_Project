@@ -65,6 +65,8 @@ public:
 
 public: // 서버 시작시 초기화하는 함수들
 	void	init_room_number(const int room_num){ room_number = room_num;}
+	void	init_fix_object_and_life_chip();
+
 	void	add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation);
 	void	add_game_walls(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents);
 	void	add_game_doors(const unsigned int door_id, Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents);

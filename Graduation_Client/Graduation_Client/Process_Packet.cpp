@@ -11,6 +11,13 @@ void Network::Process_Game_Start(char* ptr)
 	// 여기서 로비씬 -> 게임씬으로 전환 해주면 됨
 }
 
+void Network::Process_LifeChip_Update(char* ptr)
+{
+	sc_packet_life_chip_update* packet = reinterpret_cast<sc_packet_life_chip_update*>(ptr);
+	packet->id;
+	packet->life_chip;
+}
+
 void Network::Process_Player_Move(char* ptr)
 {
 	m_pPlayer_before_Pos = m_pPlayer_Pos;
@@ -209,8 +216,29 @@ void Network::Process_ElectrinicSystem_Init(char* ptr)
 	// 해당부분에서 전력장치 수정 해야됨 아직 없음 ㅎ
 }
 
-void Network::Process_LifeChip_Update(char* ptr)
+void Network::Process_Pick_Item_Init(char* ptr)
 {
-	sc_packet_life_chip_update* packet = reinterpret_cast<sc_packet_life_chip_update*>(ptr);
-	m_lifechip = packet->life_chip;
+	sc_packet_pick_item_init* packet = reinterpret_cast<sc_packet_pick_item_init*>(ptr);
+	// 여기서 처리해야함
+
+	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
+	{
+		if (packet->data[i].item_type == GAME_ITEM::ITEM_LIFECHIP)
+			continue;
+		if (packet->data[i].item_type == GAME_ITEM::ITEM_DRILL)
+			continue;
+		if (packet->data[i].item_type == GAME_ITEM::ITEM_HAMMER)
+			continue;
+		if (packet->data[i].item_type == GAME_ITEM::ITEM_NONE)
+			continue;
+		if (packet->data[i].item_type == GAME_ITEM::ITEM_PLIERS)
+			continue;
+		if (packet->data[i].item_type == GAME_ITEM::ITEM_WRENCH)
+			continue;
+	}
+}
+
+void Network::Process_Pick_Item_Update(char* ptr)
+{
+
 }

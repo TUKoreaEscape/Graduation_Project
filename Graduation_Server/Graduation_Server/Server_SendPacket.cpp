@@ -136,7 +136,7 @@ void cGameServer::send_calculate_move_packet(const unsigned int id) // 이동을 요
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 
-void cGameServer::send_life_chip_update(const unsigned int id)
+void cGameServer::send_life_chip_update(const unsigned int id) // 생명칩 일괄 전송!
 {
 	sc_packet_life_chip_update packet;
 	packet.size = sizeof(packet);

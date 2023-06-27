@@ -126,12 +126,3 @@ namespace CLIENT_ROLE
 	};
 }
 
-namespace GAME_ITEM
-{
-	enum ITEM {
-		ITEM_HAMMER,
-		ITEM_DRILL,
-		ITEM_WRENCH,
-		ITEM_PLIERS
-	};
-}

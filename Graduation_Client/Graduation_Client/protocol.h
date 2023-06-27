@@ -14,7 +14,7 @@ const int CHECK_MAX_PACKET_SIZE = 127;
 
 const int BUF_SIZE = 1024;
 // ----- 클라이언트가 서버에게 보낼때 ------
-
+#define MAX_INGAME_ITEM 14
 #define VOICE_ISSUER "작성해야됨"
 #define VOICE_DOMAIN "작성해야됨"
 #define VOICE_KEY "작성해야됨"
@@ -38,6 +38,18 @@ namespace LOGIN_FAIL_REASON
 	{
 		INVALID_ID,
 		WRONG_PW
+	};
+}
+
+namespace GAME_ITEM
+{
+	enum ITEM {
+		ITEM_HAMMER,
+		ITEM_DRILL,
+		ITEM_WRENCH,
+		ITEM_PLIERS,
+		ITEM_LIFECHIP,
+		ITEM_NONE
 	};
 }
 
@@ -123,6 +135,13 @@ struct Roominfo_by10 {
 	unsigned short				join_member;
 	GAME_ROOM_STATE::TYPE		state;
 };
+
+struct GameItem_Setting {
+	unsigned short			item_box_index;
+	GAME_ITEM::ITEM			item_type;
+};
+
+//===============================================================
 
 struct cs_packet_create_id {
 	unsigned char	size;
@@ -243,7 +262,7 @@ struct cs_packet_pick_fix_item {
 	unsigned char	size;
 	unsigned char	type;
 
-	unsigned short	item_type;
+	unsigned short	index;
 };
 
 struct cs_packet_request_exit_room {
@@ -314,6 +333,7 @@ namespace SC_PACKET
 		SC_PACKET_VIVOX_DATA,
 		SC_PACKET_CUSTOMIZING,
 		SC_PACKET_ATTACK,
+		SC_PACKET_PICK_ITEM_INIT,
 		SC_PACKET_PICK_ITEM_UPDATE,
 		SC_PACKET_GAME_END
 	};
@@ -493,6 +513,12 @@ struct sc_packet_electronic_system_init {
 	unsigned char	type;
 
 	ElectronicSystem_Data data[5];
+};
+
+struct sc_packet_pick_item_init {
+	unsigned char		size;
+	unsigned char		type;
+	GameItem_Setting	data[MAX_INGAME_ITEM];
 };
 
 struct sc_packet_attack {

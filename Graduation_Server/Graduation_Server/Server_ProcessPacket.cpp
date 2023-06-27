@@ -153,6 +153,12 @@ void cGameServer::Process_Create_Room(const unsigned int _user_id, void* buff) /
 	send_put_player_data(_user_id);
 	m_clients[_user_id].set_bounding_box(m_clients[_user_id].get_user_position(), XMFLOAT3(0.7f, 1.f, 0.7f), XMFLOAT4(0, 0, 0, 1));
 
+
+	m_clients[_user_id].set_item_own(GAME_ITEM::ITEM_DRILL, false);
+	m_clients[_user_id].set_item_own(GAME_ITEM::ITEM_HAMMER, false);
+	m_clients[_user_id].set_item_own(GAME_ITEM::ITEM_PLIERS, false);
+	m_clients[_user_id].set_item_own(GAME_ITEM::ITEM_WRENCH, false);
+
 	sc_packet_update_room update_room_packet;
 	update_room_packet.size = sizeof(update_room_packet);
 	update_room_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO_UPDATE;
@@ -184,6 +190,11 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 	{
 		if (m_room_manager->Join_room(user_id, packet->room_number))
 		{
+			m_clients[user_id].set_item_own(GAME_ITEM::ITEM_DRILL, false);
+			m_clients[user_id].set_item_own(GAME_ITEM::ITEM_HAMMER, false);
+			m_clients[user_id].set_item_own(GAME_ITEM::ITEM_PLIERS, false);
+			m_clients[user_id].set_item_own(GAME_ITEM::ITEM_WRENCH, false);
+
 			m_clients[user_id].set_join_room_number(packet->room_number);
 			m_clients[user_id]._state_lock.lock();
 			m_clients[user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
@@ -594,20 +605,25 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
-	bool ret = room.Pick_Item(packet->item_type);
+	bool ret = room.Pick_Item(packet->index);
 
 	if (ret == false)
 		return;
 
-	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
-
-	m_clients[user_id].set_item_own(static_cast<GAME_ITEM::ITEM>(packet->item_type), true);
+	if(room.m_fix_item[packet->index].Get_Item_Type() == GAME_ITEM::ITEM_DRILL)
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_DRILL, true);
+	else if (room.m_fix_item[packet->index].Get_Item_Type() == GAME_ITEM::ITEM_HAMMER)
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_HAMMER, true);
+	else if (room.m_fix_item[packet->index].Get_Item_Type() == GAME_ITEM::ITEM_PLIERS)
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_PLIERS, true);
+	else if (room.m_fix_item[packet->index].Get_Item_Type() == GAME_ITEM::ITEM_WRENCH)
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_WRENCH, true);
 
 	sc_packet_pick_fix_item_update item_packet;
 	item_packet.size = sizeof(item_packet);
 	item_packet.type = SC_PACKET::SC_PACKET_PICK_ITEM_UPDATE;
 	item_packet.own_id = user_id;
-	item_packet.item_type = packet->item_type;
+	item_packet.item_type = packet->index;
 	item_packet.item_show = false;
 
 	for (auto player_id : room.in_player)

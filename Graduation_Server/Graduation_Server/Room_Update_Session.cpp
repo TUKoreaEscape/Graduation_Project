@@ -64,6 +64,8 @@ void Room::Start_Game()
 
 	for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
 		server.m_clients[in_player[i]].do_send(sizeof(system_packet), &system_packet);
+
+	init_fix_object_and_life_chip();
 }
 
 void Room::End_Game()
