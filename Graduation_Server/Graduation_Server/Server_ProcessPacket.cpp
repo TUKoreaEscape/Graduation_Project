@@ -596,8 +596,26 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 
 	bool ret = room.Pick_Item(packet->item_type);
 
-	if (ret)
-		m_clients[user_id].set_item_own(static_cast<GAME_ITEM::ITEM>(packet->item_type), true);
+	if (ret == false)
+		return;
 
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+	m_clients[user_id].set_item_own(static_cast<GAME_ITEM::ITEM>(packet->item_type), true);
+
+	sc_packet_pick_fix_item_update item_packet;
+	item_packet.size = sizeof(item_packet);
+	item_packet.type = SC_PACKET::SC_PACKET_PICK_ITEM_UPDATE;
+	item_packet.own_id = user_id;
+	item_packet.item_type = packet->item_type;
+	item_packet.item_show = false;
+
+	for (auto player_id : room.in_player)
+	{
+		if (player_id == -1)
+			continue;
+		
+		m_clients[player_id].do_send(sizeof(item_packet), &item_packet);
+	}
 	// 이제 여기에 아이템 획득유무를 나타내고 맵에 보이는걸 비활성화 해야함
 }

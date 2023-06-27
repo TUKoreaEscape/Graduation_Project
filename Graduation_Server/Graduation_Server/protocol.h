@@ -314,6 +314,7 @@ namespace SC_PACKET
 		SC_PACKET_VIVOX_DATA,
 		SC_PACKET_CUSTOMIZING,
 		SC_PACKET_ATTACK,
+		SC_PACKET_PICK_ITEM_UPDATE,
 		SC_PACKET_GAME_END
 	};
 }
@@ -524,6 +525,15 @@ struct sc_packet_electronic_system_update_value {
 	unsigned short	es_num;
 	unsigned short	es_switch_idx;
 	bool			es_value;
+};
+
+struct sc_packet_pick_fix_item_update {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned short	own_id;
+	unsigned short	item_type;
+	bool			item_show;
 };
 
 struct sc_packet_customizing_update {
