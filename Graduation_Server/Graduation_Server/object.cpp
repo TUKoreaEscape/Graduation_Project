@@ -211,7 +211,7 @@ bool GameItem::Pict_Item()
 	m_state_lock->lock();
 	if (m_show == true)
 	{
-		m_show == false;
+		m_show = false;
 		m_state_lock->unlock();
 		return true;
 	}

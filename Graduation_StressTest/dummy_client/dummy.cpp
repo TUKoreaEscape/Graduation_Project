@@ -19,7 +19,7 @@ using namespace chrono;
 
 extern HWND		hWnd;
 
-const static int MAX_TEST = 2000;
+const static int MAX_TEST = 5;
 const static int MAX_CLIENTS = MAX_TEST * 2;
 const static int INVALID_ID = -1;
 const static int MAX_PACKET_SIZE = 255;
@@ -30,7 +30,7 @@ const static int MAX_BUFF_SIZE = 255;
 #include "protocol.h"
 
 HANDLE g_hiocp;
-
+int		test_num = 0;
 enum OPTYPE { OP_SEND, OP_RECV, OP_DO_MOVE };
 
 high_resolution_clock::time_point last_connect_time;
@@ -55,6 +55,8 @@ struct CLIENT {
 	int prev_packet_data;
 	int curr_packet_size;
 	high_resolution_clock::time_point last_move_time;
+	int	join_room;
+	bool join = false;
 };
 
 array<int, MAX_CLIENTS> client_map;
@@ -94,6 +96,7 @@ void DisconnectClient(int ci)
 	bool status = true;
 	if (true == atomic_compare_exchange_strong(&g_clients[ci].connected, &status, false)) {
 		closesocket(g_clients[ci].client_socket);
+		
 		active_clients--;
 	}
 	// cout << "Client [" << ci << "] Disconnected!\n";
@@ -119,28 +122,72 @@ void SendPacket(int cl, void* packet)
 	// std::cout << "Send Packet [" << ptype << "] To Client : " << cl << std::endl;
 }
 
+int room_value = 1000;
+
 void ProcessPacket(int ci, unsigned char packet[])
 {
 	switch (packet[1]) {
 	case SC_PACKET::SC_PACKET_LOGINOK:
-		
+	{
+		if (ci % 6 == 0)
+		{
+			cs_packet_create_room create_packet;
+			create_packet.size = sizeof(packet);
+			create_packet.type = CS_PACKET::CS_PACKET_CREATE_ROOM;
+			create_packet.room_number = ci / 6 + room_value * (test_num - 1);
+			SendPacket(ci, &create_packet);
+		}
+		else
+		{
+			cs_packet_join_room create_packet;
+			create_packet.size = sizeof(create_packet);
+			create_packet.type = CS_PACKET::CS_PACKET_JOIN_ROOM;
+			create_packet.room_number = ci / 6 + room_value * (test_num - 1);
+			SendPacket(ci, &create_packet);
+		}
 		break;
-
+	}
 	case SC_PACKET::SC_PACKET_JOIN_ROOM_FAIL:
 
 		break;
 
 	case SC_PACKET::SC_PACKET_CREATE_ROOM_OK:
+	{
+		g_clients[ci].join = true;
+		cs_packet_ready send_packet;
 
+		send_packet.size = sizeof(send_packet);
+		send_packet.type = CS_PACKET::CS_PACKET_READY;
+		send_packet.ready_type = true;
+
+		SendPacket(ci, &send_packet);
+		g_clients[ci].last_move_time = high_resolution_clock::now();
 		break;
-
+	}
 	case SC_PACKET::SC_PACKET_JOIN_ROOM_SUCCESS:
+		g_clients[ci].join = true;
+		cs_packet_ready send_packet;
 
+		send_packet.size = sizeof(send_packet);
+		send_packet.type = CS_PACKET::CS_PACKET_READY;
+		send_packet.ready_type = true;
+
+		SendPacket(ci, &send_packet);
+		g_clients[ci].last_move_time = high_resolution_clock::now();
 		break;
 		
 	case SC_PACKET::SC_PACKET_CALCULATE_MOVE:
+	{
+		sc_packet_calculate_move_test* move_packet = reinterpret_cast<sc_packet_calculate_move_test*>(packet);
 
+		if (0 != move_packet->move_time) {
+			auto d_ms = duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count() - move_packet->move_time;
+			if (global_delay < d_ms) global_delay++;
+			else if (global_delay > d_ms) global_delay--;
+		}
 		break;
+	}
+
 	default: 
 		//MessageBox(hWnd, L"Unknown Packet Type", L"ERROR", 0);
 		//while (true);
@@ -309,25 +356,38 @@ void Adjust_Number_Of_Client()
 			error_display("RECV ERROR", err_no);
 			goto fail_to_connect;
 		}
-	}
+	}g_clients[num_connections].connected = true;
 	num_connections++;
+	active_clients++;
 fail_to_connect:
 	return;
 }
 
 void Test_Thread()
 {
+	chrono::steady_clock::time_point last_add = chrono::steady_clock::now();
 	while (true) {
-		//Sleep(max(20, global_delay));
 		Adjust_Number_Of_Client();
 
 		for (int i = 0; i < num_connections; ++i) {
 			if (false == g_clients[i].connected) continue;
-			if (g_clients[i].last_move_time + 1s > high_resolution_clock::now()) continue;
+			if (g_clients[i].join == false) continue;
+			if (g_clients[i].last_move_time + 16ms > high_resolution_clock::now()) continue;
 			g_clients[i].last_move_time = high_resolution_clock::now();
-			cs_packet_move my_packet;
+			cs_packet_move_test my_packet;
 			my_packet.size = sizeof(my_packet);
 			my_packet.type = CS_PACKET::CS_PACKET_MOVE;
+			my_packet.input_key = 0x01;
+			my_packet.look.x = 0;
+			my_packet.look.y = 0;
+			my_packet.look.z = 100;
+			my_packet.right.x = 100;
+			my_packet.right.y = 0;
+			my_packet.right.z = 0;
+			my_packet.xmf3Shift.x = 0;
+			my_packet.xmf3Shift.y = -0.166667;
+			my_packet.xmf3Shift.z = 0.125;
+			my_packet.move_time = static_cast<unsigned>(duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count());
 			SendPacket(i, &my_packet);
 		}
 	}
@@ -339,6 +399,8 @@ void InitializeNetwork()
 		cl.connected = false;
 		cl.id = INVALID_ID;
 	}
+	cout << "동접테스트기 번호를 입력(1 ~ 3) : ";
+	cin >> test_num;
 
 	for (auto& cl : client_map) cl = -1;
 	num_connections = 0;
@@ -349,10 +411,16 @@ void InitializeNetwork()
 
 	g_hiocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, NULL, 0);
 
+
+
+	system("cls");
+	cout << "동접 테스트기를 시작합니다." << endl;
 	for (int i = 0; i < 6; ++i)
 		worker_threads.push_back(new std::thread{ Worker_Thread });
+	cout << "Worker_Thread Start!!! (6 threads)" << endl;
 
 	test_thread = thread{ Test_Thread };
+	cout << "Test_Thread Start!!!" << endl;
 }
 
 void ShutdownNetwork()

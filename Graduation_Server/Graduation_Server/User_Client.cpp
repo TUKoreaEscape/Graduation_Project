@@ -25,8 +25,9 @@ void CLIENT::do_recv()
 	{
 		int error_num = WSAGetLastError();
 		if (ERROR_IO_PENDING != error_num) {
-			error_display(error_num);
-			cout << "recv error" << endl;
+			//error_display(error_num);
+			//cout << "recv error" << endl;
+			//cGameServer::GetInstance()->Disconnect(m_id);
 		}
 	}
 }
@@ -40,9 +41,9 @@ void CLIENT::do_send(int num_byte, void* mess)
 	{
 		int error_num = WSAGetLastError();
 		if (ERROR_IO_PENDING != error_num) {
-			error_display(error_num);
-			TIMER_EVENT ev;
-			cGameServer::GetInstance()->Disconnect(m_id);
+			//error_display(error_num);
+			//cout << "send error" << endl;
+			delete ex_over;
 		}
 	}
 	//delete ex_over;
@@ -180,10 +181,12 @@ void CLIENT::get_client_name(char& name, int size)
 void CLIENT::error_display(int error_number)
 {
 	WCHAR* lpMsgBuf;
-
-	
-	(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, error_number, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, 0);
-
-	std::wcout << lpMsgBuf << std::endl;
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL, error_number,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPTSTR)&lpMsgBuf, 0, 0);
+	wcout << lpMsgBuf << endl;
+	//while (true);
 	LocalFree(lpMsgBuf);
 }

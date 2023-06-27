@@ -96,45 +96,29 @@ void cGameServer::send_game_start_packet(const unsigned int id)
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 
-void cGameServer::send_move_packet(const unsigned int id, const unsigned int moved_id, cs_packet_move recv_packet, XMFLOAT3 calculate_pos)
-{
-	sc_packet_move packet;
-
-	packet.size = sizeof(packet);
-	packet.type = SC_PACKET::SC_PACKET_MOVE;
-	packet.pos.x = static_cast<short>(calculate_pos.x * 100);
-	packet.pos.y = static_cast<short>(calculate_pos.y * 100);
-	packet.pos.z = static_cast<short>(calculate_pos.z * 100);
-	packet.id = moved_id;
-	packet.input_key = recv_packet.input_key;
-	packet.look = recv_packet.look;
-	packet.right = recv_packet.right;
-
-	m_clients[id].do_send(sizeof(packet), &packet);
-}
-
 void cGameServer::send_move_packet(const unsigned int id, const unsigned int moved_id)
 {
-	sc_packet_move packet;
+	sc_packet_move move_packet;
+	move_packet.size = sizeof(move_packet);
+	move_packet.type = SC_PACKET::SC_PACKET_MOVE;
+	move_packet.data.id = moved_id;
+	move_packet.data.input_key = m_clients[moved_id].get_input_key();
+	move_packet.data.look.x = m_clients[moved_id].get_look_x();
+	move_packet.data.look.y = m_clients[moved_id].get_look_y();
+	move_packet.data.look.z = m_clients[moved_id].get_look_z();
+	move_packet.data.right.x = m_clients[moved_id].get_right_x();
+	move_packet.data.right.y = m_clients[moved_id].get_right_y();
+	move_packet.data.right.z = m_clients[moved_id].get_right_z();
+	move_packet.data.position.x = static_cast<int>(m_clients[moved_id].get_user_position().x * 10000);
+	move_packet.data.position.y = static_cast<int>(m_clients[moved_id].get_user_position().y * 10000);
+	move_packet.data.position.z = static_cast<int>(m_clients[moved_id].get_user_position().z * 10000);
+	move_packet.data.is_jump = m_clients[moved_id].get_user_is_jump();
+	move_packet.data.is_attack = m_clients[moved_id].get_user_attack_animation();
+	move_packet.data.is_victim = m_clients[moved_id].get_user_victim_animation();
+	move_packet.data.is_collision_up_face = m_clients[moved_id].get_user_collied_up_face();
+	move_packet.data.active = m_clients[moved_id].get_life_chip();
 
-	packet.size = sizeof(packet);
-	packet.type = SC_PACKET::SC_PACKET_MOVE;
-	m_clients[moved_id]._update_lock.lock();
-	packet.pos.x = static_cast<short>(m_clients[moved_id].get_user_position().x * 100);
-	packet.pos.y = static_cast<short>(m_clients[moved_id].get_user_position().y * 100);
-	packet.pos.z = static_cast<short>(m_clients[moved_id].get_user_position().z * 100);
-	packet.id = moved_id;
-	packet.input_key = m_clients[moved_id].get_input_key();
-
-	packet.look.x = m_clients[moved_id].get_look_x();
-	packet.look.y = m_clients[moved_id].get_look_y();
-	packet.look.z = m_clients[moved_id].get_look_z();
-
-	packet.right.x = m_clients[moved_id].get_right_x();
-	packet.right.y = m_clients[moved_id].get_right_y();
-	packet.right.z = m_clients[moved_id].get_right_z();
-	m_clients[moved_id]._update_lock.unlock();
-	m_clients[id].do_send(sizeof(packet), &packet);
+	m_clients[id].do_send(sizeof(move_packet), &move_packet);
 }
 
 void cGameServer::send_calculate_move_packet(const unsigned int id) // 이동을 요청한 클라이언트 이동정보를 계산하여 좌표를 전해줌
@@ -148,6 +132,17 @@ void cGameServer::send_calculate_move_packet(const unsigned int id) // 이동을 요
 	packet.pos.y = static_cast<int>(m_clients[id].get_user_position().y * 10000);
 	packet.pos.z = static_cast<int>(m_clients[id].get_user_position().z * 10000);
 	packet.is_collision_up_face = m_clients[id].get_user_collied_up_face();
+
+	m_clients[id].do_send(sizeof(packet), &packet);
+}
+
+void cGameServer::send_life_chip_update(const unsigned int id)
+{
+	sc_packet_life_chip_update packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_LIFE_CHIP_UPDATE;
+	packet.id = id;
+	packet.life_chip = m_clients[id].get_life_chip();
 
 	m_clients[id].do_send(sizeof(packet), &packet);
 }

@@ -21,27 +21,58 @@ void cGameServer::Timer()
 
 		if (m_timer_queue.try_pop(ev)) {
 			if (ev.event_time > current_time) {
-				m_room_manager->Get_Room_Info(ev.room_number)->_room_state_lock.lock();
-				if(m_room_manager->Get_Room_Info(ev.room_number)->_room_state == GAME_ROOM_STATE::PLAYING || m_room_manager->Get_Room_Info(ev.room_number)->_room_state == GAME_ROOM_STATE::READY)
+				if (ev.event_type == EventType::CHECK_NUM_OF_SERVER_ACCEPT_USER)
+				{
 					timer_queue.push(ev);
-				m_room_manager->Get_Room_Info(ev.room_number)->_room_state_lock.unlock();
-				std::this_thread::sleep_for(6ms);
-				continue;
+					//std::this_thread::sleep_for(4ms);
+					std::this_thread::sleep_for(4ms);
+					continue;
+				}
+				else {
+					//m_room_manager->Get_Room_Info(ev.room_number)->_room_state_lock.lock();
+					if (m_room_manager->Get_Room_Info(ev.room_number)->_room_state == GAME_ROOM_STATE::PLAYING || m_room_manager->Get_Room_Info(ev.room_number)->_room_state == GAME_ROOM_STATE::READY)
+					{
+						timer_queue.push(ev);
+						std::this_thread::sleep_for(4ms);
+						continue;
+					}
+				}
 			}
 			else {
 				Process_Event(ev);
 				continue;
 			}
 		}
-		std::this_thread::sleep_for(6ms);
+		else
+			std::this_thread::sleep_for(4ms);
 	}
 }
+
 
 void cGameServer::Process_Event(const TIMER_EVENT& ev)
 {
 
 	switch (ev.event_type)
 	{
+	case EventType::CHECK_NUM_OF_SERVER_ACCEPT_USER:
+	{
+		int number_of_users_in_server = 0;
+		for (int i = 0; i < MAX_USER; ++i)
+		{
+			if (m_clients[i].get_state() == CLIENT_STATE::ST_FREE)
+				continue;
+			number_of_users_in_server++;
+		}
+		join_member = number_of_users_in_server;
+		cout << "Number of users accessing the server : " << number_of_users_in_server << "                                                            " << "\r";
+
+		TIMER_EVENT next_ev;
+		next_ev.event_type = EventType::CHECK_NUM_OF_SERVER_ACCEPT_USER;
+		next_ev.event_time = chrono::system_clock::now() + 5s;
+
+		m_timer_queue.push(next_ev);
+		return;
+	}
 	
 	case EventType::UPDATE_MOVE:
 	{
@@ -50,7 +81,7 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		over->m_comp_op = OP_TYPE::OP_UPDATE_PLAYER_MOVE;
 		memcpy(&over->m_wsa_buf, &ev, sizeof(ev));
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
-		break;
+		return;
 	}
 
 	case EventType::SELECT_TAGGER:
@@ -59,25 +90,19 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		over->m_comp_op = OP_TYPE::OP_SELECT_TAGGER;
 		memcpy(&over->m_wsa_buf, &ev, sizeof(ev));
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
-
-		TIMER_EVENT next_ev;
-		next_ev.room_number = ev.room_number;
-		next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(FIRST_SKILL_ENABLE_TIME);
-		next_ev.event_type = EventType::OPEN_TAGGER_SKILL_FIRST;
-		m_timer_queue.push(next_ev);
-		break;
+		return;
 	}
 
 	case EventType::PLAYER_ATTACK:
 	{
 		m_clients[ev.obj_id].set_attack_animation(false);
-		break;
+		return;
 	}
 
 	case EventType::PLAYER_VICTIM:
 	{
 		m_clients[ev.obj_id].set_victim_animation(false);
-		break;
+		return;
 	}
 
 	case EventType::OPEN_TAGGER_SKILL_FIRST:
@@ -85,13 +110,7 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		EXP_OVER* over = new EXP_OVER;
 		over->m_comp_op = OP_TYPE::OP_FIRST_TAGGER_SKILL_OPEN;
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
-
-		TIMER_EVENT next_ev;
-		next_ev.room_number = ev.room_number;
-		next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(SECOND_SKILL_ENABLE_TIME);
-		next_ev.event_type = EventType::OPEN_TAGGER_SKILL_SECOND;
-		m_timer_queue.push(next_ev);
-		break;
+		return;
 	}
 
 	case EventType::OPEN_TAGGER_SKILL_SECOND:
@@ -99,13 +118,7 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		EXP_OVER* over = new EXP_OVER;
 		over->m_comp_op = OP_TYPE::OP_SECOND_TAGGER_SKILL_OPEN;
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
-
-		TIMER_EVENT next_ev;
-		next_ev.room_number = ev.room_number;
-		next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(THIRD_SKILL_ENABLE_TIME);
-		next_ev.event_type = EventType::OPEN_TAGGER_SKILL_THIRD;
-		m_timer_queue.push(next_ev);
-		break;
+		return;
 	}
 
 	case EventType::OPEN_TAGGER_SKILL_THIRD:
@@ -113,7 +126,7 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		EXP_OVER* over = new EXP_OVER;
 		over->m_comp_op = OP_TYPE::OP_THIRD_TAGGER_SKILL_OPEN;
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
-		break;
+		return;
 	}
 
 	case EventType::OPEN_DOOR:
@@ -122,7 +135,7 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 
 		rl.m_door_object[ev.obj_id].m_check_bounding_box = false;
 		rl.m_door_object[ev.obj_id].m_door_open_start = false;
-		break;
+		return;
 	}
 
 	case EventType::CLOSE_DOOR:
@@ -131,18 +144,18 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 
 		rl.m_door_object[ev.obj_id].m_check_bounding_box = true;
 		rl.m_door_object[ev.obj_id].m_door_close_start = false;
-		break;
+		return;
 	}
 
 	case EventType::OPEN_ELECTRONIC:
 	{
-		break;
+		return;
 	}
 
 	case EventType::CLOSE_ELECTRONIC:
 	{
 
-		break;
+		return;
 	}
 
 	case EventType::GAME_END:
@@ -150,7 +163,7 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		EXP_OVER* over = new EXP_OVER;
 		over->m_comp_op = OP_TYPE::OP_GAME_END;
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
-		break;
+		return;
 	}
 
 	}

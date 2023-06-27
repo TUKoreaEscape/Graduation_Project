@@ -21,7 +21,7 @@ void cGameServer::Update_OtherPlayer(int room_number, float elaspeTime)
 				if (room.Get_Join_Member(in_id) != -1 && room.Get_Join_Member(in_id) != room.Get_Join_Member(k))
 				{
 					int this_id = room.Get_Join_Member(in_id);
-					m_clients[this_id]._pos_lock.lock();
+					//[this_id]._pos_lock.lock();
 					packet.data[index].id = this_id;
 					packet.data[index].input_key = m_clients[this_id].get_input_key();
 					packet.data[index].look.x = m_clients[this_id].get_look_x();
@@ -38,7 +38,7 @@ void cGameServer::Update_OtherPlayer(int room_number, float elaspeTime)
 					packet.data[index].is_victim = m_clients[this_id].get_user_victim_animation();
 					packet.data[index].is_collision_up_face = m_clients[this_id].get_user_collied_up_face();
 					packet.data[index].active = true;
-					m_clients[this_id]._pos_lock.unlock();
+					//m_clients[this_id]._pos_lock.unlock();
 					index++;
 				}
 

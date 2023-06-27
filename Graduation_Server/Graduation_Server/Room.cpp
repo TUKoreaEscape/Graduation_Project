@@ -23,12 +23,12 @@ void Room::Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE r
 
 	cGameServer& server = *cGameServer::GetInstance();
 
-	TIMER_EVENT ev;
-	ev.room_number = room_number;
-	ev.event_type = EventType::UPDATE_MOVE;
-	ev.cool_time = (float)((float)1 / SET_SERVER_UPDATE_FRAME);
-	ev.event_time = chrono::system_clock::now();
-	server.m_timer_queue.push(ev);
+	//TIMER_EVENT ev;
+	//ev.room_number = room_number;
+	//ev.event_type = EventType::UPDATE_MOVE;
+	//ev.cool_time = (float)((float)1 / SET_SERVER_UPDATE_FRAME);
+	//ev.event_time = chrono::system_clock::now();
+	//server.m_timer_queue.push(ev);
 }
 
 bool Room::Join_Player(int user_id)
@@ -88,7 +88,12 @@ void Room::add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extent
 
 void Room::add_game_walls(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents)
 {
-	m_game_wall_and_fix_object.emplace_back(GameObject(ob_type, center, extents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)));
+	m_game_wall.emplace_back(GameObject(ob_type, center, extents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)));
+}
+
+void Room::add_fix_objects(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents)
+{
+	m_game_fix_object.emplace_back(GameObject(ob_type, center, extents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)));
 }
 
 void Room::add_game_doors(const unsigned int door_id, Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents)
@@ -113,13 +118,12 @@ void Room::SetReady(const bool is_ready, const int user_id)
 {
 	for (int i = 0; i < in_player.size(); ++i)
 	{
-		in_player_lock.lock();
 		if (in_player[i] == user_id) {
+			in_player_lock.lock();
 			in_player_ready[i] = is_ready;
 			in_player_lock.unlock();
 			break;
 		}
-		in_player_lock.unlock();
 	}
 }
 
@@ -127,13 +131,12 @@ void Room::SetLoading(const bool is_loading, const int user_id)
 {
 	for (int i = 0; i < in_player_loading_success.size(); ++i)
 	{
-		in_player_lock.lock();
 		if (in_player[i] == user_id) {
+			in_player_lock.lock();
 			in_player_loading_success[i] = is_loading;
 			in_player_lock.unlock();
 			break;
 		}
-		in_player_lock.unlock();
 	}
 }
 
@@ -311,15 +314,17 @@ CollisionInfo Room::is_collision_player_to_player(const int& player_id, const XM
 	BoundingOrientedBox player_bounding_box = client.get_bounding_box();
 	for (int i = 0; i < Number_of_users; ++i)
 	{
-		if (in_player[i] != player_id && in_player[i] != -1)
-		{
-			CLIENT& other_player = *server.get_client_info(in_player[i]);
-			BoundingOrientedBox other_player_bounding_box = other_player.get_bounding_box();
+		if (in_player[i] == player_id)
+			continue;
+		if (in_player[i] == -1)
+			continue;
 
-			if (player_bounding_box.Intersects(other_player_bounding_box)) {
-				collied_id = in_player[i];
-				break;
-			}
+		CLIENT& other_player = *server.get_client_info(in_player[i]);
+		BoundingOrientedBox other_player_bounding_box = other_player.get_bounding_box();
+
+		if (player_bounding_box.Intersects(other_player_bounding_box)) {
+			collied_id = in_player[i];
+			break;
 		}
 	}
 
@@ -373,8 +378,10 @@ CollisionInfo Room::is_collision_wall_to_player(const int& player_id, const XMFL
 	XMFLOAT3 tmp_position = current_position;
 	BoundingOrientedBox check_box = cl.get_bounding_box();
 	int collied_face_num = -1;
-	for (auto& object : m_game_wall_and_fix_object) // 모든벽을 체크 후 값을 더해주는 방식이 좋아보임!
+	for (auto& object : m_game_wall) // 모든벽을 체크 후 값을 더해주는 방식이 좋아보임!
 	{
+		if (false == Is_near(current_position, object.Get_center(), 100))
+			continue;
 		if (check_box.Intersects(object.Get_BoundingBox()))
 		{
 			cl.set_user_position(tmp_position);
@@ -415,4 +422,66 @@ CollisionInfo Room::is_collision_wall_to_player(const int& player_id, const XMFL
 	return return_data;
 }
 
+CollisionInfo Room::is_collision_fix_object_to_player(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift)
+{
+	cGameServer& server = *cGameServer::GetInstance();
+	CLIENT& cl = *server.get_client_info(player_id);
+	CollisionInfo return_data;
+	return_data.is_collision = false;
+	return_data.CollisionNormal = XMFLOAT3(0, 0, 0);
+	return_data.SlidingVector = XMFLOAT3(0, 0, 0);
+	BoundingOrientedBox player_bounding_box = cl.get_bounding_box();
+	XMFLOAT3 MotionVector = xmf3shift;
+	XMFLOAT3 tmp_position = current_position;
+	BoundingOrientedBox check_box = cl.get_bounding_box();
+	int collied_face_num = -1;
+	for (auto& object : m_game_fix_object) // 모든벽을 체크 후 값을 더해주는 방식이 좋아보임!
+	{
+		if (false == Is_near(current_position, object.Get_center(), 15))
+			continue;
+		if (check_box.Intersects(object.Get_BoundingBox()))
+		{
+			cl.set_user_position(tmp_position);
+			cl.update_bounding_box_pos(tmp_position);
+			CollisionInfo collision_data = server.GetCollisionInfo(object.Get_BoundingBox(), player_bounding_box);
+			XMFLOAT3 SlidingVector = XMFLOAT3(0.0f, 0.0f, 0.0f);
+			XMFLOAT3 current_player_position = tmp_position;
 
+
+			float DotProduct = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&MotionVector), XMLoadFloat3(&collision_data.CollisionNormal)));
+
+			if (DotProduct < 0.0f)
+			{
+				XMFLOAT3 RejectionVector = XMFLOAT3(-DotProduct * collision_data.CollisionNormal.x, -DotProduct * collision_data.CollisionNormal.y, -DotProduct * collision_data.CollisionNormal.z);
+				SlidingVector = XMFLOAT3(MotionVector.x + RejectionVector.x, MotionVector.y + RejectionVector.y, MotionVector.z + RejectionVector.z);
+			}
+			else
+			{
+				SlidingVector = MotionVector;
+			}
+
+			if (collision_data.collision_face_num == 4)
+				collied_face_num = 4;
+
+			return_data.is_collision = true;
+			return_data.SlidingVector = SlidingVector;
+			return_data.collision_face_num = collision_data.collision_face_num;
+			MotionVector = SlidingVector;
+			tmp_position = Add(tmp_position, SlidingVector);
+
+			cl.set_user_position(current_position);
+			cl.update_bounding_box_pos(current_position);
+			check_box.Center = tmp_position;
+		}
+	}
+
+	return_data.collision_face_num = collied_face_num;
+	return return_data;
+}
+
+bool Room::Is_near(XMFLOAT3 player_pos, XMFLOAT3 object_pos, int range)
+{
+	if (range < abs(player_pos.x - object_pos.x)) return false;
+	if (range < abs(player_pos.z - object_pos.z)) return false;
+	return true;
+}

@@ -24,7 +24,8 @@ private:
 public:
 	array<BoundingOrientedBox, 6>	in_player_bounding_box;
 	vector<GameObject>				m_game_object;
-	vector<GameObject>				m_game_wall_and_fix_object;
+	vector<GameObject>				m_game_fix_object;
+	vector<GameObject>				m_game_wall;
 	vector<Door>					m_door_object;
 	vector<ElectronicSystem>		m_electrinic_system;
 	vector<GameItem>				m_fix_item;
@@ -62,20 +63,22 @@ public:
 
 	}
 
-	void init_room_number(const int room_num)
-	{
-		room_number = room_num;
-	}
-
-	// 인게임 로딩 전 사용하는 함수
+public: // 서버 시작시 초기화하는 함수들
+	void	init_room_number(const int room_num){ room_number = room_num;}
 	void	add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation);
 	void	add_game_walls(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents);
 	void	add_game_doors(const unsigned int door_id, Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents);
 	void	add_game_ElectronicSystem(const unsigned int id, Object_Type ob_type, XMFLOAT3& center, XMFLOAT3& extents);
+	void	add_fix_objects(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents);
+
+public: // 게임 시작 전 사용하는 함수들
 	void	Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE room_state);
 	void	SetReady(const bool is_ready, const int user_id);
 	void	SetLoading(const bool is_loading, const int user_id);
 	void	Exit_Player(int user_id);
+	bool	Join_Player(int user_id);
+	bool	All_Player_Ready();
+	bool	All_Player_Loading();
 
 public:
 	// 인게임 시작후 사용하는 함수
@@ -89,15 +92,15 @@ public:
 public: // 인게임 오브젝트 state 받아야하는 공간
 	Door_State Get_Door_State(const int door_num) { return m_door_object[door_num].get_state(); }
 	ES_State   Get_EletronicSystem_State(const int es_num) { return m_electrinic_system[es_num].get_state(); }
-public:
+
+public: // 게임 state 변환하는 함수
 	void	Reset_Room();
 	void	Start_Game();
 	void	End_Game();
 
 public: // 인게임 아이템관련 함수
 	bool	Pick_Item(const int item_type);
-
-private:
+	bool	Is_near(XMFLOAT3 player_pos, XMFLOAT3 object_pos, int range);
 
 public:
 	int		Select_Tagger();
@@ -105,15 +108,13 @@ public:
 	int		Get_Join_Member(int data);
 	int		Get_Tagger_ID() { return m_tagger_id; }
 
-	bool	Join_Player(int user_id);
-	bool	All_Player_Ready();
-	bool	All_Player_Loading();
-
 	bool	Is_Door_Open(const int door_num);
 	bool	Is_ElectronicSystem_Open(const int es_num);
 
+public: // 충돌 관련 함수
 	CollisionInfo	is_collision_wall_to_player(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
 	CollisionInfo	is_collision_player_to_player(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
+	CollisionInfo	is_collision_fix_object_to_player(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
 	CollisionInfo	is_collision_player_to_object(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
 	CollisionInfo	is_collision_player_to_door(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
 

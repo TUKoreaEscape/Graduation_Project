@@ -304,6 +304,7 @@ namespace SC_PACKET
 		SC_PACKET_MOVE,
 		SC_PACKET_ELECTRONIC_SWITCH_INIT,
 		SC_PACKET_CALCULATE_MOVE,
+		SC_PACKET_LIFE_CHIP_UPDATE,
 		SC_PACKET_SELECT_TAGGER,
 		SC_PACKET_TAGGER_SKILL,
 		SC_PACKET_DOOR_UPDATE,
@@ -313,6 +314,7 @@ namespace SC_PACKET
 		SC_PACKET_VIVOX_DATA,
 		SC_PACKET_CUSTOMIZING,
 		SC_PACKET_ATTACK,
+		SC_PACKET_PICK_ITEM_UPDATE,
 		SC_PACKET_GAME_END
 	};
 }
@@ -434,13 +436,7 @@ struct sc_packet_voice_data {
 struct sc_packet_move {
 	unsigned char	size;
 	unsigned char	type;
-	unsigned short	id;
-
-	unsigned char	input_key;
-
-	Look		look;
-	Right		right;
-	Position	pos;
+	UserData		data;
 };
 
 struct sc_packet_calculate_move {
@@ -449,6 +445,14 @@ struct sc_packet_calculate_move {
 	short			id;
 	Position		pos;
 	bool			is_collision_up_face;
+};
+
+struct sc_packet_life_chip_update {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			id;
+	bool			life_chip;
 };
 
 struct sc_packet_select_tagger {
@@ -523,6 +527,15 @@ struct sc_packet_electronic_system_update_value {
 	bool			es_value;
 };
 
+struct sc_packet_pick_fix_item_update {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned short	own_id;
+	unsigned short	item_type;
+	bool			item_show;
+};
+
 struct sc_packet_customizing_update {
 	unsigned char	size;
 	unsigned char	type;
@@ -550,5 +563,32 @@ struct sc_packet_game_end {
 	unsigned char	type;
 
 	bool			is_tagger_win;
+};
+
+// 여긴 StressTest용 패킷입니다
+
+struct cs_packet_move_test {
+	unsigned char		size;
+	unsigned char		type;
+
+	unsigned char		input_key;
+	bool				is_jump;
+	float				yaw;
+	Look				look;
+	Right				right;
+	DirectX::XMFLOAT3	velocity;
+	DirectX::XMFLOAT3	xmf3Shift;
+
+	int				move_time;
+};
+
+struct sc_packet_calculate_move_test {
+	unsigned char	size;
+	unsigned char	type;
+	short			id;
+	Position		pos;
+	bool			is_collision_up_face;
+
+	int				move_time;
 };
 #pragma pack(pop)

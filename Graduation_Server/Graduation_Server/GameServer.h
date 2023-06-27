@@ -13,7 +13,7 @@
 #define FIRST_SKILL_ENABLE_TIME 180
 #define SECOND_SKILL_ENABLE_TIME 240
 #define THIRD_SKILL_ENABLE_TIME 240
-#define SET_SERVER_UPDATE_FRAME 45
+#define SET_SERVER_UPDATE_FRAME 30
 
 class EXP_OVER;
 class CLIENT;
@@ -22,6 +22,7 @@ class RoomManager;
 
 enum class EventType : char
 {
+	CHECK_NUM_OF_SERVER_ACCEPT_USER,
 	OPEN_DOOR,
 	CLOSE_DOOR,
 	OPEN_ELECTRONIC,
@@ -51,14 +52,12 @@ struct TIMER_EVENT {
 
 class cGameServer : public C_IOCP
 {
-public:
+private:
 	static cGameServer* server_instance;
 	cGameServer();
 	~cGameServer();
 
 public:
-
-	//static cGameServer& GetInstance();
 	static cGameServer* GetInstance() {
 		if (server_instance == nullptr)
 			server_instance = new cGameServer;
@@ -73,13 +72,11 @@ public:
 	void	Send(EXP_OVER* exp_over);
 	void	Recv(EXP_OVER* exp_over, const unsigned int user_id, const DWORD num_byte);
 	void	Disconnect(const unsigned int _user_id);
-	void	Update_Session(int thread_number); // 방의 시간, 실시간으로 체크해야하는 부분은 여기서 전부 처리 할 예정입니다.
-
 	void	Update_OtherPlayer(int room_number, float elaspeTime);
 	void	Update_Viewlist(const int id, const int room_number);
-
 	bool	Is_near(int a, int b);
 
+public: // 이쪽은 패킷을 전송하는 함수의 모임입니다.
 	void	send_chat_packet(const unsigned int user_id, const unsigned int my_id, char* mess); // 채팅내용을 패킷으로 보내는 함수입니다.
 	void	send_login_fail_packet(const unsigned int user_id, LOGIN_FAIL_REASON::TYPE reason); // 로그인 실패를 패킷으로 전송하는 함수입니다.
 	void	send_login_ok_packet(const unsigned int user_id); // 로그인에 성공했다는것을 패킷으로 전송하는 함수입니다.
@@ -88,11 +85,9 @@ public:
 	void	send_create_room_ok_packet(const unsigned int user_id, const int room_number); // 게임방에 생성을 성공했다는것을 알리는 함수입니다.
 	void	send_join_room_success_packet(const unsigned int user_id);	// 방 접속에 성공했음을 알리는 패킷입니다.
 	void	send_join_room_fail_packet(const unsigned int user_id);	// 방 접속에 실패했음을 알리는 패킷입니다.
-
-	void	send_move_packet(const unsigned int id, const unsigned int moved_id, cs_packet_move recv_packet, XMFLOAT3 calculate_pos); // 한 클라이언트의 이동을 계산하여 다른 클라이언트에게 전송합니다.
-	void	send_move_packet(const unsigned int id, const unsigned int moved_id); // 현재는 사용하지 않습니다/
+	void	send_move_packet(const unsigned int id, const unsigned int moved_id); // 이동을 처리합니다.
 	void	send_calculate_move_packet(const unsigned int id); // 이동을 요청한 클라이언트에게 좌표를 계산하여 넘겨줍니다.
-
+	void	send_life_chip_update(const unsigned int id);
 	void	send_game_start_packet(const unsigned int id); // 게임이 시작된것을 패킷으로 전송함
 	void	send_put_player_data(const unsigned int recv_id);
 	void	send_put_other_player(const unsigned int put_id, const unsigned int recv_id);  
@@ -100,7 +95,7 @@ public:
 	void	send_customizing_data(const unsigned int id);
 
 
-
+public:
 	void	ProcessPacket(const unsigned int user_id, unsigned char* p); // 패킷을 구분후 처리함
 	void	Process_User_Login(int c_id, void* buff); // 로그인 처리
 	void	Process_Create_ID(int c_id, void* buff); // 아이디 생성 처리
@@ -118,12 +113,14 @@ public:
 	void	Process_ElectronicSystem_Open(const int user_id, void* buff); // 게임방 내 전력장치를 열기,닫기를 하는 함수
 	void	Process_ElectronicSystem_Control(const int user_id, void* buff); // 게임방 내 전력장치 스위치 on,off를 처리, 수리를 체크하는 함수
 	void	Process_Pick_Fix_Item(const int user_id, void* buff);
-	
 	void	Process_Event(const TIMER_EVENT& ev); // 이벤트를 처리, worker thread로 넘기는 역할을 함 *매우중요*
-
 	// voice chat data를 전송하는 부분!
 	void	Process_Voice_Data(int user_id);
+	// stress test용
+	void	Process_Move_Test(const int user_id, void* buff);
 
+
+public:
 	void	Timer();
 	int		get_new_id();
 	CLIENT*	get_client_info(const int player_id);
@@ -131,12 +128,16 @@ public:
 
 	wstring stringToWstring(const std::string& t_str);
 
+public: // 이 아래 두개는 db와 플레이어용입니다.
 	std::array<CLIENT, MAX_USER>	m_clients;
 	DataBase						*m_database = nullptr;
-
-	concurrency::concurrent_priority_queue<TIMER_EVENT> m_timer_queue;
 protected:
 	std::queue<CLIENT>				request_querry;
+
+public: // 타이머 이벤트용
+
+	concurrency::concurrent_priority_queue<TIMER_EVENT> m_timer_queue;
+	std::priority_queue<TIMER_EVENT>					timer_queue;
 
 private:
 	const int						RANGE = 7;
