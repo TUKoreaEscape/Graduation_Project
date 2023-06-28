@@ -29,6 +29,7 @@ public:
 	vector<Door>					m_door_object;
 	vector<ElectronicSystem>		m_electrinic_system;
 	vector<GameItem>				m_fix_item;
+	Altar*							m_altar = nullptr;
 
 private:
 	chrono::system_clock::time_point start_time;
@@ -56,11 +57,12 @@ public:
 		_room_state = GAME_ROOM_STATE::FREE;
 		in_player.fill(-1);
 		in_player_ready.fill(false);
+		m_altar = new Altar;
 	}
 
 	~Room()
 	{
-
+		delete m_altar;
 	}
 
 public: // 서버 시작시 초기화하는 함수들
@@ -101,6 +103,7 @@ public: // 게임 state 변환하는 함수
 	void	End_Game();
 
 public: // 인게임 아이템관련 함수
+	void	Activate_Altar();
 	bool	Pick_Item(const int item_type);
 	bool	Is_near(XMFLOAT3 player_pos, XMFLOAT3 object_pos, int range);
 

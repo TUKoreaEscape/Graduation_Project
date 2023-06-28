@@ -148,3 +148,12 @@ void Network::Send_Select_Room(int select_room_number)
 
 	}
 }
+
+void Network::Send_Ativate_Altar()
+{
+	cs_packet_activate_altar packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_ACTIVATE_ALTAR;
+
+	send_packet(&packet);
+}

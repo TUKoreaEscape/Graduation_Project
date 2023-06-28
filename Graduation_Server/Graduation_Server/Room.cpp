@@ -189,6 +189,11 @@ void Room::SetLoading(const bool is_loading, const int user_id)
 	}
 }
 
+void Room::Activate_Altar()
+{
+	m_altar->Set_Valid(true);
+}
+
 void Room::Set_Electronic_System_ONOFF()
 {
 	for (int i = 0; i < NUMBER_OF_ELECTRONIC; ++i)

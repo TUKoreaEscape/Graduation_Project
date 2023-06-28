@@ -230,3 +230,32 @@ void GameItem::Release()
 {
 	delete m_state_lock;
 }
+
+
+Altar::Altar()
+{
+	m_state_lock = new mutex;
+}
+
+void Altar::init()
+{
+	m_is_valid = false;
+	m_have_life_chip = 0;
+}
+
+void Altar::Release()
+{
+	delete m_state_lock;
+}
+
+void Altar::Set_Valid(bool value)
+{
+	m_state_lock->lock();
+	m_is_valid = true;
+	m_state_lock->unlock();
+}
+
+bool Altar::Get_Valid()
+{
+	return m_is_valid;
+}

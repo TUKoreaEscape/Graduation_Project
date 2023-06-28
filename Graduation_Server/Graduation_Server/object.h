@@ -138,3 +138,22 @@ public:
 	void				Update_Object();
 	void				Release();
 };
+
+class Altar : public GameObject {
+private:
+	bool	m_is_valid = false;
+	mutex*	m_state_lock = nullptr;
+
+	int		m_have_life_chip = 0;
+public:
+	Altar();
+	~Altar() = default;
+
+	void	init();
+	void	Set_Valid(bool value);
+	void	Add_Life_Chip() { m_have_life_chip++; }
+
+	bool	Get_Valid();
+	int		Get_Life_Chip() { return m_have_life_chip; }
+	void	Release();
+};

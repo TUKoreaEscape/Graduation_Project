@@ -623,7 +623,7 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 	if (ret == false)
 		return;
 
-	if(room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_DRILL)
+	if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_DRILL)
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_DRILL, true);
 	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_HAMMER)
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_HAMMER, true);
@@ -631,6 +631,8 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_PLIERS, true);
 	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_WRENCH)
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_WRENCH, true);
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_LIFECHIP)
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, true);
 
 	sc_packet_pick_fix_item_update item_packet;
 	item_packet.size = sizeof(item_packet);
@@ -648,4 +650,21 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 		m_clients[player_id].do_send(sizeof(item_packet), &item_packet);
 	}
 	// 이제 여기에 아이템 획득유무를 나타내고 맵에 보이는걸 비활성화 해야함
+}
+
+void cGameServer::Process_Active_Altar(const int user_id)
+{
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+	room.Activate_Altar();
+
+	sc_packet_activate_altar packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_ACTIVATE_ALTAR;
+
+	for (auto player_id : room.in_player)
+	{
+		if (player_id == -1)
+			continue;
+		m_clients[player_id].do_send(sizeof(packet), &packet);
+	}
 }
