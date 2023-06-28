@@ -4,6 +4,11 @@
 RECT_FLOAT idRect{ 0,0,0,0 };
 RECT_FLOAT passwordRect{ 0,0,0,0 };
 RECT_FLOAT roominfoRect[6]{ 0, };
+RECT_FLOAT roomPageRect[2]{ 0, };
+RECT_FLOAT pageNumRect{ 0,0,0,0 };
+RECT_FLOAT waitingRoomRect[3]{ 0, };
+RECT_FLOAT customizingRect{ 0,0,0,0 };
+RECT_FLOAT endingRect{ 0,0,0,0 };
 
 void UpdateRectSize(HWND hWnd)
 {
@@ -12,13 +17,26 @@ void UpdateRectSize(HWND hWnd)
 	float clientWidth = clientRect.right - clientRect.left;
 	float clientHeight = clientRect.bottom - clientRect.top;
 
-	idRect = RECT_FLOAT{ clientWidth / 9.14, clientHeight / 1.62, clientWidth / 2.73, clientHeight / 1.51 };
-	passwordRect = RECT_FLOAT{ clientWidth / 9.14, clientHeight / 1.46, clientWidth / 2.73, clientHeight / 1.37 };
+	idRect = RECT_FLOAT{ clientWidth / float(1600.0 / 175.0), clientHeight / float(900.0 / 555.0), clientWidth / float(1600.0 / 585.0), clientHeight / float(900.0 / 595.0) };
+	passwordRect = RECT_FLOAT{ clientWidth / float(1600.0 / 175.0) , clientHeight / float(900.0 / 615.0), clientWidth / float(1600.0 / 585.0), clientHeight / float(900.0 / 656.0) };
 
-	roominfoRect[0] = RECT_FLOAT{ clientWidth / 5.71, clientHeight / 20.0, clientWidth / 2.35, clientHeight / 4.00 };
-	roominfoRect[1] = RECT_FLOAT{ clientWidth / 1.73, clientHeight / 20.0, clientWidth / 1.21, clientHeight / 4.00 };
-	roominfoRect[2] = RECT_FLOAT{ clientWidth / 5.71, clientHeight / 2.85, clientWidth / 2.35, clientHeight / 1.81 };
-	roominfoRect[3] = RECT_FLOAT{ clientWidth / 1.73, clientHeight / 2.85, clientWidth / 1.21, clientHeight / 1.81 };
-	roominfoRect[4] = RECT_FLOAT{ clientWidth / 5.71, clientHeight / 1.53, clientWidth / 2.35, clientHeight / 1.17 };
-	roominfoRect[5] = RECT_FLOAT{ clientWidth / 1.73, clientHeight / 1.53, clientWidth / 1.21, clientHeight / 1.17 };
+	roominfoRect[0] = RECT_FLOAT{ clientWidth / float(1600.0 / 280.0), clientHeight / float(900.0 / 45.0), clientWidth / float(1600.0 / 680.0), clientHeight / float(900.0 / 225.0) };
+	roominfoRect[1] = RECT_FLOAT{ clientWidth / float(1600.0 / 920.0), clientHeight / float(900.0 / 45.0), clientWidth / float(1600.0 / 1320.0), clientHeight / float(900.0 / 225.0) };
+	roominfoRect[2] = RECT_FLOAT{ clientWidth / float(1600.0 / 280.0), clientHeight / float(900.0 / 315.0), clientWidth / float(1600.0 / 680.0), clientHeight / float(900.0 / 495.0) };
+	roominfoRect[3] = RECT_FLOAT{ clientWidth / float(1600.0 / 920.0), clientHeight / float(900.0 / 315.0), clientWidth / float(1600.0 / 1320.0), clientHeight / float(900.0 / 495.0) };
+	roominfoRect[4] = RECT_FLOAT{ clientWidth / float(1600.0 / 280.0), clientHeight / float(900.0 / 585.0), clientWidth / float(1600.0 / 680.0), clientHeight / float(900.0 / 765.0) };
+	roominfoRect[5] = RECT_FLOAT{ clientWidth / float(1600.0 / 920.0), clientHeight / float(900.0 / 585.0), clientWidth / float(1600.0 / 1320.0), clientHeight / float(900.0 / 765.0) };
+
+	roomPageRect[0] = RECT_FLOAT{ clientWidth / float(1600.0 / 560.0), clientHeight / float(900.0 / 825.0), clientWidth / float(1600.0 / 720.0), clientHeight / float(900.0 / 885.0) };
+	roomPageRect[1] = RECT_FLOAT{ clientWidth / float(1600.0 / 880.0), clientHeight / float(900.0 / 825.0), clientWidth / float(1600.0 / 1035.0), clientHeight / float(900.0 / 885.0) };
+
+	pageNumRect = RECT_FLOAT{ clientWidth / float(1600.0 / 780.0), clientHeight / float(900.0 / 850.0), clientWidth / float(1600.0 / 820.0), clientHeight / float(900.0 / 850.0) };
+
+	waitingRoomRect[0] = RECT_FLOAT{ clientWidth / float(1600.0 / 1060.0), clientHeight / float(900.0 / 785.0), clientWidth / float(1600.0 / 1180.0), clientHeight / float(900.0 / 830.0) };
+	waitingRoomRect[1] = RECT_FLOAT{ clientWidth / float(1600.0 / 1220.0), clientHeight / float(900.0 / 785.0), clientWidth / float(1600.0 / 1340.0), clientHeight / float(900.0 / 830.0) };
+	waitingRoomRect[2] = RECT_FLOAT{ clientWidth / float(1600.0 / 1380.0), clientHeight / float(900.0 / 785.0), clientWidth / float(1600.0 / 1500.0), clientHeight / float(900.0 / 830.0) };
+	
+	customizingRect = RECT_FLOAT{ clientWidth / float(1600.0 / 1380.0), clientHeight / float(900.0 / 785.0), clientWidth / float(1600.0 / 1500.0), clientHeight / float(900.0 / 830.0) };
+
+	endingRect = RECT_FLOAT{ clientWidth / float(1600.0 / 1380.0), clientHeight / float(900.0 / 785.0), clientWidth / float(1600.0 / 1500.0), clientHeight / float(900.0 / 830.0) };
 }

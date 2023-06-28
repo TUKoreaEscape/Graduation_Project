@@ -61,7 +61,13 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			speed = 60.0f;
 			break;
 		case VK_F6:
-			m_gamestate->ChangeState();
+			m_gamestate->ChangeNextState();
+			break;
+		case VK_F7:
+			m_gamestate->ChangePrevState();
+			break;
+		case VK_F8:
+			m_gamestate->ChangeSameLevelState();
 			break;
 		case VK_ESCAPE:
 		{
@@ -116,6 +122,8 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 
 void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
+	int xPos = LOWORD(lParam);
+	int yPos = HIWORD(lParam);
 	switch (nMessageID)
 	{
 	case WM_LBUTTONDOWN:
@@ -169,11 +177,72 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 					//std::cout << i+1  << " 방 클릭!" << std::endl;
 					Network& network = *Network::GetInstance();
 					network.Send_Select_Room(i);
-					network.m_join_room_number = i;
+					network.m_join_room_number = i * m_PageNum;
+				}
+			}
+			for (int i = 0; i < 2; ++i)
+			{
+				if (xPos >= roomPageRect[i].left && xPos <= roomPageRect[i].right && yPos >= roomPageRect[i].top && yPos <= roomPageRect[i].bottom)
+				{
+					//페이지 업 다운 판단, 0일때 왼쪽 화살표,1일때 오른쪽 화살표
+					// input에 PageNum이 있음 김우빈
+					if (i == 0) PageDown();
+					else PageUp();
 				}
 			}
 			//InputRoomInfo();
 		}
+		else if (m_gamestate->GetGameState() == WAITING_GAME)
+		{
+			UpdateRectSize(hWnd);
+			int xPos = LOWORD(lParam);
+			int yPos = HIWORD(lParam);
+
+			for (int i = 0; i < 3; ++i)
+			{
+				if (xPos >= waitingRoomRect[i].left && xPos <= waitingRoomRect[i].right && yPos >= waitingRoomRect[i].top && yPos <= waitingRoomRect[i].bottom) //어떤 방을 클릭했는지 판단하는 코드
+				{
+					//std::cout << i+1  << " 방 클릭!" << std::endl;
+					if (i == 0)
+					{
+						m_gamestate->ChangeNextState();//READY클릭 김우빈 여기수정
+						m_cs_packet_ready.ready_type = true;
+					}
+					else if (i == 1) m_gamestate->ChangePrevState();//QUIT클릭
+					else if (i == 2)
+					{
+						m_gamestate->ChangeSameLevelState();//CUSTOMIZING클릭
+						m_cs_packet_ready.ready_type = false;
+					}
+				}
+			}
+			//InputRoomInfo();
+		}
+		else if (m_gamestate->GetGameState() == CUSTOMIZING)
+		{
+			UpdateRectSize(hWnd);
+			int xPos = LOWORD(lParam);
+			int yPos = HIWORD(lParam);
+
+			if (xPos >= customizingRect.left && xPos <= customizingRect.right && yPos >= customizingRect.top && yPos <= customizingRect.bottom)
+			{
+				m_gamestate->ChangeSameLevelState();//QUIT클릭
+			}
+			//InputRoomInfo();
+		}
+		else if (m_gamestate->GetGameState() == ENDING_GAME)
+		{
+			UpdateRectSize(hWnd);
+			int xPos = LOWORD(lParam);
+			int yPos = HIWORD(lParam);
+
+			if (xPos >= endingRect.left && xPos <= endingRect.right && yPos >= endingRect.top && yPos <= endingRect.bottom)
+			{
+				m_gamestate->ChangeNextState();//QUIT클릭
+			}
+			//InputRoomInfo();
+		}
+		//std::cout << xPos << " " << yPos << std::endl;
 		break;
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:

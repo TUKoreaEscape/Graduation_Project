@@ -83,6 +83,8 @@ private:
 
 	LaplacianEdgeShader		*m_pEdgeShader = NULL;
 
+	Network* network = NULL;
+
 	_TCHAR						m_pszFrameRate[70];
 
 	int								m_nDebugOptions = 10; // U

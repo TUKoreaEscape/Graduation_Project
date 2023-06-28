@@ -2,10 +2,13 @@
 #include "stdafx.h"
 
 enum GAME_STATE {
-	LOGIN = 0,
-	ROOM_SELECT,
-	READY_TO_GAME,
-	PLAYING_GAME,
+	LOGIN = 0, //  로그인
+	ROOM_SELECT, //방 선택
+	WAITING_GAME, //대기실
+	CUSTOMIZING, //커스터마이징
+	READY_TO_GAME, //술래가 정해지기 전 게임 시작 전
+	PLAYING_GAME, //게임중
+	ENDING_GAME, //게임이 끝난 후
 };
 
 class GameState {
@@ -25,6 +28,8 @@ public:
 		}
 		return GameStateInstance;
 	}
-	void ChangeState();
+	void ChangeNextState();
+	void ChangePrevState();
+	void ChangeSameLevelState();
 	GAME_STATE GetGameState() { return m_GameState; };
 };

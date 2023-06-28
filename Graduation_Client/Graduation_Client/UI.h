@@ -7,4 +7,14 @@ extern RECT_FLOAT passwordRect;
 
 extern RECT_FLOAT roominfoRect[6];
 
+extern RECT_FLOAT roomPageRect[2];
+
+extern RECT_FLOAT pageNumRect;
+
+extern RECT_FLOAT waitingRoomRect[3];
+
+extern RECT_FLOAT customizingRect;
+
+extern RECT_FLOAT endingRect;
+
 void UpdateRectSize(HWND hWnd);

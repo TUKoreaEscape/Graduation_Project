@@ -386,6 +386,7 @@ void Framework::BuildObjects()
 	m_pd3dCommandList->Reset(m_ppd3dCommandAllocators[m_nSwapChainBufferIndex], NULL);
 	input = Input::GetInstance();
 	m_gamestate = GameState::GetInstance();
+	network = Network::GetInstance();
 	input->m_gamestate = m_gamestate;
 	scene = new GameScene();
 	scene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
@@ -425,7 +426,6 @@ void Framework::UpdateObjects()
 	float fTimeElapsed = time.GetTimeElapsed();
 	timeToSend += fTimeElapsed;
 	if (input ->m_pPlayer->GetID() != -1) {
-		Network& network = *Network::GetInstance();
 		cs_packet_move packet;
 		packet.size = sizeof(packet);
 		packet.type = CS_PACKET::CS_PACKET_MOVE;
@@ -446,20 +446,20 @@ void Framework::UpdateObjects()
 		//std::cout << packet.xmf3Shift.x << ", " << packet.xmf3Shift.y << ", " << packet.xmf3Shift.z << std::endl;
 		//std::cout << packet.look.x << ", " << packet.look.y << ", " << packet.look.z << std::endl;
 		//std::cout << packet.right.x << ", " << packet.right.y << ", " << packet.right.z << std::endl;
-		network.send_packet(&packet);
+		network->send_packet(&packet);
 
 		//while (!network.m_recv_move);
-		network.pos_lock.lock();
-		input->m_pPlayer->SetPosition(network.m_pPlayer_Pos);
-		network.pos_lock.unlock();
+		network->pos_lock.lock();
+		input->m_pPlayer->SetPosition(network->m_pPlayer_Pos);
+		network->pos_lock.unlock();
 
 		for (int i = 0; i < 5; ++i)
 		{
-			if (network.m_ppOther[i]->GetID() != -1)
+			if (network->m_ppOther[i]->GetID() != -1)
 			{
-				network.Other_Player_Pos[i].pos_lock.lock();
-				network.m_ppOther[i]->SetPosition(network.Other_Player_Pos[i].Other_Pos);
-				network.Other_Player_Pos[i].pos_lock.unlock();
+				network->Other_Player_Pos[i].pos_lock.lock();
+				network->m_ppOther[i]->SetPosition(network->Other_Player_Pos[i].Other_Pos);
+				network->Other_Player_Pos[i].pos_lock.unlock();
 			}
 		}
 	}
@@ -490,6 +490,16 @@ void Framework::FrameAdvance()
 		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		scene->UIrender(m_pd3dCommandList);
 		break;
+	case WAITING_GAME:
+		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
+		scene->UIrender(m_pd3dCommandList);
+		break;
+	case CUSTOMIZING:
+		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
+		scene->UIrender(m_pd3dCommandList);
+		break;
 	case READY_TO_GAME:
 		if (scene) scene->prerender(m_pd3dCommandList);
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
@@ -502,6 +512,24 @@ void Framework::FrameAdvance()
 		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
 		m_pEdgeShader->Render(m_pd3dCommandList);
 		scene->UIrender(m_pd3dCommandList); // Door UI
+		break;
+	case PLAYING_GAME:
+		if (scene) scene->prerender(m_pd3dCommandList);
+		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+		//렌더링 코드는 여기에 추가될 것이다.
+		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+		if (scene) scene->defrender(m_pd3dCommandList);
+		//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
+		//if (scene) scene->forrender(m_pd3dCommandList);
+		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
+		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
+		m_pEdgeShader->Render(m_pd3dCommandList);
+		scene->UIrender(m_pd3dCommandList); // Door UI
+		break;
+	case ENDING_GAME:
+		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
+		scene->UIrender(m_pd3dCommandList);
 		break;
 	}
 	//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
@@ -626,8 +654,7 @@ void Framework::TextRender()
 
 		m_pd3d11DeviceContext->Flush();
 	}
-
-	if (m_gamestate->GetGameState() == ROOM_SELECT)
+	else if (m_gamestate->GetGameState() == ROOM_SELECT)
 	{
 		m_pd2dDeviceContext->SetTarget(m_ppd2dRenderTargets[m_nSwapChainBufferIndex]);
 		ID3D11Resource* ppd3dResources[] = { m_ppd3d11WrappedBackBuffers[m_nSwapChainBufferIndex] };
@@ -672,6 +699,7 @@ void Framework::TextRender()
 
 			rcLowerText = D2D1::RectF(roominfoRect[i].left + 340, roominfoRect[i].top + 80, roominfoRect[i].right + 340, roominfoRect[i].bottom + 80);
 			m_pd2dDeviceContext->DrawTextW(L"방 상태", (UINT32)wcslen(L"방 상태"), m_pdRoomOtherFont, &rcLowerText, m_pd2dblackText);
+
 			switch (input->m_Roominfo[i].state) {
 			case GAME_ROOM_STATE::FREE:
 				rcLowerText = D2D1::RectF(roominfoRect[i].left + 350, roominfoRect[i].top + 100, roominfoRect[i].right + 350, roominfoRect[i].bottom + 100);
@@ -693,6 +721,77 @@ void Framework::TextRender()
 			delete[] array;
 		}
 
+		std::wstring num = std::to_wstring(input->m_PageNum);
+		D2D1_RECT_F rcLowerText = D2D1::RectF(pageNumRect.left, pageNumRect.top, pageNumRect.right, pageNumRect.bottom);
+		m_pd2dDeviceContext->DrawTextW(num.c_str(), (UINT32)wcslen(num.c_str()), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
+
+		m_pd2dDeviceContext->EndDraw();
+
+		m_pd3d11On12Device->ReleaseWrappedResources(ppd3dResources, _countof(ppd3dResources));
+
+		m_pd3d11DeviceContext->Flush();
+	}
+	else if (m_gamestate->GetGameState() == WAITING_GAME)
+	{
+		m_pd2dDeviceContext->SetTarget(m_ppd2dRenderTargets[m_nSwapChainBufferIndex]);
+		ID3D11Resource* ppd3dResources[] = { m_ppd3d11WrappedBackBuffers[m_nSwapChainBufferIndex] };
+		m_pd3d11On12Device->AcquireWrappedResources(ppd3dResources, _countof(ppd3dResources));
+
+		m_pd2dDeviceContext->BeginDraw();
+
+		m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
+
+		D2D1_SIZE_F szRenderTarget = m_ppd2dRenderTargets[m_nSwapChainBufferIndex]->GetSize();
+
+		for (int i = 0; i < 3; ++i)
+		{
+			D2D1_RECT_F rcLowerText = D2D1::RectF(waitingRoomRect[i].left, waitingRoomRect[i].top, waitingRoomRect[i].right, waitingRoomRect[i].bottom);
+			if (i == 0 && !input->m_cs_packet_ready.ready_type) m_pd2dDeviceContext->DrawTextW(L"READY", (UINT32)wcslen(L"READY"), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
+			else if (i == 0 && input->m_cs_packet_ready.ready_type) m_pd2dDeviceContext->DrawTextW(L"READY OK", (UINT32)wcslen(L"READY OK"), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
+			else if (i == 1) m_pd2dDeviceContext->DrawTextW(L"QUIT", (UINT32)wcslen(L"QUIT"), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
+			else if (i == 2) m_pd2dDeviceContext->DrawTextW(L"CUSTOMIZING", (UINT32)wcslen(L"CUSTOMIZING"), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
+		}
+
+		m_pd2dDeviceContext->EndDraw();
+
+		m_pd3d11On12Device->ReleaseWrappedResources(ppd3dResources, _countof(ppd3dResources));
+
+		m_pd3d11DeviceContext->Flush();
+	}
+	else if (m_gamestate->GetGameState() == CUSTOMIZING)
+	{
+		m_pd2dDeviceContext->SetTarget(m_ppd2dRenderTargets[m_nSwapChainBufferIndex]);
+		ID3D11Resource* ppd3dResources[] = { m_ppd3d11WrappedBackBuffers[m_nSwapChainBufferIndex] };
+		m_pd3d11On12Device->AcquireWrappedResources(ppd3dResources, _countof(ppd3dResources));
+
+		m_pd2dDeviceContext->BeginDraw();
+
+		m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
+
+		D2D1_SIZE_F szRenderTarget = m_ppd2dRenderTargets[m_nSwapChainBufferIndex]->GetSize();
+
+		D2D1_RECT_F rcLowerText = D2D1::RectF(endingRect.left, endingRect.top, endingRect.right, endingRect.bottom);
+		m_pd2dDeviceContext->DrawTextW(L"QUIT", (UINT32)wcslen(L"QUIT"), m_pdRoomOtherLayout, &rcLowerText, m_pd2dblackText);
+		m_pd2dDeviceContext->EndDraw();
+
+		m_pd3d11On12Device->ReleaseWrappedResources(ppd3dResources, _countof(ppd3dResources));
+
+		m_pd3d11DeviceContext->Flush();
+	}
+	else if (m_gamestate->GetGameState() == ENDING_GAME)
+	{
+		m_pd2dDeviceContext->SetTarget(m_ppd2dRenderTargets[m_nSwapChainBufferIndex]);
+		ID3D11Resource* ppd3dResources[] = { m_ppd3d11WrappedBackBuffers[m_nSwapChainBufferIndex] };
+		m_pd3d11On12Device->AcquireWrappedResources(ppd3dResources, _countof(ppd3dResources));
+
+		m_pd2dDeviceContext->BeginDraw();
+
+		m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
+
+		D2D1_SIZE_F szRenderTarget = m_ppd2dRenderTargets[m_nSwapChainBufferIndex]->GetSize();
+
+		D2D1_RECT_F rcLowerText = D2D1::RectF(endingRect.left, endingRect.top, endingRect.right, endingRect.bottom);
+		m_pd2dDeviceContext->DrawTextW(L"QUIT", (UINT32)wcslen(L"QUIT"), m_pdRoomOtherLayout, &rcLowerText, m_pd2dblackText);
 		m_pd2dDeviceContext->EndDraw();
 
 		m_pd3d11On12Device->ReleaseWrappedResources(ppd3dResources, _countof(ppd3dResources));

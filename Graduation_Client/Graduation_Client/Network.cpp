@@ -233,7 +233,7 @@ void Network::ProcessPacket(char* ptr)
 		m_pPlayer->SetID(recv_packet->id);
 
 		GameState& game_state = *GameState::GetInstance();
-		game_state.ChangeState();
+		game_state.ChangeNextState();
 
 		cs_packet_request_all_room_info packet;
 		packet.size = sizeof(packet);
@@ -292,7 +292,7 @@ void Network::ProcessPacket(char* ptr)
 #endif
 
 		GameState& game_state = *GameState::GetInstance();
-		game_state.ChangeState();
+		game_state.ChangeNextState();
 
 		Send_Ready_Packet(true);
 		break;
@@ -331,7 +331,7 @@ void Network::ProcessPacket(char* ptr)
 		GetProcessId(info.hProcess); // retrieve PID
 #endif
 		GameState& game_state = *GameState::GetInstance();
-		game_state.ChangeState();
+		game_state.ChangeNextState();
 
 		Send_Ready_Packet(true);
 		break;
