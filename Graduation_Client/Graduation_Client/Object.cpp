@@ -287,11 +287,22 @@ void Door::update(float fElapsedTime)
 		if (IsNear) {
 			if (!IsWorking)
 				m_fCooltime += fElapsedTime;
+			else
+				m_fCooltime = 0;
+			UCHAR keyBuffer[256];
+			memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
+			if (((keyBuffer['f'] & 0xF0) == false) && ((keyBuffer['F'] & 0xF0) == false)) {
+				m_fCooltime = 0;
+				IsInteraction = false;
+			}
 		}
 		else {
 			IsInteraction = false;
 			m_fCooltime = 0;
 		}
+	}
+	else {
+		m_fCooltime = 0;
 	}
 	if (IsOpen) {
 		OpenTime += fElapsedTime;
@@ -333,13 +344,18 @@ void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Door::Interaction(int playerType)
 {
-	IsInteraction = true;
+	if (false == IsInteraction) {
+		if (IsWorking) return;
+		if (m_fCooltime > 0) m_fCooltime = 0;
+		IsInteraction = true;
+	}
 	if (IsOpen) {
 		switch (playerType) {
 		case TYPE_TAGGER:
 			if (m_fCooltime >= DOOR_CLOSE_COOLTIME_TAGGER) {
 				SetOpen(false);
 				m_fCooltime = 0;
+				IsInteraction = false;
 			}
 			break;
 		case TYPE_PLAYER_YET:
@@ -347,6 +363,7 @@ void Door::Interaction(int playerType)
 			if (m_fCooltime >= DOOR_CLOSE_COOLTIME_PLYAER) {
 				SetOpen(false);
 				m_fCooltime = 0;
+				IsInteraction = false;
 			}
 			break;
 		case TYPE_DEAD_PLAYER:
@@ -361,6 +378,7 @@ void Door::Interaction(int playerType)
 			if (m_fCooltime >= DOOR_OPEN_COOLTIME_TAGGER) {
 				SetOpen(true);
 				m_fCooltime = 0;
+				IsInteraction = false;
 			}
 			break;
 		case TYPE_PLAYER_YET:
@@ -368,6 +386,7 @@ void Door::Interaction(int playerType)
 			if (m_fCooltime >= DOOR_OPEN_COOLTIME_PLYAER) {
 				SetOpen(true);
 				m_fCooltime = 0;
+				IsInteraction = false;
 			}
 			break;
 		case TYPE_DEAD_PLAYER:
