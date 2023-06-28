@@ -71,6 +71,7 @@ namespace CS_PACKET
 		CS_PACKET_REQUEST_VIVOX_DATA,
 		CS_PACKET_CUSTOMIZING,
 		CS_PACKET_ACTIVATE_ALTAR,
+		CS_PACKET_ALTAR_LIFECHIP_UPDATE,
 		CS_PACKET_USE_FIRST_TAGGER_SKILL,
 		CS_PACKET_USE_SECOND_TAGGER_SKILL,
 		CS_PACKET_USE_THIRD_TAGGER_SKILL,
@@ -229,6 +230,11 @@ struct cs_packet_activate_altar {
 	unsigned char	type;
 };
 
+struct cs_packet_altar_lifechip_update {
+	unsigned char	size;
+	unsigned char	type;
+};
+
 struct cs_packet_request_open_door {
 	unsigned char	size;
 	unsigned char	type;
@@ -334,6 +340,7 @@ namespace SC_PACKET
 		SC_PACKET_TAGGER_SKILL,
 		SC_PACKET_DOOR_UPDATE,
 		SC_PACKET_ACTIVATE_ALTAR,
+		SC_PACKET_ALTAR_LIFECHIP_UPDATE,
 		SC_PACKET_ELECTRONIC_SYSTEM_DOOR_UPDATE,
 		SC_PACKET_ELECTRONIC_SYSTEM_SWITCH_UPDATE,
 		SC_PACKET_ROOM_INFO,
@@ -573,6 +580,13 @@ struct sc_packet_pick_fix_item_update {
 struct sc_packet_activate_altar {
 	unsigned char	size;
 	unsigned char	type;
+};
+
+struct sc_packet_altar_lifechip_update {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			lifechip_count;
 };
 
 struct sc_packet_customizing_update {

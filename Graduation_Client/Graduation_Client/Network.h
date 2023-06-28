@@ -88,6 +88,8 @@ public:
 	void Process_LifeChip_Update(char* ptr);
 	void Process_Pick_Item_Init(char* ptr);
 	void Process_Pick_Item_Update(char* ptr);
+	void Process_Active_Altar(char* ptr);
+	void Process_Altar_LifeChip_Update(char* ptr);
 
 	// 게임 시작 전 사용하는 함수들
 	void Send_Request_Room_Info(int page);
@@ -95,6 +97,8 @@ public:
 	void Send_Ready_Packet(bool is_ready);
 	void Send_Loading_Success_Packet();
 	void Send_Select_Room(int select_room_number);
+	void Send_Ativate_Altar();
+	void Send_Altar_Event();
 
 	// 게임 플레이시 사용하는 패킷전송 함수
 	void Send_Use_Tagger_Skill(int skill_type);

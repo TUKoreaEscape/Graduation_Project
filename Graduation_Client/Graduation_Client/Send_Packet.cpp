@@ -157,3 +157,13 @@ void Network::Send_Ativate_Altar()
 
 	send_packet(&packet);
 }
+
+void Network::Send_Altar_Event()
+{
+	// 해당부분은 술래가 생명칩을 회수하였을 경우 서버로 전송합니다.
+	cs_packet_altar_lifechip_update packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_ALTAR_LIFECHIP_UPDATE;
+
+	send_packet(&packet);
+}

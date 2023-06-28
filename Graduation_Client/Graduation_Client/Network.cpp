@@ -543,6 +543,16 @@ void Network::ProcessPacket(char* ptr)
 		break;
 	}
 
+	case SC_PACKET::SC_PACKET_ACTIVATE_ALTAR:
+	{
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_ALTAR_LIFECHIP_UPDATE:
+	{
+		break;
+	}
+
 	case SC_PACKET::SC_PACKET_ROOM_INFO:
 	{
 		sc_packet_request_room_info* packet = reinterpret_cast<sc_packet_request_room_info*>(ptr);

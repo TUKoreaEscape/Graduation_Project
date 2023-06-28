@@ -668,3 +668,21 @@ void cGameServer::Process_Active_Altar(const int user_id)
 		m_clients[player_id].do_send(sizeof(packet), &packet);
 	}
 }
+
+void cGameServer::Process_Altar_LifeChip_Update(const int user_id)
+{
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+	room.m_altar->Add_Life_Chip();
+
+
+	sc_packet_altar_lifechip_update packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_ALTAR_LIFECHIP_UPDATE;
+	packet.lifechip_count = room.m_altar->Get_Life_Chip();
+	for (auto player_id : room.in_player)
+	{
+		if (player_id == -1)
+			continue;
+		m_clients[player_id].do_send(sizeof(packet), &packet);
+	}
+}

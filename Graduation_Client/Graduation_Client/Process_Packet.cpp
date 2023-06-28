@@ -243,3 +243,15 @@ void Network::Process_Pick_Item_Update(char* ptr)
 {
 
 }
+
+void Network::Process_Active_Altar(char* ptr)
+{
+	sc_packet_activate_altar* packet = reinterpret_cast<sc_packet_activate_altar*>(ptr);
+	// 여기서 술래 재단을 활성화 해야함.
+}
+
+void Network::Process_Altar_LifeChip_Update(char* ptr)
+{
+	sc_packet_altar_lifechip_update* packet = reinterpret_cast<sc_packet_altar_lifechip_update*>(ptr);
+	packet->lifechip_count; // 이게 현재 수집된 생명칩 갯수임
+}
