@@ -141,6 +141,9 @@ public:
 	bool IsOpen = false;
 	int	 m_door_number = 0;
 	virtual bool GetIsWorking() { return false; }
+
+	virtual	void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f) {};
+	virtual void Interaction(int playerType) {};
 };
 
 template<typename T>

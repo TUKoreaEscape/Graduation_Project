@@ -68,13 +68,14 @@ void CommonMovement::update(float elapsedTime)
 		if (keyBuffer['f'] & 0xF0 || keyBuffer['F'] & 0xF0)
 		{
 			// 여기 건드세요 @우빈``
+			int playerType = Input::GetInstance()->m_pPlayer->GetType();
 			if (Input::GetInstance()->m_pPlayer->m_pNearDoor)
 			{
 				bool DoorState = Input::GetInstance()->m_pPlayer->m_pNearDoor->IsOpen;
 				if (Input::GetInstance()->m_pPlayer->m_pNearDoor->GetIsWorking() == false)
 				{
 #if !USE_NETWORK
-					Input::GetInstance()->m_pPlayer->m_pNearDoor->SetOpen(!DoorState);
+					Input::GetInstance()->m_pPlayer->m_pNearDoor->Interaction(playerType);
 #endif
 #if USE_NETWORK
 
@@ -122,6 +123,9 @@ void CommonMovement::update(float elapsedTime)
 						Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct->SetOpen(true);
 					}
 				}
+			}
+			if (Input::GetInstance()->m_pPlayer->m_pNearVent) {
+				Input::GetInstance()->m_pPlayer->m_pNearVent->Interaction(playerType);
 			}
 		}
 

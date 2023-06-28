@@ -125,6 +125,9 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < NUM_POWER; ++i) {
 			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->UIrender(pd3dCommandList);
 		}
+		for (int i = 0; i < NUM_VENT; ++i) {
+			reinterpret_cast<Vent*>(Vents[i])->UIrender(pd3dCommandList);
+		}
 		break;
 	}
 }
@@ -803,21 +806,31 @@ void GameScene::LoadSceneBushFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	LoadedModelInfo* pVentModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/airvent.bin", nullptr);
+	InteractionUI* VentUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/f.dds");
 
 	for (int i = 0; i < NUM_VENT; ++i) {
 		Vents[i] = new Vent();
 		Vents[i]->SetChild(pVentModel->m_pModelRootObject, true);
+		reinterpret_cast<Vent*>(Vents[i])->m_pInteractionUI = VentUI;
 	}
 	Vents[0]->SetPosition(XMFLOAT3(97.2155, 1.0061, 40.43311));
+	reinterpret_cast<Vent*>(Vents[0])->SetOpenPos(XMFLOAT3(98.94085, 1.0061, 42.29158));
 	Vents[1]->SetPosition(XMFLOAT3(97.27, 1.0061, -40.43311));
+	reinterpret_cast<Vent*>(Vents[1])->SetOpenPos(XMFLOAT3(95.5352, 1.0061, -42.2919));
 	Vents[2]->SetPosition(XMFLOAT3(20.43311, 1.0061, -77.6103));
+	reinterpret_cast<Vent*>(Vents[2])->SetOpenPos(XMFLOAT3(22.29154, 1.0061, -75.88629));
 	reinterpret_cast<Vent*>(Vents[2])->Rotate(0, 90, 0);
 	reinterpret_cast<Vent*>(Vents[3])->Rotate(0, 90, 0);
 	Vents[3]->SetPosition(XMFLOAT3(18.56689, 1.0061, -77.6103));
+	reinterpret_cast<Vent*>(Vents[3])->SetOpenPos(XMFLOAT3(16.70864, 1.0061, -79.3296));
 	Vents[4]->SetPosition(XMFLOAT3(-56.00388, 1.033527, -40.54385));
+	reinterpret_cast<Vent*>(Vents[4])->SetOpenPos(XMFLOAT3(-57.66415, 1.0061, -42.1952));
 	Vents[5]->SetPosition(XMFLOAT3(-56.04684, 1.0061, 40.43311));
+	reinterpret_cast<Vent*>(Vents[5])->SetOpenPos(XMFLOAT3(-54.31968, 1.0061, 42.29163));
 	Vents[6]->SetPosition(XMFLOAT3(35.994, 1.0061, 40.56689));
+	reinterpret_cast<Vent*>(Vents[6])->SetOpenPos(XMFLOAT3(37.63297, 1.0061, 42.2901));
 	Vents[7]->SetPosition(XMFLOAT3(35.96133, 1.0061, 23.56689));
+	reinterpret_cast<Vent*>(Vents[7])->SetOpenPos(XMFLOAT3(34.23397, 90, 21.70837));
 	for (int i = 0; i < NUM_VENT; ++i) {
 		Vents[i]->UpdateTransform(nullptr);
 	}
@@ -887,6 +900,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 
 	bool IsNearDoor = false;
 	bool IsNearInteractionObject = false;
+	bool IsNearVent = false;
 	for (int i = 0; i < NUM_DOOR; ++i) {
 		m_pDoors[i]->update(elapsedTime);
 		if (reinterpret_cast<Door*>(m_pDoors[i])->IsPlayerNear(PlayerPos)) {
@@ -905,8 +919,17 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 			m_pPlayer->m_power_number = i;
 		}
 	}
+	for (int i = 0; i < NUM_VENT; ++i) {
+		if (reinterpret_cast<Vent*>(Vents[i])->IsPlayerNear(PlayerPos)) {
+			m_pPlayer->m_pNearVent = Vents[i];
+			IsNearVent = true;
+
+			m_pPlayer->m_vent_number = i;
+		}
+	}
 	if (IsNearDoor == false) m_pPlayer->m_pNearDoor = nullptr;
 	if (IsNearInteractionObject == false) m_pPlayer->m_pNearInteractionObejct = nullptr;
+	if (IsNearVent == false) m_pPlayer->m_pNearVent = nullptr;
 }
 
 bool InArea(int startX, int startZ, int width, int length, float x, float z)

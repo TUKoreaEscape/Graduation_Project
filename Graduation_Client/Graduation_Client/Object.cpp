@@ -72,7 +72,7 @@ HeightMapTerrain::~HeightMapTerrain(void)
 	if (m_pHeightMapImage) delete m_pHeightMapImage;
 }
 
-Vent::Vent() : GameObject()
+Vent::Vent() : InteractionObject()
 {
 }
 
@@ -86,6 +86,115 @@ void Vent::Rotate(float fPitch, float fYaw, float fRoll)
 	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
 
 	UpdateTransform(NULL);
+
+	IsRot = true;
+}
+
+void Vent::SetOpen(bool open)
+{
+	if (open) {
+		if (IsOpen) return;
+		Rotate(0, 90, 0);
+		SetPosition(m_xmf3OpenPosition);
+		UpdateTransform(NULL);
+		IsOpen = true;
+	}
+	else {
+		if (IsOpen == false) return;
+		Rotate(0, -90, 0);
+		SetPosition(m_xmf3ClosePosition);
+		UpdateTransform(NULL);
+		IsOpen = false;
+	}
+}
+
+void Vent::SetOpenPos(const XMFLOAT3& pos)
+{
+	m_xmf3ClosePosition = m_xmf3Position;
+	m_xmf3OpenPosition = pos;
+}
+
+bool Vent::IsPlayerNear(const XMFLOAT3& PlayerPos)
+{
+	float minx, maxx, minz, maxz;
+	if (IsRot) {
+		minx = m_xmf4x4ToParent._41 - 1.75f;
+		maxx = m_xmf4x4ToParent._41 + 1.75f;
+		minz = m_xmf4x4ToParent._43 - 2.0f;
+		maxz = m_xmf4x4ToParent._43 + 2.0f;
+	}
+	else {
+		minx = m_xmf4x4ToParent._41 - 2.0f;
+		maxx = m_xmf4x4ToParent._41 + 2.0f;
+		minz = m_xmf4x4ToParent._43 - 1.75f;
+		maxz = m_xmf4x4ToParent._43 + 1.75f;
+	}
+	if (PlayerPos.x > maxx) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.x < minx) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.z < minz) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.z > maxz) {
+		IsNear = false;
+		return false;
+	}
+	IsNear = true;
+	return true;
+}
+
+void Vent::render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	GameObject::render(pd3dCommandList);
+}
+
+void Vent::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (IsNear) {
+		if (m_pInteractionUI) {
+			if (IsRot)
+				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 0.5f, m_xmf4x4ToParent._43);
+			else
+				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_fPitch, m_fYaw, m_fRoll);
+		}
+	}
+}
+
+void Vent::Move(float fxOffset, float fyOffset, float fzOffset)
+{
+}
+
+void Vent::SetPosition(XMFLOAT3 xmf3Position)
+{
+	m_xmf3Position = xmf3Position;
+	GameObject::SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
+}
+
+void Vent::Interaction(int playerType)
+{
+	switch (playerType) {
+	case TYPE_TAGGER:
+		break;
+	case TYPE_PLAYER_YET:
+		break;
+	case TYPE_PLAYER:
+		break;
+	case TYPE_DEAD_PLAYER:
+		break;
+	}
+	if (IsOpen) {
+		SetOpen(false);
+	}
+	else {
+		SetOpen(true);
+	}
 }
 
 Door::Door() : InteractionObject()
@@ -174,6 +283,27 @@ void Door::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Door::update(float fElapsedTime)
 {
+	if (IsInteraction) {
+		if (IsNear) {
+			if (!IsWorking)
+				m_fCooltime += fElapsedTime;
+			else
+				m_fCooltime = 0;
+			UCHAR keyBuffer[256];
+			memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
+			if (((keyBuffer['f'] & 0xF0) == false) && ((keyBuffer['F'] & 0xF0) == false)) {
+				m_fCooltime = 0;
+				IsInteraction = false;
+			}
+		}
+		else {
+			IsInteraction = false;
+			m_fCooltime = 0;
+		}
+	}
+	else {
+		m_fCooltime = 0;
+	}
 	if (IsOpen) {
 		OpenTime += fElapsedTime;
 		if (OpenTime >= 1.6f) {
@@ -208,6 +338,61 @@ void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		if (m_pInteractionUI) {
 			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f );
 			m_pInteractionUI->BillboardRender(pd3dCommandList, m_fPitch, m_fYaw, m_fRoll);
+		}
+	}
+}
+
+void Door::Interaction(int playerType)
+{
+	if (false == IsInteraction) {
+		if (IsWorking) return;
+		if (m_fCooltime > 0) m_fCooltime = 0;
+		IsInteraction = true;
+	}
+	if (IsOpen) {
+		switch (playerType) {
+		case TYPE_TAGGER:
+			if (m_fCooltime >= DOOR_CLOSE_COOLTIME_TAGGER) {
+				SetOpen(false);
+				m_fCooltime = 0;
+				IsInteraction = false;
+			}
+			break;
+		case TYPE_PLAYER_YET:
+		case TYPE_PLAYER:
+			if (m_fCooltime >= DOOR_CLOSE_COOLTIME_PLYAER) {
+				SetOpen(false);
+				m_fCooltime = 0;
+				IsInteraction = false;
+			}
+			break;
+		case TYPE_DEAD_PLAYER:
+			IsInteraction = false;
+			m_fCooltime = 0;
+			break;
+		}
+	}
+	else {
+		switch (playerType) {
+		case TYPE_TAGGER:
+			if (m_fCooltime >= DOOR_OPEN_COOLTIME_TAGGER) {
+				SetOpen(true);
+				m_fCooltime = 0;
+				IsInteraction = false;
+			}
+			break;
+		case TYPE_PLAYER_YET:
+		case TYPE_PLAYER:
+			if (m_fCooltime >= DOOR_OPEN_COOLTIME_PLYAER) {
+				SetOpen(true);
+				m_fCooltime = 0;
+				IsInteraction = false;
+			}
+			break;
+		case TYPE_DEAD_PLAYER:
+			IsInteraction = false;
+			m_fCooltime = 0;
+			break;
 		}
 	}
 }
@@ -499,5 +684,44 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
 			m_pInteractionUI->BillboardRender(pd3dCommandList, m_fPitch, m_fYaw, m_fRoll);
 		}
+	}
+}
+
+void PowerSwitch::Interaction(int playerType)
+{
+}
+
+Item::Item()
+{
+}
+
+Item::~Item()
+{
+}
+
+bool Item::IsPlayerNear(const XMFLOAT3& PlayerPos)
+{
+	return false;
+}
+
+void Item::render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void Item::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void Item::Interaction(int playerType)
+{
+	switch (playerType) {
+	case TYPE_TAGGER:
+		break;
+	case TYPE_PLAYER_YET:
+		break;
+	case TYPE_PLAYER:
+		break;
+	case TYPE_DEAD_PLAYER:
+		break;
 	}
 }
