@@ -50,6 +50,19 @@ void Network::Send_Request_Room_Info(int page)
 	send_packet(&packet);
 }
 
+void Network::Send_Exit_Room()
+{
+	cs_packet_request_exit_room packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_EXIT_ROOM;
+	packet.request_page = m_page_num;
+
+	send_packet(&packet);
+
+	for (int i = 0; i < 5; ++i)
+		m_ppOther[i]->SetID(-1);
+}
+
 void Network::Send_Ready_Packet(bool is_ready)
 {
 	cs_packet_ready packet;
@@ -114,9 +127,9 @@ void Network::Send_Use_Tagger_Skill(int skill_type)
 	send_packet(&packet);
 }
 
-void Network::Send_Select_Room(int select_room_number)
+void Network::Send_Select_Room(int select_room_number, int index)
 {
-	switch (Input::GetInstance()->m_Roominfo[select_room_number].state)
+	switch (Input::GetInstance()->m_Roominfo[index].state)
 	{
 
 	case GAME_ROOM_STATE::FREE:
@@ -125,7 +138,7 @@ void Network::Send_Select_Room(int select_room_number)
 		packet.size = sizeof(packet);
 		packet.type = CS_PACKET::CS_PACKET_CREATE_ROOM;
 		packet.room_number = select_room_number;
-
+		std::cout << "规 积己 菩哦 傈价" << std::endl;
 		send_packet(&packet);
 		break;
 	}

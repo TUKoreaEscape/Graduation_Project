@@ -7,7 +7,7 @@
 #include "Server_Timer.h"
 
 #define  DIR_NO 100
-#define  USE_NETWORK 0
+#define  USE_NETWORK 1
 #define	 USE_VOICE 0
 
 class Door;
@@ -46,7 +46,7 @@ public:
 	bool	m_recv_move = false;
 	int		m_my_id = -1;
 	int		m_join_room_number = -1;
-
+	int		m_page_num = 0;
 	std::thread send_thread;
 	//임시사용 변수입니다.
 	bool    m_login = false;
@@ -93,10 +93,11 @@ public:
 
 	// 게임 시작 전 사용하는 함수들
 	void Send_Request_Room_Info(int page);
+	void Send_Exit_Room();
 	void Send_Customizing_Data();
 	void Send_Ready_Packet(bool is_ready);
 	void Send_Loading_Success_Packet();
-	void Send_Select_Room(int select_room_number);
+	void Send_Select_Room(int select_room_number, int index);
 	void Send_Ativate_Altar();
 	void Send_Altar_Event();
 

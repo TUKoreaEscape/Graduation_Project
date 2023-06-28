@@ -272,7 +272,9 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 		Room& cl_room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 		cl_room.Exit_Player(user_id);
 		m_clients[user_id].set_join_room_number(-1);
+		m_clients[user_id]._state_lock.lock();
 		m_clients[user_id].set_state(CLIENT_STATE::ST_LOBBY);
+		m_clients[user_id]._state_lock.unlock();
 
 		for (auto& p : m_clients[user_id].room_list)
 		{
@@ -295,15 +297,10 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 			send_packet.room_info[i].room_number = room_number;
 			send_packet.room_info[i].join_member = get_room_info.Get_Number_of_users();
 			send_packet.room_info[i].state = get_room_info._room_state;
-			get_room_info.Get_Room_Name(send_packet.room_info[i].room_name, 20);
+			get_room_info.Get_Room_Name(send_packet.room_info[i].room_name, 10);
 		}
 
-		if (sizeof(send_packet) >= CHECK_MAX_PACKET_SIZE)
-		{
-			send_packet.size = CHECK_MAX_PACKET_SIZE;
-			send_packet.sub_size_mul = sizeof(send_packet) / CHECK_MAX_PACKET_SIZE;
-			send_packet.sub_size_add = sizeof(send_packet) % CHECK_MAX_PACKET_SIZE;
-		}/**/
+		send_packet.size = sizeof(send_packet);
 		send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
 		m_clients[user_id].do_send(sizeof(send_packet), &send_packet);
 	}

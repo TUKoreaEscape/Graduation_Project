@@ -264,7 +264,7 @@ void Network::ProcessPacket(char* ptr)
 	{
 		//std::cout << "방 접속 성공" << std::endl;
 		m_join_room = true;
-		send_thread = std::thread{ &Network::Debug_send_thread, this };
+		//send_thread = std::thread{ &Network::Debug_send_thread, this };
 		for (int i = 0; i < 5; ++i)
 			m_ppOther[i]->SetPosition(XMFLOAT3(-100, -100, -100));
 #if USE_VOICE
@@ -294,17 +294,17 @@ void Network::ProcessPacket(char* ptr)
 		GameState& game_state = *GameState::GetInstance();
 		game_state.ChangeNextState();
 
-		Send_Ready_Packet(true);
+		//Send_Ready_Packet(true);
 		break;
 	}
 
 	case SC_PACKET::SC_PACKET_CREATE_ROOM_OK:
 	{
-		//std::cout << "보이스 시작" << std::endl;
+		std::cout << "보이스 시작" << std::endl;
 		//ShellExecute(NULL, L"open", L"voice\Voice.exe", NULL, NULL, SW_SHOWMINIMIZED);
 		//std::cout << "방 생성에 성공하였습니다." << std::endl;
 		m_join_room = true;
-		send_thread = std::thread{ &Network::Debug_send_thread, this };
+		//send_thread = std::thread{ &Network::Debug_send_thread, this };
 		for (int i = 0; i < 5; ++i)
 			m_ppOther[i]->SetPosition(XMFLOAT3(-100, -100, -100));
 #if USE_VOICE
@@ -332,8 +332,8 @@ void Network::ProcessPacket(char* ptr)
 #endif
 		GameState& game_state = *GameState::GetInstance();
 		game_state.ChangeNextState();
-
-		Send_Ready_Packet(true);
+		std::cout << "방 생성 성공" << std::endl;
+		//Send_Ready_Packet(true);
 		break;
 	}
 
@@ -345,9 +345,9 @@ void Network::ProcessPacket(char* ptr)
 		cs_packet_request_all_room_info packet;
 		packet.size = sizeof(packet);
 		packet.type = CS_PACKET::CS_PACKET_REQUEST_ROOM_INFO;
-		packet.request_page = 0;
+		packet.request_page = m_page_num;
 
-		system("cls");
+		//system("cls");
 		//send_packet(&packet);
 		//cs_packet_create_room packet;
 		//packet.size = sizeof(packet);
@@ -556,7 +556,7 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_ROOM_INFO:
 	{
 		sc_packet_request_room_info* packet = reinterpret_cast<sc_packet_request_room_info*>(ptr);
-		system("cls");
+		//system("cls");
 		for (int i = 0; i < MAX_ROOM_INFO_SEND; ++i)
 		{
 			memcpy(Input::GetInstance()->m_Roominfo[i].room_name, packet->room_info[i].room_name, sizeof(packet->room_info[i].room_name));

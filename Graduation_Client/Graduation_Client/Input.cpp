@@ -174,10 +174,11 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			{
 				if (xPos >= roominfoRect[i].left && xPos <= roominfoRect[i].right && yPos >= roominfoRect[i].top && yPos <= roominfoRect[i].bottom) //어떤 방을 클릭했는지 판단하는 코드
 				{
-					//std::cout << i+1  << " 방 클릭!" << std::endl;
+					std::cout << 6 * (m_PageNum - 1) + i << " 방 클릭!" << std::endl;
 					Network& network = *Network::GetInstance();
-					network.Send_Select_Room(i);
-					network.m_join_room_number = i * m_PageNum;
+					network.Send_Select_Room(6 * (m_PageNum - 1) + i, i);
+					network.m_join_room_number = 6 * (m_PageNum - 1) + i;
+					network.m_page_num = m_PageNum - 1;
 				}
 			}
 			for (int i = 0; i < 2; ++i)
@@ -186,8 +187,17 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 				{
 					//페이지 업 다운 판단, 0일때 왼쪽 화살표,1일때 오른쪽 화살표
 					// input에 PageNum이 있음 김우빈
-					if (i == 0) PageDown();
-					else PageUp();
+					if (i == 0) {
+						PageDown();
+						Network& network = *Network::GetInstance();
+						network.Send_Request_Room_Info(m_PageNum - 1);
+					}
+					else {
+						PageUp();
+						Network& network = *Network::GetInstance();
+						network.Send_Request_Room_Info(m_PageNum - 1);
+						std::cout << "Page : " << m_PageNum << std::endl;
+					}
 				}
 			}
 			//InputRoomInfo();
@@ -206,12 +216,21 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 					if (i == 0)
 					{
 						m_gamestate->ChangeNextState();//READY클릭 김우빈 여기수정
+						Network& network = *Network::GetInstance();
+						network.Send_Ready_Packet(true);
 						m_cs_packet_ready.ready_type = true;
 					}
-					else if (i == 1) m_gamestate->ChangePrevState();//QUIT클릭
+					else if (i == 1)
+					{
+						Network& network = *Network::GetInstance();
+						network.Send_Exit_Room();
+						m_gamestate->ChangePrevState();//QUIT클릭
+					}
 					else if (i == 2)
 					{
 						m_gamestate->ChangeSameLevelState();//CUSTOMIZING클릭
+						Network& network = *Network::GetInstance();
+						network.Send_Ready_Packet(false);
 						m_cs_packet_ready.ready_type = false;
 					}
 				}

@@ -56,8 +56,9 @@ void Room::Exit_Player(int user_id)
 			in_player_loading_success[i] = false;
 			Number_of_users -= 1;
 			remain_user = 6 - Number_of_users;
-			if (Number_of_users == 0)
+			if (Number_of_users == 0) {
 				Reset_Room();
+			}
 			break;
 		}
 	}
