@@ -89,6 +89,11 @@ constexpr int NUM_VENT = 8;
 constexpr int NUM_DOOR = 6;
 constexpr int NUM_POWER = 5;
 
+constexpr float DOOR_OPEN_COOLTIME_TAGGER = 6.0f;
+constexpr float DOOR_OPEN_COOLTIME_PLYAER = 3.0f;
+constexpr float DOOR_CLOSE_COOLTIME_TAGGER = 3.0f;
+constexpr float DOOR_CLOSE_COOLTIME_PLYAER = 1.5f;
+
 extern UINT	gnCbvSrvDescriptorIncrementSize;
 extern UINT	gnRtvDescriptorIncrementSize;
 extern UINT gnDsvDescriptorIncrementSize;

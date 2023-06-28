@@ -337,11 +337,17 @@ void Door::Interaction(int playerType)
 	if (IsOpen) {
 		switch (playerType) {
 		case TYPE_TAGGER:
+			if (m_fCooltime >= DOOR_CLOSE_COOLTIME_TAGGER) {
+				SetOpen(false);
+				m_fCooltime = 0;
+			}
 			break;
 		case TYPE_PLAYER_YET:
 		case TYPE_PLAYER:
-			SetOpen(false);
-			m_fCooltime = 0;
+			if (m_fCooltime >= DOOR_CLOSE_COOLTIME_PLYAER) {
+				SetOpen(false);
+				m_fCooltime = 0;
+			}
 			break;
 		case TYPE_DEAD_PLAYER:
 			IsInteraction = false;
@@ -352,14 +358,21 @@ void Door::Interaction(int playerType)
 	else {
 		switch (playerType) {
 		case TYPE_TAGGER:
+			if (m_fCooltime >= DOOR_OPEN_COOLTIME_TAGGER) {
+				SetOpen(true);
+				m_fCooltime = 0;
+			}
+			break;
 		case TYPE_PLAYER_YET:
 		case TYPE_PLAYER:
-			if (m_fCooltime > 3.0) {
+			if (m_fCooltime >= DOOR_OPEN_COOLTIME_PLYAER) {
 				SetOpen(true);
 				m_fCooltime = 0;
 			}
 			break;
 		case TYPE_DEAD_PLAYER:
+			IsInteraction = false;
+			m_fCooltime = 0;
 			break;
 		}
 	}
