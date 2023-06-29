@@ -182,3 +182,13 @@ void Room::Update_room_time()
 	}
 	duration_time = std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count();
 }
+
+bool Room::All_ElectronicSystem_Fixed()
+{
+	for (int i = 0; i < m_electrinic_system.size(); ++i)
+	{
+		if (!m_electrinic_system[i].Get_On_Off_Switch_Vaild())
+			return false;
+	}
+	return true;
+}

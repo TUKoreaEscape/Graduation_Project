@@ -79,6 +79,7 @@ namespace CS_PACKET
 		CS_PACKET_REQUEST_OPEN_HIDDEN_DOOR,
 		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_DOOR,
 		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_SWICH,
+		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_ATIVATE,
 		CS_PACKET_ATTACK,
 		CS_PACKET_PICK_ITEM,
 		CS_PACKET_STRESS_LOGIN
@@ -263,6 +264,13 @@ struct cs_packet_request_eletronic_system_switch_control {
 	bool			switch_value;
 };
 
+struct cs_packet_request_electronic_system_activate {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			system_index;
+};
+
 struct cs_packet_request_electronic_system_fix {
 	unsigned char	size;
 	unsigned char	type;
@@ -343,6 +351,7 @@ namespace SC_PACKET
 		SC_PACKET_ALTAR_LIFECHIP_UPDATE,
 		SC_PACKET_ELECTRONIC_SYSTEM_DOOR_UPDATE,
 		SC_PACKET_ELECTRONIC_SYSTEM_SWITCH_UPDATE,
+		SC_PACKET_ELECTRONIC_SYSTEM_ACTIVATE_UPDATE,
 		SC_PACKET_ROOM_INFO,
 		SC_PACKET_VIVOX_DATA,
 		SC_PACKET_CUSTOMIZING,
@@ -565,6 +574,14 @@ struct sc_packet_electronic_system_update_value {
 	unsigned short	es_num;
 	unsigned short	es_switch_idx;
 	bool			es_value;
+};
+
+struct sc_packet_electronic_system_activate_update {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			system_index;
+	bool			activate;
 };
 
 struct sc_packet_pick_fix_item_update {

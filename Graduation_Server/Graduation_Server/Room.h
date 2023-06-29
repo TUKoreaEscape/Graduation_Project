@@ -111,6 +111,7 @@ public: // 게임 state 변환하는 함수
 
 public: // 인게임 아이템관련 함수
 	void	Activate_Altar();
+	bool	All_ElectronicSystem_Fixed();
 	bool	Pick_Item(const int item_type);
 	bool	Is_near(XMFLOAT3 player_pos, XMFLOAT3 object_pos, int range);
 

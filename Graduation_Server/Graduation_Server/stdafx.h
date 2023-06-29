@@ -5,6 +5,7 @@
 #define MAX_USER 30000
 #define NUMBER_OF_DOOR 6
 #define NUMBER_OF_ELECTRONIC 5
+#define ON_OFF_SWITCH 15
 
 #include <iostream>
 #include <WS2tcpip.h>

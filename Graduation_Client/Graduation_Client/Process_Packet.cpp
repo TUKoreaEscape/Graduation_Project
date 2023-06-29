@@ -227,6 +227,21 @@ void Network::Process_ElectrinicSystem_Init(char* ptr)
 	// 해당부분에서 전력장치 수정 해야됨 아직 없음 ㅎ
 }
 
+void Network::Process_ElectronicSystem_Switch_Update(char* ptr)
+{
+	sc_packet_electronic_system_update_value* packet = reinterpret_cast< sc_packet_electronic_system_update_value*>(ptr);
+	packet->es_num;
+	packet->es_switch_idx;
+	packet->es_value;
+}
+
+void Network::Process_ElectronicSystem_Activate(char* ptr)
+{
+	sc_packet_electronic_system_activate_update* packet = reinterpret_cast<sc_packet_electronic_system_activate_update*>(ptr);
+	packet->system_index;
+	packet->activate;
+}
+
 void Network::Process_Pick_Item_Init(char* ptr)
 {
 	sc_packet_pick_item_init* packet = reinterpret_cast<sc_packet_pick_item_init*>(ptr);

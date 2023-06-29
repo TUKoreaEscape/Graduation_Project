@@ -533,6 +533,12 @@ void Network::ProcessPacket(char* ptr)
 		break;
 	}
 
+	case SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_ACTIVATE_UPDATE:
+	{
+		Process_ElectronicSystem_Activate(ptr);
+		break;
+	}
+
 	case SC_PACKET::SC_PACKET_DOOR_UPDATE:
 	{
 		Process_Door_Update(ptr);

@@ -136,7 +136,12 @@ void ElectronicSystem::Reset()
 {
 	m_state_lock->lock();
 	m_state = ES_CLOSE;
+	m_fixed_system = false;
 	m_state_lock->unlock();
+	for (int i = 0; i < ON_OFF_SWITCH; ++i) {
+		m_check_on_off_switch[i] = false;
+		m_correct_on_off_switch[i] = false;
+	}
 }
 
 void ElectronicSystem::Update_Object(bool value)
@@ -154,14 +159,25 @@ void ElectronicSystem::Update_bounding_box_pos(const XMFLOAT3& pos)
 
 }
 
-bool ElectronicSystem::Get_On_Off_Switch_Vaild(int idx, bool data[])
+bool ElectronicSystem::Get_On_Off_Switch_Vaild()
 {
 	for (int i = 0; i < 15; ++i)
 	{
-		if (m_correct_on_off_switch[i] != data[i])
+		if (m_correct_on_off_switch[i] != m_check_on_off_switch[i])
 			return false;
 	}
 	return true;
+}
+
+bool ElectronicSystem::Activate_ElectronicSystem()
+{
+	if (Get_On_Off_Switch_Vaild() == true)
+	{
+		m_fixed_system = true;
+		return true;
+	}
+	else
+		return false;
 }
 
 void ElectronicSystem::Release()

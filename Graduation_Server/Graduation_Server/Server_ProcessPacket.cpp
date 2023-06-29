@@ -590,6 +590,8 @@ void cGameServer::Process_ElectronicSystem_Control(const int user_id, void* buff
 	room.m_electrinic_system[packet->electronic_system_index].Set_On_Off_Switch_Value(packet->switch_idx, packet->switch_value);
 	//room.m_electrinic_system[packet->electronic_system_index].m_state_lock->unlock();
 
+	//room.m_electrinic_system[packet->electronic_system_index].Get_On_Off_Switch_Vaild();
+
 	sc_packet_electronic_system_update_value es_packet;
 	es_packet.size = sizeof(es_packet);
 	es_packet.type = SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_SWITCH_UPDATE;
@@ -602,6 +604,41 @@ void cGameServer::Process_ElectronicSystem_Control(const int user_id, void* buff
 		int player_id = room.in_player[i];
 		m_clients[player_id].do_send(sizeof(es_packet), &es_packet);
 	}
+}
+
+void cGameServer::Process_ElectronicSystem_Activate(const int user_id, void* buff)
+{
+	cs_packet_request_electronic_system_activate* packet = reinterpret_cast<cs_packet_request_electronic_system_activate*>(buff);
+
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+	
+	bool ret = room.m_electrinic_system[packet->system_index].Activate_ElectronicSystem();
+
+	sc_packet_electronic_system_activate_update update_packet;
+	update_packet.size = sizeof(packet);
+	update_packet.type = SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_ACTIVATE_UPDATE;
+	update_packet.system_index = packet->system_index;
+	if (ret)
+		update_packet.activate = true;
+	else
+		update_packet.activate = false;
+
+	for (auto player_id : room.in_player)
+	{
+		if (player_id == -1)
+			continue;
+		
+		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
+	}
+
+
+	//여기서 모든 전력장치가 수리되었을 경우를 판단
+	if (room.All_ElectronicSystem_Fixed())
+	{
+		// 모든 전력장치 수리가 완료되었을 경우 탈출장치 활성화 시켜야함
+	}
+
+
 }
 
 void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)

@@ -84,8 +84,10 @@ public:
 	void Process_Game_End(char* ptr);
 	void Process_Door_Update(char* ptr);
 	void Process_ElectronicSystemDoor_Update(char* ptr);
-	void Process_Attack_Packet(char* ptr);
 	void Process_ElectrinicSystem_Init(char* ptr);
+	void Process_ElectronicSystem_Switch_Update(char* ptr);
+	void Process_ElectronicSystem_Activate(char* ptr);
+	void Process_Attack_Packet(char* ptr);
 	void Process_LifeChip_Update(char* ptr);
 	void Process_Pick_Item_Init(char* ptr);
 	void Process_Pick_Item_Update(char* ptr);

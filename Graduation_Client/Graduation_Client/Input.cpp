@@ -219,7 +219,9 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 					//std::cout << i+1  << " 방 클릭!" << std::endl;
 					if (i == 0)
 					{
+#if !USE_NETWORK
 						m_gamestate->ChangeNextState();//READY클릭 김우빈 여기수정
+#endif
 #if USE_NETWORK
 						Network& network = *Network::GetInstance();
 						network.Send_Ready_Packet(true);
@@ -230,9 +232,11 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 					{
 #if USE_NETWORK
 						Network& network = *Network::GetInstance();
+						network.Send_Ready_Packet(false);
 						network.Send_Exit_Room();
 #endif
 						m_gamestate->ChangePrevState();//QUIT클릭
+						m_cs_packet_ready.ready_type = false;
 					}
 					else if (i == 2)
 					{
