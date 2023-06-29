@@ -81,6 +81,7 @@ public:
 	void Process_Other_Player_Move(char* ptr);
 	void Process_Other_Move(char* ptr);
 	void Process_Game_Start(char* ptr);
+	void Process_Game_End(char* ptr);
 	void Process_Door_Update(char* ptr);
 	void Process_ElectronicSystemDoor_Update(char* ptr);
 	void Process_Attack_Packet(char* ptr);

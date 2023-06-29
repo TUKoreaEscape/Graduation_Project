@@ -132,6 +132,13 @@ ElectronicSystem::ElectronicSystem(const unsigned int obj_id, Object_Type type, 
 		m_state_lock = new mutex;
 }
 
+void ElectronicSystem::Reset()
+{
+	m_state_lock->lock();
+	m_state = ES_CLOSE;
+	m_state_lock->unlock();
+}
+
 void ElectronicSystem::Update_Object(bool value)
 {
 	m_state_lock->lock();

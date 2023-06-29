@@ -86,6 +86,8 @@ public:
 	ElectronicSystem(const unsigned int obj_id, Object_Type type, XMFLOAT3 center, XMFLOAT3 extents);
 	~ElectronicSystem() = default;
 
+	void Reset();
+
 	void init_electrinic_switch_data(int idx, bool value) { m_correct_on_off_switch[idx] = value; }
 
 	bool Get_On_Off_Switch_Vaild(int idx, bool data[]);

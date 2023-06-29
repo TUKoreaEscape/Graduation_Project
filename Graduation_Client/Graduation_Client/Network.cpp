@@ -455,6 +455,12 @@ void Network::ProcessPacket(char* ptr)
 		break;
 	}
 
+	case SC_PACKET::SC_PACKET_GAME_END:
+	{
+		Process_Game_End(ptr);
+		break;
+	}
+
 	case SC_PACKET::SC_PACKET_LIFE_CHIP_UPDATE:
 	{
 		// 게임 시작시 생명칩을 활성화 시켜줘야하므로 존재함.
@@ -507,6 +513,7 @@ void Network::ProcessPacket(char* ptr)
 		}
 		break;
 	}
+
 
 	case SC_PACKET::SC_PACKET_ELECTRONIC_SWITCH_INIT:
 	{

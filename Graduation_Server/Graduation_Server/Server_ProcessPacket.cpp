@@ -346,7 +346,15 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 		}
 		// 모든 플레이어가 레디가 된 경우 이제 게임을 시작하게 바꿔줘야하는 부분!
 
-		// 임시로 사용하는 부분 (중간발표 이후 삭제 예정)
+		sc_packet_game_start start_packet;
+		start_packet.size = sizeof(start_packet);
+		start_packet.type = SC_PACKET::SC_PACKET_GAME_START;
+		for (auto player_id : room.in_player)
+		{
+			if (player_id == -1)
+				continue;
+			m_clients[player_id].do_send(sizeof(start_packet), &start_packet);
+		}
 		room.Start_Game();
 	}
 }

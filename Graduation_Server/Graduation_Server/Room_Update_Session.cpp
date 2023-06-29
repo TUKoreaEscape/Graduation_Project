@@ -68,14 +68,17 @@ void Room::Start_Game()
 	init_fix_object_and_life_chip();
 }
 
-void Room::End_Game()
+void Room::End_Game(bool is_tagger_win)
 {
 	_room_state_lock.lock();
-	_room_state = GAME_ROOM_STATE::END;
+	_room_state = GAME_ROOM_STATE::READY;
 	_room_state_lock.unlock();
-
-	cout << "게임이 종료되었습니다." << endl;
 	// 엔딩패킷처리 보내는곳
+
+	sc_packet_game_end packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_GAME_END;
+	packet.is_tagger_win = is_tagger_win;
 
 }
 
@@ -170,12 +173,12 @@ void Room::Update_room_time()
 	// 게임 종료를 확인하는 부분
 	if (m_tagger_collect_chip == GAME_END_COLLECT_CHIP) // 술래가 정해진 갯수의 생명칩을 수거한 경우
 	{
-		End_Game();
+		End_Game(true);
 	}
 
 	if (std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count() > 720 && _room_state == GAME_ROOM_STATE::PLAYING) // 게임종료 확인(타임아웃)
 	{
-		End_Game();
+		End_Game(true);
 	}
 	duration_time = std::chrono::duration_cast<std::chrono::seconds>(now_time - start_time).count();
 }

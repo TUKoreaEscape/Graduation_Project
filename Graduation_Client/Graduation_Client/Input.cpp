@@ -215,7 +215,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 					//std::cout << i+1  << " 방 클릭!" << std::endl;
 					if (i == 0)
 					{
-						m_gamestate->ChangeNextState();//READY클릭 김우빈 여기수정
+						//m_gamestate->ChangeNextState();//READY클릭 김우빈 여기수정
 						Network& network = *Network::GetInstance();
 						network.Send_Ready_Packet(true);
 						m_cs_packet_ready.ready_type = true;
@@ -257,6 +257,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 
 			if (xPos >= endingRect.left && xPos <= endingRect.right && yPos >= endingRect.top && yPos <= endingRect.bottom)
 			{
+				m_cs_packet_ready.ready_type = false;
 				m_gamestate->ChangeNextState();//QUIT클릭
 			}
 			//InputRoomInfo();

@@ -6,9 +6,20 @@ void Network::Process_Game_Start(char* ptr)
 {
 	sc_packet_game_start* packet = reinterpret_cast<sc_packet_game_start*>(ptr);
 
-	std::cout << std::endl;
-	std::cout << "10초뒤 술래가 결정됩니다." << std::endl;
-	// 여기서 로비씬 -> 게임씬으로 전환 해주면 됨
+	GameState& game_state = *GameState::GetInstance();
+	game_state.ChangeNextState();
+}
+
+void Network::Process_Game_End(char* ptr)
+{
+	sc_packet_game_end* packet = reinterpret_cast<sc_packet_game_end*>(ptr);
+	
+	GameState& game_state = *GameState::GetInstance();
+	game_state.ChangeNextState();
+
+	m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
+	for (int i = 0; i < 5; ++i)
+		m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);
 }
 
 void Network::Process_LifeChip_Update(char* ptr)

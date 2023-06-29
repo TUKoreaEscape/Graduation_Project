@@ -6,10 +6,15 @@
 #define GAME_END_COLLECT_CHIP 12
 #define JOIN_ROOM_MAX_USER 6
 
-#define FIRST_TAGGER_SKILL_OPEN_SECOND 180
-#define SECOND_TAGGER_SKILL_OPEN_SECOND 360
-#define THIRD_TAGGER_SKILL_OPEN_SECOND 540
-#define GAME_END_SECOND 900
+//#define FIRST_TAGGER_SKILL_OPEN_SECOND 180
+//#define SECOND_TAGGER_SKILL_OPEN_SECOND 360
+//#define THIRD_TAGGER_SKILL_OPEN_SECOND 540
+//#define GAME_END_SECOND 900
+
+#define FIRST_TAGGER_SKILL_OPEN_SECOND 5
+#define SECOND_TAGGER_SKILL_OPEN_SECOND 10
+#define THIRD_TAGGER_SKILL_OPEN_SECOND 15
+#define GAME_END_SECOND 20
 
 //class CLIENT;
 class Room {
@@ -64,6 +69,8 @@ public:
 	{
 		delete m_altar;
 	}
+public:
+	void	init_room_by_game_end(); // 방 초기화
 
 public: // 서버 시작시 초기화하는 함수들
 	void	init_room_number(const int room_num){ room_number = room_num;}
@@ -100,7 +107,7 @@ public: // 인게임 오브젝트 state 받아야하는 공간
 public: // 게임 state 변환하는 함수
 	void	Reset_Room();
 	void	Start_Game();
-	void	End_Game();
+	void	End_Game(bool is_tagger_win);
 
 public: // 인게임 아이템관련 함수
 	void	Activate_Altar();

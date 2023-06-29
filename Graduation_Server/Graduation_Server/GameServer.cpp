@@ -270,7 +270,7 @@ void cGameServer::WorkerThread()
 		{
 			Room& rl = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
 			rl._room_state_lock.lock();
-			rl._room_state = GAME_ROOM_STATE::END;
+			rl._room_state = GAME_ROOM_STATE::READY;
 			rl._room_state_lock.unlock();
 
 			sc_packet_game_end packet;
@@ -283,6 +283,39 @@ void cGameServer::WorkerThread()
 				m_clients[rl.in_player[i]].do_send(sizeof(packet), &packet);
 			}
 
+			sc_packet_update_room update_room_packet;
+			update_room_packet.size = sizeof(update_room_packet);
+			update_room_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO_UPDATE;
+			update_room_packet.join_member = m_room_manager->Get_Room_Info(static_cast<int>(iocp_key))->Get_Number_of_users();
+			update_room_packet.room_number = static_cast<int>(iocp_key);
+			update_room_packet.state = m_room_manager->Get_Room_Info(static_cast<int>(iocp_key))->_room_state;
+
+			for (auto& cl : m_clients)
+			{
+				if (cl.get_state() != CLIENT_STATE::ST_LOBBY)
+					continue;
+
+				if (cl.get_look_lobby_page() != static_cast<int>(iocp_key) / 6)
+					continue;
+
+				cl.do_send(sizeof(update_room_packet), &update_room_packet);
+			}
+	
+			rl.init_room_by_game_end();
+
+			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
+			{
+				if(rl.in_player[i] != -1)
+					send_put_player_data(rl.in_player[i]);
+				for (int idx = 0; idx < JOIN_ROOM_MAX_USER; ++idx)
+				{
+					if (rl.in_player[idx] == -1)
+						continue;
+					if (rl.in_player[i] == rl.in_player[idx])
+						continue;
+					send_put_other_player(rl.in_player[i], rl.in_player[idx]);
+				}
+			}
 			delete exp_over;
 			break;
 		}

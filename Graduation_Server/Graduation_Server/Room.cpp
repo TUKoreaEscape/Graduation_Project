@@ -11,6 +11,26 @@ void Room::Reset_Room()
 	in_player_loading_success.fill(false);
 }
 
+void Room::init_room_by_game_end()
+{
+	in_player_ready.fill(false);
+	in_player_loading_success.fill(false);
+
+	for (int i = 0; i < m_door_object.size(); ++i)
+		m_door_object[i].m_check_bounding_box = true;
+
+	for (int i = 0; i < m_electrinic_system.size(); ++i)
+		m_electrinic_system[i].Reset();
+
+	m_first_skill_enable = false;
+	m_second_skill_enable = false;
+	m_third_skill_enable = false;
+
+	m_tagger_id = -1;
+	m_tagger_collect_chip = 0;
+	m_altar->init();
+}
+
 void Room::Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE room_state) // <- 방 만들때 in_player가 전부 -1에서 0으로 바뀜 이거 수정해야댐
 {
 	in_player.fill(-1);
