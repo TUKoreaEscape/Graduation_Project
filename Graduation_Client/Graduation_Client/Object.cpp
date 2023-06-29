@@ -354,6 +354,13 @@ void Door::Interaction(int playerType)
 		case TYPE_TAGGER:
 			if (m_fCooltime >= DOOR_CLOSE_COOLTIME_TAGGER) {
 				SetOpen(false);
+				cs_packet_request_open_door packet;
+				packet.size = sizeof(packet);
+				packet.type = CS_PACKET::CS_PACKET_REQUEST_OPEN_DOOR;
+				packet.door_num = Input::GetInstance()->m_pPlayer->m_door_number;
+
+				Network& network = *Network::GetInstance();
+				network.send_packet(&packet);
 				m_fCooltime = 0;
 				IsInteraction = false;
 			}
@@ -362,6 +369,13 @@ void Door::Interaction(int playerType)
 		case TYPE_PLAYER:
 			if (m_fCooltime >= DOOR_CLOSE_COOLTIME_PLYAER) {
 				SetOpen(false);
+				cs_packet_request_open_door packet;
+				packet.size = sizeof(packet);
+				packet.type = CS_PACKET::CS_PACKET_REQUEST_OPEN_DOOR;
+				packet.door_num = Input::GetInstance()->m_pPlayer->m_door_number;
+
+				Network& network = *Network::GetInstance();
+				network.send_packet(&packet);
 				m_fCooltime = 0;
 				IsInteraction = false;
 			}
@@ -377,6 +391,13 @@ void Door::Interaction(int playerType)
 		case TYPE_TAGGER:
 			if (m_fCooltime >= DOOR_OPEN_COOLTIME_TAGGER) {
 				SetOpen(true);
+				cs_packet_request_open_door packet;
+				packet.size = sizeof(packet);
+				packet.type = CS_PACKET::CS_PACKET_REQUEST_OPEN_DOOR;
+				packet.door_num = Input::GetInstance()->m_pPlayer->m_door_number;
+
+				Network& network = *Network::GetInstance();
+				network.send_packet(&packet);
 				m_fCooltime = 0;
 				IsInteraction = false;
 			}
@@ -385,6 +406,13 @@ void Door::Interaction(int playerType)
 		case TYPE_PLAYER:
 			if (m_fCooltime >= DOOR_OPEN_COOLTIME_PLYAER) {
 				SetOpen(true);
+				cs_packet_request_open_door packet;
+				packet.size = sizeof(packet);
+				packet.type = CS_PACKET::CS_PACKET_REQUEST_OPEN_DOOR;
+				packet.door_num = Input::GetInstance()->m_pPlayer->m_door_number;
+
+				Network& network = *Network::GetInstance();
+				network.send_packet(&packet);
 				m_fCooltime = 0;
 				IsInteraction = false;
 			}
