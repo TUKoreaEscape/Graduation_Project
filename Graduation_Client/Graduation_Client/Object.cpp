@@ -717,6 +717,33 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void PowerSwitch::Interaction(int playerType)
 {
+	if (IsOpen) {
+		switch (playerType) {
+		case TYPE_TAGGER:
+			SetOpen(false);
+			break;
+		case TYPE_PLAYER_YET:
+			break;
+		case TYPE_PLAYER:
+			// Do Something 
+			break;
+		case TYPE_DEAD_PLAYER:
+			// Can't Do
+			break;
+		}
+	}
+	else {
+		switch (playerType) {
+		case TYPE_TAGGER:
+		case TYPE_PLAYER_YET:
+		case TYPE_DEAD_PLAYER:
+			// nothing to do
+			break;
+		case TYPE_PLAYER:
+			SetOpen(true);
+			break;
+		}
+	}
 }
 
 Item::Item()
