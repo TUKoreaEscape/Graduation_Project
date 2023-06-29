@@ -101,6 +101,8 @@ public:
 	void Send_Ready_Packet(bool is_ready);
 	void Send_Loading_Success_Packet();
 	void Send_Select_Room(int select_room_number, int index);
+	void Send_ElectronicSystem_Switch_Value(int system_index, int switch_index, bool value);
+	void Send_ElectronicSystem_Request_Activate(int system_index);
 	void Send_Ativate_Altar();
 	void Send_Altar_Event();
 

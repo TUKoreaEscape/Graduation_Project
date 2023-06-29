@@ -162,6 +162,28 @@ void Network::Send_Select_Room(int select_room_number, int index)
 	}
 }
 
+void Network::Send_ElectronicSystem_Switch_Value(int system_index, int switch_index, bool value)
+{
+	cs_packet_request_eletronic_system_switch_control packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_SWICH;
+	packet.electronic_system_index = system_index;
+	packet.switch_idx = switch_index;
+	packet.switch_value = value;
+
+	send_packet(&packet);
+}
+
+void Network::Send_ElectronicSystem_Request_Activate(int system_index)
+{
+	cs_packet_request_electronic_system_activate packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_ATIVATE;
+	packet.system_index = system_index;
+
+	send_packet(&packet);
+}
+
 void Network::Send_Ativate_Altar()
 {
 	cs_packet_activate_altar packet;
