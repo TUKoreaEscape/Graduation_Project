@@ -107,7 +107,7 @@ struct Right {
 
 struct ElectronicSystem_Data {
 	unsigned short	idx;
-	unsigned char	value[15];
+	unsigned char	value[10];
 };
 
 struct UserData {
