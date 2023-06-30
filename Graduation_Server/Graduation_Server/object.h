@@ -109,11 +109,20 @@ public:
 class EscapeSystem : public GameObject {
 private:
 	int		m_system_id = -1;
+	bool	m_activate = false;
+	bool	m_working = false;
 
 public:
 	EscapeSystem();
 	EscapeSystem(const unsigned int obj_id, Object_Type type, XMFLOAT3 center, XMFLOAT3 extents);
 	~EscapeSystem() = default;
+
+	void init();
+	void Activate();
+	void Working_Escape();
+
+	bool Is_Activate();
+	bool Is_Working_Escape();
 
 	void Update_bounding_box_pos(const XMFLOAT3& pos);
 	void Update_Object();

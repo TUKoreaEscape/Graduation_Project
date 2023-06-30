@@ -9,6 +9,23 @@ void Room::Reset_Room()
 	in_player.fill(-1);
 	in_player_ready.fill(false);
 	in_player_loading_success.fill(false);
+
+	for (int i = 0; i < m_door_object.size(); ++i)
+		m_door_object[i].m_check_bounding_box = true;
+
+	for (int i = 0; i < m_electrinic_system.size(); ++i)
+		m_electrinic_system[i].Reset();
+
+	for (int i = 0; i < m_escape_system.size(); ++i)
+		m_escape_system[i].init();
+
+	m_first_skill_enable = false;
+	m_second_skill_enable = false;
+	m_third_skill_enable = false;
+
+	m_tagger_id = -1;
+	m_tagger_collect_chip = 0;
+	m_altar->init();
 }
 
 void Room::init_room_by_game_end()
@@ -21,6 +38,9 @@ void Room::init_room_by_game_end()
 
 	for (int i = 0; i < m_electrinic_system.size(); ++i)
 		m_electrinic_system[i].Reset();
+
+	for (int i = 0; i < m_escape_system.size(); ++i)
+		m_escape_system[i].init();
 
 	m_first_skill_enable = false;
 	m_second_skill_enable = false;

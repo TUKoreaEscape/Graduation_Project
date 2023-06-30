@@ -198,6 +198,34 @@ EscapeSystem::EscapeSystem(const unsigned int obj_id, Object_Type type, XMFLOAT3
 	m_bounding_box = BoundingOrientedBox{ center, extents, XMFLOAT4(0,0,0,1) };
 }
 
+void EscapeSystem::init()
+{
+	m_activate = false;
+	m_working = false;
+}
+
+void EscapeSystem::Activate()
+{
+	if (m_activate == false)
+		m_activate = true;
+}
+
+void EscapeSystem::Working_Escape()
+{
+	if (m_working == false)
+		m_working = true;
+}
+
+bool EscapeSystem::Is_Activate()
+{
+	return m_activate;
+}
+
+bool EscapeSystem::Is_Working_Escape()
+{
+	return m_working;
+}
+
 void EscapeSystem::Update_bounding_box_pos(const XMFLOAT3& pos)
 {
 

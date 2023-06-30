@@ -33,6 +33,7 @@ public:
 	vector<GameObject>				m_game_wall;
 	vector<Door>					m_door_object;
 	vector<ElectronicSystem>		m_electrinic_system;
+	vector<EscapeSystem>			m_escape_system;
 	vector<GameItem>				m_fix_item;
 	Altar*							m_altar = nullptr;
 
@@ -63,6 +64,11 @@ public:
 		in_player.fill(-1);
 		in_player_ready.fill(false);
 		m_altar = new Altar;
+		for (int i = 0; i < 3; ++i) {
+			m_escape_system.emplace_back();
+			m_escape_system[i].init();
+		}
+
 	}
 
 	~Room()

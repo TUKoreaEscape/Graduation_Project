@@ -635,6 +635,8 @@ void cGameServer::Process_ElectronicSystem_Activate(const int user_id, void* buf
 	//여기서 모든 전력장치가 수리되었을 경우를 판단
 	if (room.All_ElectronicSystem_Fixed())
 	{
+		for (int i = 0; i < room.m_escape_system.size(); ++i)
+			room.m_escape_system[i].Activate();
 		// 모든 전력장치 수리가 완료되었을 경우 탈출장치 활성화 시켜야함
 	}
 
