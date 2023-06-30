@@ -224,7 +224,14 @@ void Network::Process_ElectronicSystemDoor_Update(char* ptr)
 void Network::Process_ElectrinicSystem_Init(char* ptr)
 {
 	sc_packet_electronic_system_init* packet = reinterpret_cast<sc_packet_electronic_system_init*>(ptr);
-	// 해당부분에서 전력장치 수정 해야됨 아직 없음 ㅎ
+
+	for (int i = 0; i < 5; ++i)
+	{
+		for (int idx = 0; idx < 10; ++idx)
+		{
+			m_pPowers[i]->SetAnswer(idx, packet->data[i].value);
+		}
+	}
 }
 
 void Network::Process_ElectronicSystem_Switch_Update(char* ptr)
