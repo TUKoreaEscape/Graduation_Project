@@ -84,6 +84,7 @@ void CommonMovement::update(float elapsedTime)
 			}
 			if (Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct) {
 				// 술래면 닫음 술래가 아니면 여는 동작만
+				/*
 				if (reinterpret_cast<InteractionObject*>(Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct)->IsOpen) {
 					if (TYPE_TAGGER == Input::GetInstance()->m_pPlayer->GetType())
 					{
@@ -114,7 +115,8 @@ void CommonMovement::update(float elapsedTime)
 						network.send_packet(&packet);
 						Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct->SetOpen(true);
 					}
-				}
+				}*/
+				Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct->Interaction(playerType);
 			}
 			if (Input::GetInstance()->m_pPlayer->m_pNearVent) {
 				Input::GetInstance()->m_pPlayer->m_pNearVent->Interaction(playerType);

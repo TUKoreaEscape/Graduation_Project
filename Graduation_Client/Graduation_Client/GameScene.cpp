@@ -895,7 +895,7 @@ void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	LoadedModelInfo* pElecModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Shield.bin", nullptr);
+	LoadedModelInfo* pElecModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Power.bin", nullptr);
 	InteractionUI* PowerUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/f.dds");
 
 	pElecModel->m_pModelRootObject->SetScale(0.5, 0.5, 0.5);
@@ -940,6 +940,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 		}
 	}
 	for (int i = 0; i < NUM_POWER; ++i) {
+		m_pPowers[i]->update(elapsedTime);
 		if (m_pPowers[i]->IsPlayerNear(PlayerPos)) {
 			m_pPlayer->m_pNearInteractionObejct = m_pPowers[i];
 			IsNearInteractionObject = true;
