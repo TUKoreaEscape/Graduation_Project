@@ -87,10 +87,12 @@ public:
 
 	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList) {};
 	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) {};
+	virtual void update(float fElapsedTime) {};
 
 	virtual void Interaction(int playerType) override {};
 
 	virtual void SetUI(InteractionUI* ui);
+	virtual void SetAnswer(int index, bool answer) {};
 };
 
 class Door : public InteractionObject
@@ -133,7 +135,7 @@ public:
 class PowerSwitch : public InteractionObject
 {
 public:
-	bool m_bOnAndOff[15];
+	bool m_bOnAndOff[10];
 	GameObject* m_pCup = nullptr;
 	GameObject* m_pMainKnob = nullptr;
 
@@ -141,7 +143,7 @@ public:
 	float m_fOnKnobPos;
 
 	bool m_bClear = false;
-
+	bool m_bIsOperating = false;
 public:
 	PowerSwitch();
 	virtual ~PowerSwitch();
@@ -153,10 +155,20 @@ public:
 
 	void SetOpen(bool Open);
 
+	virtual void update(float fElapsedTime) override;
 	void render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
 
 	void Interaction(int playerType) override;
+
+	void PowerOperate();
+	void SetAnswer(int index, bool answer) override;
+	void OperateKnob(int index);
+	bool CheckAnswer();
+	void Reset();
+
+private:
+	bool m_bAnswers[10];
 };
 
 class Vent : public InteractionObject

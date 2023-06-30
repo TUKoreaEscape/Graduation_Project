@@ -598,10 +598,6 @@ PowerSwitch::~PowerSwitch()
 
 void PowerSwitch::Init()
 {
-	m_bOnAndOff[1] = true;
-	m_bOnAndOff[4] = true;
-	m_bOnAndOff[7] = true;
-
 	GameObject* pKnob = FindFrame("Knob");
 
 	m_pCup = FindFrame("Cup");
@@ -660,6 +656,42 @@ void PowerSwitch::SetOpen(bool Open)
 	IsOpen = Open;
 }
 
+void PowerSwitch::update(float fElapsedTime)
+{
+	if (m_bClear) return;
+	if (m_bIsOperating == false) return;
+	if (IsNear == false) {
+		m_bIsOperating = false;
+		return;
+	}
+	UCHAR keyBuffer[256];
+	memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
+	if (keyBuffer['1'] & 0xF0) OperateKnob(0);
+	if (keyBuffer['2'] & 0xF0) OperateKnob(1);
+	if (keyBuffer['3'] & 0xF0) OperateKnob(2);
+	if (keyBuffer['4'] & 0xF0) OperateKnob(3);
+	if (keyBuffer['5'] & 0xF0) OperateKnob(4);
+	if (keyBuffer['6'] & 0xF0) OperateKnob(5);
+	if (keyBuffer['7'] & 0xF0) OperateKnob(6);
+	if (keyBuffer['8'] & 0xF0) OperateKnob(7);
+	if (keyBuffer['9'] & 0xF0) OperateKnob(8);
+	if (keyBuffer['0'] & 0xF0) OperateKnob(9);
+
+	if (keyBuffer['c'] & 0xF0 || keyBuffer['C'] & 0xF0) {
+		Reset();
+		m_bIsOperating = false;
+	}
+	if (keyBuffer['v'] & 0xF0 || keyBuffer['V'] & 0xF0) {
+		if (false == CheckAnswer()) {
+			Reset();
+			m_bIsOperating = false;
+			return;
+		}
+		m_bClear = true;
+		m_bIsOperating = false;
+	}
+}
+
 void PowerSwitch::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (IsOpen) {
@@ -670,14 +702,9 @@ void PowerSwitch::render(ID3D12GraphicsCommandList* pd3dCommandList)
 		m_pCup->isNotDraw = false;
 		if (m_pCup->m_pChild) m_pCup->m_pChild->isNotDraw = false;
 	}
-	for (int i = 0; i < 15; ++i) {
+	for (int i = 0; i < 10; ++i) {
 		std::string str = "Knob";
-		if (i != 0) {
-			if (i < 10)
-				str += "00" + std::to_string(i);
-			else
-				str += "0" + std::to_string(i);
-		}
+		str += "00" + std::to_string(i);
 		GameObject* pKnob = FindFrame(str.c_str());
 		if (pKnob) {
 			m_fOffKnobPos = pKnob->GetPosition().x;		
@@ -691,6 +718,7 @@ void PowerSwitch::render(ID3D12GraphicsCommandList* pd3dCommandList)
 			}
 		}
 	}
+	UpdateTransform(nullptr);
 	if (m_bClear) {
 		FindFrame("Lamp_1")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 		FindFrame("Lamp_2")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
@@ -704,6 +732,7 @@ void PowerSwitch::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (m_bClear) return;
 	if (IsNear) {
 		if (m_pInteractionUI) {
 			if (IsRot)
@@ -717,6 +746,64 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void PowerSwitch::Interaction(int playerType)
 {
+	if (m_bClear) return;
+	if (m_bIsOperating) return;
+	if (IsOpen) {
+		switch (playerType) {
+		case TYPE_TAGGER:
+			Reset();
+			SetOpen(false);
+			break;
+		case TYPE_PLAYER_YET:
+			break;
+		case TYPE_PLAYER:
+			m_bIsOperating = true;
+			break;
+		case TYPE_DEAD_PLAYER:
+			break;
+		}
+	}
+	else {
+		switch (playerType) {
+		case TYPE_TAGGER:
+		case TYPE_PLAYER_YET:
+		case TYPE_DEAD_PLAYER:
+			break;
+		case TYPE_PLAYER:
+			SetOpen(true);
+			break;
+		}
+	}
+}
+
+void PowerSwitch::PowerOperate()
+{
+}
+
+void PowerSwitch::SetAnswer(int index, bool answer)
+{
+	m_bAnswers[index] = answer;
+}
+
+void PowerSwitch::OperateKnob(int index)
+{
+	m_bOnAndOff[index] = true;
+}
+
+bool PowerSwitch::CheckAnswer()
+{
+	for (int i = 0; i < 10; ++i) {
+		if (m_bAnswers[i] != m_bOnAndOff[i])
+			return false;
+	}
+	return true;
+}
+
+void PowerSwitch::Reset()
+{
+	for (int i = 0; i < 10; ++i) {
+		m_bOnAndOff[i] = false;
+	}
 }
 
 Item::Item()
