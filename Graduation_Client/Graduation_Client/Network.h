@@ -84,6 +84,7 @@ public:
 	void Process_Game_End(char* ptr);
 	void Process_Door_Update(char* ptr);
 	void Process_ElectronicSystem_Reset_By_Tagger(char* ptr);
+	void Process_ElectronicSystem_Reset_By_Player(char* ptr);
 	void Process_ElectronicSystemDoor_Update(char* ptr);
 	void Process_ElectrinicSystem_Init(char* ptr);
 	void Process_ElectronicSystem_Switch_Update(char* ptr);

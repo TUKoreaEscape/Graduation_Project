@@ -527,6 +527,11 @@ void Network::ProcessPacket(char* ptr)
 		break;
 	}
 
+	case SC_PACKET::SC_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_PLAYER:
+	{
+		break;
+	}
+
 	case SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_DOOR_UPDATE:
 	{
 		Process_ElectronicSystemDoor_Update(ptr);

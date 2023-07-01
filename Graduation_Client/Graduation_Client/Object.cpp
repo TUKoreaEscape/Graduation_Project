@@ -358,9 +358,10 @@ void Door::Interaction(int playerType)
 				packet.size = sizeof(packet);
 				packet.type = CS_PACKET::CS_PACKET_REQUEST_OPEN_DOOR;
 				packet.door_num = Input::GetInstance()->m_pPlayer->m_door_number;
-
+#if USE_NETWORK
 				Network& network = *Network::GetInstance();
 				network.send_packet(&packet);
+#endif
 				m_fCooltime = 0;
 				IsInteraction = false;
 			}
@@ -373,9 +374,10 @@ void Door::Interaction(int playerType)
 				packet.size = sizeof(packet);
 				packet.type = CS_PACKET::CS_PACKET_REQUEST_OPEN_DOOR;
 				packet.door_num = Input::GetInstance()->m_pPlayer->m_door_number;
-
+#if USE_NETWORK
 				Network& network = *Network::GetInstance();
 				network.send_packet(&packet);
+#endif
 				m_fCooltime = 0;
 				IsInteraction = false;
 			}
@@ -395,9 +397,10 @@ void Door::Interaction(int playerType)
 				packet.size = sizeof(packet);
 				packet.type = CS_PACKET::CS_PACKET_REQUEST_OPEN_DOOR;
 				packet.door_num = Input::GetInstance()->m_pPlayer->m_door_number;
-
+#if USE_NETWORK
 				Network& network = *Network::GetInstance();
 				network.send_packet(&packet);
+#endif
 				m_fCooltime = 0;
 				IsInteraction = false;
 			}
@@ -410,9 +413,10 @@ void Door::Interaction(int playerType)
 				packet.size = sizeof(packet);
 				packet.type = CS_PACKET::CS_PACKET_REQUEST_OPEN_DOOR;
 				packet.door_num = Input::GetInstance()->m_pPlayer->m_door_number;
-
+#if USE_NETWORK
 				Network& network = *Network::GetInstance();
 				network.send_packet(&packet);
+#endif
 				m_fCooltime = 0;
 				IsInteraction = false;
 			}
@@ -753,6 +757,7 @@ void PowerSwitch::Interaction(int playerType)
 		case TYPE_TAGGER:
 		{
 			Reset();
+#if USE_NETWORK
 			Network& network = *Network::GetInstance();
 			cs_packet_request_electronic_system_open packet;
 			packet.size = sizeof(packet);
@@ -762,11 +767,12 @@ void PowerSwitch::Interaction(int playerType)
 			network.send_packet(&packet);
 
 
-			cs_packet_request_electronic_system_reset_by_tagger update_packet;
+			cs_packet_request_electronic_system_reset update_packet;
 			update_packet.size = sizeof(update_packet);
 			update_packet.type = CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_TAGGER;
 			update_packet.switch_index = m_switch_index;
 			network.send_packet(&update_packet);
+#endif
 			SetOpen(false);
 			break;
 		}
@@ -796,6 +802,7 @@ void PowerSwitch::Interaction(int playerType)
 			break;
 		case TYPE_PLAYER:
 		{
+#if USE_NETWORK
 			Network& network = *Network::GetInstance();
 			cs_packet_request_electronic_system_open packet;
 			packet.size = sizeof(packet);
@@ -803,6 +810,7 @@ void PowerSwitch::Interaction(int playerType)
 			packet.es_num = m_switch_index;
 			packet.is_door_open = true;
 			network.send_packet(&packet);
+#endif
 			SetOpen(true);
 			break;
 		}
@@ -833,7 +841,7 @@ void PowerSwitch::SetAnswer(int index, bool answer)
 void PowerSwitch::OperateKnob(int index)
 {
 	m_bOnAndOff[index] = true;
-
+#if USE_NETWORK
 	Network& network = *Network::GetInstance();
 	cs_packet_request_eletronic_system_switch_control packet;
 	packet.size = sizeof(packet);
@@ -843,6 +851,7 @@ void PowerSwitch::OperateKnob(int index)
 	packet.switch_value = true;
 
 	network.send_packet(&packet);
+#endif
 }
 
 bool PowerSwitch::CheckAnswer()
@@ -859,6 +868,15 @@ void PowerSwitch::Reset()
 	for (int i = 0; i < 10; ++i) {
 		m_bOnAndOff[i] = false;
 	}
+
+#if USE_NETWORK
+	Network& network = *Network::GetInstance();
+	cs_packet_request_electronic_system_reset update_packet;
+	update_packet.size = sizeof(update_packet);
+	update_packet.type = CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_PLAYER;
+	update_packet.switch_index = m_switch_index;
+	network.send_packet(&update_packet);
+#endif
 }
 
 Item::Item()

@@ -78,6 +78,7 @@ namespace CS_PACKET
 		CS_PACKET_REQUEST_OPEN_DOOR,
 		CS_PACKET_REQUEST_OPEN_HIDDEN_DOOR,
 		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_DOOR,
+		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_PLAYER,
 		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_TAGGER,
 		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_SWICH,
 		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_ATIVATE,
@@ -256,7 +257,7 @@ struct cs_packet_request_electronic_system_open {
 	unsigned short	es_num;
 };
 
-struct cs_packet_request_electronic_system_reset_by_tagger {
+struct cs_packet_request_electronic_system_reset {
 	unsigned char	size;
 	unsigned char	type;
 
@@ -358,6 +359,7 @@ namespace SC_PACKET
 		SC_PACKET_ACTIVATE_ALTAR,
 		SC_PACKET_ALTAR_LIFECHIP_UPDATE,
 		SC_PACKET_ELECTRONIC_SYSTEM_DOOR_UPDATE,
+		SC_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_PLAYER,
 		SC_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_TAGGER,
 		SC_PACKET_ELECTRONIC_SYSTEM_SWITCH_UPDATE,
 		SC_PACKET_ELECTRONIC_SYSTEM_ACTIVATE_UPDATE,
@@ -576,7 +578,7 @@ struct sc_packet_open_electronic_system_door {
 	unsigned char	es_state;
 };
 
-struct sc_packet_request_electronic_system_reset_by_tagger {
+struct sc_packet_request_electronic_system_reset {
 	unsigned char	size;
 	unsigned char	type;
 

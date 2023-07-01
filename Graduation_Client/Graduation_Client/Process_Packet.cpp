@@ -214,7 +214,15 @@ void Network::Process_Door_Update(char* ptr)
 
 void Network::Process_ElectronicSystem_Reset_By_Tagger(char* ptr)
 {
-	sc_packet_request_electronic_system_reset_by_tagger* packet = reinterpret_cast<sc_packet_request_electronic_system_reset_by_tagger*>(ptr);
+	sc_packet_request_electronic_system_reset* packet = reinterpret_cast<sc_packet_request_electronic_system_reset*>(ptr);
+
+	for (int i = 0; i < 10; ++i)
+		m_pPowers[packet->switch_index]->SetSwitchValue(i, false);
+}
+
+void Network::Process_ElectronicSystem_Reset_By_Player(char* ptr)
+{
+	sc_packet_request_electronic_system_reset* packet = reinterpret_cast<sc_packet_request_electronic_system_reset*>(ptr);
 
 	for (int i = 0; i < 10; ++i)
 		m_pPowers[packet->switch_index]->SetSwitchValue(i, false);

@@ -580,16 +580,38 @@ void cGameServer::Process_ElectronicSystem_Open(const int user_id, void* buff)
 	}
 }
 
-void cGameServer::Process_ElectronicSystem_Reset_By_Tagger(const int user_id, void* buff)
+void cGameServer::Process_ElectronicSystem_Reset_By_Player(const int user_id, void* buff)
 {
-	cs_packet_request_electronic_system_reset_by_tagger* packet = reinterpret_cast<cs_packet_request_electronic_system_reset_by_tagger*>(buff);
+	cs_packet_request_electronic_system_reset* packet = reinterpret_cast<cs_packet_request_electronic_system_reset*>(buff);
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
 
 	for (int i = 0; i < ON_OFF_SWITCH; ++i)
 		room.m_electrinic_system[packet->switch_index].Set_On_Off_Switch_Value(i, false);
 
-	sc_packet_request_electronic_system_reset_by_tagger update_packet;
+	sc_packet_request_electronic_system_reset update_packet;
+	update_packet.size = sizeof(update_packet);
+	update_packet.type = SC_PACKET::SC_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_PLAYER;
+	update_packet.switch_index = packet->switch_index;
+
+	for (auto player_id : room.in_player)
+	{
+		if (player_id == -1)
+			continue;
+		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
+	}
+}
+
+void cGameServer::Process_ElectronicSystem_Reset_By_Tagger(const int user_id, void* buff)
+{
+	cs_packet_request_electronic_system_reset* packet = reinterpret_cast<cs_packet_request_electronic_system_reset*>(buff);
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+
+	for (int i = 0; i < ON_OFF_SWITCH; ++i)
+		room.m_electrinic_system[packet->switch_index].Set_On_Off_Switch_Value(i, false);
+
+	sc_packet_request_electronic_system_reset update_packet;
 	update_packet.size = sizeof(update_packet);
 	update_packet.type = SC_PACKET::SC_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_TAGGER;
 	update_packet.switch_index = packet->switch_index;
