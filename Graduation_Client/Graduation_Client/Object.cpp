@@ -668,6 +668,7 @@ void PowerSwitch::update(float fElapsedTime)
 		m_bIsOperating = false;
 		return;
 	}
+	m_fCooltime += fElapsedTime;
 	UCHAR keyBuffer[256];
 	memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
 	if (keyBuffer['1'] & 0xF0) OperateKnob(0);
@@ -840,7 +841,9 @@ void PowerSwitch::SetAnswer(int index, bool answer)
 
 void PowerSwitch::OperateKnob(int index)
 {
-	m_bOnAndOff[index] = true;
+	if (m_fCooltime < KNOB_OPERATE_COOLTIME) return;
+	m_bOnAndOff[index] = !m_bOnAndOff[index];
+	m_fCooltime = 0;
 #if USE_NETWORK
 	Network& network = *Network::GetInstance();
 	cs_packet_request_eletronic_system_switch_control packet;
@@ -868,7 +871,7 @@ void PowerSwitch::Reset()
 	for (int i = 0; i < 10; ++i) {
 		m_bOnAndOff[i] = false;
 	}
-
+	m_fCooltime = 0;
 #if USE_NETWORK
 	Network& network = *Network::GetInstance();
 	cs_packet_request_electronic_system_reset update_packet;

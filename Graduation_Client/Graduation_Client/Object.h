@@ -78,7 +78,7 @@ public:
 
 	float m_fPitch{}, m_fYaw{}, m_fRoll{};
 
-	float m_fCooltime;
+	float volatile m_fCooltime;
 public:
 	InteractionObject();
 	virtual ~InteractionObject();
