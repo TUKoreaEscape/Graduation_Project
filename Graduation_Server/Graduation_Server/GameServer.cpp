@@ -742,6 +742,12 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		break;
 	}
 
+	case CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_TAGGER:
+	{
+		Process_ElectronicSystem_Reset_By_Tagger(user_id, p);
+		break;
+	}
+
 	case CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_SWICH:
 	{
 		// 여기선 스위치 조작 처리 해주면됨

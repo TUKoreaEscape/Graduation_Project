@@ -58,7 +58,7 @@ void Room::Start_Game()
 	for (int i = 0; i < m_electrinic_system.size(); ++i)
 	{
 		system_packet.data[i].idx = i;
-		for (int idx = 0; idx < 15; ++idx)
+		for (int idx = 0; idx < ON_OFF_SWITCH; ++idx)
 			system_packet.data[i].value[idx] = m_electrinic_system[i].Get_On_Off_Switch_Value(idx);
 	}
 

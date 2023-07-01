@@ -92,14 +92,14 @@ void CommonMovement::update(float elapsedTime)
 						cs_packet_request_electronic_system_open packet;
 						packet.size = sizeof(packet);
 						packet.type = CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_DOOR;
-						packet.es_num = Input::GetInstance()->m_pPlayer->m_power_number;
-						packet.is_door_open = false;
-
+						packet.es_num = Input::GetInstance()-
 						network.send_packet(&packet);
 						Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct->SetOpen(false);
 					}
 					else if (TYPE_PLAYER == Input::GetInstance()->m_pPlayer->GetType()) {
-						// 전력장치 수리
+						// 전력장치 수리>m_pPlayer->m_power_number;
+						packet.is_door_open = false;
+
 					}
 				}
 				else {

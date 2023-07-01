@@ -93,6 +93,8 @@ public:
 
 	virtual void SetUI(InteractionUI* ui);
 	virtual void SetAnswer(int index, bool answer) {};
+	virtual void SetSwitchValue(int index, bool value) {};
+	virtual void SetIndex(int index) {};
 };
 
 class Door : public InteractionObject
@@ -135,6 +137,8 @@ public:
 class PowerSwitch : public InteractionObject
 {
 public:
+	int	 m_switch_index = -1;
+
 	bool m_bOnAndOff[10];
 	GameObject* m_pCup = nullptr;
 	GameObject* m_pMainKnob = nullptr;
@@ -162,7 +166,9 @@ public:
 	void Interaction(int playerType) override;
 
 	void PowerOperate();
+	void SetIndex(int index) override;
 	void SetAnswer(int index, bool answer) override;
+	void SetSwitchValue(int index, bool value) override;
 	void OperateKnob(int index);
 	bool CheckAnswer();
 	void Reset();

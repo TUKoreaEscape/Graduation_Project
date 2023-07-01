@@ -521,6 +521,12 @@ void Network::ProcessPacket(char* ptr)
 		break;
 	}
 
+	case SC_PACKET::SC_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_TAGGER:
+	{
+		Process_ElectronicSystem_Reset_By_Tagger(ptr);
+		break;
+	}
+
 	case SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_DOOR_UPDATE:
 	{
 		Process_ElectronicSystemDoor_Update(ptr);
@@ -529,6 +535,7 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_SWITCH_UPDATE:
 	{
+		Process_ElectronicSystem_Switch_Update(ptr);
 		// 아직 처리할 전력장치 코드가 없음
 		break;
 	}

@@ -7,7 +7,7 @@
 #include "Server_Timer.h"
 
 #define  DIR_NO 100
-#define  USE_NETWORK 0
+#define  USE_NETWORK 1
 #define	 USE_VOICE 0
 
 class Door;
@@ -83,6 +83,7 @@ public:
 	void Process_Game_Start(char* ptr);
 	void Process_Game_End(char* ptr);
 	void Process_Door_Update(char* ptr);
+	void Process_ElectronicSystem_Reset_By_Tagger(char* ptr);
 	void Process_ElectronicSystemDoor_Update(char* ptr);
 	void Process_ElectrinicSystem_Init(char* ptr);
 	void Process_ElectronicSystem_Switch_Update(char* ptr);

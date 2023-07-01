@@ -751,16 +751,41 @@ void PowerSwitch::Interaction(int playerType)
 	if (IsOpen) {
 		switch (playerType) {
 		case TYPE_TAGGER:
+		{
 			Reset();
+			Network& network = *Network::GetInstance();
+			cs_packet_request_electronic_system_open packet;
+			packet.size = sizeof(packet);
+			packet.type = CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_DOOR;
+			packet.es_num = m_switch_index;
+			packet.is_door_open = false;
+			network.send_packet(&packet);
+
+
+			cs_packet_request_electronic_system_reset_by_tagger update_packet;
+			update_packet.size = sizeof(update_packet);
+			update_packet.type = CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_TAGGER;
+			update_packet.switch_index = m_switch_index;
+			network.send_packet(&update_packet);
 			SetOpen(false);
 			break;
+		}
+
 		case TYPE_PLAYER_YET:
+		{
 			break;
+		}
+
 		case TYPE_PLAYER:
+		{
 			m_bIsOperating = true;
 			break;
+		}
 		case TYPE_DEAD_PLAYER:
+		{
 			break;
+		}
+
 		}
 	}
 	else {
@@ -770,14 +795,34 @@ void PowerSwitch::Interaction(int playerType)
 		case TYPE_DEAD_PLAYER:
 			break;
 		case TYPE_PLAYER:
+		{
+			Network& network = *Network::GetInstance();
+			cs_packet_request_electronic_system_open packet;
+			packet.size = sizeof(packet);
+			packet.type = CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_DOOR;
+			packet.es_num = m_switch_index;
+			packet.is_door_open = true;
+			network.send_packet(&packet);
 			SetOpen(true);
 			break;
+		}
+
 		}
 	}
 }
 
 void PowerSwitch::PowerOperate()
 {
+}
+
+void PowerSwitch::SetIndex(int index)
+{
+	m_switch_index = index;
+}
+
+void PowerSwitch::SetSwitchValue(int index, bool value)
+{
+	m_bOnAndOff[index] = value;
 }
 
 void PowerSwitch::SetAnswer(int index, bool answer)
@@ -788,6 +833,16 @@ void PowerSwitch::SetAnswer(int index, bool answer)
 void PowerSwitch::OperateKnob(int index)
 {
 	m_bOnAndOff[index] = true;
+
+	Network& network = *Network::GetInstance();
+	cs_packet_request_eletronic_system_switch_control packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_SWICH;
+	packet.electronic_system_index = m_switch_index;
+	packet.switch_idx = index;
+	packet.switch_value = true;
+
+	network.send_packet(&packet);
 }
 
 bool PowerSwitch::CheckAnswer()

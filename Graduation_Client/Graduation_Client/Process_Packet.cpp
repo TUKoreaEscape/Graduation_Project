@@ -212,6 +212,14 @@ void Network::Process_Door_Update(char* ptr)
 		m_pDoors[static_cast<int>(packet->door_number)]->SetOpen(false);
 }
 
+void Network::Process_ElectronicSystem_Reset_By_Tagger(char* ptr)
+{
+	sc_packet_request_electronic_system_reset_by_tagger* packet = reinterpret_cast<sc_packet_request_electronic_system_reset_by_tagger*>(ptr);
+
+	for (int i = 0; i < 10; ++i)
+		m_pPowers[packet->switch_index]->SetSwitchValue(i, false);
+}
+
 void Network::Process_ElectronicSystemDoor_Update(char* ptr)
 {
 	sc_packet_open_electronic_system_door* packet = reinterpret_cast<sc_packet_open_electronic_system_door*>(ptr);
@@ -230,6 +238,7 @@ void Network::Process_ElectrinicSystem_Init(char* ptr)
 		for (int idx = 0; idx < 10; ++idx)
 		{
 			m_pPowers[i]->SetAnswer(idx, packet->data[i].value);
+			m_pPowers[i]->SetIndex(i);
 		}
 	}
 }
@@ -237,9 +246,7 @@ void Network::Process_ElectrinicSystem_Init(char* ptr)
 void Network::Process_ElectronicSystem_Switch_Update(char* ptr)
 {
 	sc_packet_electronic_system_update_value* packet = reinterpret_cast< sc_packet_electronic_system_update_value*>(ptr);
-	packet->es_num;
-	packet->es_switch_idx;
-	packet->es_value;
+	m_pPowers[packet->es_num]->SetSwitchValue(packet->es_switch_idx, packet->es_value);
 }
 
 void Network::Process_ElectronicSystem_Activate(char* ptr)
