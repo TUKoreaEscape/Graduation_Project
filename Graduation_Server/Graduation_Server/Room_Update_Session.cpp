@@ -59,7 +59,7 @@ void Room::Start_Game()
 	{
 		system_packet.data[i].idx = i;
 		for (int idx = 0; idx < ON_OFF_SWITCH; ++idx)
-			system_packet.data[i].value[idx] = m_electrinic_system[i].Get_On_Off_Switch_Value(idx);
+			system_packet.data[i].value[idx] = m_electrinic_system[i].Get_On_Off_Switch_Correct_Value(idx);
 	}
 
 	for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)

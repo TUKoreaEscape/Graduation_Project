@@ -237,10 +237,11 @@ void Room::Activate_Altar()
 
 void Room::Set_Electronic_System_ONOFF()
 {
+	mt19937 engine((unsigned int)time(NULL));
 	for (int i = 0; i < NUMBER_OF_ELECTRONIC; ++i)
 	{
-		for (int idx = 0; idx < 15; ++idx)
-			m_electrinic_system[i].init_electrinic_switch_data(idx, rand() % 2);
+		for (int idx = 0; idx < ON_OFF_SWITCH; ++idx)
+			m_electrinic_system[i].init_electrinic_switch_data(idx, (engine() % 2 + rand() % 2) % 2);
 	}
 }
 

@@ -659,7 +659,7 @@ void cGameServer::Process_ElectronicSystem_Activate(const int user_id, void* buf
 	bool ret = room.m_electrinic_system[packet->system_index].Activate_ElectronicSystem();
 
 	sc_packet_electronic_system_activate_update update_packet;
-	update_packet.size = sizeof(packet);
+	update_packet.size = sizeof(update_packet);
 	update_packet.type = SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_ACTIVATE_UPDATE;
 	update_packet.system_index = packet->system_index;
 	if (ret)

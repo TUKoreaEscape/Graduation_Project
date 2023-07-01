@@ -243,11 +243,16 @@ void Network::Process_ElectrinicSystem_Init(char* ptr)
 
 	for (int i = 0; i < 5; ++i)
 	{
+		std::cout << "EletronicSystem Correct : ";
+		m_pPowers[i]->SetIndex(i);
+		m_pPowers[i]->SetActivate(false);
 		for (int idx = 0; idx < 10; ++idx)
 		{
-			m_pPowers[i]->SetAnswer(idx, packet->data[i].value);
-			m_pPowers[i]->SetIndex(i);
+			std::cout << static_cast<int>(packet->data[i].value[idx]) << " ";
+			m_pPowers[i]->SetAnswer(idx, packet->data[i].value[idx]);
+			m_pPowers[i]->SetSwitchValue(idx, false);
 		}
+		std::cout << std::endl;
 	}
 }
 
@@ -260,8 +265,9 @@ void Network::Process_ElectronicSystem_Switch_Update(char* ptr)
 void Network::Process_ElectronicSystem_Activate(char* ptr)
 {
 	sc_packet_electronic_system_activate_update* packet = reinterpret_cast<sc_packet_electronic_system_activate_update*>(ptr);
-	packet->system_index;
-	packet->activate;
+	m_pPowers[packet->system_index]->SetActivate(packet->activate);
+	if (packet->activate)
+		std::cout << packet->system_index << "번 전력장치 수리 완료" << std::endl;
 }
 
 void Network::Process_Pick_Item_Init(char* ptr)

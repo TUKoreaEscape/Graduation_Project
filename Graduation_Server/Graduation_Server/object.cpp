@@ -161,7 +161,7 @@ void ElectronicSystem::Update_bounding_box_pos(const XMFLOAT3& pos)
 
 bool ElectronicSystem::Get_On_Off_Switch_Vaild()
 {
-	for (int i = 0; i < 15; ++i)
+	for (int i = 0; i < ON_OFF_SWITCH; ++i)
 	{
 		if (m_correct_on_off_switch[i] != m_check_on_off_switch[i])
 			return false;

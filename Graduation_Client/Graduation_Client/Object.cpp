@@ -660,6 +660,11 @@ void PowerSwitch::SetOpen(bool Open)
 	IsOpen = Open;
 }
 
+void PowerSwitch::SetActivate(bool value)
+{
+	m_bClear = value;
+}
+
 void PowerSwitch::update(float fElapsedTime)
 {
 	if (m_bClear) return;
@@ -694,6 +699,14 @@ void PowerSwitch::update(float fElapsedTime)
 		}
 		m_bClear = true;
 		m_bIsOperating = false;
+#if USE_NETWORK
+		cs_packet_request_electronic_system_activate packet;
+		packet.size = sizeof(packet);
+		packet.type = CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_ATIVATE;
+		packet.system_index = m_switch_index;
+		Network& network = *Network::GetInstance();
+		network.send_packet(&packet);
+#endif
 	}
 }
 
@@ -851,7 +864,7 @@ void PowerSwitch::OperateKnob(int index)
 	packet.type = CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_SWICH;
 	packet.electronic_system_index = m_switch_index;
 	packet.switch_idx = index;
-	packet.switch_value = true;
+	packet.switch_value = m_bOnAndOff[index];
 
 	network.send_packet(&packet);
 #endif

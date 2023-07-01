@@ -95,6 +95,7 @@ public:
 	virtual void SetAnswer(int index, bool answer) {};
 	virtual void SetSwitchValue(int index, bool value) {};
 	virtual void SetIndex(int index) {};
+	virtual void SetActivate(bool value) {};
 };
 
 class Door : public InteractionObject
@@ -169,6 +170,7 @@ public:
 	void SetIndex(int index) override;
 	void SetAnswer(int index, bool answer) override;
 	void SetSwitchValue(int index, bool value) override;
+	void SetActivate(bool value) override;
 	void OperateKnob(int index);
 	bool CheckAnswer();
 	void Reset();
