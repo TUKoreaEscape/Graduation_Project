@@ -8,6 +8,13 @@
 #include "GameObject.h"
 #include "GameScene.h"
 
+enum DIR {
+	DEGREE0 = 0,
+	DEGREE90,
+	DEGREE180,
+	DEGREE270
+};
+
 class SkyBox : public GameObject
 {
 public:
@@ -96,6 +103,7 @@ public:
 	virtual void SetSwitchValue(int index, bool value) {};
 	virtual void SetIndex(int index) {};
 	virtual void SetActivate(bool value) {};
+	virtual void SetRotation(DIR d) {};
 };
 
 class Door : public InteractionObject
@@ -220,4 +228,28 @@ public:
 public:
 	int m_ItemType = -1;
 	bool m_bShow = false;
+};
+
+class ItemBox : public InteractionObject
+{
+public:
+	ItemBox();
+	virtual ~ItemBox();
+
+	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
+
+	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
+	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
+
+	void Interaction(int playerType) override;
+	void SetOpen(bool open) override;
+
+	virtual void SetRotation(DIR d) override;
+public:
+	Item* m_pItem = nullptr;
+
+	DIR m_dir;
+
+	XMFLOAT4X4 m_xmf4x4CapMatrix;
+	XMFLOAT4X4 m_xmf4x4CapOpenMatrix;
 };
