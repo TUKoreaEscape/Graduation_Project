@@ -96,6 +96,12 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->render(pd3dCommandList);
 		}
 	}
+	for (int i = 0; i < 1; ++i) {
+		if (m_pBoxes[i]) {
+			m_pBoxes[i]->UpdateTransform(nullptr);
+			reinterpret_cast<ItemBox*>(m_pBoxes[i])->render(pd3dCommandList);
+		}
+	}
 	if (m_sPVS[static_cast<int>(m_pvsCamera)].count(PVSROOM::FOREST) != 0) {
 		m_pOak->render(pd3dCommandList);
 		for (int i = 0; i < m_nBush; ++i)
@@ -134,6 +140,9 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		}
 		for (int i = 0; i < NUM_VENT; ++i) {
 			reinterpret_cast<Vent*>(Vents[i])->UIrender(pd3dCommandList);
+		}
+		for (int i = 0; i < 1; ++i) {
+			reinterpret_cast<ItemBox*>(m_pBoxes[i])->UIrender(pd3dCommandList);
 		}
 		break;
 	case ENDING_GAME:
@@ -278,6 +287,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	MakeVents(pd3dDevice, pd3dCommandList);
 	MakeDoors(pd3dDevice, pd3dCommandList);
 	MakePowers(pd3dDevice, pd3dCommandList);
+	MakeBoxes(pd3dDevice, pd3dCommandList);
 
 	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 
@@ -929,6 +939,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	bool IsNearDoor = false;
 	bool IsNearInteractionObject = false;
 	bool IsNearVent = false;
+	bool IsNearItembox = false;
 	for (int i = 0; i < NUM_DOOR; ++i) {
 		m_pDoors[i]->update(elapsedTime);
 		if (reinterpret_cast<Door*>(m_pDoors[i])->IsPlayerNear(PlayerPos)) {
@@ -948,6 +959,15 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 			m_pPlayer->m_power_number = i;
 		}
 	}
+	for (int i = 0; i < 1; ++i) {
+		m_pBoxes[i]->update(elapsedTime);
+		if (m_pBoxes[i]->IsPlayerNear(PlayerPos)) {
+			m_pPlayer->m_pNearItembox = m_pBoxes[i];
+			IsNearItembox = true;
+
+			m_pPlayer->m_itembox_number = i;
+		}
+	}
 	for (int i = 0; i < NUM_VENT; ++i) {
 		if (reinterpret_cast<Vent*>(Vents[i])->IsPlayerNear(PlayerPos)) {
 			m_pPlayer->m_pNearVent = Vents[i];
@@ -959,6 +979,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	if (IsNearDoor == false) m_pPlayer->m_pNearDoor = nullptr;
 	if (IsNearInteractionObject == false) m_pPlayer->m_pNearInteractionObejct = nullptr;
 	if (IsNearVent == false) m_pPlayer->m_pNearVent = nullptr;
+	if (IsNearItembox == false) m_pPlayer->m_pNearItembox = nullptr;
 }
 
 bool InArea(int startX, int startZ, int width, int length, float x, float z)
@@ -1004,4 +1025,23 @@ void GameScene::CheckCameraPos(const XMFLOAT3 camera)
 		m_pvsCamera = PVSROOM::CLASS_ROOM;
 		return;
 	}
+}
+
+void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	LoadedModelInfo* pBoxModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/AmmoBox.bin", nullptr);
+	InteractionUI* BoxUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/f.dds");
+
+	for (int i = 0; i < 1; ++i) {
+		m_pBoxes[i] = new ItemBox();
+		m_pBoxes[i]->SetChild(pBoxModel->m_pModelRootObject, true);
+		m_pBoxes[i]->SetUI(BoxUI);
+	}
+
+	m_pBoxes[0]->SetPosition(-3.952, 0, -22.804);
+	m_pBoxes[0]->SetRotation(DEGREE0);
+	for (int i = 0; i < 1; ++i) {
+		m_pBoxes[i]->UpdateTransform(nullptr);
+	}
+	if (pBoxModel) delete pBoxModel;
 }
