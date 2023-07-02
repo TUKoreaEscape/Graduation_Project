@@ -916,3 +916,59 @@ void Item::Interaction(int playerType)
 		break;
 	}
 }
+
+ItemBox::ItemBox()
+{
+}
+
+ItemBox::~ItemBox()
+{
+}
+
+bool ItemBox::IsPlayerNear(const XMFLOAT3& PlayerPos)
+{
+	return false;
+}
+
+void ItemBox::render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (IsOpen)
+	{
+		GameObject* cap = FindFrame("Object005");
+		cap->Rotate(90, 0, 0);
+	}
+	else
+	{
+
+	}
+	GameObject::render(pd3dCommandList);
+}
+
+void ItemBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void ItemBox::Interaction(int playerType)
+{
+	switch (playerType) {
+	case TYPE_TAGGER:
+	case TYPE_PLAYER_YET:
+	case TYPE_DEAD_PLAYER:
+		break;
+	case TYPE_PLAYER:
+		SetOpen(true);
+		break;
+	}
+}
+
+void ItemBox::SetOpen(bool open)
+{
+	if (false == open) {
+		if (false == IsOpen) return;
+		IsOpen = false;
+	}
+	else {
+		if (true == IsOpen) return;
+		IsOpen = true;
+	}
+}

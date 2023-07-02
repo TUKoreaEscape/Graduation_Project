@@ -68,7 +68,7 @@ public:
 	Door* m_pDoors[NUM_DOOR];
 
 	InteractionObject* m_pPowers[NUM_POWER];
-
+	InteractionObject* m_pBoxes[1];
 	Network* m_network;
 	std::thread recv_thread;
 
@@ -126,6 +126,7 @@ public:
 	void MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 

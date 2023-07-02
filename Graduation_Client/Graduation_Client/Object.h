@@ -219,3 +219,20 @@ public:
 	int m_ItemType = -1;
 	bool m_bShow = false;
 };
+
+class ItemBox : public InteractionObject
+{
+public:
+	ItemBox();
+	virtual ~ItemBox();
+
+	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
+
+	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
+	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
+
+	void Interaction(int playerType) override;
+	void SetOpen(bool open) override;
+public:
+	Item* item();
+};
