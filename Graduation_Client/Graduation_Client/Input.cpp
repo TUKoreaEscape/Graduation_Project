@@ -223,9 +223,16 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 						m_gamestate->ChangeNextState();//READYÅ¬¸¯ ±è¿ìºó ¿©±â¼öÁ¤
 #endif
 #if USE_NETWORK
-						Network& network = *Network::GetInstance();
-						network.Send_Ready_Packet(true);
-						m_cs_packet_ready.ready_type = true;
+						if (m_cs_packet_ready.ready_type == false) {
+							Network& network = *Network::GetInstance();
+							network.Send_Ready_Packet(true);
+							m_cs_packet_ready.ready_type = true;
+						}
+						else {
+							Network& network = *Network::GetInstance();
+							network.Send_Ready_Packet(false);
+							m_cs_packet_ready.ready_type = false;
+						}
 #endif
 					}
 					else if (i == 1)
