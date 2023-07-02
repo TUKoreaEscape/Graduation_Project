@@ -290,7 +290,18 @@ void Network::Process_Pick_Item_Init(char* ptr)
 			std::cout << "ITEM_PLIERS" << std::endl;
 		if (packet->data[i].item_type == GAME_ITEM::ITEM_WRENCH)
 			std::cout << "ITEM_WRENCH" << std::endl;
+
+		if (packet->data[i].item_box_index == 0) {
+			m_pBoxes[0]->SetIndex(packet->data[i].item_box_index);
+			m_pBoxes[0]->m_Type = static_cast<int>(packet->data[i].item_type);
+		}
 	}
+}
+
+void Network::Process_Pick_Item_Box_Update(char* ptr)
+{
+	sc_packet_item_box_update* packet = reinterpret_cast<sc_packet_item_box_update*>(ptr);
+	m_pBoxes[packet->box_index]->SetOpen(packet->is_open);
 }
 
 void Network::Process_Pick_Item_Update(char* ptr)

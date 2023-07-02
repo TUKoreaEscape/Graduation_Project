@@ -1040,6 +1040,10 @@ void ItemBox::Interaction(int playerType)
 			break;
 		}
 	}
+#if USE_NETWORK
+	Network& network = *Network::GetInstance();
+	network.Send_Fix_Object_Box_Update(m_item_box_index, IsOpen);
+#endif
 }
 
 void ItemBox::SetOpen(bool open)

@@ -95,6 +95,17 @@ void Network::Send_Picking_Fix_Object_Packet(short index)
 	// 이쪽은 생명칩 OR 다른 오브젝트가 주변에 있을때 획득요청을 합니다.
 }
 
+void Network::Send_Fix_Object_Box_Update(short box_num, bool value)
+{
+	cs_packet_item_box_update packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET::CS_PACKET_ITEM_BOX_UPDATE;
+	packet.index = box_num;
+	packet.is_open = value;
+
+	send_packet(&packet);
+}
+
 void Network::Send_Attack_Packet()
 {
 	cs_packet_attack packet;

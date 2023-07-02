@@ -687,6 +687,26 @@ void cGameServer::Process_ElectronicSystem_Activate(const int user_id, void* buf
 
 }
 
+void cGameServer::Process_Item_Box_Update(const int user_id, void* buff)
+{
+	cs_packet_item_box_update* packet = reinterpret_cast<cs_packet_item_box_update*>(buff);
+
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+	sc_packet_item_box_update update_packet;
+	update_packet.size = sizeof(update_packet);
+	update_packet.type = SC_PACKET::SC_PACKET_ITEM_BOX_UPDATE;
+	update_packet.box_index = packet->index;
+	update_packet.is_open = packet->is_open;
+
+	for (auto player_id : room.in_player)
+	{
+		if (player_id == -1)
+			continue;
+		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
+	}
+}
+
 void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 {
 	cs_packet_pick_fix_item* packet = reinterpret_cast<cs_packet_pick_fix_item*>(buff);

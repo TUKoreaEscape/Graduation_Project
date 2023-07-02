@@ -269,7 +269,7 @@ void Network::ProcessPacket(char* ptr)
 	{
 		//std::cout << "规 立加 己傍" << std::endl;
 		m_join_room = true;
-		send_thread = std::thread{ &Network::Debug_send_thread, this };
+		//send_thread = std::thread{ &Network::Debug_send_thread, this };
 		for (int i = 0; i < 5; ++i)
 			m_ppOther[i]->SetPosition(XMFLOAT3(-100, -100, -100));
 #if USE_VOICE
@@ -309,7 +309,7 @@ void Network::ProcessPacket(char* ptr)
 		//ShellExecute(NULL, L"open", L"voice\Voice.exe", NULL, NULL, SW_SHOWMINIMIZED);
 		//std::cout << "规 积己俊 己傍窍看嚼聪促." << std::endl;
 		m_join_room = true;
-		send_thread = std::thread{ &Network::Debug_send_thread, this };
+		//send_thread = std::thread{ &Network::Debug_send_thread, this };
 		for (int i = 0; i < 5; ++i)
 			m_ppOther[i]->SetPosition(XMFLOAT3(-100, -100, -100));
 #if USE_VOICE
@@ -565,6 +565,12 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_PICK_ITEM_INIT:
 	{
 		Process_Pick_Item_Init(ptr);
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_ITEM_BOX_UPDATE:
+	{
+		Process_Pick_Item_Box_Update(ptr);
 		break;
 	}
 

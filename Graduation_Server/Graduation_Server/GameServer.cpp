@@ -741,6 +741,12 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		break;
 	}
 
+	case CS_PACKET::CS_PACKET_ITEM_BOX_UPDATE:
+	{
+		Process_Item_Box_Update(user_id, p);
+		break;
+	}
+
 	case CS_PACKET::CS_PACKET_PICK_ITEM:
 	{
 		Process_Pick_Fix_Item(user_id, p);

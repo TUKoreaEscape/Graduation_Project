@@ -83,6 +83,7 @@ namespace CS_PACKET
 		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_SWICH,
 		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_ATIVATE,
 		CS_PACKET_ATTACK,
+		CS_PACKET_ITEM_BOX_UPDATE,
 		CS_PACKET_PICK_ITEM,
 		CS_PACKET_STRESS_LOGIN,
 		CS_ADMIN_SERVER_END
@@ -294,6 +295,14 @@ struct cs_packet_request_electronic_system_fix {
 	unsigned char	fix_item_info;
 };
 
+struct cs_packet_item_box_update {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned short  index;
+	bool			is_open;
+};
+
 struct cs_packet_pick_fix_item {
 	unsigned char	size;
 	unsigned char	type;
@@ -375,6 +384,7 @@ namespace SC_PACKET
 		SC_PACKET_CUSTOMIZING,
 		SC_PACKET_ATTACK,
 		SC_PACKET_PICK_ITEM_INIT,
+		SC_PACKET_ITEM_BOX_UPDATE,
 		SC_PACKET_PICK_ITEM_UPDATE,
 		SC_PACKET_GAME_END
 	};
@@ -607,6 +617,14 @@ struct sc_packet_electronic_system_activate_update {
 
 	short			system_index;
 	bool			activate;
+};
+
+struct sc_packet_item_box_update {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned short	box_index;
+	bool			is_open;
 };
 
 struct sc_packet_pick_fix_item_update {

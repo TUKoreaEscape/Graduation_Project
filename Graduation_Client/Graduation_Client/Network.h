@@ -7,10 +7,11 @@
 #include "Server_Timer.h"
 
 #define  DIR_NO 100
-#define  USE_NETWORK 0
+#define  USE_NETWORK 1
 #define	 USE_VOICE 0
 
 class Door;
+class ItemBox;
 class InteractionObject;
 
 struct Custom {
@@ -59,6 +60,7 @@ public:
 	Player** m_ppOther = nullptr;
 	Door* m_pDoors[6];
 	InteractionObject* m_pPowers[5];
+	ItemBox* m_pBoxes[1];
 
 	static Network* GetInstance() {
 		if (NetworkInstance == NULL) {
@@ -92,6 +94,7 @@ public:
 	void Process_Attack_Packet(char* ptr);
 	void Process_LifeChip_Update(char* ptr);
 	void Process_Pick_Item_Init(char* ptr);
+	void Process_Pick_Item_Box_Update(char* ptr);
 	void Process_Pick_Item_Update(char* ptr);
 	void Process_Active_Altar(char* ptr);
 	void Process_Altar_LifeChip_Update(char* ptr);
@@ -111,6 +114,7 @@ public:
 	// 게임 플레이시 사용하는 패킷전송 함수
 	void Send_Use_Tagger_Skill(int skill_type);
 	void Send_Picking_Fix_Object_Packet(short item_type);
+	void Send_Fix_Object_Box_Update(short box_num, bool value);
 	void Send_Attack_Packet();
 
 	void send_packet(void* packet);

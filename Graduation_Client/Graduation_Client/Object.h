@@ -224,7 +224,6 @@ public:
 	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
 
 	void Interaction(int playerType) override;
-
 public:
 	int m_ItemType = -1;
 	bool m_bShow = false;
@@ -245,7 +244,9 @@ public:
 	void SetOpen(bool open) override;
 
 	virtual void SetRotation(DIR d) override;
+	void SetIndex(int index) { m_item_box_index = index; }
 public:
+	int m_item_box_index = -1;
 	Item* m_pItem = nullptr;
 
 	DIR m_dir;
