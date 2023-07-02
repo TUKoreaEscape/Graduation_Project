@@ -141,6 +141,9 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < NUM_VENT; ++i) {
 			reinterpret_cast<Vent*>(Vents[i])->UIrender(pd3dCommandList);
 		}
+		for (int i = 0; i < 1; ++i) {
+			reinterpret_cast<ItemBox*>(m_pBoxes[i])->UIrender(pd3dCommandList);
+		}
 		break;
 	case ENDING_GAME:
 		for (int i = 0; i < m_Ending; ++i) m_UIEnding[i]->render(pd3dCommandList);
@@ -936,6 +939,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	bool IsNearDoor = false;
 	bool IsNearInteractionObject = false;
 	bool IsNearVent = false;
+	bool IsNearItembox = false;
 	for (int i = 0; i < NUM_DOOR; ++i) {
 		m_pDoors[i]->update(elapsedTime);
 		if (reinterpret_cast<Door*>(m_pDoors[i])->IsPlayerNear(PlayerPos)) {
@@ -955,6 +959,15 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 			m_pPlayer->m_power_number = i;
 		}
 	}
+	for (int i = 0; i < 1; ++i) {
+		m_pBoxes[i]->update(elapsedTime);
+		if (m_pBoxes[i]->IsPlayerNear(PlayerPos)) {
+			m_pPlayer->m_pNearItembox = m_pBoxes[i];
+			IsNearItembox = true;
+
+			m_pPlayer->m_itembox_number = i;
+		}
+	}
 	for (int i = 0; i < NUM_VENT; ++i) {
 		if (reinterpret_cast<Vent*>(Vents[i])->IsPlayerNear(PlayerPos)) {
 			m_pPlayer->m_pNearVent = Vents[i];
@@ -966,6 +979,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	if (IsNearDoor == false) m_pPlayer->m_pNearDoor = nullptr;
 	if (IsNearInteractionObject == false) m_pPlayer->m_pNearInteractionObejct = nullptr;
 	if (IsNearVent == false) m_pPlayer->m_pNearVent = nullptr;
+	if (IsNearItembox == false) m_pPlayer->m_pNearItembox = nullptr;
 }
 
 bool InArea(int startX, int startZ, int width, int length, float x, float z)
@@ -1024,7 +1038,8 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_pBoxes[i]->SetUI(BoxUI);
 	}
 
-	m_pBoxes[0]->SetPosition(10, 0, 0);
+	m_pBoxes[0]->SetPosition(-3.952, 0, -22.804);
+	m_pBoxes[0]->SetRotation(DEGREE0);
 	for (int i = 0; i < 1; ++i) {
 		m_pBoxes[i]->UpdateTransform(nullptr);
 	}

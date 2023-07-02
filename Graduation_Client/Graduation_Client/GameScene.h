@@ -18,6 +18,7 @@ enum class PVSROOM {
 };
 
 class InteractionObject;
+class ItemBox;
 //GameScene과 Scene을 분리해놓은 이유
 //GameScene에서 게임내의 플레이어 생성, 오브젝트 배치, 상태 등을 따로 관리하기 위해.
 class GameScene : public Scene
@@ -68,7 +69,7 @@ public:
 	Door* m_pDoors[NUM_DOOR];
 
 	InteractionObject* m_pPowers[NUM_POWER];
-	InteractionObject* m_pBoxes[1];
+	ItemBox* m_pBoxes[1];
 	Network* m_network;
 	std::thread recv_thread;
 

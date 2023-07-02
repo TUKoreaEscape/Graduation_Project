@@ -901,6 +901,7 @@ void Item::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Item::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	
 }
 
 void Item::Interaction(int playerType)
@@ -917,8 +918,9 @@ void Item::Interaction(int playerType)
 	}
 }
 
-ItemBox::ItemBox()
+ItemBox::ItemBox() : InteractionObject()
 {
+	m_dir = DEGREE0;
 }
 
 ItemBox::~ItemBox()
@@ -927,7 +929,51 @@ ItemBox::~ItemBox()
 
 bool ItemBox::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
-	return false;
+	float minx{}, maxx{}, minz{}, maxz{};
+	switch (m_dir) {
+	case DEGREE0:
+		minx = m_xmf4x4ToParent._41 - 2.2f;
+		maxx = m_xmf4x4ToParent._41 + 2.2f;
+		minz = m_xmf4x4ToParent._43 - 0.5f;
+		maxz = m_xmf4x4ToParent._43 + 2.0f;
+		break;
+	case DEGREE90:
+		minx = m_xmf4x4ToParent._41 - 0.5f;
+		maxx = m_xmf4x4ToParent._41 + 2.0f;
+		minz = m_xmf4x4ToParent._43 - 2.2f;
+		maxz = m_xmf4x4ToParent._43 + 2.2f;
+		break;
+	case DEGREE180:
+		minx = m_xmf4x4ToParent._41 - 2.2f;
+		maxx = m_xmf4x4ToParent._41 + 2.2f;
+		minz = m_xmf4x4ToParent._43 + 0.5f;
+		maxz = m_xmf4x4ToParent._43 - 2.0f;
+		break;
+	default:
+		minx = m_xmf4x4ToParent._41 + 0.5f;
+		maxx = m_xmf4x4ToParent._41 - 2.0f;
+		minz = m_xmf4x4ToParent._43 - 2.2f;
+		maxz = m_xmf4x4ToParent._43 + 2.2f;
+		break;
+	}
+	if (PlayerPos.x > maxx) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.x < minx) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.z < minz) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.z > maxz) {
+		IsNear = false;
+		return false;
+	}
+	IsNear = true;
+	return true;
 }
 
 void ItemBox::render(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -935,29 +981,51 @@ void ItemBox::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (IsOpen)
 	{
 		GameObject* cap = FindFrame("Object005");
-		cap->Rotate(90, 0, 0);
+		cap->m_xmf4x4ToParent = m_xmf4x4CapOpenMatrix;
 	}
 	else
 	{
-
+		GameObject* cap = FindFrame("Object005");
+		cap->m_xmf4x4ToParent = m_xmf4x4CapMatrix;
 	}
 	GameObject::render(pd3dCommandList);
+	if (m_pItem) m_pItem->render(pd3dCommandList);
 }
 
 void ItemBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (IsNear) {
+		if (m_pInteractionUI) {
+			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_fPitch, m_fYaw, m_fRoll);
+		}
+	}
 }
 
 void ItemBox::Interaction(int playerType)
 {
-	switch (playerType) {
-	case TYPE_TAGGER:
-	case TYPE_PLAYER_YET:
-	case TYPE_DEAD_PLAYER:
-		break;
-	case TYPE_PLAYER:
-		SetOpen(true);
-		break;
+	if (IsOpen) {
+		switch (playerType) {
+		case TYPE_TAGGER:
+			SetOpen(false);
+		case TYPE_PLAYER_YET:
+		case TYPE_DEAD_PLAYER:
+		case TYPE_PLAYER:
+			break;
+		}
+	}
+	else {
+		switch (playerType) {
+		case TYPE_TAGGER:
+		case TYPE_PLAYER_YET:
+			break;
+		case TYPE_DEAD_PLAYER:
+			SetOpen(true); // tempa
+			break;
+		case TYPE_PLAYER:
+			SetOpen(true);
+			break;
+		}
 	}
 }
 
@@ -970,5 +1038,31 @@ void ItemBox::SetOpen(bool open)
 	else {
 		if (true == IsOpen) return;
 		IsOpen = true;
+	}
+}
+
+void ItemBox::SetRotation(DIR d)
+{
+	GameObject* cap = FindFrame("Object005");
+	m_xmf4x4CapOpenMatrix = m_xmf4x4CapMatrix = cap->m_xmf4x4ToParent;
+	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(-90), XMConvertToRadians(0), XMConvertToRadians(0));
+	m_xmf4x4CapOpenMatrix = Matrix4x4::Multiply(mtxRotate, m_xmf4x4CapOpenMatrix);
+	switch (d)
+	{
+	case DEGREE0:
+		m_dir = DEGREE0;
+		break;
+	case DEGREE90:
+		m_dir = DEGREE90;
+		Rotate(0, 90, 0);
+		break;
+	case DEGREE180:
+		m_dir = DEGREE180;
+		Rotate(0, 180, 0);
+		break;
+	default:
+		m_dir = DEGREE270;
+		Rotate(0, 270, 0);
+		break;
 	}
 }
