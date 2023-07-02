@@ -30,6 +30,7 @@ void Network::Debug_send_thread()
 		std::cout << "7. Mouse and Nose 변경 \n";
 		std::cout << "8. 무조건 한번 눌러요\n";
 		std::cout << "9. 프로그램 전체 종료 \n";
+		std::cout << "10. 서버 종료 요청 \n";
 		std::cout << "명령어 입력 : ";
 		std::cin >> code;
 
@@ -128,7 +129,10 @@ void Network::Debug_send_thread()
 
 		case 10:
 			system("cls");
-			Send_Ready_Packet(true);
+			cs_packet_server_end packet;
+			packet.size = sizeof(packet);
+			packet.type = CS_PACKET::CS_ADMIN_SERVER_END;
+			send_packet(&packet);
 			break;
 		}
 	}
@@ -201,6 +205,7 @@ void Network::listen_thread()
 		{
 			std::cout << "Socket Error Exit" << std::endl;
 			TerminateProcess(info.hProcess, 1);
+			m_shutdown = true;
 			exit(0);
 		}
 
@@ -264,7 +269,7 @@ void Network::ProcessPacket(char* ptr)
 	{
 		//std::cout << "방 접속 성공" << std::endl;
 		m_join_room = true;
-		//send_thread = std::thread{ &Network::Debug_send_thread, this };
+		send_thread = std::thread{ &Network::Debug_send_thread, this };
 		for (int i = 0; i < 5; ++i)
 			m_ppOther[i]->SetPosition(XMFLOAT3(-100, -100, -100));
 #if USE_VOICE
@@ -304,7 +309,7 @@ void Network::ProcessPacket(char* ptr)
 		//ShellExecute(NULL, L"open", L"voice\Voice.exe", NULL, NULL, SW_SHOWMINIMIZED);
 		//std::cout << "방 생성에 성공하였습니다." << std::endl;
 		m_join_room = true;
-		//send_thread = std::thread{ &Network::Debug_send_thread, this };
+		send_thread = std::thread{ &Network::Debug_send_thread, this };
 		for (int i = 0; i < 5; ++i)
 			m_ppOther[i]->SetPosition(XMFLOAT3(-100, -100, -100));
 #if USE_VOICE

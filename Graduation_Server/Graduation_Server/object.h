@@ -113,6 +113,7 @@ private:
 	bool	m_activate = false;
 	bool	m_working = false;
 
+	mutex* m_state_lock;
 public:
 	EscapeSystem();
 	EscapeSystem(const unsigned int obj_id, Object_Type type, XMFLOAT3 center, XMFLOAT3 extents);
@@ -125,6 +126,7 @@ public:
 	bool Is_Activate();
 	bool Is_Working_Escape();
 
+	void Release();
 	void Update_bounding_box_pos(const XMFLOAT3& pos);
 	void Update_Object();
 };

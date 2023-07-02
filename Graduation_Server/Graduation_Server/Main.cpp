@@ -13,4 +13,6 @@ int main()
 	cGameServer& game_server = *cGameServer::GetInstance();
 	game_server.init();
 	game_server.StartServer();
+
+	cout << "서버가 종료되었습니다." << std::endl;
 }

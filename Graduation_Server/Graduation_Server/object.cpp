@@ -113,7 +113,8 @@ void Door::Update_Object()
 
 void Door::Release()
 {
-	delete m_state_lock;
+	if(m_state_lock != nullptr)
+		delete m_state_lock;
 }
 
 ElectronicSystem::ElectronicSystem()
@@ -171,13 +172,17 @@ bool ElectronicSystem::Get_On_Off_Switch_Vaild()
 
 bool ElectronicSystem::Activate_ElectronicSystem()
 {
+	m_state_lock->lock();
 	if (Get_On_Off_Switch_Vaild() == true)
 	{
 		m_fixed_system = true;
+		m_state_lock->unlock();
 		return true;
 	}
-	else
+	else {
+		m_state_lock->unlock();
 		return false;
+	}
 }
 
 void ElectronicSystem::Release()
@@ -196,6 +201,13 @@ EscapeSystem::EscapeSystem(const unsigned int obj_id, Object_Type type, XMFLOAT3
 	m_pos = center;
 	m_extents = extents;
 	m_bounding_box = BoundingOrientedBox{ center, extents, XMFLOAT4(0,0,0,1) };
+	m_state_lock = new mutex;
+}
+
+void EscapeSystem::Release()
+{
+	if(m_state_lock != nullptr)
+		delete m_state_lock;
 }
 
 void EscapeSystem::init()
@@ -285,18 +297,21 @@ void GameItem::Release()
 
 Altar::Altar()
 {
-	m_state_lock = new mutex;
+	
 }
 
 void Altar::init()
 {
+	if(m_state_lock == nullptr)
+		m_state_lock = new mutex;
 	m_is_valid = false;
 	m_have_life_chip = 0;
 }
 
 void Altar::Release()
 {
-	delete m_state_lock;
+	if(m_state_lock != nullptr)
+		delete m_state_lock;
 }
 
 void Altar::Set_Valid(bool value)

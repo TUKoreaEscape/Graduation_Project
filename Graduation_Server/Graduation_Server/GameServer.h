@@ -34,7 +34,8 @@ enum class EventType : char
 	OPEN_TAGGER_SKILL_FIRST,
 	OPEN_TAGGER_SKILL_SECOND,
 	OPEN_TAGGER_SKILL_THIRD,
-	GAME_END
+	GAME_END,
+	SERVER_END
 };
 
 struct TIMER_EVENT {
@@ -125,6 +126,9 @@ public:
 	void	Process_Move_Test(const int user_id, void* buff);
 
 
+public:
+	bool	server_end = false;
+	void	Server_End();
 public:
 	void	Timer();
 	int		get_new_id();

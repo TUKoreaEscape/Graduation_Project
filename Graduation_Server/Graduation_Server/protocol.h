@@ -84,7 +84,8 @@ namespace CS_PACKET
 		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_ATIVATE,
 		CS_PACKET_ATTACK,
 		CS_PACKET_PICK_ITEM,
-		CS_PACKET_STRESS_LOGIN
+		CS_PACKET_STRESS_LOGIN,
+		CS_ADMIN_SERVER_END
 	};
 }
 
@@ -144,6 +145,12 @@ struct Roominfo_by10 {
 struct GameItem_Setting {
 	unsigned short			item_box_index;
 	GAME_ITEM::ITEM			item_type;
+};
+
+// 서버종료용 패킷
+struct cs_packet_server_end {
+	unsigned char	size;
+	unsigned char	type;
 };
 
 //===============================================================

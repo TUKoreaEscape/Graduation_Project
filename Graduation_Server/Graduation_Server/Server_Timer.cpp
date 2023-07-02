@@ -6,7 +6,7 @@ void cGameServer::Timer()
 
 	std::priority_queue<TIMER_EVENT> timer_queue;
 
-	while (true)
+	while (!server_end)
 	{
 		//cout << "이벤트쓰레드 도는중" << endl;
 		auto current_time = chrono::system_clock::now();

@@ -17,6 +17,7 @@ public:
 	int		Create_room(int user_id, int room_number);
 	bool	Join_room(int user_id, int select_room_number);
 	void	Clean_room(int room_number);
+	void	Release();
 
 	Room*	Get_Room_Info(int room_number);
 

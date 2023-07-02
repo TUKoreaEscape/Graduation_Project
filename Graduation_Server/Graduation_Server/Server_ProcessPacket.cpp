@@ -774,3 +774,15 @@ void cGameServer::Process_Altar_LifeChip_Update(const int user_id)
 		m_clients[player_id].do_send(sizeof(packet), &packet);
 	}
 }
+
+void cGameServer::Server_End()
+{
+	server_end = true;
+	for (int i = 0; i < MAX_USER; ++i)
+	{
+		if (m_clients[i].get_state() == CLIENT_STATE::ST_FREE)
+			continue;
+		Disconnect(i);
+	}
+	//m_room_manager->Release();
+}

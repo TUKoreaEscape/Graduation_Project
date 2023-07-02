@@ -212,3 +212,19 @@ Room* RoomManager::Get_Room_Info(int room_number) // 방 정보 전체를 일괄적으로 �
 {
 	return &a_in_game_room[room_number];
 }
+
+void RoomManager::Release()
+{
+	//for (int i = 0; i < MAX_ROOM; ++i)
+	//{
+	//	a_in_game_room[i].m_altar->Release();
+	//	for(int idx = 0; idx < a_in_game_room[i].m_door_object.size(); ++idx)
+	//		a_in_game_room[i].m_door_object[idx].Release();
+	//	for(int idx = 0; idx < a_in_game_room[i].m_fix_item.size(); ++idx)
+	//		a_in_game_room[i].m_fix_item[idx].Release();
+	//	for (int idx = 0; idx < a_in_game_room[i].m_electrinic_system.size(); ++idx)
+	//		a_in_game_room[i].m_electrinic_system[idx].Release();
+	//	for (int idx = 0; idx < a_in_game_room[i].m_escape_system.size(); ++idx)
+	//		a_in_game_room[i].m_escape_system[idx].Release();
+	//}
+}

@@ -65,16 +65,18 @@ void cGameServer::StartServer()
 	for (auto& worker : m_worker_threads)
 		worker.join();
 	
+	cout << "¿öÄ¿½º·¹µå Á¾·á" << endl;
 	for (auto& db_worker : m_database_thread)
 		db_worker.join();
-
+	cout << "DB ½º·¹µå Á¾·á" << endl;
 	for (auto& event_worker : m_event_thread)
 		event_worker.join();
+	cout << "ÀÌº¥Æ® ½º·¹µå Á¾·á" << endl;
 }
 
 void cGameServer::WorkerThread()
 {
-	while (true)
+	while (!server_end)
 	{
 		DWORD num_byte;
 		LONG64 iocp_key;
@@ -320,12 +322,20 @@ void cGameServer::WorkerThread()
 			break;
 		}
 
+		case OP_TYPE::OP_SERVER_END:
+		{
+			EXP_OVER* over = new EXP_OVER;
+			over->m_comp_op = OP_TYPE::OP_SERVER_END;
+			PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, 0, &over->m_wsa_over);
+			break;
+		}
 		default:
 			cout << exp_over->m_comp_op << " : recv" << endl;
 			break;
 
 		}
 	}
+	cout << "¿öÄ¿½º·¹µå Á¾·áÁß" << endl;
 }
 
 void cGameServer::Accept(EXP_OVER* exp_over)
@@ -421,74 +431,82 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 		m_database->insert_request(request);
 	}
 	// ¿©±â¼­ ÃÊ±âÈ­
-	if (cl.get_join_room_number() != -1) {
-		int disconnect_room_number = cl.get_join_room_number();
-		Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
-		rl.in_player_lock.lock();
-		for (int i = 0; i < 6; ++i)
-		{
-			if (rl.Get_Join_Member(i) != _user_id && rl.Get_Join_Member(i) != -1)
+	if (server_end != true) {
+		if (cl.get_join_room_number() != -1) {
+			int disconnect_room_number = cl.get_join_room_number();
+			Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
+			rl.in_player_lock.lock();
+			for (int i = 0; i < 6; ++i)
 			{
-				int rl_id = rl.Get_Join_Member(i);
-				m_clients[rl_id]._room_list_lock.lock();
-				if(m_clients[rl_id].room_list.size() != 0)
-					m_clients[rl_id].room_list.erase(m_clients[rl_id].room_list.find(_user_id));
-				m_clients[rl_id]._room_list_lock.unlock();
+				if (rl.Get_Join_Member(i) != _user_id && rl.Get_Join_Member(i) != -1)
+				{
+					int rl_id = rl.Get_Join_Member(i);
+					m_clients[rl_id]._room_list_lock.lock();
+					if (m_clients[rl_id].room_list.size() != 0)
+						m_clients[rl_id].room_list.erase(m_clients[rl_id].room_list.find(_user_id));
+					m_clients[rl_id]._room_list_lock.unlock();
+				}
+			}
+			rl.Exit_Player(_user_id);
+			rl.in_player_lock.unlock();
+
+			sc_packet_update_room update_room_packet;
+			update_room_packet.size = sizeof(update_room_packet);
+			update_room_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO_UPDATE;
+			update_room_packet.join_member = m_room_manager->Get_Room_Info(disconnect_room_number)->Get_Number_of_users();
+			update_room_packet.room_number = disconnect_room_number;
+			update_room_packet.state = m_room_manager->Get_Room_Info(disconnect_room_number)->_room_state;
+
+			for (auto& cl : m_clients)
+			{
+				if (cl.get_id() == _user_id)
+					continue;
+
+				if (cl.get_state() != CLIENT_STATE::ST_LOBBY)
+					continue;
+
+				if (cl.get_look_lobby_page() != disconnect_room_number / 6)
+					continue;
+
+				cl.do_send(sizeof(update_room_packet), &update_room_packet);
 			}
 		}
-		rl.Exit_Player(_user_id);
-		rl.in_player_lock.unlock();
-
-		sc_packet_update_room update_room_packet;
-		update_room_packet.size = sizeof(update_room_packet);
-		update_room_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO_UPDATE;
-		update_room_packet.join_member = m_room_manager->Get_Room_Info(disconnect_room_number)->Get_Number_of_users();
-		update_room_packet.room_number = disconnect_room_number;
-		update_room_packet.state = m_room_manager->Get_Room_Info(disconnect_room_number)->_room_state;
-
-		for (auto& cl : m_clients)
-		{
-			if (cl.get_id() == _user_id)
-				continue;
-
-			if (cl.get_state() != CLIENT_STATE::ST_LOBBY)
-				continue;
-
-			if (cl.get_look_lobby_page() != disconnect_room_number / 6)
-				continue;
-
-			cl.do_send(sizeof(update_room_packet), &update_room_packet);
-		}
 	}
 
-	// ¿©±ä °°Àº ¹æ¿¡ ÀÖ´Â ÇÃ·¹ÀÌ¾î¿¡°Ô »ç¿ëÀÚ°¡ ¶°³ª¹ö¸²À» ¾Ë·ÁÁÜ
-	sc_other_player_disconnect packet;
-	packet.size = sizeof(packet);
-	packet.type = SC_PACKET::SC_PACKET_OTHER_PLAYER_DISCONNECT;
-	packet.id = _user_id;
-	cl._room_list_lock.lock();
-	for (auto p : cl.room_list)
+	if (server_end != true)
 	{
-		//m_clients[p]._state_lock.lock();
-		if(m_clients[p].get_state() == CLIENT_STATE::ST_GAMEROOM || m_clients[p].get_state() == CLIENT_STATE::ST_INGAME)
-			m_clients[p].do_send(sizeof(packet), &packet);
-		//m_clients[p]._state_lock.unlock();
+		// ¿©±ä °°Àº ¹æ¿¡ ÀÖ´Â ÇÃ·¹ÀÌ¾î¿¡°Ô »ç¿ëÀÚ°¡ ¶°³ª¹ö¸²À» ¾Ë·ÁÁÜ
+		sc_other_player_disconnect packet;
+		packet.size = sizeof(packet);
+		packet.type = SC_PACKET::SC_PACKET_OTHER_PLAYER_DISCONNECT;
+		packet.id = _user_id;
+		cl._room_list_lock.lock();
+		for (auto p : cl.room_list)
+		{
+			//m_clients[p]._state_lock.lock();
+			if (m_clients[p].get_state() == CLIENT_STATE::ST_GAMEROOM || m_clients[p].get_state() == CLIENT_STATE::ST_INGAME)
+				m_clients[p].do_send(sizeof(packet), &packet);
+			//m_clients[p]._state_lock.unlock();
+		}
+		//==============================================================
+		cl.room_list.clear();
+		cl._room_list_lock.unlock();
+		cl.set_user_position({ 0,5,0 });
+		cl.set_user_velocity({ 0,0,0 });
+		cl.set_user_yaw(0);
 	}
-	//==============================================================
-	cl.room_list.clear();
-	cl._room_list_lock.unlock();
-	cl.set_user_position({ 0,5,0 });
-	cl.set_user_velocity({ 0,0,0 });
-	cl.set_user_yaw(0);
 	closesocket(cl._socket);
 
-	cl._state_lock.lock();
-	cl.set_state(CLIENT_STATE::ST_FREE);
-	cl.set_login_state(N_LOGIN);
-	char reset_name[20] = {};
-	cl.set_name(reset_name);
-	cl.set_id(-1);
-	cl._state_lock.unlock();
+	if (server_end != true)
+	{
+		cl._state_lock.lock();
+		cl.set_state(CLIENT_STATE::ST_FREE);
+		cl.set_login_state(N_LOGIN);
+		char reset_name[20] = {};
+		cl.set_name(reset_name);
+		cl.set_id(-1);
+		cl._state_lock.unlock();
+	}
 #if DEBUG
 	join_member--;
 	cout << "Number of users accessing the server : " << join_member << "\r";
@@ -772,6 +790,16 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		Process_Customizing(user_id, p);
 		break;
 	}
+
+	case CS_PACKET::CS_ADMIN_SERVER_END:
+	{
+		cout << "¼­¹ö Á¾·á ¿äÃ»" << endl;
+		Server_End();
+		EXP_OVER* over = new EXP_OVER;
+		over->m_comp_op = OP_TYPE::OP_SERVER_END;
+		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, 0, &over->m_wsa_over);
+	}
+
 	}
 }
 

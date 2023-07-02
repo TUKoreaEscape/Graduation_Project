@@ -236,7 +236,8 @@ void DataBase::insert_request(DB_Request& request)
 
 void DataBase::DataBaseThread()
 {
-	while (true)
+	cGameServer& server = *cGameServer::GetInstance();
+	while (!server.server_end || !request_db_queue.empty())
 	{
 		if (!request_db_queue.empty())
 		{
