@@ -7,7 +7,7 @@
 #include "Server_Timer.h"
 
 #define  DIR_NO 100
-#define  USE_NETWORK 1
+#define  USE_NETWORK 0
 #define	 USE_VOICE 0
 
 class Door;
@@ -33,7 +33,7 @@ class Network {
 private:
 	static Network* NetworkInstance;
 	SOCKET			m_socket;
-	const char*		SERVER_ADDR = "127.0.0.1";
+	const char*		SERVER_ADDR = "14.36.243.169";
 	Server_Timer	m_server_counter;
 	Custom			data;
 

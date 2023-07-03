@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "GameObject.h"
 #include "GameScene.h"
+#include "protocol.h"
 
 enum DIR {
 	DEGREE0 = 0,
@@ -86,6 +87,8 @@ public:
 	float m_fPitch{}, m_fYaw{}, m_fRoll{};
 
 	float volatile m_fCooltime;
+
+	DIR m_dir = DEGREE0;
 public:
 	InteractionObject();
 	virtual ~InteractionObject();
@@ -123,6 +126,7 @@ public:
 	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void update(float fElapsedTime);
 	virtual void SetPosition(XMFLOAT3 xmf3Position);
+	virtual void SetRotation(DIR d) override;
 
 	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList);
 
@@ -165,7 +169,7 @@ public:
 	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
 
 	void Rotate(float fPitch, float fYaw, float fRoll) override;
-
+	virtual void SetRotation(DIR d) override;
 	void SetOpen(bool Open);
 
 	virtual void update(float fElapsedTime) override;
@@ -206,6 +210,7 @@ public:
 	void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f) override;
 
 	virtual void SetPosition(XMFLOAT3 xmf3Position) override;
+	virtual void SetRotation(DIR d) override;
 	void Interaction(int playerType) override;
 public:
 	XMFLOAT3 m_xmf3OpenPosition;
@@ -245,11 +250,14 @@ public:
 
 	virtual void SetRotation(DIR d) override;
 	void SetIndex(int index) { m_item_box_index = index; }
+
+	void SetItem(GAME_ITEM::ITEM item);
 public:
 	int m_item_box_index = -1;
 	Item* m_pItem = nullptr;
+	GAME_ITEM::ITEM m_item = GAME_ITEM::ITEM::ITEM_NONE;
 
-	DIR m_dir;
+	bool m_bShownItem = true;
 
 	XMFLOAT4X4 m_xmf4x4CapMatrix;
 	XMFLOAT4X4 m_xmf4x4CapOpenMatrix;

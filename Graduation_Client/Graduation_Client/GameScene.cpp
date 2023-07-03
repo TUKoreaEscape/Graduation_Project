@@ -866,22 +866,28 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	}
 	Vents[0]->SetPosition(XMFLOAT3(97.2155, 1.0061, 40.43311));
 	reinterpret_cast<Vent*>(Vents[0])->SetOpenPos(XMFLOAT3(98.94085, 1.0061, 42.29158));
+	reinterpret_cast<Vent*>(Vents[0])->SetRotation(DEGREE0);
 	Vents[1]->SetPosition(XMFLOAT3(97.27, 1.0061, -40.43311));
 	reinterpret_cast<Vent*>(Vents[1])->SetOpenPos(XMFLOAT3(95.5352, 1.0061, -42.2919));
+	reinterpret_cast<Vent*>(Vents[1])->SetRotation(DEGREE0);
 	Vents[2]->SetPosition(XMFLOAT3(20.43311, 1.0061, -77.6103));
 	reinterpret_cast<Vent*>(Vents[2])->SetOpenPos(XMFLOAT3(22.29154, 1.0061, -75.88629));
-	reinterpret_cast<Vent*>(Vents[2])->Rotate(0, 90, 0);
-	reinterpret_cast<Vent*>(Vents[3])->Rotate(0, 90, 0);
+	reinterpret_cast<Vent*>(Vents[2])->SetRotation(DEGREE90);
 	Vents[3]->SetPosition(XMFLOAT3(18.56689, 1.0061, -77.6103));
 	reinterpret_cast<Vent*>(Vents[3])->SetOpenPos(XMFLOAT3(16.70864, 1.0061, -79.3296));
+	reinterpret_cast<Vent*>(Vents[3])->SetRotation(DEGREE90);
 	Vents[4]->SetPosition(XMFLOAT3(-56.00388, 1.033527, -40.54385));
 	reinterpret_cast<Vent*>(Vents[4])->SetOpenPos(XMFLOAT3(-57.66415, 1.0061, -42.1952));
+	reinterpret_cast<Vent*>(Vents[4])->SetRotation(DEGREE0);
 	Vents[5]->SetPosition(XMFLOAT3(-56.04684, 1.0061, 40.43311));
 	reinterpret_cast<Vent*>(Vents[5])->SetOpenPos(XMFLOAT3(-54.31968, 1.0061, 42.29163));
+	reinterpret_cast<Vent*>(Vents[5])->SetRotation(DEGREE0);
 	Vents[6]->SetPosition(XMFLOAT3(35.994, 1.0061, 40.56689));
 	reinterpret_cast<Vent*>(Vents[6])->SetOpenPos(XMFLOAT3(37.63297, 1.0061, 42.2901));
+	reinterpret_cast<Vent*>(Vents[6])->SetRotation(DEGREE0);
 	Vents[7]->SetPosition(XMFLOAT3(35.96133, 1.0061, 23.56689));
 	reinterpret_cast<Vent*>(Vents[7])->SetOpenPos(XMFLOAT3(34.23397, 90, 21.70837));
+	reinterpret_cast<Vent*>(Vents[7])->SetRotation(DEGREE0);
 	for (int i = 0; i < NUM_VENT; ++i) {
 		Vents[i]->UpdateTransform(nullptr);
 	}
@@ -901,17 +907,23 @@ void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	}
 	
 	m_pDoors[0]->SetPosition(XMFLOAT3(-29.73866, 0, 39.6)); 
-	reinterpret_cast<Door*>(m_pDoors[0])->Rotate(0, 180, 0);
+	reinterpret_cast<Door*>(m_pDoors[0])->SetRotation(DEGREE180);
 	m_pDoors[1]->SetPosition(XMFLOAT3(77.37788, 0, 39.72));
+	reinterpret_cast<Door*>(m_pDoors[1])->SetRotation(DEGREE0);
 	m_pDoors[1]->UpdateTransform(nullptr);
 	m_pDoors[2]->SetPosition(XMFLOAT3(23.26, 0, -39.99));
+	reinterpret_cast<Door*>(m_pDoors[2])->SetRotation(DEGREE0);
 	m_pDoors[2]->UpdateTransform(nullptr);
+
 	m_pDoors[3]->SetPosition(XMFLOAT3(-29.99397, 0, -39.71));
+	reinterpret_cast<Door*>(m_pDoors[3])->SetRotation(DEGREE0);
 	m_pDoors[3]->UpdateTransform(nullptr);
+
 	m_pDoors[4]->SetPosition(XMFLOAT3(54.99, 0, -0.4182036));
-	reinterpret_cast<Door*>(m_pDoors[4])->Rotate(0, -90, 0);
+	reinterpret_cast<Door*>(m_pDoors[4])->SetRotation(DEGREE270);
+
 	m_pDoors[5]->SetPosition(XMFLOAT3(0.18, 0, 60.25972));
-	reinterpret_cast<Door*>(m_pDoors[5])->Rotate(0, -90, 0);
+	reinterpret_cast<Door*>(m_pDoors[5])->SetRotation(DEGREE270);
 
 	if (pDoorModel) delete pDoorModel;
 }
@@ -931,14 +943,15 @@ void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	}
 
 	m_pPowers[0]->SetPosition(XMFLOAT3(-0.7033535, 1.5, 76.76)); // piano
-	m_pPowers[0]->Rotate(0, -90, 0);
+	m_pPowers[0]->SetRotation(DEGREE270);
 	m_pPowers[1]->SetPosition(XMFLOAT3(-54.11389, 1.5, -66.95)); // classroom
-	m_pPowers[1]->Rotate(0, -90, 0);
+	m_pPowers[1]->SetRotation(DEGREE270);
 	m_pPowers[2]->SetPosition(XMFLOAT3(60.87, 1.5, -70)); // porest
-	m_pPowers[2]->Rotate(0, -180, 0);
+	m_pPowers[2]->SetRotation(DEGREE180);
 	m_pPowers[3]->SetPosition(XMFLOAT3(67.6, 1.5, 40.6322)); // broadcastingroom
+	m_pPowers[3]->SetRotation(DEGREE0);
 	m_pPowers[4]->SetPosition(XMFLOAT3(65.231, 1.5, -27.5)); // maze
-	m_pPowers[4]->Rotate(0, -90, 0);
+	m_pPowers[4]->SetRotation(DEGREE270);
 
 	if (pElecModel) delete pElecModel;
 }

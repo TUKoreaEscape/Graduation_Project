@@ -117,18 +117,33 @@ void Vent::SetOpenPos(const XMFLOAT3& pos)
 bool Vent::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
 	float minx, maxx, minz, maxz;
-	if (IsRot) {
-		minx = m_xmf4x4ToParent._41 - 1.75f;
-		maxx = m_xmf4x4ToParent._41 + 1.75f;
-		minz = m_xmf4x4ToParent._43 - 2.0f;
-		maxz = m_xmf4x4ToParent._43 + 2.0f;
-	}
-	else {
+	switch (m_dir) {
+	case DEGREE0:
 		minx = m_xmf4x4ToParent._41 - 2.0f;
 		maxx = m_xmf4x4ToParent._41 + 2.0f;
 		minz = m_xmf4x4ToParent._43 - 1.75f;
 		maxz = m_xmf4x4ToParent._43 + 1.75f;
+		break;
+	case DEGREE90:
+		minx = m_xmf4x4ToParent._41 - 1.75f;
+		maxx = m_xmf4x4ToParent._41 + 1.75f;
+		minz = m_xmf4x4ToParent._43 - 2.0f;
+		maxz = m_xmf4x4ToParent._43 + 2.0f;
+		break;
+	case DEGREE180:
+		minx = m_xmf4x4ToParent._41 - 2.0f;
+		maxx = m_xmf4x4ToParent._41 + 2.0f;
+		minz = m_xmf4x4ToParent._43 - 1.75f;
+		maxz = m_xmf4x4ToParent._43 + 1.75f;
+		break;
+	default:
+		minx = m_xmf4x4ToParent._41 - 1.75f;
+		maxx = m_xmf4x4ToParent._41 + 1.75f;
+		minz = m_xmf4x4ToParent._43 - 2.0f;
+		maxz = m_xmf4x4ToParent._43 + 2.0f;
+		break;
 	}
+
 	if (PlayerPos.x > maxx) {
 		IsNear = false;
 		return false;
@@ -197,6 +212,28 @@ void Vent::Interaction(int playerType)
 	}
 }
 
+void Vent::SetRotation(DIR d)
+{
+	switch (d)
+	{
+	case DEGREE0:
+		m_dir = DEGREE0;
+		break;
+	case DEGREE90:
+		m_dir = DEGREE90;
+		Rotate(0, 90, 0);
+		break;
+	case DEGREE180:
+		m_dir = DEGREE180;
+		Rotate(0, 180, 0);
+		break;
+	default:
+		m_dir = DEGREE270;
+		Rotate(0, 270, 0);
+		break;
+	}
+}
+
 Door::Door() : InteractionObject()
 {
 }
@@ -227,17 +264,31 @@ void Door::Rotate(float fPitch, float fYaw, float fRoll)
 bool Door::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
 	float minx, maxx, minz, maxz;
-	if (IsRot) {
-		minx = m_xmf4x4ToParent._41 - 1.5f;
-		maxx = m_xmf4x4ToParent._41 + 1.5f;
-		minz = m_xmf4x4ToParent._43 - 2.0f;
-		maxz = m_xmf4x4ToParent._43 + 2.0f;
-	}
-	else {
+	switch (m_dir) {
+	case DEGREE0:
 		minx = m_xmf4x4ToParent._41 - 2.0f;
 		maxx = m_xmf4x4ToParent._41 + 2.0f;
 		minz = m_xmf4x4ToParent._43 - 1.5f;
 		maxz = m_xmf4x4ToParent._43 + 1.5f;
+		break;
+	case DEGREE90:
+		minx = m_xmf4x4ToParent._41 - 1.5f;
+		maxx = m_xmf4x4ToParent._41 + 1.5f;
+		minz = m_xmf4x4ToParent._43 - 2.0f;
+		maxz = m_xmf4x4ToParent._43 + 2.0f;
+		break;
+	case DEGREE180:
+		minx = m_xmf4x4ToParent._41 - 2.0f;
+		maxx = m_xmf4x4ToParent._41 + 2.0f;
+		minz = m_xmf4x4ToParent._43 - 1.5f;
+		maxz = m_xmf4x4ToParent._43 + 1.5f;
+		break;
+	default:
+		minx = m_xmf4x4ToParent._41 - 1.5f;
+		maxx = m_xmf4x4ToParent._41 + 1.5f;
+		minz = m_xmf4x4ToParent._43 - 2.0f;
+		maxz = m_xmf4x4ToParent._43 + 2.0f;
+		break;
 	}
 	if (PlayerPos.x > maxx) {
 		IsNear = false;
@@ -447,6 +498,28 @@ void Door::SetOpen(bool Open)
 	}
 }
 
+void Door::SetRotation(DIR d)
+{
+	switch (d)
+	{
+	case DEGREE0:
+		m_dir = DEGREE0;
+		break;
+	case DEGREE90:
+		m_dir = DEGREE90;
+		Rotate(0, 90, 0);
+		break;
+	case DEGREE180:
+		m_dir = DEGREE180;
+		Rotate(0, 180, 0);
+		break;
+	default:
+		m_dir = DEGREE270;
+		Rotate(0, 270, 0);
+		break;
+	}
+}
+
 bool Door::GetIsWorking()
 {
 	return IsWorking;
@@ -611,17 +684,31 @@ void PowerSwitch::Init()
 bool PowerSwitch::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
 	float minx, maxx, minz, maxz;
-	if (IsRot) {
-		minx = m_xmf4x4ToParent._41 - 1.5f;
-		maxx = m_xmf4x4ToParent._41 - 0.5f;
-		minz = m_xmf4x4ToParent._43 - 0.6f;
-		maxz = m_xmf4x4ToParent._43 + 0.6f;
-	}
-	else {
+	switch (m_dir) {
+	case DEGREE0:
 		minx = m_xmf4x4ToParent._41 - 0.6f;
 		maxx = m_xmf4x4ToParent._41 + 0.6f;
 		minz = m_xmf4x4ToParent._43 + 0.5f;
 		maxz = m_xmf4x4ToParent._43 + 1.5f;
+		break;
+	case DEGREE90:
+		minx = m_xmf4x4ToParent._41 - 1.5f;
+		maxx = m_xmf4x4ToParent._41 - 0.5f;
+		minz = m_xmf4x4ToParent._43 - 0.6f;
+		maxz = m_xmf4x4ToParent._43 + 0.6f;
+		break;
+	case DEGREE180:
+		minx = m_xmf4x4ToParent._41 - 0.6f;
+		maxx = m_xmf4x4ToParent._41 + 0.6f;
+		minz = m_xmf4x4ToParent._43 - 1.5f;
+		maxz = m_xmf4x4ToParent._43 - 0.5f;
+		break;
+	default:
+		minx = m_xmf4x4ToParent._41 - 1.5f;
+		maxx = m_xmf4x4ToParent._41 - 0.5f;
+		minz = m_xmf4x4ToParent._43 - 0.6f;
+		maxz = m_xmf4x4ToParent._43 + 0.6f;
+		break;
 	}
 	if (PlayerPos.x > maxx) {
 		IsNear = false;
@@ -842,6 +929,28 @@ void PowerSwitch::SetIndex(int index)
 	m_switch_index = index;
 }
 
+void PowerSwitch::SetRotation(DIR d)
+{
+	switch (d)
+	{
+	case DEGREE0:
+		m_dir = DEGREE0;
+		break;
+	case DEGREE90:
+		m_dir = DEGREE90;
+		Rotate(0, 90, 0);
+		break;
+	case DEGREE180:
+		m_dir = DEGREE180;
+		Rotate(0, 180, 0);
+		break;
+	default:
+		m_dir = DEGREE270;
+		Rotate(0, 270, 0);
+		break;
+	}
+}
+
 void PowerSwitch::SetSwitchValue(int index, bool value)
 {
 	m_bOnAndOff[index] = value;
@@ -959,8 +1068,8 @@ bool ItemBox::IsPlayerNear(const XMFLOAT3& PlayerPos)
 	case DEGREE180:
 		minx = m_xmf4x4ToParent._41 - 2.2f;
 		maxx = m_xmf4x4ToParent._41 + 2.2f;
-		minz = m_xmf4x4ToParent._43 + 0.5f;
-		maxz = m_xmf4x4ToParent._43 - 2.0f;
+		minz = m_xmf4x4ToParent._43 - 2.0f;
+		maxz = m_xmf4x4ToParent._43 + 0.5f;
 		break;
 	default:
 		minx = m_xmf4x4ToParent._41 + 0.5f;
@@ -995,6 +1104,25 @@ void ItemBox::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	{
 		GameObject* cap = FindFrame("Object005");
 		cap->m_xmf4x4ToParent = m_xmf4x4CapOpenMatrix;
+
+		if (m_bShownItem) {
+			// Item Render
+			switch (m_item) {
+			case GAME_ITEM::ITEM_DRILL:
+				break;
+			case GAME_ITEM::ITEM_HAMMER:
+				break;
+			case GAME_ITEM::ITEM_PLIERS:
+				break;
+			case GAME_ITEM::ITEM_WRENCH:
+				break;
+			case GAME_ITEM::ITEM_LIFECHIP:
+				break;
+			default:
+				// NONE
+				break;
+			}
+		}
 	}
 	else
 	{
@@ -1056,6 +1184,11 @@ void ItemBox::SetOpen(bool open)
 		if (true == IsOpen) return;
 		IsOpen = true;
 	}
+}
+
+void ItemBox::SetItem(GAME_ITEM::ITEM item)
+{
+	m_item = item;
 }
 
 void ItemBox::SetRotation(DIR d)
