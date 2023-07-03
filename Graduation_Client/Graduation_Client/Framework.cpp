@@ -281,14 +281,20 @@ void Framework::CreateDirect2DDevice()
 
 	hResult = m_pdWriteFactory->CreateTextFormat(L"나눔스퀘어 ExtraBold", NULL, DWRITE_FONT_WEIGHT_DEMI_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 30.0f, L"en-US", &m_pdLoginFont);
 	hResult = m_pdWriteFactory->CreateTextFormat(L"굴림체", NULL, DWRITE_FONT_WEIGHT_EXTRA_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 20.0f, L"en-US", &m_pdRoomTitleFont);
+	hResult = m_pdWriteFactory->CreateTextFormat(L"굴림체", NULL, DWRITE_FONT_WEIGHT_EXTRA_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 50.0f, L"en-US", &m_pdReadytoStartFont);
 	hResult = m_pdWriteFactory->CreateTextFormat(L"굴림체", NULL, DWRITE_FONT_WEIGHT_LIGHT, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 15.0f, L"en-US", &m_pdRoomOtherFont);
 	hResult = m_pdLoginFont->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 	hResult = m_pdLoginFont->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+	hResult = m_pdRoomTitleFont->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+	hResult = m_pdRoomTitleFont->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Purple, 1.0f), &m_pd2dpurpleText);
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::LightSalmon, 1.0f), &m_pd2dlightsalmonText);
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black, 1.0f), &m_pd2dblackText);
 	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdLoginFont, 4096.0f, 4096.0f, &m_pdwTextLayout);
 	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdRoomTitleFont, 4096.0f, 4096.0f, &m_pdRoomTitleFLayout);
+	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdReadytoStartFont, 4096.0f, 4096.0f, &m_pdRoomTitleFLayout);
 	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdRoomOtherFont, 4096.0f, 4096.0f, &m_pdRoomOtherLayout);
 
 	float fDpi = (float)GetDpiForWindow(m_hWnd);
@@ -466,6 +472,10 @@ void Framework::UpdateObjects()
 		}
 	}
 	scene->update(fTimeElapsed, m_pd3dDevice, m_pd3dCommandList);
+	if (scene->m_pPlayer->m_pCamera->m_pcbMappedCamera == nullptr)
+	{
+		scene->m_pPlayer->m_pCamera->start(m_pd3dDevice, m_pd3dCommandList);
+	}
 }
 
 void Framework::FrameAdvance()
@@ -493,14 +503,19 @@ void Framework::FrameAdvance()
 		scene->UIrender(m_pd3dCommandList);
 		break;
 	case WAITING_GAME:
+		//if (scene) scene->prerender(m_pd3dCommandList);
+		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
-		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		scene->UIrender(m_pd3dCommandList);
+		scene->WaitingRoomrender(m_pd3dCommandList);
+		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
 		break;
 	case CUSTOMIZING:
+		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
-		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		scene->UIrender(m_pd3dCommandList);
+		scene->WaitingRoomrender(m_pd3dCommandList);
+		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
 		break;
 	case READY_TO_GAME:
 		if (scene) scene->prerender(m_pd3dCommandList);
@@ -772,8 +787,34 @@ void Framework::TextRender()
 
 		D2D1_SIZE_F szRenderTarget = m_ppd2dRenderTargets[m_nSwapChainBufferIndex]->GetSize();
 
-		D2D1_RECT_F rcLowerText = D2D1::RectF(endingRect.left, endingRect.top, endingRect.right, endingRect.bottom);
-		m_pd2dDeviceContext->DrawTextW(L"QUIT", (UINT32)wcslen(L"QUIT"), m_pdRoomOtherLayout, &rcLowerText, m_pd2dblackText);
+		for (int i = 0; i < 2; ++i)
+		{
+			D2D1_RECT_F rcLowerText = D2D1::RectF(customizingRect[i].left, customizingRect[i].top, customizingRect[i].right, customizingRect[i].bottom);
+			if (i == 0 ) m_pd2dDeviceContext->DrawTextW(L"SAVE", (UINT32)wcslen(L"SAVE"), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
+			else if (i == 1) m_pd2dDeviceContext->DrawTextW(L"QUIT", (UINT32)wcslen(L"QUIT"), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
+		}
+
+		m_pd2dDeviceContext->EndDraw();
+
+		m_pd3d11On12Device->ReleaseWrappedResources(ppd3dResources, _countof(ppd3dResources));
+
+		m_pd3d11DeviceContext->Flush();
+	}
+	else if (m_gamestate->GetGameState() == READY_TO_GAME)
+	{
+		m_pd2dDeviceContext->SetTarget(m_ppd2dRenderTargets[m_nSwapChainBufferIndex]);
+		ID3D11Resource* ppd3dResources[] = { m_ppd3d11WrappedBackBuffers[m_nSwapChainBufferIndex] };
+		m_pd3d11On12Device->AcquireWrappedResources(ppd3dResources, _countof(ppd3dResources));
+
+		m_pd2dDeviceContext->BeginDraw();
+
+		m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
+
+		D2D1_SIZE_F szRenderTarget = m_ppd2dRenderTargets[m_nSwapChainBufferIndex]->GetSize();
+
+		D2D1_RECT_F rcLowerText = D2D1::RectF(m_nWndClientWidth/2-250, m_nWndClientHeight/2-300, m_nWndClientWidth/2+500, m_nWndClientHeight+200);
+		m_pd2dDeviceContext->DrawTextW(L"곧 게임이 시작됩니다.", (UINT32)wcslen(L"곧 게임이 시작됩니다."), m_pdReadytoStartFont, &rcLowerText, m_pd2dblackText);
+
 		m_pd2dDeviceContext->EndDraw();
 
 		m_pd3d11On12Device->ReleaseWrappedResources(ppd3dResources, _countof(ppd3dResources));

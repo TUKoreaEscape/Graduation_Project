@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "Object.h"
 #include "Network.h"
+#include "Game_state.h"
 
 Player::Player() : GameObject()
 {
@@ -32,9 +33,57 @@ Player::Player() : GameObject()
 	m_pCameraUpdatedContext = NULL;
 
 	Input::GetInstance()->m_pPlayer = this;
-	AddComponent<FirstPersonCamera>();
-	m_pCamera = GetComponent<FirstPersonCamera>();
+	AddComponent<ThirdPersonCamera>();
+	m_pCamera = GetComponent<ThirdPersonCamera>();
 	m_pCamera->m_pPlayer = this;
+}
+
+void Player::ChangeCamera(GAME_STATE prev, GAME_STATE p)
+{
+	m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
+	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
+
+	m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+
+	m_fPitch = 0.0f;
+	m_fRoll = 0.0f;
+	m_fYaw = 0.0f;
+	switch (p) {
+	case LOGIN:
+		break;
+	case ROOM_SELECT:
+		break;
+	case WAITING_GAME:
+		if (prev == CUSTOMIZING)
+		{
+			DeleteComponent<CustomizingCamera>();
+		}
+		else if (prev == ENDING_GAME)
+		{
+			DeleteComponent<FirstPersonCamera>();
+		}
+		AddComponent<ThirdPersonCamera>();
+		m_pCamera = GetComponent<ThirdPersonCamera>();
+		m_pCamera->m_pPlayer = this;
+		break;
+	case CUSTOMIZING:
+		DeleteComponent<ThirdPersonCamera>();
+		AddComponent<CustomizingCamera>();
+		m_pCamera = GetComponent<CustomizingCamera>();
+		m_pCamera->m_pPlayer = this;
+		break;
+	case READY_TO_GAME:
+		DeleteComponent<ThirdPersonCamera>();
+		AddComponent<FirstPersonCamera>();
+		m_pCamera = GetComponent<FirstPersonCamera>();
+		m_pCamera->m_pPlayer = this;
+		break;
+	case PLAYING_GAME:
+		break;
+	case ENDING_GAME:
+		break;
+	}
 }
 
 void Player::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
@@ -302,9 +351,11 @@ void Player::SetPlayerType(int type)
 
 void Player::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (PlayerNum != 0 && GameState::GetInstance()->GetGameState() <= CUSTOMIZING) return;
+
 	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->UpdateShaderVariables(pd3dCommandList, PlayerNum);
 
-	if (PlayerNum == 0) {
+	if (PlayerNum == 0 && GameState::GetInstance()->GetGameState() > CUSTOMIZING ) {
 		GameObject* Hand = FindFrame("Gloves");
 		Hand->m_pChild->render(pd3dCommandList);
 	}

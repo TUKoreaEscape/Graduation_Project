@@ -53,6 +53,21 @@ public:
 		return nullptr;
 	}
 
+	template<typename T>
+	void DeleteComponent()
+	{
+		for (auto it = components.begin(); it != components.end(); ++it)
+		{
+			auto c = dynamic_cast<T*>(*it);
+			if (c)
+			{
+				delete c;
+				components.erase(it);
+				break;
+			}
+		}
+	}
+
 	Texture* FindReplicatedTexture(_TCHAR* pstrTextureName);
 
 	void SetMesh(Mesh* pMesh);

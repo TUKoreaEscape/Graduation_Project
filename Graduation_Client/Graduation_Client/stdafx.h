@@ -56,6 +56,7 @@ using Microsoft::WRL::ComPtr;
 #include <WS2tcpip.h>
 #include <MSWSock.h>
 #include <WinSock2.h>
+#include <typeinfo>
 
 #include <unordered_map>
 #include <set>
