@@ -433,7 +433,7 @@ void Framework::UpdateObjects()
 {
 	float fTimeElapsed = time.GetTimeElapsed();
 	timeToSend += fTimeElapsed;
-	if (input ->m_pPlayer->GetID() != -1) {
+	if (input ->m_pPlayer->GetID() != -1 && (m_gamestate->GetGameState() == READY_TO_GAME || m_gamestate->GetGameState() == PLAYING_GAME)) {
 		cs_packet_move packet;
 		packet.size = sizeof(packet);
 		packet.type = CS_PACKET::CS_PACKET_MOVE;

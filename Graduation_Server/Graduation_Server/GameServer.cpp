@@ -658,16 +658,13 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_PACKET_MOVE:
 	{
-		if (m_clients[user_id].get_login_state() == Y_LOGIN && m_clients[user_id].get_join_room_number() != -1)
+		if (m_clients[user_id].get_login_state() == Y_LOGIN && m_clients[user_id].get_join_room_number() != -1 && m_clients[user_id].get_state() == CLIENT_STATE::ST_INGAME)
 		{
 			if (!m_clients[user_id].m_is_stresstest_npc)
 				Process_Move(user_id, p);
 			else
 				Process_Move_Test(user_id, p);
 		}
-
-		else if (m_clients[user_id].m_is_stresstest_npc)
-			Process_Move_Test(user_id, p);
 		break;
 	}
 

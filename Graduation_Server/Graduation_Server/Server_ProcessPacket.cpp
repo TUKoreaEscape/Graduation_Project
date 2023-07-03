@@ -150,7 +150,7 @@ void cGameServer::Process_Create_Room(const unsigned int _user_id, void* buff) /
 	m_clients[_user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
 	m_clients[_user_id]._state_lock.unlock();
 	send_create_room_ok_packet(_user_id, m_clients[_user_id].get_join_room_number());
-	send_put_player_data(_user_id);
+	//send_put_player_data(_user_id);
 	m_clients[_user_id].set_bounding_box(m_clients[_user_id].get_user_position(), XMFLOAT3(0.7f, 1.f, 0.7f), XMFLOAT4(0, 0, 0, 1));
 
 
@@ -199,33 +199,21 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 			m_clients[user_id]._state_lock.lock();
 			m_clients[user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
 			m_clients[user_id]._state_lock.unlock();
-			send_put_player_data(user_id);
+			//send_put_player_data(user_id);
 			Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
-			for (int i = 0; i < 6; ++i)
-			{
-				if (room.Get_Join_Member(i) != -1 && room.Get_Join_Member(i) != user_id)
-				{
-					m_clients[user_id]._room_list_lock.lock();
-					m_clients[user_id].room_list.insert(room.Get_Join_Member(i));
-					send_put_other_player(room.Get_Join_Member(i), user_id);
-					m_clients[user_id]._room_list_lock.unlock();
-				}
-			}
+			//for (int i = 0; i < 6; ++i)
+			//{
+			//	if (room.Get_Join_Member(i) != -1 && room.Get_Join_Member(i) != user_id)
+			//	{
+			//		m_clients[user_id]._room_list_lock.lock();
+			//		m_clients[user_id].room_list.insert(room.Get_Join_Member(i));
+			//		send_put_other_player(room.Get_Join_Member(i), user_id);
+			//		m_clients[user_id]._room_list_lock.unlock();
+			//	}
+			//}
 
 			// 이제 여기에 그 방에 존재하는 모든 사람에게 누가 접속했는지 정보를 전달해야함!
-			for (int i = 0; i < 6; ++i)
-			{
-				if (room.Get_Join_Member(i) != -1 && room.Get_Join_Member(i) != user_id)
-				{
-					m_clients[room.Get_Join_Member(i)]._room_list_lock.lock();
-					m_clients[room.Get_Join_Member(i)].room_list.insert(user_id);
-					m_clients[room.Get_Join_Member(i)]._room_list_lock.unlock();
-					send_put_other_player(user_id, room.Get_Join_Member(i));
-				}
-			}
-			//m_clients[user_id].set_user_position(XMFLOAT3(0.0f, 5.0f, 0.0f));
-			m_clients[user_id].set_bounding_box(m_clients[user_id].get_user_position(), XMFLOAT3(0.7f, 1.f, 0.7f), XMFLOAT4(0, 0, 0, 1));
 			send_join_room_success_packet(user_id);
 			//cout << "send_join_room_success_packet" << endl;
 
@@ -338,6 +326,18 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 	room.SetReady(packet->ready_type, user_id);
 	if (room.All_Player_Ready())
 	{
+		for (auto put_id : room.in_player)
+		{
+			send_put_player_data(put_id);
+			m_clients[put_id].set_bounding_box(m_clients[put_id].get_user_position(), XMFLOAT3(0.7f, 1.f, 0.7f), XMFLOAT4(0, 0, 0, 1));
+			for (auto recv_id : room.in_player)
+			{
+				if (put_id == recv_id)
+					continue;
+				send_put_other_player(put_id, recv_id);
+			}
+		}
+
 		for (auto player_index : room.in_player) {
 			send_game_start_packet(player_index);
 			m_clients[player_index]._state_lock.lock();
@@ -469,9 +469,9 @@ void cGameServer::Process_Attack(const int user_id)
 
 		m_timer_queue.push(ev);
 	}
-
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 	punch.Center = Add(punch.Center, attacker_look);
-	for (auto other_player_id : m_clients[user_id].room_list)
+	for (auto other_player_id : room.in_player)
 	{
 		if (punch.Intersects(m_clients[other_player_id].get_bounding_box()))
 		{
@@ -514,8 +514,8 @@ void cGameServer::Process_Door(const int user_id, void* buff)
 
 	//m_clients[user_id].do_send(sizeof(door_packet), &door_packet);
 	//m_clients[user_id]._room_list_lock.lock();
-	for (auto& player : m_clients[user_id].room_list)
-		m_clients[player].do_send(sizeof(door_packet), &door_packet);
+	for (auto player_id : room.in_player)
+		m_clients[player_id].do_send(sizeof(door_packet), &door_packet);
 	//m_clients[user_id]._room_list_lock.unlock();
 
 	if (!is_door_open)
@@ -554,8 +554,8 @@ void cGameServer::Process_ElectronicSystem_Open(const int user_id, void* buff)
 	es_packet.es_state = room.Get_EletronicSystem_State(static_cast<int>(packet->es_num));
 
 	//m_clients[user_id]._room_list_lock.lock();
-	for (auto& player : m_clients[user_id].room_list)
-		m_clients[player].do_send(sizeof(es_packet), &es_packet);
+	for (auto player_id : room.in_player)
+		m_clients[player_id].do_send(sizeof(es_packet), &es_packet);
 	//m_clients[user_id]._room_list_lock.unlock();
 
 	if (!is_electronioc_system_door_open)
