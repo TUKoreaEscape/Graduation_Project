@@ -5,7 +5,7 @@ GameState* GameState::GameStateInstance = nullptr;
 
 void GameState::ChangeNextState()
 {
-	std::cout << m_GameState << " -> ";
+	//std::cout << m_GameState << " -> ";
 	switch (m_GameState) {
 		case LOGIN:
 			m_GameState = ROOM_SELECT;
@@ -28,12 +28,12 @@ void GameState::ChangeNextState()
 			m_GameState = WAITING_GAME;
 			break;
 	}
-	std::cout << m_GameState << std::endl;
+	//std::cout << m_GameState << std::endl;
 }
 
 void GameState::ChangePrevState()
 {
-	std::cout << m_GameState << " -> ";
+	//std::cout << m_GameState << " -> ";
 	switch (m_GameState) {
 		case LOGIN:
 			break;
@@ -55,12 +55,12 @@ void GameState::ChangePrevState()
 			m_GameState = PLAYING_GAME;
 			break;
 	}
-	std::cout << m_GameState << std::endl;
+	//std::cout << m_GameState << std::endl;
 }
 
 void GameState::ChangeSameLevelState()
 {
-	std::cout << m_GameState << " -> ";
+	//std::cout << m_GameState << " -> ";
 	switch (m_GameState) {
 		case LOGIN:
 			break;
@@ -79,5 +79,5 @@ void GameState::ChangeSameLevelState()
 		case ENDING_GAME:
 			break;
 	}
-	std::cout << m_GameState << std::endl;
+	//std::cout << m_GameState << std::endl;
 }

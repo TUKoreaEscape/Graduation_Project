@@ -305,7 +305,6 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_CREATE_ROOM_OK:
 	{
-		std::cout << "보이스 시작" << std::endl;
 		//ShellExecute(NULL, L"open", L"voice\Voice.exe", NULL, NULL, SW_SHOWMINIMIZED);
 		//std::cout << "방 생성에 성공하였습니다." << std::endl;
 		m_join_room = true;
@@ -337,16 +336,12 @@ void Network::ProcessPacket(char* ptr)
 #endif
 		GameState& game_state = *GameState::GetInstance();
 		game_state.ChangeNextState();
-		std::cout << "방 생성 성공" << std::endl;
 		//Send_Ready_Packet(true);
 		break;
 	}
 
 	case SC_PACKET::SC_PACKET_JOIN_ROOM_FAIL:
 	{
-		//std::cout << "recv SC_PACKET_JOIN_ROOM_FAIL" << std::endl;
-		
-		std::cout << "방 접속에 실패하였습니다." << std::endl;
 		cs_packet_request_all_room_info packet;
 		packet.size = sizeof(packet);
 		packet.type = CS_PACKET::CS_PACKET_REQUEST_ROOM_INFO;

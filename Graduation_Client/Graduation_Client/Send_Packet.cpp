@@ -52,6 +52,9 @@ void Network::Send_Request_Room_Info(int page)
 
 void Network::Send_Exit_Room()
 {
+#if USE_VOICE
+	TerminateProcess(info.hProcess, 1);
+#endif
 	cs_packet_request_exit_room packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET::CS_PACKET_EXIT_ROOM;
@@ -149,7 +152,7 @@ void Network::Send_Select_Room(int select_room_number, int index)
 		packet.size = sizeof(packet);
 		packet.type = CS_PACKET::CS_PACKET_CREATE_ROOM;
 		packet.room_number = select_room_number;
-		std::cout << "规 积己 菩哦 傈价" << std::endl;
+		//std::cout << "规 积己 菩哦 傈价" << std::endl;
 		send_packet(&packet);
 		break;
 	}
