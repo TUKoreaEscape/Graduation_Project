@@ -139,3 +139,12 @@ public:
 	virtual void SetLookAt(XMFLOAT3& vLookAt);
 };
 
+class CustomizingCamera : public Camera
+{
+public:
+	//CThirdPersonCamera(Camera* pCamera);
+	//virtual ~CThirdPersonCamera() { }
+	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void update(float elapsedTime);
+	virtual void SetLookAt(XMFLOAT3& vLookAt);
+};

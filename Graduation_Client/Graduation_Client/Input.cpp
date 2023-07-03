@@ -264,9 +264,13 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			int xPos = LOWORD(lParam);
 			int yPos = HIWORD(lParam);
 
-			if (xPos >= customizingRect.left && xPos <= customizingRect.right && yPos >= customizingRect.top && yPos <= customizingRect.bottom)
+			for(int i=0; i<2; ++i)
 			{
-				m_gamestate->ChangeSameLevelState();//QUIT클릭
+				if (xPos >= customizingRect[i].left && xPos <= customizingRect[i].right && yPos >= customizingRect[i].top && yPos <= customizingRect[i].bottom)
+				{
+					if (i == 0) break; // save 클릭 break는 없애도됨
+					else if (i == 1) m_gamestate->ChangeSameLevelState();//QUIT클릭
+				}
 			}
 			//InputRoomInfo();
 		}

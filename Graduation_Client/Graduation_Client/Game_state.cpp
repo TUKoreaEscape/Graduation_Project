@@ -1,19 +1,24 @@
 #pragma once
 #include "Game_state.h"
+#include "Input.h"
+#include "Camera.h"
 
 GameState* GameState::GameStateInstance = nullptr;
 
 void GameState::ChangeNextState()
 {
+	Player* player = Input::GetInstance()->m_pPlayer;
 	std::cout << m_GameState << " -> ";
 	switch (m_GameState) {
 		case LOGIN:
 			m_GameState = ROOM_SELECT;
 			break;
 		case ROOM_SELECT:
+			player->ChangeCamera(ROOM_SELECT, WAITING_GAME);
 			m_GameState = WAITING_GAME;
 			break;
 		case WAITING_GAME:
+			player->ChangeCamera(WAITING_GAME, READY_TO_GAME);
 			m_GameState = READY_TO_GAME;
 			break;
 		case CUSTOMIZING:
@@ -25,6 +30,7 @@ void GameState::ChangeNextState()
 			m_GameState = ENDING_GAME;
 			break;
 		case ENDING_GAME:
+			player->ChangeCamera(ENDING_GAME, WAITING_GAME);
 			m_GameState = WAITING_GAME;
 			break;
 	}
@@ -33,6 +39,7 @@ void GameState::ChangeNextState()
 
 void GameState::ChangePrevState()
 {
+	Player* player = Input::GetInstance()->m_pPlayer;
 	std::cout << m_GameState << " -> ";
 	switch (m_GameState) {
 		case LOGIN:
@@ -46,6 +53,7 @@ void GameState::ChangePrevState()
 		case CUSTOMIZING:
 			break;
 		case READY_TO_GAME:
+			player->ChangeCamera(READY_TO_GAME, WAITING_GAME);
 			m_GameState = WAITING_GAME;
 			break;
 		case PLAYING_GAME:
@@ -60,6 +68,7 @@ void GameState::ChangePrevState()
 
 void GameState::ChangeSameLevelState()
 {
+	Player* player = Input::GetInstance()->m_pPlayer;
 	std::cout << m_GameState << " -> ";
 	switch (m_GameState) {
 		case LOGIN:
@@ -67,9 +76,11 @@ void GameState::ChangeSameLevelState()
 		case ROOM_SELECT:
 			break;
 		case WAITING_GAME:
+			player->ChangeCamera(WAITING_GAME, CUSTOMIZING);
 			m_GameState = CUSTOMIZING;
 			break;
 		case CUSTOMIZING:
+			player->ChangeCamera(CUSTOMIZING, WAITING_GAME);
 			m_GameState = WAITING_GAME;
 			break;
 		case READY_TO_GAME:

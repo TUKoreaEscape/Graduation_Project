@@ -908,12 +908,12 @@ UIMesh::UIMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	float halfWidth = width * 0.5f;
 	float halfHeight = height * 0.5f;
 
-	m_pxmf3Positions[0] = XMFLOAT3(-halfWidth + x, +halfHeight + y, 0.0f);
-	m_pxmf3Positions[1] = XMFLOAT3(+halfWidth + x, +halfHeight + y, 0.0f);
-	m_pxmf3Positions[2] = XMFLOAT3(-halfWidth + x, -halfHeight + y, 0.0f);
-	m_pxmf3Positions[3] = XMFLOAT3(-halfWidth + x, -halfHeight + y, 0.0f);
-	m_pxmf3Positions[4] = XMFLOAT3(+halfWidth + x, -halfHeight + y, 0.0f);
-	m_pxmf3Positions[5] = XMFLOAT3(+halfWidth + x, +halfHeight + y, 0.0f);
+	m_pxmf3Positions[0] = XMFLOAT3(-halfWidth + x, +halfHeight + y, 1.0f);
+	m_pxmf3Positions[1] = XMFLOAT3(+halfWidth + x, +halfHeight + y, 1.0f);
+	m_pxmf3Positions[2] = XMFLOAT3(-halfWidth + x, -halfHeight + y, 1.0f);
+	m_pxmf3Positions[3] = XMFLOAT3(-halfWidth + x, -halfHeight + y, 1.0f);
+	m_pxmf3Positions[4] = XMFLOAT3(+halfWidth + x, -halfHeight + y, 1.0f);
+	m_pxmf3Positions[5] = XMFLOAT3(+halfWidth + x, +halfHeight + y, 1.0f);
 
 	m_pxmf2TextureCoords0[0] = XMFLOAT2(0.0f, 0.0f);
 	m_pxmf2TextureCoords0[1] = XMFLOAT2(1.0f, 0.0f);

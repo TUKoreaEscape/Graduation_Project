@@ -7,7 +7,7 @@ RECT_FLOAT roominfoRect[6]{ 0, };
 RECT_FLOAT roomPageRect[2]{ 0, };
 RECT_FLOAT pageNumRect{ 0,0,0,0 };
 RECT_FLOAT waitingRoomRect[3]{ 0, };
-RECT_FLOAT customizingRect{ 0,0,0,0 };
+RECT_FLOAT customizingRect[2]{ 0, };
 RECT_FLOAT endingRect{ 0,0,0,0 };
 
 void UpdateRectSize(HWND hWnd)
@@ -36,7 +36,8 @@ void UpdateRectSize(HWND hWnd)
 	waitingRoomRect[1] = RECT_FLOAT{ clientWidth / float(1600.0 / 1220.0), clientHeight / float(900.0 / 785.0), clientWidth / float(1600.0 / 1340.0), clientHeight / float(900.0 / 830.0) };
 	waitingRoomRect[2] = RECT_FLOAT{ clientWidth / float(1600.0 / 1380.0), clientHeight / float(900.0 / 785.0), clientWidth / float(1600.0 / 1500.0), clientHeight / float(900.0 / 830.0) };
 	
-	customizingRect = RECT_FLOAT{ clientWidth / float(1600.0 / 1380.0), clientHeight / float(900.0 / 785.0), clientWidth / float(1600.0 / 1500.0), clientHeight / float(900.0 / 830.0) };
+	customizingRect[0] = RECT_FLOAT{ clientWidth / float(1600.0 / 1220.0), clientHeight / float(900.0 / 785.0), clientWidth / float(1600.0 / 1340.0), clientHeight / float(900.0 / 830.0) };
+	customizingRect[1] = RECT_FLOAT{clientWidth / float(1600.0 / 1380.0), clientHeight / float(900.0 / 785.0), clientWidth / float(1600.0 / 1500.0), clientHeight / float(900.0 / 830.0)};
 
 	endingRect = RECT_FLOAT{ clientWidth / float(1600.0 / 1380.0), clientHeight / float(900.0 / 785.0), clientWidth / float(1600.0 / 1500.0), clientHeight / float(900.0 / 830.0) };
 }

@@ -116,7 +116,7 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
-	
+
 	switch (GameState::GetInstance()->GetGameState()) {
 	case LOGIN:
 		for (int i = 0; i < m_nLogin; ++i) m_UILogin[i]->render(pd3dCommandList);
@@ -149,6 +149,15 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < m_Ending; ++i) m_UIEnding[i]->render(pd3dCommandList);
 		break;
 	}
+}
+
+void GameScene::WaitingRoomrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
+	m_pPlayer->m_pCamera->update(pd3dCommandList);
+	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
+	Scene::render(pd3dCommandList);
 }
 
 void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -232,10 +241,11 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_UIWaitingRoom[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.6f, -0.8f, 0.15f, 0.1f);
 	m_UIWaitingRoom[3] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Customizing.dds", 0.8f, -0.8f, 0.15f, 0.1f);
 
-	m_nCustomizing = 2;
+	m_nCustomizing = 3;
 	m_UICustomizing = new GameObject * [m_nCustomizing];
 	m_UICustomizing[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/CustomizingRoom.dds", 0.0f, 0.0f, 2.0f, 2.0f);
-	m_UICustomizing[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.8f, -0.8f, 0.15f, 0.1f);
+	m_UICustomizing[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Ready.dds", 0.6f, -0.8f, 0.15f, 0.1f);
+	m_UICustomizing[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.8f, -0.8f, 0.15f, 0.1f);
 
 	m_Ending = 2;
 	m_UIEnding = new GameObject * [m_Ending];
