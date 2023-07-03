@@ -291,9 +291,11 @@ void Network::Process_Pick_Item_Init(char* ptr)
 		if (packet->data[i].item_type == GAME_ITEM::ITEM_WRENCH)
 			std::cout << "ITEM_WRENCH" << std::endl;
 
-		if (packet->data[i].item_box_index == 0) {
-			m_pBoxes[0]->SetIndex(packet->data[i].item_box_index);
-			m_pBoxes[0]->m_Type = static_cast<int>(packet->data[i].item_type);
+		for (int idx = 0; idx < MAX_INGAME_ITEM; ++idx)
+		{
+			if (m_pBoxes[i]->m_item_box_index != packet->data[idx].item_box_index)
+				continue;
+			m_pBoxes[i]->SetItem(packet->data[idx].item_type);
 		}
 	}
 }
