@@ -1087,16 +1087,16 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	
 	m_pBoxes[0]->SetPosition(2.29f, 0.0f, 70.7f); // InBroadcastingRoom
 	m_pBoxes[0]->SetRotation(DEGREE90);
-	m_pBoxes[1]->SetPosition(36.91f, 0.0f, 64.3f);
+	m_pBoxes[1]->SetPosition(36.91f, 0.0f, 64.079f);
 	m_pBoxes[1]->SetRotation(DEGREE180);
 	m_pBoxes[2]->SetPosition(87.3f, 0.0f, 77.7f);
 	m_pBoxes[2]->SetRotation(DEGREE180);
 
 	m_pBoxes[3]->SetPosition(66.924f, 0.0f, 11.678f); // InCubeRoom
 	m_pBoxes[3]->SetRotation(DEGREE270);
-	m_pBoxes[4]->SetPosition(63.271f, 0.0f, 26.12f);
+	m_pBoxes[4]->SetPosition(63.465f, 0.0f, 26.12f);
 	m_pBoxes[4]->SetRotation(DEGREE90);
-	m_pBoxes[5]->SetPosition(85.95f, 0.0f, 26.9f);
+	m_pBoxes[5]->SetPosition(85.75f, 0.0f, 26.9f);
 	m_pBoxes[5]->SetRotation(DEGREE270);
 
 	m_pBoxes[6]->SetPosition(49.261f, 0.1f, -65.91f); // InPorset
@@ -1115,7 +1115,7 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pBoxes[12]->SetPosition(-56.89f, 0.0f, -59.96f);
 	m_pBoxes[12]->SetRotation(DEGREE90);
 
-	m_pBoxes[13]->SetPosition(-57.07f, 0.0f, 60.05f); // InPianoRoom
+	m_pBoxes[13]->SetPosition(-56.8f, 0.0f, 60.05f); // InPianoRoom
 	m_pBoxes[13]->SetRotation(DEGREE90);
 	m_pBoxes[14]->SetPosition(-16.757f, 0.0f, 59.201f);
 	m_pBoxes[14]->SetRotation(DEGREE0);
