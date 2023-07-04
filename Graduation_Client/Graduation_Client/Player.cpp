@@ -351,7 +351,8 @@ void Player::SetPlayerType(int type)
 
 void Player::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	if (PlayerNum != 0 && GameState::GetInstance()->GetGameState() <= CUSTOMIZING) return;
+	if (PlayerNum != 0 && GameState::GetInstance()->GetGameState() == CUSTOMIZING) return;
+	if (USE_NETWORK  && m_id == -1 && GameState::GetInstance()->GetGameState() == WAITING_GAME) return;
 
 	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->UpdateShaderVariables(pd3dCommandList, PlayerNum);
 
