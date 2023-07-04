@@ -264,16 +264,16 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 		m_clients[user_id].set_state(CLIENT_STATE::ST_LOBBY);
 		m_clients[user_id]._state_lock.unlock();
 
-		for (auto& p : m_clients[user_id].room_list)
-		{
-			m_clients[p]._room_list_lock.lock();
-			m_clients[p].room_list.erase(m_clients[p].room_list.find(user_id));
-			m_clients[p]._room_list_lock.unlock();
-		}
+		//for (auto& p : m_clients[user_id].room_list)
+		//{
+		//	m_clients[p]._room_list_lock.lock();
+		//	m_clients[p].room_list.erase(m_clients[p].room_list.find(user_id));
+		//	m_clients[p]._room_list_lock.unlock();
+		//}
 
-		m_clients[user_id]._room_list_lock.lock();
-		m_clients[user_id].room_list.clear();
-		m_clients[user_id]._room_list_lock.unlock();
+		//m_clients[user_id]._room_list_lock.lock();
+		//m_clients[user_id].room_list.clear();
+		//m_clients[user_id]._room_list_lock.unlock();
 
 		// 방을 나가면 로비이므로 방 정보들을 다시 보내줘야함!
 		sc_packet_request_room_info send_packet;
@@ -473,6 +473,8 @@ void cGameServer::Process_Attack(const int user_id)
 	punch.Center = Add(punch.Center, attacker_look);
 	for (auto other_player_id : room.in_player)
 	{
+		if (other_player_id == -1)
+			continue;
 		if (punch.Intersects(m_clients[other_player_id].get_bounding_box()))
 		{
 
@@ -512,11 +514,11 @@ void cGameServer::Process_Door(const int user_id, void* buff)
 	door_packet.door_number = static_cast<int>(packet->door_num);
 	door_packet.door_state = room.Get_Door_State(static_cast<int>(packet->door_num));
 
-	//m_clients[user_id].do_send(sizeof(door_packet), &door_packet);
-	//m_clients[user_id]._room_list_lock.lock();
-	for (auto player_id : room.in_player)
+	for (auto player_id : room.in_player) {
+		if (player_id == -1)
+			continue;
 		m_clients[player_id].do_send(sizeof(door_packet), &door_packet);
-	//m_clients[user_id]._room_list_lock.unlock();
+	}
 
 	if (!is_door_open)
 	{
@@ -553,10 +555,11 @@ void cGameServer::Process_ElectronicSystem_Open(const int user_id, void* buff)
 	es_packet.es_num = packet->es_num;
 	es_packet.es_state = room.Get_EletronicSystem_State(static_cast<int>(packet->es_num));
 
-	//m_clients[user_id]._room_list_lock.lock();
-	for (auto player_id : room.in_player)
+	for (auto player_id : room.in_player) {
+		if (player_id == -1)
+			continue;
 		m_clients[player_id].do_send(sizeof(es_packet), &es_packet);
-	//m_clients[user_id]._room_list_lock.unlock();
+	}
 
 	if (!is_electronioc_system_door_open)
 	{
@@ -646,6 +649,8 @@ void cGameServer::Process_ElectronicSystem_Control(const int user_id, void* buff
 	for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
 	{
 		int player_id = room.in_player[i];
+		if (player_id == -1)
+			continue;
 		m_clients[player_id].do_send(sizeof(es_packet), &es_packet);
 	}
 }

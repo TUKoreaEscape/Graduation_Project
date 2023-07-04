@@ -14,7 +14,7 @@ const int CHECK_MAX_PACKET_SIZE = 127;
 
 const int BUF_SIZE = 1024;
 // ----- 클라이언트가 서버에게 보낼때 ------
-#define MAX_INGAME_ITEM 14
+#define MAX_INGAME_ITEM 20
 #define VOICE_ISSUER "작성해야됨"
 #define VOICE_DOMAIN "작성해야됨"
 #define VOICE_KEY "작성해야됨"
@@ -48,6 +48,7 @@ namespace GAME_ITEM
 		ITEM_DRILL,
 		ITEM_WRENCH,
 		ITEM_PLIERS,
+		ITEM_DRIVER,
 		ITEM_LIFECHIP,
 		ITEM_NONE
 	};

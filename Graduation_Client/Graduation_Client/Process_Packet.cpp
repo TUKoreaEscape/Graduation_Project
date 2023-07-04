@@ -18,8 +18,15 @@ void Network::Process_Game_End(char* ptr)
 	game_state.ChangeNextState();
 
 	m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < 5; ++i) {
 		m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);
+		m_ppOther[i]->SetID(-1);
+	}
+	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
+		m_pBoxes[i]->SetOpen(false);
+	for (int i = 0; i < 6; ++i)
+		m_pDoors[i]->SetOpen(false);
+
 }
 
 void Network::Process_LifeChip_Update(char* ptr)
@@ -275,21 +282,24 @@ void Network::Process_Pick_Item_Init(char* ptr)
 	sc_packet_pick_item_init* packet = reinterpret_cast<sc_packet_pick_item_init*>(ptr);
 	// 여기서 처리해야함
 
+	for(int i = 0; i < MAX_INGAME_ITEM; ++i)
+		m_pBoxes[i]->SetIndex(i);
+
 	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
 	{
-		std::cout << "Item [" << packet->data[i].item_box_index << "] Type : ";
-		if (packet->data[i].item_type == GAME_ITEM::ITEM_LIFECHIP)
-			std::cout << "ITEM_LIFECHIP" << std::endl;
-		if (packet->data[i].item_type == GAME_ITEM::ITEM_DRILL)
-			std::cout << "ITEM_DRILL" << std::endl;
-		if (packet->data[i].item_type == GAME_ITEM::ITEM_HAMMER)
-			std::cout << "ITEM_HAMMER" << std::endl;
-		if (packet->data[i].item_type == GAME_ITEM::ITEM_NONE)
-			std::cout << "ITEM_NONE" << std::endl;
-		if (packet->data[i].item_type == GAME_ITEM::ITEM_PLIERS)
-			std::cout << "ITEM_PLIERS" << std::endl;
-		if (packet->data[i].item_type == GAME_ITEM::ITEM_WRENCH)
-			std::cout << "ITEM_WRENCH" << std::endl;
+		//std::cout << "Item [" << packet->data[i].item_box_index << "] Type : ";
+		//if (packet->data[i].item_type == GAME_ITEM::ITEM_LIFECHIP)
+		//	std::cout << "ITEM_LIFECHIP" << std::endl;
+		//if (packet->data[i].item_type == GAME_ITEM::ITEM_DRILL)
+		//	std::cout << "ITEM_DRILL" << std::endl;
+		//if (packet->data[i].item_type == GAME_ITEM::ITEM_HAMMER)
+		//	std::cout << "ITEM_HAMMER" << std::endl;
+		//if (packet->data[i].item_type == GAME_ITEM::ITEM_NONE)
+		//	std::cout << "ITEM_NONE" << std::endl;
+		//if (packet->data[i].item_type == GAME_ITEM::ITEM_PLIERS)
+		//	std::cout << "ITEM_PLIERS" << std::endl;
+		//if (packet->data[i].item_type == GAME_ITEM::ITEM_WRENCH)
+		//	std::cout << "ITEM_WRENCH" << std::endl;
 
 		for (int idx = 0; idx < MAX_INGAME_ITEM; ++idx)
 		{

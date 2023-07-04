@@ -152,10 +152,11 @@ void Room::init_fix_object_and_life_chip()
 
 	m_fix_item[0].Set_Item_Type(GAME_ITEM::ITEM_DRILL);
 	m_fix_item[1].Set_Item_Type(GAME_ITEM::ITEM_HAMMER);
-	m_fix_item[12].Set_Item_Type(GAME_ITEM::ITEM_PLIERS);
-	m_fix_item[13].Set_Item_Type(GAME_ITEM::ITEM_WRENCH);
+	m_fix_item[MAX_INGAME_ITEM - 1].Set_Item_Type(GAME_ITEM::ITEM_PLIERS);
+	m_fix_item[MAX_INGAME_ITEM - 2].Set_Item_Type(GAME_ITEM::ITEM_WRENCH);
+	m_fix_item[MAX_INGAME_ITEM - 3].Set_Item_Type(GAME_ITEM::ITEM_DRIVER);
 
-	for (int i = 2; i < MAX_INGAME_ITEM - 2; ++i)
+	for (int i = 2; i < MAX_INGAME_ITEM - 3; ++i)
 		m_fix_item[i].Set_Item_Type(GAME_ITEM::ITEM_LIFECHIP);
 
 	sc_packet_pick_item_init item_init_packet;
@@ -235,7 +236,8 @@ void Room::Activate_Altar()
 	m_altar->Set_Valid(true);
 }
 
-void Room::Set_Electronic_System_ONOFF()
+void Room::Set_Electronic_System_ONOFF
+()
 {
 	mt19937 engine((unsigned int)time(NULL));
 	for (int i = 0; i < NUMBER_OF_ELECTRONIC; ++i)
