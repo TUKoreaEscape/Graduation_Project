@@ -239,7 +239,6 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 					{
 #if USE_NETWORK
 						Network& network = *Network::GetInstance();
-						network.Send_Ready_Packet(false);
 						network.Send_Exit_Room();
 #endif
 						m_gamestate->ChangePrevState();//QUITÅ¬¸¯

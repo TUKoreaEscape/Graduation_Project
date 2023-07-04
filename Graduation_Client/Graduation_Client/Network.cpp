@@ -203,10 +203,13 @@ void Network::listen_thread()
 
 		if (WSARecv(m_socket, &wsabuf, 1, &recv_byte, &recv_flag, nullptr, nullptr) == SOCKET_ERROR)
 		{
-			std::cout << "Socket Error Exit" << std::endl;
-			TerminateProcess(info.hProcess, 1);
-			m_shutdown = true;
-			exit(0);
+			int err_no = WSAGetLastError();
+			if (WSA_IO_PENDING != err_no) {
+				std::cout << "Socket Error Exit" << std::endl;
+				TerminateProcess(info.hProcess, 1);
+				m_shutdown = true;
+				exit(0);
+			}
 		}
 
 		if (recv_byte > 0) {
@@ -270,8 +273,8 @@ void Network::ProcessPacket(char* ptr)
 		//std::cout << "방 접속 성공" << std::endl;
 		m_join_room = true;
 		//send_thread = std::thread{ &Network::Debug_send_thread, this };
-		for (int i = 0; i < 5; ++i)
-			m_ppOther[i]->SetPosition(XMFLOAT3(-100, -100, -100));
+		//for (int i = 0; i < 5; ++i)
+		//	m_ppOther[i]->SetPosition(XMFLOAT3(-100, -100, -100));
 #if USE_VOICE
 		std::wstring parameter = L"addsession -l ";
 		std::wstring room_parameter = std::to_wstring(m_join_room_number);
@@ -309,8 +312,8 @@ void Network::ProcessPacket(char* ptr)
 		//std::cout << "방 생성에 성공하였습니다." << std::endl;
 		m_join_room = true;
 		//send_thread = std::thread{ &Network::Debug_send_thread, this };
-		for (int i = 0; i < 5; ++i)
-			m_ppOther[i]->SetPosition(XMFLOAT3(-100, -100, -100));
+		//for (int i = 0; i < 5; ++i)
+		//	m_ppOther[i]->SetPosition(XMFLOAT3(-100, -100, -100));
 #if USE_VOICE
 		std::wstring parameter = L"addsession -l ";
 		std::wstring room_parameter = std::to_wstring(m_join_room_number);
@@ -397,7 +400,7 @@ void Network::ProcessPacket(char* ptr)
 	{
 		sc_put_player_packet* packet = reinterpret_cast<sc_put_player_packet*>(ptr);
 		m_pPlayer->SetID(packet->data.id);
-		m_pPlayer->SetPosition(packet->data.position, true);
+		//m_pPlayer->SetPosition(packet->data.position, true);
 		//std::cout << "Set Init Pos : (" << packet->data.position.x << ", " << packet->data.position.y << ", " << packet->data.position.z << ") " << std::endl;
 		m_pPlayer->SetVelocity(packet->data.velocity);
 		m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
@@ -416,7 +419,7 @@ void Network::ProcessPacket(char* ptr)
 				//std::cout << i << "번째에 플레이어 할당" << std::endl;
 				m_ppOther[i]->SetID(packet->data.id);
 				Other_Player_Pos[i].id = packet->data.id;
-				m_ppOther[i]->SetPosition(packet->data.position, true);
+				//m_ppOther[i]->SetPosition(packet->data.position, true);
 				m_ppOther[i]->SetVelocity(packet->data.velocity);
 				m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);
 				break;
@@ -446,6 +449,24 @@ void Network::ProcessPacket(char* ptr)
 		std::cout << std::endl;
 		std::cout << "Player (Server ID) [" << packet->id << "] 가 술래로 결정되었습니다. 외곽선이 빨간선으로 바뀝니다." << std::endl;
 
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_PLAYER_EXIT:
+	{
+		Process_Player_Exit(ptr);
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_READY:
+	{
+		Process_Ready(ptr);
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_INIT_POSITION:
+	{
+		Process_Init_Position(ptr);
 		break;
 	}
 
@@ -513,7 +534,6 @@ void Network::ProcessPacket(char* ptr)
 		}
 		break;
 	}
-
 
 	case SC_PACKET::SC_PACKET_ELECTRONIC_SWITCH_INIT:
 	{

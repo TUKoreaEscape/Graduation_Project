@@ -150,7 +150,7 @@ void cGameServer::Process_Create_Room(const unsigned int _user_id, void* buff) /
 	m_clients[_user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
 	m_clients[_user_id]._state_lock.unlock();
 	send_create_room_ok_packet(_user_id, m_clients[_user_id].get_join_room_number());
-	//send_put_player_data(_user_id);
+	send_put_player_data(_user_id);
 	m_clients[_user_id].set_bounding_box(m_clients[_user_id].get_user_position(), XMFLOAT3(0.7f, 1.f, 0.7f), XMFLOAT4(0, 0, 0, 1));
 
 
@@ -199,19 +199,20 @@ void cGameServer::Process_Join_Room(const int user_id, void* buff)
 			m_clients[user_id]._state_lock.lock();
 			m_clients[user_id].set_state(CLIENT_STATE::ST_GAMEROOM);
 			m_clients[user_id]._state_lock.unlock();
-			//send_put_player_data(user_id);
+			send_put_player_data(user_id);
 			Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
-			//for (int i = 0; i < 6; ++i)
-			//{
-			//	if (room.Get_Join_Member(i) != -1 && room.Get_Join_Member(i) != user_id)
-			//	{
-			//		m_clients[user_id]._room_list_lock.lock();
-			//		m_clients[user_id].room_list.insert(room.Get_Join_Member(i));
-			//		send_put_other_player(room.Get_Join_Member(i), user_id);
-			//		m_clients[user_id]._room_list_lock.unlock();
-			//	}
-			//}
+			for (int i = 0; i < 6; ++i)
+			{
+				if (room.Get_Join_Member(i) != -1 && room.Get_Join_Member(i) != user_id)
+				{
+					m_clients[user_id]._room_list_lock.lock();
+					m_clients[user_id].room_list.insert(room.Get_Join_Member(i));
+					send_put_other_player(room.Get_Join_Member(i), user_id);
+					send_put_other_player(user_id, room.Get_Join_Member(i));
+					m_clients[user_id]._room_list_lock.unlock();
+				}
+			}
 
 			// 이제 여기에 그 방에 존재하는 모든 사람에게 누가 접속했는지 정보를 전달해야함!
 			send_join_room_success_packet(user_id);
@@ -256,9 +257,10 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 
 	int request_exit_room_number = m_clients[user_id].get_join_room_number();
 
-	if (m_clients[user_id].get_join_room_number() != -1) {
-		Room& cl_room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+	if (request_exit_room_number != -1) {
+		Room& cl_room = *m_room_manager->Get_Room_Info(request_exit_room_number);
 		cl_room.Exit_Player(user_id);
+		m_clients[user_id].m_is_ready = false;
 		m_clients[user_id].set_join_room_number(-1);
 		m_clients[user_id]._state_lock.lock();
 		m_clients[user_id].set_state(CLIENT_STATE::ST_LOBBY);
@@ -291,6 +293,8 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 		send_packet.size = sizeof(send_packet);
 		send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
 		m_clients[user_id].do_send(sizeof(send_packet), &send_packet);
+
+		cout << "send_packet size : " << sizeof(send_packet) << endl;
 	}
 
 	sc_packet_update_room update_room_packet;
@@ -318,23 +322,40 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 void cGameServer::Process_Ready(const int user_id, void* buff)
 {
 	cs_packet_ready* packet = reinterpret_cast<cs_packet_ready*>(buff);
-
+	m_clients[user_id].m_is_ready = packet->ready_type;
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
-#if PRINT
-	cout << "id : " << user_id << "가 ready함" << endl;
-#endif
+
+	sc_packet_ready ready_packet;
+	ready_packet.size = sizeof(packet);
+	ready_packet.type = SC_PACKET::SC_PACKET_READY;
+	ready_packet.id = user_id;
+	ready_packet.ready_type = packet->ready_type;
+	for (auto player_id : room.in_player)
+	{
+		if (player_id == -1 || player_id == user_id)
+			continue;
+		m_clients[player_id].do_send(sizeof(ready_packet), &ready_packet);
+	}
+
 	room.SetReady(packet->ready_type, user_id);
 	if (room.All_Player_Ready())
 	{
 		for (auto put_id : room.in_player)
 		{
-			send_put_player_data(put_id);
-			m_clients[put_id].set_bounding_box(m_clients[put_id].get_user_position(), XMFLOAT3(0.7f, 1.f, 0.7f), XMFLOAT4(0, 0, 0, 1));
+			if (put_id == -1)
+				continue;
+			sc_packet_init_position init_packet;
+			init_packet.size = sizeof(init_packet);
+			init_packet.type = SC_PACKET::SC_PACKET_INIT_POSITION;
+			init_packet.user_id = put_id;
+			init_packet.position = m_clients[put_id].get_user_position();
+			init_packet.yaw = m_clients[put_id].get_user_yaw();
+
 			for (auto recv_id : room.in_player)
 			{
-				if (put_id == recv_id)
+				if (recv_id == -1)
 					continue;
-				send_put_other_player(put_id, recv_id);
+				m_clients[recv_id].do_send(sizeof(init_packet), &init_packet);
 			}
 		}
 

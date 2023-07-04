@@ -7,7 +7,7 @@
 #include "Server_Timer.h"
 
 #define  DIR_NO 100
-#define  USE_NETWORK 0
+#define  USE_NETWORK 1
 #define	 USE_VOICE 0
 
 class Door;
@@ -33,7 +33,7 @@ class Network {
 private:
 	static Network* NetworkInstance;
 	SOCKET			m_socket;
-	const char*		SERVER_ADDR = "127.0.0.1";
+	const char*		SERVER_ADDR = "172.30.1.20";
 	Server_Timer	m_server_counter;
 	Custom			data;
 
@@ -82,6 +82,9 @@ public:
 	void Process_Player_Move(char* ptr);
 	void Process_Other_Player_Move(char* ptr);
 	void Process_Other_Move(char* ptr);
+	void Process_Player_Exit(char* ptr);
+	void Process_Ready(char* ptr);
+	void Process_Init_Position(char* ptr);
 	void Process_Game_Start(char* ptr);
 	void Process_Game_End(char* ptr);
 	void Process_Door_Update(char* ptr);

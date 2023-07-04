@@ -179,7 +179,7 @@ void cGameServer::send_put_player_data(const unsigned int recv_id)
 	packet.type = SC_PACKET::SC_PACKET_PUT_PLAYER;
 	packet.data.active = false;
 	packet.data.id = recv_id;
-	packet.data.position = m_clients[recv_id].get_user_position();
+	//packet.data.position = m_clients[recv_id].get_user_position();
 	packet.data.velocity = XMFLOAT3{ 0,0,0 };
 	packet.data.yaw = 0.0f;
 	m_clients[recv_id].do_send(sizeof(packet), &packet);
@@ -192,7 +192,8 @@ void cGameServer::send_put_other_player(const unsigned int put_id, const unsigne
 	packet.type = SC_PACKET::SC_PACKET_PUT_OTHER_PLAYER;
 	packet.data.active = false;
 	packet.data.id = put_id;
-	packet.data.position = m_clients[put_id].get_user_position();
+	packet.is_ready = m_clients[put_id].m_is_ready;
+	//packet.data.position = m_clients[put_id].get_user_position();
 #if PRINT
 	cout << "유저 정보를 보넀습니다 : " << put_id << "->" << recv_id << endl;
 #endif

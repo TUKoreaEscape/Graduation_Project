@@ -125,6 +125,12 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < m_nRoomSelect; ++i) m_UIRoomSelect[i]->render(pd3dCommandList);
 		break;
 	case WAITING_GAME:
+		m_ppPlayers[0]->SetPosition(XMFLOAT3(6.0f, 0.0f, -5.0f));
+		m_ppPlayers[1]->SetPosition(XMFLOAT3(3.0f, 0.0f, -5.0f));
+		m_ppPlayers[2]->SetPosition(XMFLOAT3(-3.0f, 0.0f, -5.0f));
+		m_ppPlayers[3]->SetPosition(XMFLOAT3(-6.0f, 0.0f, -5.0f));
+		m_ppPlayers[4]->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
+		m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -3.0f));
 		for (int i = 0; i < m_nWaitingRoom; ++i) m_UIWaitingRoom[i]->render(pd3dCommandList);
 		break;
 	case CUSTOMIZING:
@@ -183,7 +189,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 		m_ppPlayers[i] = new Player();
 		m_ppPlayers[i]->SetChild(pPlayerModel->m_pModelRootObject, true);
 		m_ppPlayers[i]->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 1, pPlayerModel);
-		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 9);
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 		//m_ppPlayers[i]->SetPosition(XMFLOAT3(i , 0.0f, -5.0f));
 		for (int j = 0; j < 6; ++j)

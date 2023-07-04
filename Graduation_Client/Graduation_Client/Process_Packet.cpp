@@ -2,6 +2,62 @@
 #include "Object.h"
 #include "GameObject.h"
 
+void Network::Process_Player_Exit(char* ptr)
+{
+	sc_packet_player_exit* packet = reinterpret_cast<sc_packet_player_exit*>(ptr);
+	std::cout << "나간패킷 받음" << std::endl;
+	for (int i = 0; i < 5; ++i)
+	{
+		if (m_ppOther[i]->GetID() == -1)
+			continue;
+		if (m_ppOther[i]->GetID() == packet->user_id) {
+			m_ppOther[i]->SetID(-1);
+			return;
+		}
+	}
+}
+
+void Network::Process_Ready(char* ptr)
+{
+	sc_packet_ready* packet = reinterpret_cast<sc_packet_ready*>(ptr);
+
+	for (int i = 0; i < 5; ++i) {
+		if (m_ppOther[i]->GetID() == -1)
+			continue;
+		if (m_ppOther[i]->GetID() == packet->id) {
+			if (packet->ready_type) {
+				m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+				m_ppOther[i]->SetTrackAnimationSet(0, 9);
+			}
+			else {
+				m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+				m_ppOther[i]->SetTrackAnimationSet(0, 0);
+			}
+			return;
+		}
+	}
+}
+
+void Network::Process_Init_Position(char* ptr)
+{
+	sc_packet_init_position* packet = reinterpret_cast<sc_packet_init_position*>(ptr);
+
+	if (m_pPlayer->GetID() == packet->user_id) {
+		m_pPlayer->SetPosition(packet->position, true);
+		m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+		m_pPlayer->SetTrackAnimationSet(0, 0);
+	}
+	else {
+		for (int i = 0; i < 5; ++i) {
+			if (m_ppOther[i]->GetID() == packet->user_id) {
+				m_ppOther[i]->SetPosition(packet->position, true);
+				m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+				m_ppOther[i]->SetTrackAnimationSet(0, 0);
+			}
+		}
+	}
+}
+
 void Network::Process_Game_Start(char* ptr)
 {
 	sc_packet_game_start* packet = reinterpret_cast<sc_packet_game_start*>(ptr);

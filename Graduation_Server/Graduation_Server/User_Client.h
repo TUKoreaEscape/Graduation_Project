@@ -35,6 +35,7 @@ private:
 	BoundingOrientedBox		m_bounding_box{};
 
 public:
+	bool					m_is_ready = false;
 	bool					m_is_stresstest_npc = false;
 	bool					m_befor_send_move = false;
 

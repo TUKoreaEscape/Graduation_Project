@@ -49,6 +49,16 @@ void Room::init_room_by_game_end()
 	m_tagger_id = -1;
 	m_tagger_collect_chip = 0;
 	m_altar->init();
+
+	cGameServer& server = *cGameServer::GetInstance();
+	int i = 0;
+	for (auto player_id : in_player)
+	{
+		if (player_id == -1)
+			continue;
+		server.m_clients[player_id].set_user_position(XMFLOAT3(static_cast<float>(6.f - ((float)i * 2.5)), 5.f, -4.f));
+		i++;
+	}
 }
 
 void Room::Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE room_state) // <- 방 만들때 in_player가 전부 -1에서 0으로 바뀜 이거 수정해야댐
@@ -96,10 +106,27 @@ void Room::Exit_Player(int user_id)
 			in_player_loading_success[i] = false;
 			Number_of_users -= 1;
 			remain_user = 6 - Number_of_users;
+
 			if (Number_of_users == 0) {
 				Reset_Room();
 			}
 			break;
+		}
+	}
+
+	if (Number_of_users > 0) {
+		sc_packet_player_exit packet;
+		packet.size = sizeof(packet);
+		packet.type = SC_PACKET::SC_PACKET_PLAYER_EXIT;
+		packet.user_id = user_id;
+
+
+		cGameServer& server = *cGameServer::GetInstance();
+		for (auto player_id : in_player)
+		{
+			if (player_id == -1)
+				continue;
+			server.m_clients[player_id].do_send(sizeof(packet), &packet);
 		}
 	}
 }

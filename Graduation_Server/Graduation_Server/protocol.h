@@ -363,6 +363,9 @@ namespace SC_PACKET
 		SC_PACKET_CHAT,
 		SC_PACKET_JOIN_ROOM_SUCCESS,
 		SC_PACKET_JOIN_ROOM_FAIL,
+		SC_PACKET_PLAYER_EXIT,
+		SC_PACKET_READY,
+		SC_PACKET_INIT_POSITION,
 		SC_PACKET_GAME_START,
 		SC_PACKET_PUT_PLAYER,
 		SC_PACKET_PUT_OTHER_PLAYER,
@@ -435,7 +438,8 @@ struct sc_put_player_packet {
 	unsigned char	size;
 	unsigned char	type;
 
-	PutData		data;
+	PutData			data;
+	bool			is_ready;
 };
 
 struct sc_packet_request_room_info {
@@ -479,9 +483,33 @@ struct sc_packet_chat { // 유저간 채팅
 struct sc_packet_put_other_client {
 	unsigned char		size;
 	unsigned char		type;
-	unsigned int		user_id;
+	short				user_id;
 
 	char				id[MAX_NAME_SIZE];
+	DirectX::XMFLOAT3	position;
+	float				yaw;
+};
+
+struct sc_packet_player_exit {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			user_id;
+};
+
+struct sc_packet_ready {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			id;
+	bool			ready_type;
+};
+
+struct sc_packet_init_position {
+	unsigned char		size;
+	unsigned char		type;
+
+	unsigned int		user_id;
 	DirectX::XMFLOAT3	position;
 	float				yaw;
 };
@@ -490,8 +518,6 @@ struct sc_packet_game_start { // 게임 시작을 방에 있는 플레이어에게 알려줌
 	unsigned char	size;
 	unsigned char	type;
 };
-
-
 
 struct sc_packet_voice_data {
 	unsigned char	size;
