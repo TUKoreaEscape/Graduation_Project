@@ -69,14 +69,14 @@ public:
 	Door* m_pDoors[NUM_DOOR];
 
 	InteractionObject* m_pPowers[NUM_POWER];
-	ItemBox* m_pBoxes[1];
+	ItemBox* m_pBoxes[NUM_ITEMBOX];
 	Network* m_network;
 	std::thread recv_thread;
 
 	std::set<PVSROOM> m_sPVS[6];
 	PVSROOM m_pvsCamera;
 
-	GameObject* Items[5];
+	GameObject* Items[NUM_ITEMS];
 	
 protected:
 	static ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap;

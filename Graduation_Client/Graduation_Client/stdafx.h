@@ -89,6 +89,8 @@ constexpr int TYPE_DEAD_PLAYER = 8;
 constexpr int NUM_VENT = 8;
 constexpr int NUM_DOOR = 6;
 constexpr int NUM_POWER = 5;
+constexpr int NUM_ITEMBOX = 14;
+constexpr int NUM_ITEMS = 5;
 
 constexpr float DOOR_OPEN_COOLTIME_TAGGER = 6.0f;
 constexpr float DOOR_OPEN_COOLTIME_PLYAER = 3.0f;

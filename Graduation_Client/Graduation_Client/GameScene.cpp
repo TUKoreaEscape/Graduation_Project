@@ -96,7 +96,7 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->render(pd3dCommandList);
 		}
 	}
-	for (int i = 0; i < 1; ++i) {
+	for (int i = 0; i < NUM_ITEMBOX; ++i) {
 		if (m_pBoxes[i]) {
 			m_pBoxes[i]->UpdateTransform(nullptr);
 			reinterpret_cast<ItemBox*>(m_pBoxes[i])->render(pd3dCommandList);
@@ -141,7 +141,7 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < NUM_VENT; ++i) {
 			reinterpret_cast<Vent*>(Vents[i])->UIrender(pd3dCommandList);
 		}
-		for (int i = 0; i < 1; ++i) {
+		for (int i = 0; i < NUM_ITEMBOX; ++i) {
 			reinterpret_cast<ItemBox*>(m_pBoxes[i])->UIrender(pd3dCommandList);
 		}
 		break;
@@ -335,7 +335,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	for (int i = 0; i < 5; ++i)
 		m_network->m_pPowers[i] = m_pPowers[i];
 
-	for (int i = 0; i < 1; ++i)
+	for (int i = 0; i < NUM_ITEMBOX; ++i)
 		m_network->m_pBoxes[i] = m_pBoxes[i];
 
 	recv_thread = std::thread{ &Network::listen_thread, m_network };
@@ -985,7 +985,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 			m_pPlayer->m_power_number = i;
 		}
 	}
-	for (int i = 0; i < 1; ++i) {
+	for (int i = 0; i < NUM_ITEMBOX; ++i) {
 		m_pBoxes[i]->update(elapsedTime);
 		if (m_pBoxes[i]->IsPlayerNear(PlayerPos)) {
 			m_pPlayer->m_pNearItembox = m_pBoxes[i];
@@ -1074,7 +1074,7 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	Items[4] = new GameObject();
 	Items[4]->SetChild(pWrenchModel->m_pModelRootObject, true);
 	
-	for (int i = 0; i < 1; ++i) {
+	for (int i = 0; i < NUM_ITEMBOX; ++i) {
 		m_pBoxes[i] = new ItemBox();
 		m_pBoxes[i]->SetChild(pBoxModel->m_pModelRootObject, true);
 		m_pBoxes[i]->SetUI(BoxUI);
@@ -1085,10 +1085,21 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		}
 	}
 
-	m_pBoxes[0]->SetPosition(-3.952, 0, -22.804);
-	m_pBoxes[0]->SetRotation(DEGREE0);
-	m_pBoxes[0]->SetItem(GAME_ITEM::ITEM_HAMMER);
-	for (int i = 0; i < 1; ++i) {
+	for (int i = 0; i < NUM_ITEMBOX; ++i) {
+		m_pBoxes[i]->SetPosition(-3.952f + i * 2.0f, 0, -22.804f);
+		m_pBoxes[i]->SetRotation(DEGREE0);
+		if (i % NUM_ITEMS == 0)
+			m_pBoxes[i]->SetItem(GAME_ITEM::ITEM_DRILL);
+		else if (i % NUM_ITEMS == 1)
+			m_pBoxes[i]->SetItem(GAME_ITEM::ITEM_HAMMER);
+		else if (i % NUM_ITEMS == 2)
+			m_pBoxes[i]->SetItem(GAME_ITEM::ITEM_LIFECHIP);
+		else if (i % NUM_ITEMS == 3)
+			m_pBoxes[i]->SetItem(GAME_ITEM::ITEM_PLIERS);
+		else
+			m_pBoxes[i]->SetItem(GAME_ITEM::ITEM_WRENCH);
+	}
+	for (int i = 0; i < NUM_ITEMBOX; ++i) {
 		m_pBoxes[i]->UpdateTransform(nullptr);
 	}
 	if (pBoxModel) delete pBoxModel;
