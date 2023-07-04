@@ -12,7 +12,6 @@ void Network::Process_Player_Exit(char* ptr)
 			continue;
 		if (m_ppOther[i]->GetID() == packet->user_id) {
 			m_ppOther[i]->SetID(-1);
-			return;
 		}
 	}
 }
@@ -33,7 +32,6 @@ void Network::Process_Ready(char* ptr)
 				m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 				m_ppOther[i]->SetTrackAnimationSet(0, 0);
 			}
-			return;
 		}
 	}
 }

@@ -422,6 +422,14 @@ void Network::ProcessPacket(char* ptr)
 				//m_ppOther[i]->SetPosition(packet->data.position, true);
 				m_ppOther[i]->SetVelocity(packet->data.velocity);
 				m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);
+				if (packet->is_ready) {
+					m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+					m_ppOther[i]->SetTrackAnimationSet(0, 9);
+				}
+				else {
+					m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+					m_ppOther[i]->SetTrackAnimationSet(0, 0);
+				}
 				break;
 			}
 		}

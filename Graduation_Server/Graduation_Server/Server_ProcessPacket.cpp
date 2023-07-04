@@ -326,7 +326,7 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
 	sc_packet_ready ready_packet;
-	ready_packet.size = sizeof(packet);
+	ready_packet.size = sizeof(ready_packet);
 	ready_packet.type = SC_PACKET::SC_PACKET_READY;
 	ready_packet.id = user_id;
 	ready_packet.ready_type = packet->ready_type;
@@ -338,12 +338,17 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 	}
 
 	room.SetReady(packet->ready_type, user_id);
+	cout << room.All_Player_Ready() << endl;
+	int i = 0;
 	if (room.All_Player_Ready())
 	{
 		for (auto put_id : room.in_player)
 		{
-			if (put_id == -1)
+			if (put_id == -1) {
+				i++;
 				continue;
+			}
+			m_clients[put_id].set_user_position(XMFLOAT3(static_cast<float>(4.f - ((float)i * 2.5)), 5.f, -4.f));
 			sc_packet_init_position init_packet;
 			init_packet.size = sizeof(init_packet);
 			init_packet.type = SC_PACKET::SC_PACKET_INIT_POSITION;
@@ -357,6 +362,7 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 					continue;
 				m_clients[recv_id].do_send(sizeof(init_packet), &init_packet);
 			}
+			i++;
 		}
 
 		for (auto player_index : room.in_player) {
