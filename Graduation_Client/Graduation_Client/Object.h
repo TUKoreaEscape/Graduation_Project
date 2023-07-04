@@ -241,7 +241,7 @@ public:
 	virtual ~ItemBox();
 
 	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
-
+	void Rotate(float fPitch, float fYaw, float fRoll);
 	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
 	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
 
@@ -258,7 +258,7 @@ public:
 	GameObject* m_pItems[6];
 	GAME_ITEM::ITEM m_item = GAME_ITEM::ITEM::ITEM_NONE;
 
-	bool m_bShownItem = true;
+	bool m_bShownItem = false;
 
 	XMFLOAT4X4 m_xmf4x4CapMatrix;
 	XMFLOAT4X4 m_xmf4x4CapOpenMatrix;

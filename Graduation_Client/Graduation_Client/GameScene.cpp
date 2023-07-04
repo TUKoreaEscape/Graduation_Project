@@ -864,29 +864,29 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		Vents[i]->SetChild(pVentModel->m_pModelRootObject, true);
 		reinterpret_cast<Vent*>(Vents[i])->m_pInteractionUI = VentUI;
 	}
-	Vents[0]->SetPosition(XMFLOAT3(97.2155, 1.0061, 40.43311));
-	reinterpret_cast<Vent*>(Vents[0])->SetOpenPos(XMFLOAT3(98.94085, 1.0061, 42.29158));
+	Vents[0]->SetPosition(XMFLOAT3(97.2155f, 1.0061f, 40.43311f));
+	reinterpret_cast<Vent*>(Vents[0])->SetOpenPos(XMFLOAT3(98.94085f, 1.0061f, 42.29158f));
 	reinterpret_cast<Vent*>(Vents[0])->SetRotation(DEGREE0);
-	Vents[1]->SetPosition(XMFLOAT3(97.27, 1.0061, -40.43311));
-	reinterpret_cast<Vent*>(Vents[1])->SetOpenPos(XMFLOAT3(95.5352, 1.0061, -42.2919));
+	Vents[1]->SetPosition(XMFLOAT3(97.27f, 1.0061f, -40.43311f));
+	reinterpret_cast<Vent*>(Vents[1])->SetOpenPos(XMFLOAT3(95.5352f, 1.0061f, -42.2919f));
 	reinterpret_cast<Vent*>(Vents[1])->SetRotation(DEGREE0);
-	Vents[2]->SetPosition(XMFLOAT3(20.43311, 1.0061, -77.6103));
-	reinterpret_cast<Vent*>(Vents[2])->SetOpenPos(XMFLOAT3(22.29154, 1.0061, -75.88629));
+	Vents[2]->SetPosition(XMFLOAT3(20.43311f, 1.0061f, -77.6103f));
+	reinterpret_cast<Vent*>(Vents[2])->SetOpenPos(XMFLOAT3(22.29154f, 1.0061f, -75.88629f));
 	reinterpret_cast<Vent*>(Vents[2])->SetRotation(DEGREE90);
 	Vents[3]->SetPosition(XMFLOAT3(18.56689, 1.0061, -77.6103));
-	reinterpret_cast<Vent*>(Vents[3])->SetOpenPos(XMFLOAT3(16.70864, 1.0061, -79.3296));
+	reinterpret_cast<Vent*>(Vents[3])->SetOpenPos(XMFLOAT3(16.70864f, 1.0061f, -79.3296f));
 	reinterpret_cast<Vent*>(Vents[3])->SetRotation(DEGREE90);
-	Vents[4]->SetPosition(XMFLOAT3(-56.00388, 1.033527, -40.54385));
-	reinterpret_cast<Vent*>(Vents[4])->SetOpenPos(XMFLOAT3(-57.66415, 1.0061, -42.1952));
+	Vents[4]->SetPosition(XMFLOAT3(-56.00388f, 1.033527f, -40.54385f));
+	reinterpret_cast<Vent*>(Vents[4])->SetOpenPos(XMFLOAT3(-57.66415f, 1.0061f, -42.1952f));
 	reinterpret_cast<Vent*>(Vents[4])->SetRotation(DEGREE0);
-	Vents[5]->SetPosition(XMFLOAT3(-56.04684, 1.0061, 40.43311));
-	reinterpret_cast<Vent*>(Vents[5])->SetOpenPos(XMFLOAT3(-54.31968, 1.0061, 42.29163));
+	Vents[5]->SetPosition(XMFLOAT3(-56.04684f, 1.0061f, 40.43311f));
+	reinterpret_cast<Vent*>(Vents[5])->SetOpenPos(XMFLOAT3(-54.31968f, 1.0061f, 42.29163f));
 	reinterpret_cast<Vent*>(Vents[5])->SetRotation(DEGREE0);
-	Vents[6]->SetPosition(XMFLOAT3(35.994, 1.0061, 40.56689));
-	reinterpret_cast<Vent*>(Vents[6])->SetOpenPos(XMFLOAT3(37.63297, 1.0061, 42.2901));
+	Vents[6]->SetPosition(XMFLOAT3(35.994f, 1.0061f, 40.56689f));
+	reinterpret_cast<Vent*>(Vents[6])->SetOpenPos(XMFLOAT3(37.63297f, 1.0061f, 42.2901f));
 	reinterpret_cast<Vent*>(Vents[6])->SetRotation(DEGREE0);
-	Vents[7]->SetPosition(XMFLOAT3(35.96133, 1.0061, 23.56689));
-	reinterpret_cast<Vent*>(Vents[7])->SetOpenPos(XMFLOAT3(34.23397, 90, 21.70837));
+	Vents[7]->SetPosition(XMFLOAT3(35.96133f, 1.0061f, 23.56689f));
+	reinterpret_cast<Vent*>(Vents[7])->SetOpenPos(XMFLOAT3(34.23397f, 1.0061f, 21.70837f));
 	reinterpret_cast<Vent*>(Vents[7])->SetRotation(DEGREE0);
 	for (int i = 0; i < NUM_VENT; ++i) {
 		Vents[i]->UpdateTransform(nullptr);
@@ -906,23 +906,23 @@ void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		reinterpret_cast<Door*>(m_pDoors[i])->m_pInteractionUI = doorUI;
 	}
 	
-	m_pDoors[0]->SetPosition(XMFLOAT3(-29.73866, 0, 39.6)); 
+	m_pDoors[0]->SetPosition(XMFLOAT3(-29.73866f, 0.0f, 39.6f)); 
 	reinterpret_cast<Door*>(m_pDoors[0])->SetRotation(DEGREE180);
-	m_pDoors[1]->SetPosition(XMFLOAT3(77.37788, 0, 39.72));
+	m_pDoors[1]->SetPosition(XMFLOAT3(77.37788f, 0.0f, 39.72f));
 	reinterpret_cast<Door*>(m_pDoors[1])->SetRotation(DEGREE0);
 	m_pDoors[1]->UpdateTransform(nullptr);
-	m_pDoors[2]->SetPosition(XMFLOAT3(23.26, 0, -39.99));
+	m_pDoors[2]->SetPosition(XMFLOAT3(23.26f, 0.0f, -39.99f));
 	reinterpret_cast<Door*>(m_pDoors[2])->SetRotation(DEGREE0);
 	m_pDoors[2]->UpdateTransform(nullptr);
 
-	m_pDoors[3]->SetPosition(XMFLOAT3(-29.99397, 0, -39.71));
+	m_pDoors[3]->SetPosition(XMFLOAT3(-29.99397f, 0.0f, -39.71f));
 	reinterpret_cast<Door*>(m_pDoors[3])->SetRotation(DEGREE0);
 	m_pDoors[3]->UpdateTransform(nullptr);
 
-	m_pDoors[4]->SetPosition(XMFLOAT3(54.99, 0, -0.4182036));
+	m_pDoors[4]->SetPosition(XMFLOAT3(54.99f, 0.0f, -0.4182036f));
 	reinterpret_cast<Door*>(m_pDoors[4])->SetRotation(DEGREE270);
 
-	m_pDoors[5]->SetPosition(XMFLOAT3(0.18, 0, 60.25972));
+	m_pDoors[5]->SetPosition(XMFLOAT3(0.18f, 0.0f, 60.25972f));
 	reinterpret_cast<Door*>(m_pDoors[5])->SetRotation(DEGREE270);
 
 	if (pDoorModel) delete pDoorModel;
@@ -988,7 +988,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	for (int i = 0; i < NUM_ITEMBOX; ++i) {
 		m_pBoxes[i]->update(elapsedTime);
 		if (m_pBoxes[i]->IsPlayerNear(PlayerPos)) {
-			m_pPlayer->m_pNearItembox = m_pBoxes[i];
+			m_pPlayer->m_pNearItembox = reinterpret_cast<GameObject*>(m_pBoxes[i]);
 			IsNearItembox = true;
 
 			m_pPlayer->m_itembox_number = i;
@@ -1060,19 +1060,19 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	LoadedModelInfo* pDrillModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Drill.bin", nullptr);
 	LoadedModelInfo* pHammerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Hammer_01.bin", nullptr);
 	LoadedModelInfo* pPliersModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Pliers.bin", nullptr);
-	LoadedModelInfo* pDriveerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Screwdriver_Cross.bin", nullptr);
+	LoadedModelInfo* pDriverModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Screwdriver_Cross.bin", nullptr);
 	LoadedModelInfo* pWrenchModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Wrench_Combination.bin", nullptr);
 	
 	Items[0] = new GameObject();
-	Items[0]->SetChild(pDrillModel->m_pModelRootObject, true);
+	Items[0]->SetChild(pHammerModel->m_pModelRootObject, true);
 	Items[1] = new GameObject();
-	Items[1]->SetChild(pHammerModel->m_pModelRootObject, true);
+	Items[1]->SetChild(pDrillModel->m_pModelRootObject, true);
 	Items[2] = new GameObject();
-	Items[2]->SetChild(pPliersModel->m_pModelRootObject, true);
+	Items[2]->SetChild(pWrenchModel->m_pModelRootObject, true);
 	Items[3] = new GameObject();
-	Items[3]->SetChild(pDriveerModel->m_pModelRootObject, true);
+	Items[3]->SetChild(pPliersModel->m_pModelRootObject, true);
 	Items[4] = new GameObject();
-	Items[4]->SetChild(pWrenchModel->m_pModelRootObject, true);
+	Items[4]->SetChild(pDriverModel->m_pModelRootObject, true);
 	
 	for (int i = 0; i < NUM_ITEMBOX; ++i) {
 		m_pBoxes[i] = new ItemBox();
@@ -1084,30 +1084,58 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 			}
 		}
 	}
+	
+	m_pBoxes[0]->SetPosition(2.29f, 0.0f, 70.7f); // InBroadcastingRoom
+	m_pBoxes[0]->SetRotation(DEGREE90);
+	m_pBoxes[1]->SetPosition(36.91f, 0.0f, 64.3f);
+	m_pBoxes[1]->SetRotation(DEGREE180);
+	m_pBoxes[2]->SetPosition(87.3f, 0.0f, 77.7f);
+	m_pBoxes[2]->SetRotation(DEGREE180);
 
-	for (int i = 0; i < NUM_ITEMBOX; ++i) {
-		m_pBoxes[i]->SetPosition(-3.952f + i * 2.0f, 0, -22.804f);
-		m_pBoxes[i]->SetRotation(DEGREE0);
-		if (i % NUM_ITEMS == 0)
-			m_pBoxes[i]->SetItem(GAME_ITEM::ITEM_DRILL);
-		else if (i % NUM_ITEMS == 1)
-			m_pBoxes[i]->SetItem(GAME_ITEM::ITEM_HAMMER);
-		else if (i % NUM_ITEMS == 2)
-			m_pBoxes[i]->SetItem(GAME_ITEM::ITEM_LIFECHIP);
-		else if (i % NUM_ITEMS == 3)
-			m_pBoxes[i]->SetItem(GAME_ITEM::ITEM_PLIERS);
-		else
-			m_pBoxes[i]->SetItem(GAME_ITEM::ITEM_WRENCH);
-	}
-	for (int i = 0; i < NUM_ITEMBOX; ++i) {
-		m_pBoxes[i]->UpdateTransform(nullptr);
-	}
+	m_pBoxes[3]->SetPosition(66.924f, 0.0f, 11.678f); // InCubeRoom
+	m_pBoxes[3]->SetRotation(DEGREE270);
+	m_pBoxes[4]->SetPosition(63.271f, 0.0f, 26.12f);
+	m_pBoxes[4]->SetRotation(DEGREE90);
+	m_pBoxes[5]->SetPosition(85.95f, 0.0f, 26.9f);
+	m_pBoxes[5]->SetRotation(DEGREE270);
+
+	m_pBoxes[6]->SetPosition(49.261f, 0.1f, -65.91f); // InPorset
+	m_pBoxes[6]->SetRotation(DEGREE180);
+	m_pBoxes[7]->SetPosition(84.502f, 0.1f, -50.275f);
+	m_pBoxes[7]->SetRotation(DEGREE180);
+	m_pBoxes[8]->SetPosition(61.45f, 0.0f, -65.87f);
+	m_pBoxes[8]->SetRotation(DEGREE0);
+
+	m_pBoxes[9]->SetPosition(9.2f, 0.0f, -41.4f); // InClassRoom
+	m_pBoxes[9]->SetRotation(DEGREE180);
+	m_pBoxes[10]->SetPosition(9.4f, 0.0f, -78.42f);
+	m_pBoxes[10]->SetRotation(DEGREE0);
+	m_pBoxes[11]->SetPosition(-18.2f, 0.0f, -60.8f);
+	m_pBoxes[11]->SetRotation(DEGREE270);
+	m_pBoxes[12]->SetPosition(-56.89f, 0.0f, -59.96f);
+	m_pBoxes[12]->SetRotation(DEGREE90);
+
+	m_pBoxes[13]->SetPosition(-57.07f, 0.0f, 60.05f); // InPianoRoom
+	m_pBoxes[13]->SetRotation(DEGREE90);
+	m_pBoxes[14]->SetPosition(-16.757f, 0.0f, 59.201f);
+	m_pBoxes[14]->SetRotation(DEGREE0);
+	m_pBoxes[15]->SetPosition(-38.81f, 0.0f, 74.12f);
+	m_pBoxes[15]->SetRotation(DEGREE0);
+
+	m_pBoxes[16]->SetPosition(21.59f, 0.0f, 32.4f); // InLobby
+	m_pBoxes[16]->SetRotation(DEGREE180);
+	m_pBoxes[17]->SetPosition(37.7f, 0.0f, -0.4f);
+	m_pBoxes[17]->SetRotation(DEGREE270);
+	m_pBoxes[18]->SetPosition(-34.2f, 0.0f, 0.5f);
+	m_pBoxes[18]->SetRotation(DEGREE270);
+	m_pBoxes[19]->SetPosition(-3.7f, 0.0f, 16.734f);
+	m_pBoxes[19]->SetRotation(DEGREE0);
+	
 	if (pBoxModel) delete pBoxModel;
 
-	
 	if (pDrillModel) delete pDrillModel;
 	if (pHammerModel) delete pHammerModel;
 	if (pPliersModel) delete pPliersModel;
-	if (pDriveerModel) delete pDriveerModel;
+	if (pDriverModel) delete pDriverModel;
 	if (pWrenchModel) delete pWrenchModel;
 }

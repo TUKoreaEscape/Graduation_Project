@@ -1075,8 +1075,8 @@ bool ItemBox::IsPlayerNear(const XMFLOAT3& PlayerPos)
 		maxz = m_xmf4x4ToParent._43 + 0.5f;
 		break;
 	default:
-		minx = m_xmf4x4ToParent._41 + 0.5f;
-		maxx = m_xmf4x4ToParent._41 - 2.0f;
+		minx = m_xmf4x4ToParent._41 - 2.0f;
+		maxx = m_xmf4x4ToParent._41 + 0.5f;
 		minz = m_xmf4x4ToParent._43 - 2.2f;
 		maxz = m_xmf4x4ToParent._43 + 2.2f;
 		break;
@@ -1107,43 +1107,51 @@ void ItemBox::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	{
 		GameObject* cap = FindFrame("Object005");
 		cap->m_xmf4x4ToParent = m_xmf4x4CapMatrix;
+		UpdateTransform(nullptr);
 		GameObject::render(pd3dCommandList);
 		return;
 	}
 	GameObject* cap = FindFrame("Object005");
 	cap->m_xmf4x4ToParent = m_xmf4x4CapOpenMatrix;
+	UpdateTransform(nullptr);
 	GameObject::render(pd3dCommandList);
 	if (m_bShownItem) {
 		// Item Render
 		switch (m_item) {
-		case GAME_ITEM::ITEM_DRILL:
+		case GAME_ITEM::ITEM_HAMMER:
 			if (m_pItems[0]) {
 				m_pItems[0]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
 				m_pItems[0]->render(pd3dCommandList);
 			}
 			break;
-		case GAME_ITEM::ITEM_HAMMER:
+		case GAME_ITEM::ITEM_DRILL:
 			if (m_pItems[1]) {
 				m_pItems[1]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
 				m_pItems[1]->render(pd3dCommandList);
 			}
 			break;
-		case GAME_ITEM::ITEM_PLIERS:
+		case GAME_ITEM::ITEM_WRENCH:
 			if (m_pItems[2]) {
 				m_pItems[2]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
 				m_pItems[2]->render(pd3dCommandList);
 			}
 			break;
-		case GAME_ITEM::ITEM_WRENCH:
+		case GAME_ITEM::ITEM_PLIERS:
 			if (m_pItems[3]) {
 				m_pItems[3]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
 				m_pItems[3]->render(pd3dCommandList);
 			}
 			break;
-		case GAME_ITEM::ITEM_LIFECHIP:
+		case GAME_ITEM::ITEM_DRIVER:
 			if (m_pItems[4]) {
 				m_pItems[4]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
 				m_pItems[4]->render(pd3dCommandList);
+			}
+			break;
+		case GAME_ITEM::ITEM_LIFECHIP:
+			if (m_pItems[5]) {
+				m_pItems[5]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
+				m_pItems[5]->render(pd3dCommandList);
 			}
 			break;
 		default:
@@ -1206,8 +1214,17 @@ void ItemBox::SetOpen(bool open)
 	}
 }
 
+void ItemBox::Rotate(float fPitch, float fYaw, float fRoll)
+{
+	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
+	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
+
+	UpdateTransform(NULL);
+}
+
 void ItemBox::SetItem(GAME_ITEM::ITEM item)
 {
+	m_bShownItem = true;
 	m_item = item;
 }
 
@@ -1239,7 +1256,7 @@ void ItemBox::SetRotation(DIR d)
 		break;
 	default:
 		m_dir = DEGREE270;
-		Rotate(0, 270, 0);
+		Rotate(0, -90, 0);
 		break;
 	}
 }
