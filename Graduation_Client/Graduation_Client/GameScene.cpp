@@ -125,6 +125,9 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < m_nRoomSelect; ++i) m_UIRoomSelect[i]->render(pd3dCommandList);
 		break;
 	case WAITING_GAME:
+		for (int i = 0; i < 5; ++i) {
+			m_ppPlayers[i]->SetLookAt(XMFLOAT3(0, 0, 0));
+		}
 		m_ppPlayers[0]->SetPosition(XMFLOAT3(6.0f, 0.0f, -5.0f));
 		m_ppPlayers[1]->SetPosition(XMFLOAT3(3.0f, 0.0f, -5.0f));
 		m_ppPlayers[2]->SetPosition(XMFLOAT3(-3.0f, 0.0f, -5.0f));
