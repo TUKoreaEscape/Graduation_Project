@@ -17,6 +17,12 @@ void cGameServer::Timer()
 				timer_queue.pop();
 				Process_Event(ev);
 			}
+			else {
+				ev = timer_queue.top();
+				if (ev.event_type == EventType::CHECK_NUM_OF_SERVER_ACCEPT_USER);
+				else if (m_room_manager->Get_Room_Info(ev.room_number)->_room_state != GAME_ROOM_STATE::PLAYING)
+					timer_queue.pop();
+			}
 		}
 
 		if (m_timer_queue.try_pop(ev)) {

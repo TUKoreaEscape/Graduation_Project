@@ -61,6 +61,8 @@ public:
 	Door(const unsigned int obj_id, Object_Type type, XMFLOAT3 center, XMFLOAT3 extents);
 	~Door() = default;
 
+	void init();
+
 	void Update_bounding_box_pos(const XMFLOAT3& pos);
 	void Update_Object();
 

@@ -144,7 +144,7 @@ void cGameServer::WorkerThread()
 			Update_OtherPlayer(static_cast<int>(iocp_key), SET_SERVER_UPDATE_FRAME);
 			cout << "ÀÌ°Åµé¾î¿È" << endl;
 			//m_room_manager->Get_Room_Info(iocp_key)->_room_state_lock.lock();
-			if (m_room_manager->Get_Room_Info(static_cast<int>(iocp_key))->_room_state == GAME_ROOM_STATE::PLAYING || m_room_manager->Get_Room_Info(static_cast<int>(iocp_key))->_room_state == GAME_ROOM_STATE::READY)
+			if (m_room_manager->Get_Room_Info(static_cast<int>(iocp_key))->_room_state == GAME_ROOM_STATE::PLAYING)
 			{
 				TIMER_EVENT ev;
 				ev.room_number = static_cast<int>(iocp_key);

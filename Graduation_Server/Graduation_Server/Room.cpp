@@ -34,7 +34,7 @@ void Room::init_room_by_game_end()
 	in_player_loading_success.fill(false);
 
 	for (int i = 0; i < m_door_object.size(); ++i)
-		m_door_object[i].m_check_bounding_box = true;
+		m_door_object[i].init();
 
 	for (int i = 0; i < m_electrinic_system.size(); ++i)
 		m_electrinic_system[i].Reset();

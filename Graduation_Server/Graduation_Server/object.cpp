@@ -80,6 +80,16 @@ Door::Door(const unsigned int door_id, Object_Type type, XMFLOAT3 center, XMFLOA
 		m_state_lock = new mutex;
 }
 
+void Door::init()
+{
+	m_state_lock->lock();
+	m_state = ST_CLOSE;
+	m_check_bounding_box = true;
+	m_door_open_start = false;
+	m_door_close_start = false;
+	m_state_lock->unlock();
+}
+
 bool Door::process_door_event()
 {
 	m_state_lock->lock();

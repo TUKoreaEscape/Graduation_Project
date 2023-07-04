@@ -26,7 +26,8 @@ void Network::Process_Game_End(char* ptr)
 		m_pBoxes[i]->SetOpen(false);
 	for (int i = 0; i < 6; ++i)
 		m_pDoors[i]->SetOpen(false);
-
+	for (int i = 0; i < 5; ++i)
+		m_pPowers[i]->SetOpen(false);
 }
 
 void Network::Process_LifeChip_Update(char* ptr)
