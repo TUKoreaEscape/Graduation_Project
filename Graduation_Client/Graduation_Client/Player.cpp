@@ -367,6 +367,13 @@ void Player::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 }
 
+void Player::SetLookAt(XMFLOAT3& xmf3Target, XMFLOAT3& xmf3Up)
+{
+	m_xmf3Look = XMFLOAT3(0, 0, 1);
+	m_xmf3Right = XMFLOAT3(1, 0, 0);
+	m_xmf3Up = XMFLOAT3(0, 1, 0);
+}
+
 void Player::ReleaseShaderVariables()
 {
 	//if (m_pCamera) m_pCamera->ReleaseShaderVariables();

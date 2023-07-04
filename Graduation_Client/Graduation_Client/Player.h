@@ -94,7 +94,7 @@ public:
 	void SetPlayerType(int type);
 
 	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
-
+	void SetLookAt(XMFLOAT3& xmf3Target, XMFLOAT3& xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f)) override;
 protected:
 	int							m_id = -1;
 	char						name[64];

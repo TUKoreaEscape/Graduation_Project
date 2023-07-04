@@ -281,6 +281,16 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 
 			if (xPos >= endingRect.left && xPos <= endingRect.right && yPos >= endingRect.top && yPos <= endingRect.bottom)
 			{
+#if USE_NETWORK
+				Network& network = *Network::GetInstance();
+				network.m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+				network.m_pPlayer->SetTrackAnimationSet(0, 0);
+
+				for (int i = 0; i < 5; ++i) {
+					network.m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+					network.m_ppOther[i]->SetTrackAnimationSet(0, 0);
+				}
+#endif
 				m_cs_packet_ready.ready_type = false;
 				m_gamestate->ChangeNextState();//QUITÅ¬¸¯
 			}
