@@ -294,11 +294,6 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pPorest->SetChild(pHouseModel->m_pModelRootObject, true);
 	m_pPorest->UpdateTransform(nullptr);*/
 
-	MakeVents(pd3dDevice, pd3dCommandList);
-	MakeDoors(pd3dDevice, pd3dCommandList);
-	MakePowers(pd3dDevice, pd3dCommandList);
-	MakeBoxes(pd3dDevice, pd3dCommandList);
-
 	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 
 	m_pPlayer->SetPlayerUpdatedContext(m_pTerrain);
@@ -318,6 +313,11 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	if (pLobbyModel) delete pLobbyModel;
 	if (pCeilModel) delete pCeilModel;
 	if (pCubeModel) delete pCubeModel;
+
+	MakeVents(pd3dDevice, pd3dCommandList);
+	MakeDoors(pd3dDevice, pd3dCommandList);
+	MakePowers(pd3dDevice, pd3dCommandList);
+	MakeBoxes(pd3dDevice, pd3dCommandList);
 
 #if USE_NETWORK
 	char id[20]{};
@@ -1057,17 +1057,46 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 {
 	LoadedModelInfo* pBoxModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/AmmoBox.bin", nullptr);
 	InteractionUI* BoxUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/f.dds");
-
+	LoadedModelInfo* pDrillModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Drill.bin", nullptr);
+	LoadedModelInfo* pHammerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Hammer_01.bin", nullptr);
+	LoadedModelInfo* pPliersModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Pliers.bin", nullptr);
+	LoadedModelInfo* pDriveerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Screwdriver_Cross.bin", nullptr);
+	LoadedModelInfo* pWrenchModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Wrench_Combination.bin", nullptr);
+	
+	Items[0] = new GameObject();
+	Items[0]->SetChild(pDrillModel->m_pModelRootObject, true);
+	Items[1] = new GameObject();
+	Items[1]->SetChild(pHammerModel->m_pModelRootObject, true);
+	Items[2] = new GameObject();
+	Items[2]->SetChild(pPliersModel->m_pModelRootObject, true);
+	Items[3] = new GameObject();
+	Items[3]->SetChild(pDriveerModel->m_pModelRootObject, true);
+	Items[4] = new GameObject();
+	Items[4]->SetChild(pWrenchModel->m_pModelRootObject, true);
+	
 	for (int i = 0; i < 1; ++i) {
 		m_pBoxes[i] = new ItemBox();
 		m_pBoxes[i]->SetChild(pBoxModel->m_pModelRootObject, true);
 		m_pBoxes[i]->SetUI(BoxUI);
+		for (int j = 0; j < 5; ++j) {
+			if (Items[j]) {
+				m_pBoxes[i]->InitItems(j, Items[j]);
+			}
+		}
 	}
 
 	m_pBoxes[0]->SetPosition(-3.952, 0, -22.804);
 	m_pBoxes[0]->SetRotation(DEGREE0);
+	m_pBoxes[0]->SetItem(GAME_ITEM::ITEM_HAMMER);
 	for (int i = 0; i < 1; ++i) {
 		m_pBoxes[i]->UpdateTransform(nullptr);
 	}
 	if (pBoxModel) delete pBoxModel;
+
+	
+	if (pDrillModel) delete pDrillModel;
+	if (pHammerModel) delete pHammerModel;
+	if (pPliersModel) delete pPliersModel;
+	if (pDriveerModel) delete pDriveerModel;
+	if (pWrenchModel) delete pWrenchModel;
 }

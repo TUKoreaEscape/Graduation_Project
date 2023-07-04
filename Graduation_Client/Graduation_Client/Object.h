@@ -252,9 +252,10 @@ public:
 	void SetIndex(int index) { m_item_box_index = index; }
 
 	void SetItem(GAME_ITEM::ITEM item);
+	void InitItems(int index, GameObject* item);
 public:
 	int m_item_box_index = -1;
-	Item* m_pItem = nullptr;
+	GameObject* m_pItems[6];
 	GAME_ITEM::ITEM m_item = GAME_ITEM::ITEM::ITEM_NONE;
 
 	bool m_bShownItem = true;

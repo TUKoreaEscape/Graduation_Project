@@ -1043,6 +1043,9 @@ void Item::Interaction(int playerType)
 ItemBox::ItemBox() : InteractionObject()
 {
 	m_dir = DEGREE0;
+	for (int i = 0; i < 6; ++i) {
+		m_pItems[i] = nullptr;
+	}
 }
 
 ItemBox::~ItemBox()
@@ -1100,37 +1103,54 @@ bool ItemBox::IsPlayerNear(const XMFLOAT3& PlayerPos)
 
 void ItemBox::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	if (IsOpen)
-	{
-		GameObject* cap = FindFrame("Object005");
-		cap->m_xmf4x4ToParent = m_xmf4x4CapOpenMatrix;
-
-		if (m_bShownItem) {
-			// Item Render
-			switch (m_item) {
-			case GAME_ITEM::ITEM_DRILL:
-				break;
-			case GAME_ITEM::ITEM_HAMMER:
-				break;
-			case GAME_ITEM::ITEM_PLIERS:
-				break;
-			case GAME_ITEM::ITEM_WRENCH:
-				break;
-			case GAME_ITEM::ITEM_LIFECHIP:
-				break;
-			default:
-				// NONE
-				break;
-			}
-		}
-	}
-	else
+	if (false == IsOpen)
 	{
 		GameObject* cap = FindFrame("Object005");
 		cap->m_xmf4x4ToParent = m_xmf4x4CapMatrix;
+		GameObject::render(pd3dCommandList);
+		return;
 	}
+	GameObject* cap = FindFrame("Object005");
+	cap->m_xmf4x4ToParent = m_xmf4x4CapOpenMatrix;
 	GameObject::render(pd3dCommandList);
-	if (m_pItem) m_pItem->render(pd3dCommandList);
+	if (m_bShownItem) {
+		// Item Render
+		switch (m_item) {
+		case GAME_ITEM::ITEM_DRILL:
+			if (m_pItems[0]) {
+				m_pItems[0]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
+				m_pItems[0]->render(pd3dCommandList);
+			}
+			break;
+		case GAME_ITEM::ITEM_HAMMER:
+			if (m_pItems[1]) {
+				m_pItems[1]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
+				m_pItems[1]->render(pd3dCommandList);
+			}
+			break;
+		case GAME_ITEM::ITEM_PLIERS:
+			if (m_pItems[2]) {
+				m_pItems[2]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
+				m_pItems[2]->render(pd3dCommandList);
+			}
+			break;
+		case GAME_ITEM::ITEM_WRENCH:
+			if (m_pItems[3]) {
+				m_pItems[3]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
+				m_pItems[3]->render(pd3dCommandList);
+			}
+			break;
+		case GAME_ITEM::ITEM_LIFECHIP:
+			if (m_pItems[4]) {
+				m_pItems[4]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
+				m_pItems[4]->render(pd3dCommandList);
+			}
+			break;
+		default:
+			// NONE
+			break;
+		}
+	}
 }
 
 void ItemBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -1189,6 +1209,13 @@ void ItemBox::SetOpen(bool open)
 void ItemBox::SetItem(GAME_ITEM::ITEM item)
 {
 	m_item = item;
+}
+
+void ItemBox::InitItems(int index, GameObject* item)
+{
+	if (m_pItems[index]) m_pItems[index]->Release();
+	if (item) m_pItems[index] = item;
+	if (m_pItems[index]) m_pItems[index]->AddRef();
 }
 
 void ItemBox::SetRotation(DIR d)

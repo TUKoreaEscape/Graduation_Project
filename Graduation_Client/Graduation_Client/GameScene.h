@@ -75,6 +75,8 @@ public:
 
 	std::set<PVSROOM> m_sPVS[6];
 	PVSROOM m_pvsCamera;
+
+	GameObject* Items[5];
 	
 protected:
 	static ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap;
