@@ -587,7 +587,7 @@ ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDe
 	pd3dRootParameters[17].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
 	pd3dRootParameters[18].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
-	pd3dRootParameters[18].Constants.Num32BitValues = 1;
+	pd3dRootParameters[18].Constants.Num32BitValues = 2;
 	pd3dRootParameters[18].Constants.ShaderRegister = 3;
 	pd3dRootParameters[18].Constants.RegisterSpace = 0;
 	pd3dRootParameters[18].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
@@ -888,7 +888,7 @@ void GameScene::LoadSceneBushFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	LoadedModelInfo* pVentModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/airvent.bin", nullptr);
-	InteractionUI* VentUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fAlpha.dds");
+	InteractionUI* VentUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fOpen.dds");
 
 	for (int i = 0; i < NUM_VENT; ++i) {
 		Vents[i] = new Vent();
@@ -929,7 +929,7 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	LoadedModelInfo* pDoorModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Future_Door_Final.bin", nullptr);
-	InteractionUI* doorUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fAlpha.dds");
+	InteractionUI* doorUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fOpen.dds");
 
 	for (int i = 0; i < NUM_DOOR; ++i) {
 		m_pDoors[i] = new Door();
@@ -962,7 +962,7 @@ void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	LoadedModelInfo* pElecModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Power.bin", nullptr);
-	InteractionUI* PowerUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fAlpha.dds");
+	InteractionUI* PowerUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fOpen.dds");
 
 	pElecModel->m_pModelRootObject->SetScale(0.5, 0.5, 0.5);
 	for (int i = 0; i < NUM_POWER; ++i) {
@@ -1088,7 +1088,7 @@ void GameScene::CheckCameraPos(const XMFLOAT3 camera)
 void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	LoadedModelInfo* pBoxModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/AmmoBox.bin", nullptr);
-	InteractionUI* BoxUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fAlpha.dds");
+	InteractionUI* BoxUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fOpen.dds");
 	LoadedModelInfo* pDrillModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Drill.bin", nullptr);
 	LoadedModelInfo* pHammerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Hammer_01.bin", nullptr);
 	LoadedModelInfo* pPliersModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Pliers.bin", nullptr);

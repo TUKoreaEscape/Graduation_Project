@@ -100,6 +100,7 @@ constexpr float KNOB_OPERATE_COOLTIME = 0.3f;
 constexpr float GLOBAL_INTERACTION_COOLTIME = 0.2f;
 constexpr float VENT_OPEN_COOLTIME = 10.0f;
 constexpr float VENT_CLOSE_COOLTIME = 3.0;
+constexpr float BOX_OPEN_COOLTIME = 3.0f;
 
 extern UINT	gnCbvSrvDescriptorIncrementSize;
 extern UINT	gnRtvDescriptorIncrementSize;
