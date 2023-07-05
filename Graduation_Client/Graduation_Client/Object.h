@@ -9,6 +9,11 @@
 #include "GameScene.h"
 #include "protocol.h"
 
+constexpr int DOOR_UI = 1;
+constexpr int VENT_UI = 2;
+constexpr int BOX_UI = 3;
+constexpr int POWER_UI = 4;
+
 enum DIR {
 	DEGREE0 = 0,
 	DEGREE90,
@@ -67,20 +72,10 @@ public:
 	InteractionUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName);
 	virtual ~InteractionUI();
 
-	void BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList, DIR d, float gauge);
+	void BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList, DIR d, float gauge, int type);
 
 	void Rotate(float fPitch, float fYaw, float fRoll) override;
-	void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, float gauge);
-};
-class InteractionGaugeUI : public GameObject
-{
-public:
-	InteractionGaugeUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName);
-	virtual ~InteractionGaugeUI();
-
-	void BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList, DIR d);
-
-	void Rotate(float fPitch, float fYaw, float fRoll) override;
+	void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, float gauge, int type);
 };
 
 class InteractionObject : public GameObject
@@ -93,10 +88,11 @@ public:
 	bool IsInteraction = false;
 
 	InteractionUI* m_pInteractionUI = nullptr;
+	int m_nUIType = -1;
 
 	float m_fPitch{}, m_fYaw{}, m_fRoll{};
 
-	float volatile m_fCooltime;
+	float volatile m_fCooltime{};
 
 	DIR m_dir = DEGREE0;
 

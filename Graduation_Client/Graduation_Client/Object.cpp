@@ -74,6 +74,7 @@ HeightMapTerrain::~HeightMapTerrain(void)
 
 Vent::Vent() : InteractionObject()
 {
+	m_nUIType = VENT_UI;
 }
 
 Vent::~Vent()
@@ -172,13 +173,14 @@ void Vent::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Vent::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (IsOpen) return;
 	if (IsNear) {
 		if (m_pInteractionUI) {
 			if (IsRot)
-				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 0.5f, m_xmf4x4ToParent._43);
+				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.0f, m_xmf4x4ToParent._43);
 			else
-				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
-			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir, m_fGauge);
+				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
 		}
 	}
 }
@@ -248,6 +250,7 @@ void Vent::SetRotation(DIR d)
 void Vent::update(float fElapsedTime)
 {
 	m_fCooltime += fElapsedTime;
+	m_fGauge = m_fCooltime / VENT_OPEN_COOLTIME;
 #if !USE_NETWORK
 	if (IsOpen)
 		if (m_fCooltime >= VENT_CLOSE_COOLTIME)
@@ -257,6 +260,7 @@ void Vent::update(float fElapsedTime)
 
 Door::Door() : InteractionObject()
 {
+	m_nUIType = DOOR_UI;
 }
 
 Door::~Door()
@@ -427,7 +431,7 @@ void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (IsNear) {
 		if (m_pInteractionUI) {
 			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f );
-			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir, m_fGauge);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
 		}
 	}
 }
@@ -680,9 +684,9 @@ InteractionUI::~InteractionUI()
 {
 }
 
-void InteractionUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList, DIR d, float gauge)
+void InteractionUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList, DIR d, float gauge, int type)
 {
-	UpdateShaderVariable(pd3dCommandList, gauge);
+	UpdateShaderVariable(pd3dCommandList, gauge, type);
 	switch (d)
 	{
 	case DEGREE0:
@@ -739,15 +743,18 @@ void InteractionUI::Rotate(float fPitch, float fYaw, float fRoll)
 	UpdateTransform(NULL);
 }
 
-void InteractionUI::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, float gauge)
+void InteractionUI::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, float gauge, int type)
 {
 	float x = gauge;
+	int t = type;
 	pd3dCommandList->SetGraphicsRoot32BitConstants(18, 1, &x, 0);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(18, 1, &t, 1);
 }
 
 PowerSwitch::PowerSwitch() : InteractionObject()
 {
 	IsOpen = false;
+	m_nUIType = POWER_UI;
 }
 
 PowerSwitch::~PowerSwitch()
@@ -925,7 +932,7 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
 			else
 				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
-			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir, m_fGauge);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
 		}
 	}
 }
@@ -1123,6 +1130,7 @@ void Item::Interaction(int playerType)
 
 ItemBox::ItemBox() : InteractionObject()
 {
+	m_nUIType = BOX_UI;
 	m_dir = DEGREE0;
 	for (int i = 0; i < 6; ++i) {
 		m_pItems[i] = nullptr;
@@ -1247,7 +1255,7 @@ void ItemBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (IsNear) {
 		if (m_pInteractionUI) {
 			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
-			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir, m_fGauge);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
 		}
 	}
 }
@@ -1340,89 +1348,4 @@ void ItemBox::SetRotation(DIR d)
 		Rotate(0, -90, 0);
 		break;
 	}
-}
-
-InteractionGaugeUI::InteractionGaugeUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
-{
-	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
-	XMStoreFloat4x4(&m_xmf4x4ToParent, XMMatrixIdentity());
-
-	renderer->m_nMaterials = 1;
-	renderer->m_ppMaterials = new Material * [renderer->m_nMaterials];
-	renderer->m_ppMaterials[0] = new Material(0);
-
-	Mesh* pUIMesh = new TexturedRectMesh(pd3dDevice, pd3dCommandList, 0.0f, 0.0f, 0.6f, 0.2f);
-	SetMesh(pUIMesh);
-
-	Texture* pUITexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pUITexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Texture/Progress_Background.dds", RESOURCE_TEXTURE2D, 0);
-
-	GameScene::CreateShaderResourceViews(pd3dDevice, pUITexture, 0, 17);
-
-	Material* pUIMaterial = new Material(1);
-	pUIMaterial->SetTexture(pUITexture);
-	pUIMaterial->SetDoorUIShader();
-
-	renderer->SetMaterial(0, pUIMaterial);
-
-	//SetScale(0.2f, 0.2f, 0.2f);
-	UpdateTransform(nullptr);
-}
-
-InteractionGaugeUI::~InteractionGaugeUI()
-{
-}
-
-void InteractionGaugeUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList, DIR d)
-{
-	switch (d)
-	{
-	case DEGREE0:
-		//render(pd3dCommandList);
-		break;
-	case DEGREE90:
-		Rotate(0, 90, 0);
-		//render(pd3dCommandList);
-		//Rotate(0, -90, 0);
-		break;
-	case DEGREE180:
-		Rotate(0, 180, 0);
-		//render(pd3dCommandList);
-		//Rotate(0, -180, 0);
-		break;
-	default:
-		Rotate(0, -90, 0);
-		//render(pd3dCommandList);
-		//Rotate(0, 90, 0);
-		break;
-	}
-	XMFLOAT3 xmf3CameraPosition = Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition();
-
-	SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-
-	switch (d)
-	{
-	case DEGREE0:
-		render(pd3dCommandList);
-		break;
-	case DEGREE90:
-		//Rotate(0, 90, 0);
-		render(pd3dCommandList);
-		Rotate(0, -90, 0);
-		break;
-	case DEGREE180:
-		//Rotate(0, 180, 0);
-		render(pd3dCommandList);
-		Rotate(0, -180, 0);
-		break;
-	default:
-		//Rotate(0, -90, 0);
-		render(pd3dCommandList);
-		Rotate(0, 90, 0);
-		break;
-	}
-}
-
-void InteractionGaugeUI::Rotate(float fPitch, float fYaw, float fRoll)
-{
 }
