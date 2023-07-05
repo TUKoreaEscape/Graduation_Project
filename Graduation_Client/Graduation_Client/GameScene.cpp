@@ -329,8 +329,6 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	if (pCeilModel) delete pCeilModel;
 	if (pCubeModel) delete pCubeModel;
 
-	m_pGauge = new InteractionGaugeUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fAlpha.dds");
-
 	MakeVents(pd3dDevice, pd3dCommandList);
 	MakeDoors(pd3dDevice, pd3dCommandList);
 	MakePowers(pd3dDevice, pd3dCommandList);
@@ -487,7 +485,7 @@ ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDe
 	pd3dDescriptorRanges[11].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 
-	D3D12_ROOT_PARAMETER pd3dRootParameters[18];
+	D3D12_ROOT_PARAMETER pd3dRootParameters[19];
 
 	pd3dRootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	pd3dRootParameters[0].Descriptor.ShaderRegister = 1; //Camera
@@ -580,6 +578,11 @@ ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDe
 	pd3dRootParameters[17].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[11]);
 	pd3dRootParameters[17].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
+	pd3dRootParameters[18].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+	pd3dRootParameters[18].Constants.Num32BitValues = 1;
+	pd3dRootParameters[18].Constants.ShaderRegister = 3;
+	pd3dRootParameters[18].Constants.RegisterSpace = 0;
+	pd3dRootParameters[18].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	D3D12_STATIC_SAMPLER_DESC pd3dSamplerDescs[2];
 
 	pd3dSamplerDescs[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
@@ -883,7 +886,6 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		Vents[i] = new Vent();
 		Vents[i]->SetChild(pVentModel->m_pModelRootObject, true);
 		reinterpret_cast<Vent*>(Vents[i])->m_pInteractionUI = VentUI;
-		reinterpret_cast<Vent*>(Vents[i])->SetGaugeUI(m_pGauge);
 	}
 	Vents[0]->SetPosition(XMFLOAT3(97.2155f, 1.0061f, 40.43311f));
 	reinterpret_cast<Vent*>(Vents[0])->SetOpenPos(XMFLOAT3(98.94085f, 1.0061f, 42.29158f));
@@ -925,7 +927,6 @@ void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_pDoors[i] = new Door();
 		m_pDoors[i]->SetChild(pDoorModel->m_pModelRootObject, true);
 		reinterpret_cast<Door*>(m_pDoors[i])->m_pInteractionUI = doorUI;
-		reinterpret_cast<Door*>(m_pDoors[i])->SetGaugeUI(m_pGauge);
 	}
 	
 	m_pDoors[0]->SetPosition(XMFLOAT3(-29.73866f, 0.0f, 39.6f)); 
@@ -961,7 +962,6 @@ void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 		m_pPowers[i]->SetChild(pElecModel->m_pModelRootObject, true);
 		m_pPowers[i]->Init();
 		m_pPowers[i]->SetUI(PowerUI);
-		m_pPowers[i]->SetGaugeUI(m_pGauge);
 		//m_pPowers[i]->UpdateTransform(nullptr);
 	}
 
@@ -1105,7 +1105,6 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_pBoxes[i] = new ItemBox();
 		m_pBoxes[i]->SetChild(pBoxModel->m_pModelRootObject, true);
 		m_pBoxes[i]->SetUI(BoxUI);
-		m_pBoxes[i]->SetGaugeUI(m_pGauge); 
 		for (int j = 0; j < 6; ++j) {
 			if (Items[j]) {
 				m_pBoxes[i]->InitItems(j, Items[j]);

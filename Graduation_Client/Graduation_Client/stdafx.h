@@ -93,9 +93,9 @@ constexpr int NUM_ITEMBOX = 20;
 constexpr int NUM_ITEMS = 6;
 
 constexpr float DOOR_OPEN_COOLTIME_TAGGER = 6.0f;
-constexpr float DOOR_OPEN_COOLTIME_PLYAER = 3.0f;
+constexpr float DOOR_OPEN_COOLTIME_PLAYER = 3.0f;
 constexpr float DOOR_CLOSE_COOLTIME_TAGGER = 3.0f;
-constexpr float DOOR_CLOSE_COOLTIME_PLYAER = 1.5f;
+constexpr float DOOR_CLOSE_COOLTIME_PLAYER = 1.5f;
 constexpr float KNOB_OPERATE_COOLTIME = 0.3f;
 constexpr float GLOBAL_INTERACTION_COOLTIME = 0.2f;
 constexpr float VENT_OPEN_COOLTIME = 10.0f;

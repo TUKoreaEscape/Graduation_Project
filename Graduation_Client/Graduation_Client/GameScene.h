@@ -78,8 +78,6 @@ public:
 	PVSROOM m_pvsCamera;
 
 	GameObject* Items[NUM_ITEMS];
-	
-	InteractionGaugeUI* m_pGauge = nullptr;
 protected:
 	static ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap;
 
