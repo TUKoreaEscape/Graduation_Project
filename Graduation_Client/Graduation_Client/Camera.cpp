@@ -356,9 +356,8 @@ void CustomizingCamera::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
 	m_pPlayer = Input::GetInstance()->m_pPlayer;
 	SetTimeLag(0.05f);
-	//SetOffset(XMFLOAT3(3.5f, 0.0f, 6.0f));
-	SetOffset(XMFLOAT3(0.0f, 0.2f, 6.0f));
-	GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
+	SetOffset(XMFLOAT3(0.0f, 3.0f, 5.0f));
+	GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 75.0f);
 	SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 	SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
 	//m_pPlayer->SetPosition(XMFLOAT3(0, 0, 0));
@@ -382,9 +381,8 @@ void CustomizingCamera::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 		if (fLength < 0.01f) fDistance = fLength;
 		if (fDistance > 0)
 		{
-			//m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Direction, fDistance);
-			m_xmf3Position.x -= 3.0;
-			SetLookAt(XMFLOAT3(m_pPlayer->GetPosition()));
+			m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Direction, fDistance);
+			SetLookAt(m_pPlayer->GetPosition());
 		}
 	}
 }

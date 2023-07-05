@@ -263,12 +263,20 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			int xPos = LOWORD(lParam);
 			int yPos = HIWORD(lParam);
 
-			for(int i=0; i<2; ++i)
+			for(int i=0; i<10; ++i)
 			{
 				if (xPos >= customizingRect[i].left && xPos <= customizingRect[i].right && yPos >= customizingRect[i].top && yPos <= customizingRect[i].bottom)
 				{
 					if (i == 0) break; // save 클릭 break는 없애도됨
 					else if (i == 1) m_gamestate->ChangeSameLevelState();//QUIT클릭
+					else if (i == 2) std::cout << "HEAD" << std::endl; // HEAD
+					else if (i == 3) std::cout << "Eyes" << std::endl; // Eyes
+					else if (i == 4) std::cout << "Mouthandnoses" << std::endl; //Mouthandnoses
+					else if (i == 5) std::cout << "Body" << std::endl; // Body
+					else if (i == 6) std::cout << "BodyParts" << std::endl; //BodyParts
+					else if (i == 7) std::cout << "Gloves" << std::endl; //Gloves
+					else if (i == 8) std::cout << "CustomizingRArrow" << std::endl; //CustomizingRArrow
+					else if (i == 9) std::cout << "CustomizingLArrow" << std::endl; //CustomizingLArrow
 				}
 			}
 			//InputRoomInfo();
@@ -296,7 +304,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			}
 			//InputRoomInfo();
 		}
-		//std::cout << xPos << " " << yPos << std::endl;
+		std::cout << xPos << " " << yPos << std::endl;
 		break;
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:

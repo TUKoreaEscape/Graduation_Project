@@ -13,7 +13,7 @@ extern RECT_FLOAT pageNumRect;
 
 extern RECT_FLOAT waitingRoomRect[3];
 
-extern RECT_FLOAT customizingRect[2];
+extern RECT_FLOAT customizingRect[10];
 
 extern RECT_FLOAT endingRect;
 
