@@ -1339,7 +1339,7 @@ InteractionGaugeUI::InteractionGaugeUI(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	SetMesh(pUIMesh);
 
 	Texture* pUITexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pUITexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Texture/Login.dds", RESOURCE_TEXTURE2D, 0);
+	pUITexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Texture/Progress_Bar.dds", RESOURCE_TEXTURE2D, 0);
 
 	GameScene::CreateShaderResourceViews(pd3dDevice, pUITexture, 0, 17);
 

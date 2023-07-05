@@ -913,5 +913,6 @@ VS_UI_OUTPUT VSDoorUI(VS_UI_INPUT input)
 float4 PSDoorUI(VS_UI_OUTPUT input) : SV_TARGET
 {
 	float4 Color = gtxtUITexture.Sample(gssWrap, input.uv);
+	clip(Color.w - 0.1f);
 	return Color;
 }
