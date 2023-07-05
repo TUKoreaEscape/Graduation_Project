@@ -268,6 +268,25 @@ void cGameServer::WorkerThread()
 			break;
 		}
 
+		case OP_TYPE::OP_VENT_CLOSE:
+		{
+			TIMER_EVENT ev = reinterpret_cast<TIMER_EVENT&>(exp_over->m_wsa_buf);
+			Room& room = *m_room_manager->Get_Room_Info(iocp_key);
+			room.m_vent_object[ev.obj_id].process_door_event();
+
+			sc_packet_open_hidden_door packet;
+			packet.size = sizeof(packet);
+			packet.type = SC_PACKET::SC_PACKET_HIDDEN_DOOR_UPDATE;
+			packet.door_num = ev.obj_id;
+			packet.door_state = room.m_vent_object[ev.obj_id].get_state();
+			for (auto player_id : room.in_player) {
+				if (player_id == -1)
+					continue;
+				m_clients[player_id].do_send(sizeof(packet), &packet);
+			}
+			break;
+		}
+
 		case OP_TYPE::OP_GAME_END:
 		{
 			Room& rl = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));

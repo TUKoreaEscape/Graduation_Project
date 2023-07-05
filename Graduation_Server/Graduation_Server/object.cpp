@@ -95,12 +95,14 @@ bool Vent::process_door_event()
 	if (m_state == ST_CLOSE)
 	{
 		m_state = ST_OPEN;
+		m_check_bounding_box = false;
 		m_state_lock->unlock();
 	}
 
 	else if (m_state == ST_OPEN)
 	{
 		m_state = ST_CLOSE;
+		m_check_bounding_box = true;
 		m_state_lock->unlock();
 	}
 	return true;

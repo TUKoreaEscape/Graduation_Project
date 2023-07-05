@@ -144,6 +144,15 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		return;
 	}
 
+	case EventType::UPDATE_VENT:
+	{
+		EXP_OVER* over = new EXP_OVER;
+		over->m_comp_op = OP_TYPE::OP_VENT_CLOSE;
+		memcpy(&over->m_wsa_buf, &ev, sizeof(ev));
+		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
+		return;
+	}
+
 	case EventType::CLOSE_DOOR:
 	{
 		Room& rl = *m_room_manager->Get_Room_Info(ev.room_number);

@@ -209,7 +209,7 @@ void Vent::Interaction(int playerType)
 			cs_packet_request_open_hidden_door packet;
 			packet.size = sizeof(packet);
 			packet.type = CS_PACKET::CS_PACKET_REQUEST_OPEN_HIDDEN_DOOR;
-			packet.door_num = m_door_number;
+			packet.door_num = Input::GetInstance()->m_pPlayer->m_vent_number;
 
 			network.send_packet(&packet);
 #endif
@@ -246,9 +246,11 @@ void Vent::SetRotation(DIR d)
 void Vent::update(float fElapsedTime)
 {
 	m_fCooltime += fElapsedTime;
+#if !USE_NETWORK
 	if (IsOpen)
 		if (m_fCooltime >= VENT_CLOSE_COOLTIME)
 			SetOpen(false);
+#endif
 }
 
 Door::Door() : InteractionObject()

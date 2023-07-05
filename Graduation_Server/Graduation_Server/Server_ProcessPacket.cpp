@@ -304,8 +304,6 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 		send_packet.size = sizeof(send_packet);
 		send_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO;
 		m_clients[user_id].do_send(sizeof(send_packet), &send_packet);
-
-		cout << "send_packet size : " << sizeof(send_packet) << endl;
 	}
 
 	sc_packet_update_room update_room_packet;
@@ -583,13 +581,20 @@ void cGameServer::Process_Vent(const int user_id, void* buff)
 	cs_packet_request_open_hidden_door* packet = reinterpret_cast<cs_packet_request_open_hidden_door*>(buff);
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
-	room.m_vent_object[packet->door_num].process_door_event();
+	room.m_vent_object[static_cast<int>(packet->door_num)].process_door_event();
+
+	TIMER_EVENT ev;
+	ev.event_type = EventType::UPDATE_VENT;
+	ev.room_number = m_clients[user_id].get_join_room_number();
+	ev.obj_id = static_cast<int>(packet->door_num);
+	ev.event_time = chrono::system_clock::now() + 3s;
+	m_timer_queue.push(ev);
 
 	sc_packet_open_hidden_door update_packet;
 	update_packet.size = sizeof(update_packet);
 	update_packet.type = SC_PACKET::SC_PACKET_HIDDEN_DOOR_UPDATE;
 	update_packet.door_num = packet->door_num;
-	update_packet.door_state = room.m_vent_object[packet->door_num].get_state();
+	update_packet.door_state = room.m_vent_object[static_cast<int>(packet->door_num)].get_state();
 
 	for (auto player_id : room.in_player) {
 		if (player_id == -1)
