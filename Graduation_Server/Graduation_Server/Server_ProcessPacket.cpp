@@ -461,6 +461,30 @@ void cGameServer::Process_Customizing(const int user_id, void* buff)
 	m_clients[user_id].m_customizing->Set_Gloves_Custom(static_cast<GLOVES>(packet->gloves));
 	m_clients[user_id].m_customizing->Set_Head_Custom(static_cast<HEADS>(packet->head));
 	m_clients[user_id].m_customizing->Set_Mouthandnoses_Custom(static_cast<MOUTHANDNOSES>(packet->mouthandnoses));
+
+	CLIENT& cl = m_clients[user_id];
+	string cl_name{};
+
+	char client_name[20];
+	cl.get_client_name(*client_name, sizeof(client_name));
+	cl_name = client_name;
+
+	wstring convertID = stringToWstring(cl_name);
+	Custom custom_data;
+	custom_data.body = cl.m_customizing->Get_Body_Custom();
+	custom_data.body_parts = cl.m_customizing->Get_Body_Part_Custom();
+	custom_data.eyes = cl.m_customizing->Get_Eyes_Custom();
+	custom_data.gloves = cl.m_customizing->Get_Gloves_Custom();
+	custom_data.head = cl.m_customizing->Get_Head_Custom();
+	custom_data.mouthandnoses = cl.m_customizing->Get_Mouthandnoses_Custom();
+
+	DB_Request request;
+	request.type = REQUEST_SAVE_CUSTOMIZING;
+	request.request_custom_data = custom_data;
+	request.request_id = user_id;
+	request.request_custom_data;
+	request.request_name = convertID;
+	m_database->insert_request(request);
  
 
 	sc_packet_customizing_update send_packet;

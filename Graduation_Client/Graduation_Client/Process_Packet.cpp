@@ -82,6 +82,8 @@ void Network::Process_Game_End(char* ptr)
 		m_pDoors[i]->SetOpen(false);
 	for (int i = 0; i < 5; ++i)
 		m_pPowers[i]->SetOpen(false);
+	for (int i = 0; i < 8; ++i)
+		m_Vents[i]->SetOpen(false);
 }
 
 void Network::Process_LifeChip_Update(char* ptr)

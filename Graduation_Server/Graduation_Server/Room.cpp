@@ -19,6 +19,9 @@ void Room::Reset_Room()
 	for (int i = 0; i < m_escape_system.size(); ++i)
 		m_escape_system[i].init();
 
+	for (int i = 0; i < m_vent_object.size(); ++i)
+		m_vent_object[i].init();
+
 	m_first_skill_enable = false;
 	m_second_skill_enable = false;
 	m_third_skill_enable = false;
@@ -41,6 +44,9 @@ void Room::init_room_by_game_end()
 
 	for (int i = 0; i < m_escape_system.size(); ++i)
 		m_escape_system[i].init();
+
+	for (int i = 0; i < m_vent_object.size(); ++i)
+		m_vent_object[i].init();
 
 	m_first_skill_enable = false;
 	m_second_skill_enable = false;

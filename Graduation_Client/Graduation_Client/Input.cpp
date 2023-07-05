@@ -275,6 +275,20 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 						for (int i = 0; i < 6; ++i) {
 							m_nPrevCosInfoIndex[i] = partIndex[i] = m_pPlayer->FindPlayerPart(i);
 						}
+#if USE_NETWORK
+						cs_packet_customizing_update packet;
+						packet.size = sizeof(packet);
+						packet.type = CS_PACKET::CS_PACKET_CUSTOMIZING;
+						packet.body = m_nPrevCosInfoIndex[0];
+						packet.body_parts = m_nPrevCosInfoIndex[1];
+						packet.eyes = m_nPrevCosInfoIndex[2];
+						packet.gloves = m_nPrevCosInfoIndex[3];
+						packet.head = m_nPrevCosInfoIndex[5];
+						packet.mouthandnoses = m_nPrevCosInfoIndex[4];
+
+						Network& network = *Network::GetInstance();
+						network.send_packet(&packet);
+#endif
 					}
 					else if (i == 1) {
 						m_gamestate->ChangeSameLevelState();//QUITÅ¬¸¯
