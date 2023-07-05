@@ -888,7 +888,7 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	Vents[2]->SetPosition(XMFLOAT3(20.43311f, 1.0061f, -77.6103f));
 	reinterpret_cast<Vent*>(Vents[2])->SetOpenPos(XMFLOAT3(22.29154f, 1.0061f, -75.88629f));
 	reinterpret_cast<Vent*>(Vents[2])->SetRotation(DEGREE90);
-	Vents[3]->SetPosition(XMFLOAT3(18.56689, 1.0061, -77.6103));
+	Vents[3]->SetPosition(XMFLOAT3(18.56689f, 1.0061f, -77.6103f));
 	reinterpret_cast<Vent*>(Vents[3])->SetOpenPos(XMFLOAT3(16.70864f, 1.0061f, -79.3296f));
 	reinterpret_cast<Vent*>(Vents[3])->SetRotation(DEGREE90);
 	Vents[4]->SetPosition(XMFLOAT3(-56.00388f, 1.033527f, -40.54385f));
@@ -957,15 +957,15 @@ void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 		//m_pPowers[i]->UpdateTransform(nullptr);
 	}
 
-	m_pPowers[0]->SetPosition(XMFLOAT3(-0.7033535, 1.5, 76.76)); // piano
+	m_pPowers[0]->SetPosition(XMFLOAT3(-0.7033535f, 1.5f, 76.76f)); // piano
 	m_pPowers[0]->SetRotation(DEGREE270);
-	m_pPowers[1]->SetPosition(XMFLOAT3(-54.11389, 1.5, -66.95)); // classroom
+	m_pPowers[1]->SetPosition(XMFLOAT3(-54.11389f, 1.5f, -66.95f)); // classroom
 	m_pPowers[1]->SetRotation(DEGREE270);
-	m_pPowers[2]->SetPosition(XMFLOAT3(60.87, 1.5, -70)); // porest
+	m_pPowers[2]->SetPosition(XMFLOAT3(60.87f, 1.5f, -70.0f)); // porest
 	m_pPowers[2]->SetRotation(DEGREE180);
-	m_pPowers[3]->SetPosition(XMFLOAT3(67.6, 1.5, 40.6322)); // broadcastingroom
+	m_pPowers[3]->SetPosition(XMFLOAT3(67.6f, 1.5f, 40.6322f)); // broadcastingroom
 	m_pPowers[3]->SetRotation(DEGREE0);
-	m_pPowers[4]->SetPosition(XMFLOAT3(65.231, 1.5, -27.5)); // maze
+	m_pPowers[4]->SetPosition(XMFLOAT3(65.231f, 1.5f, -27.5f)); // maze
 	m_pPowers[4]->SetRotation(DEGREE270);
 
 	if (pElecModel) delete pElecModel;

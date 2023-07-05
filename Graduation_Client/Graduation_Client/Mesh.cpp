@@ -955,7 +955,7 @@ void UIMesh::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pCont
 	pd3dCommandList->IASetVertexBuffers(m_nSlot, 2, pVertexBufferViews);
 }
 
-TexturedRectMesh::TexturedRectMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int xStart, int zStart, int nWidth, int nLength) : Mesh(pd3dDevice, pd3dCommandList)
+TexturedRectMesh::TexturedRectMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float xStart, float zStart, float nWidth, float nLength) : Mesh(pd3dDevice, pd3dCommandList)
 {
 	m_nVertices = 4;
 	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;

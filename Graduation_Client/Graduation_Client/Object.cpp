@@ -177,7 +177,7 @@ void Vent::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 0.5f, m_xmf4x4ToParent._43);
 			else
 				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
-			m_pInteractionUI->BillboardRender(pd3dCommandList, m_fPitch, m_fYaw, m_fRoll);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir);
 		}
 	}
 }
@@ -388,7 +388,7 @@ void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (IsNear) {
 		if (m_pInteractionUI) {
 			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f );
-			m_pInteractionUI->BillboardRender(pd3dCommandList, m_fPitch, m_fYaw, m_fRoll);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir);
 		}
 	}
 }
@@ -619,7 +619,7 @@ InteractionUI::InteractionUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	renderer->m_ppMaterials = new Material * [renderer->m_nMaterials];
 	renderer->m_ppMaterials[0] = new Material(0);
 
-	Mesh* pUIMesh = new TexturedRectMesh(pd3dDevice, pd3dCommandList, -0.5, -0.5, 1, 1);
+	Mesh* pUIMesh = new TexturedRectMesh(pd3dDevice, pd3dCommandList, 0.0f, 0.0f, 0.2f, 0.2f);
 	SetMesh(pUIMesh);
 
 	Texture* pUITexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
@@ -641,19 +641,54 @@ InteractionUI::~InteractionUI()
 {
 }
 
-void InteractionUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList, float x, float y, float z)
+void InteractionUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList, DIR d)
 {
+	switch (d)
+	{
+	case DEGREE0:
+		//render(pd3dCommandList);
+		break;
+	case DEGREE90:
+		Rotate(0, 90, 0);
+		//render(pd3dCommandList);
+		//Rotate(0, -90, 0);
+		break;
+	case DEGREE180:
+		Rotate(0, 180, 0);
+		//render(pd3dCommandList);
+		//Rotate(0, -180, 0);
+		break;
+	default:
+		Rotate(0, -90, 0);
+		//render(pd3dCommandList);
+		//Rotate(0, 90, 0);
+		break;
+	}
 	XMFLOAT3 xmf3CameraPosition = Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition();
 
 	SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 
-	Rotate(x, y, z);
-
-	UpdateTransform(nullptr);
-
-	render(pd3dCommandList);
-
-	Rotate(-x, -y, -z);
+	switch (d)
+	{
+	case DEGREE0:
+		render(pd3dCommandList);
+		break;
+	case DEGREE90:
+		//Rotate(0, 90, 0);
+		render(pd3dCommandList);
+		Rotate(0, -90, 0);
+		break;
+	case DEGREE180:
+		//Rotate(0, 180, 0);
+		render(pd3dCommandList);
+		Rotate(0, -180, 0);
+		break;
+	default:
+		//Rotate(0, -90, 0);
+		render(pd3dCommandList);
+		Rotate(0, 90, 0);
+		break;
+	}
 }
 
 void InteractionUI::Rotate(float fPitch, float fYaw, float fRoll)
@@ -815,11 +850,11 @@ void PowerSwitch::render(ID3D12GraphicsCommandList* pd3dCommandList)
 			m_fOffKnobPos = pKnob->GetPosition().x;		
 			if (true == m_bOnAndOff[i]) {
 				m_fOnKnobPos = m_fOffKnobPos;
-				m_fOnKnobPos -= 0.2;
-				pKnob->m_xmf4x4ToParent._41 = -0.21;
+				m_fOnKnobPos -= 0.2f;
+				pKnob->m_xmf4x4ToParent._41 = -0.21f;
 			}
 			else {		
-				pKnob->m_xmf4x4ToParent._41 = 0.07291567;
+				pKnob->m_xmf4x4ToParent._41 = 0.07291567f;
 			}
 		}
 	}
@@ -844,7 +879,7 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
 			else
 				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
-			m_pInteractionUI->BillboardRender(pd3dCommandList, m_fPitch, m_fYaw, m_fRoll);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir);
 		}
 	}
 }
@@ -1166,7 +1201,7 @@ void ItemBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (IsNear) {
 		if (m_pInteractionUI) {
 			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
-			m_pInteractionUI->BillboardRender(pd3dCommandList, m_fPitch, m_fYaw, m_fRoll);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir);
 		}
 	}
 }
@@ -1259,4 +1294,20 @@ void ItemBox::SetRotation(DIR d)
 		Rotate(0, -90, 0);
 		break;
 	}
+}
+
+InteractionGaugeUI::InteractionGaugeUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
+{
+}
+
+InteractionGaugeUI::~InteractionGaugeUI()
+{
+}
+
+void InteractionGaugeUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList, DIR d)
+{
+}
+
+void InteractionGaugeUI::Rotate(float fPitch, float fYaw, float fRoll)
+{
 }
