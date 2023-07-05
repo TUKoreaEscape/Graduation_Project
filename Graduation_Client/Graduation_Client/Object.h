@@ -253,6 +253,7 @@ public:
 	void Rotate(float fPitch, float fYaw, float fRoll);
 	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
 	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
+	virtual void update(float fElapsedTime) override;
 
 	void Interaction(int playerType) override;
 	void SetOpen(bool open) override;

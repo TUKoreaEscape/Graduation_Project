@@ -929,9 +929,13 @@ float4 PSDoorUI(VS_UI_OUTPUT input) : SV_TARGET
 			Color = float4(0.0f, 168.0f / 255.0f, 243.0f / 255.0f, 1.0f);
 	}
 	else if (gnUIType == VENT_UI) {
-		if (input.uv.y < 1 - gfGauge) {
+		if (input.uv.y < 1.0f - gfGauge && input.uv.y > 0.2f) {
 				Color = float4(0.2f, 0.2f, 0.2f, 1.0f);
 		}
+	}
+	else if (gnUIType == BOX_UI) {
+		if (input.uv.y - 1.0f > -gfGauge && Color.w < 0.1f)
+			Color = float4(0.0f, 243.0f / 255.0f, 168.0f / 255.0f, 1.0f);
 	}
 	clip(Color.w - 0.1f);
 	return Color;

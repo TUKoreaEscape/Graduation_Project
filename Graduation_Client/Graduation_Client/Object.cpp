@@ -745,7 +745,7 @@ void InteractionUI::Rotate(float fPitch, float fYaw, float fRoll)
 
 void InteractionUI::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, float gauge, int type)
 {
-	float x = gauge;
+	float x = gauge * 0.8f;
 	int t = type;
 	pd3dCommandList->SetGraphicsRoot32BitConstants(18, 1, &x, 0);
 	pd3dCommandList->SetGraphicsRoot32BitConstants(18, 1, &t, 1);
@@ -1260,8 +1260,35 @@ void ItemBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 }
 
+void ItemBox::update(float fElapsedTime)
+{
+	if (IsInteraction) {
+		if (IsNear) {
+			if (!IsWorking)
+				m_fCooltime += fElapsedTime;
+			else
+				m_fCooltime = 0;
+			UCHAR keyBuffer[256];
+			memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
+			if (((keyBuffer['f'] & 0xF0) == false) && ((keyBuffer['F'] & 0xF0) == false)) {
+				m_fCooltime = 0;
+				IsInteraction = false;
+			}
+		}
+		else {
+			IsInteraction = false;
+			m_fCooltime = 0;
+		}
+	}
+	else {
+		m_fCooltime = 0;
+	}
+	m_fGauge = m_fCooltime / BOX_OPEN_COOLTIME;
+}
+
 void ItemBox::Interaction(int playerType)
 {
+	IsInteraction = true;
 	if (IsOpen) {
 		switch (playerType) {
 		case TYPE_TAGGER:
@@ -1276,12 +1303,14 @@ void ItemBox::Interaction(int playerType)
 		switch (playerType) {
 		case TYPE_TAGGER:
 		case TYPE_PLAYER_YET:
-			break;
 		case TYPE_DEAD_PLAYER:
-			SetOpen(true); // tempa
 			break;
 		case TYPE_PLAYER:
-			SetOpen(true);
+			if (m_fCooltime >= BOX_OPEN_COOLTIME) {
+				SetOpen(true);
+				m_fCooltime = 0;
+				IsInteraction = false;
+			}
 			break;
 		}
 	}
