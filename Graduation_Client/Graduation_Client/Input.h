@@ -39,6 +39,8 @@ public:
 
 	GameState*		m_gamestate;
 
+	int m_nCosIndex{};
+
 	void Update(HWND hWnd);
 	void KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	void Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);

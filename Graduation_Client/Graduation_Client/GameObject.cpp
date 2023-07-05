@@ -218,6 +218,139 @@ void GameObject::SetParts(int player, int index, int partsNum)
 	
 }
 
+int GameObject::FindPlayerPart(int index)
+{
+	int num{};
+	switch (index) {
+	case 0:
+		for (int i = 0; i < 6; ++i) {
+			if (Bodies[i] == PlayerParts[index]) {
+				num = i;
+				break;
+			}
+		} 
+		break;
+	case 1:
+		for (int i = 0; i < 6; ++i) {
+			if (Bodyparts[i] == PlayerParts[index]) {
+				num = i;
+				break;
+			}
+		}
+		break;
+	case 2:
+		for (int i = 0; i < 7; ++i) {
+			if (Eyes[i] == PlayerParts[index]) {
+				num = i;
+				break;
+			}
+		}
+		break;
+	case 3:
+		for (int i = 0; i < 6; ++i) {
+			if (Gloves[i] == PlayerParts[index]) {
+				num = i;
+				break;
+			}
+		}
+		break;
+	case 4:
+		for (int i = 0; i < 7; ++i) {
+			if (MouthandNoses[i] == PlayerParts[index]) {
+				num = i;
+				break;
+			}
+		}
+		break;
+	case 5:
+		for (int i = 0; i < 21; ++i) {
+			if (Head[i] == PlayerParts[index]) {
+				num = i;
+				break;
+			}
+		}
+		break;
+	default:
+		break;
+	}
+	return num;
+}
+
+void GameObject::ChangePlayerPart(int index, int num, bool next)
+{
+	int n{};
+	switch (index) {
+	case 0:
+		if (next) {
+			n = (num + 1) % 6;
+			SetParts(PLAYER, index, n);
+		}
+		else {
+			if (num == 0) n = 5;
+			else n = num - 1;
+			SetParts(PLAYER, index, n);
+		}
+		break;
+	case 1:
+		if (next) {
+			n = (num + 1) % 6;
+			SetParts(PLAYER, index, n);
+		}
+		else {
+			if (num == 0) n = 5;
+			else n = num - 1;
+			SetParts(PLAYER, index, n);
+		}
+		break;
+	case 2:
+		if (next) {
+			n = (num + 1) % 7;
+			SetParts(PLAYER, index, n);
+		}
+		else {
+			if (num == 0) n = 6;
+			else n = num - 1;
+			SetParts(PLAYER, index, n);
+		}
+		break;
+	case 3:
+		if (next) {
+			n = (num + 1) % 6;
+			SetParts(PLAYER, index, n);
+		}
+		else {
+			if (num == 0) n = 5;
+			else n = num - 1;
+			SetParts(PLAYER, index, n);
+		}
+		break;
+	case 4:
+		if (next) {
+			n = (num + 1) % 7;
+			SetParts(PLAYER, index, n);
+		}
+		else {
+			if (num == 0) n = 6;
+			else n = num - 1;
+			SetParts(PLAYER, index, n);
+		}
+		break;
+	case 5:
+		if (next) {
+			n = (num + 1) % 21;
+			SetParts(PLAYER, index, n);
+		}
+		else {
+			if (num == 0) n = 20;
+			else n = num - 1;
+			SetParts(PLAYER, index, n);
+		}
+		break;
+	default:
+		break;
+	}
+}
+
 void GameObject::CacheSkinningBoneFrames(GameObject* pRootFrame)
 {
 	if (m_pMesh && (m_pMesh->GetType() & VERTEXT_BONE_INDEX_WEIGHT))

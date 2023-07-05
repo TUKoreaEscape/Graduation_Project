@@ -118,7 +118,8 @@ public:
 	int GetType();
 
 	static void SetParts(int player, int index, int partsNum);
-
+	static int FindPlayerPart(int index);
+	static void ChangePlayerPart(int index, int num, bool next);
 	static std::string PlayerParts[6];
 	static std::string OthersParts[5][6];
 public:

@@ -269,14 +269,40 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 				{
 					if (i == 0) break; // save 클릭 break는 없애도됨
 					else if (i == 1) m_gamestate->ChangeSameLevelState();//QUIT클릭
-					else if (i == 2) std::cout << "HEAD" << std::endl; // HEAD
-					else if (i == 3) std::cout << "Eyes" << std::endl; // Eyes
-					else if (i == 4) std::cout << "Mouthandnoses" << std::endl; //Mouthandnoses
-					else if (i == 5) std::cout << "Body" << std::endl; // Body
-					else if (i == 6) std::cout << "BodyParts" << std::endl; //BodyParts
-					else if (i == 7) std::cout << "Gloves" << std::endl; //Gloves
-					else if (i == 8) std::cout << "CustomizingRArrow" << std::endl; //CustomizingRArrow
-					else if (i == 9) std::cout << "CustomizingLArrow" << std::endl; //CustomizingLArrow
+					else if (i == 2) {
+						std::cout << "HEAD" << std::endl; // HEAD
+						m_nCosIndex = 5;
+					}
+					else if (i == 3) {
+						std::cout << "Eyes" << std::endl; // Eyes
+						m_nCosIndex = 2;
+					}
+					else if (i == 4) {
+						std::cout << "Mouthandnoses" << std::endl; //Mouthandnoses
+						m_nCosIndex = 4;
+					}
+					else if (i == 5) {
+						std::cout << "Body" << std::endl; // Body
+						m_nCosIndex = 0;
+					}
+					else if (i == 6) {
+						std::cout << "BodyParts" << std::endl; //BodyParts
+						m_nCosIndex = 1;
+					}
+					else if (i == 7) {
+						std::cout << "Gloves" << std::endl; //Gloves
+						m_nCosIndex = 3;
+					}
+					else if (i == 8) {
+						std::cout << "CustomizingRArrow" << std::endl; //CustomizingRArrow
+						int n = m_pPlayer->FindPlayerPart(m_nCosIndex);
+						m_pPlayer->ChangePlayerPart(m_nCosIndex, n, true);
+					}
+					else if (i == 9) {
+						std::cout << "CustomizingLArrow" << std::endl; //CustomizingLArrow
+						int n = m_pPlayer->FindPlayerPart(m_nCosIndex);
+						m_pPlayer->ChangePlayerPart(m_nCosIndex, n, false);
+					}
 				}
 			}
 			//InputRoomInfo();
