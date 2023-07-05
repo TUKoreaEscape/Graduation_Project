@@ -388,14 +388,18 @@ CollisionInfo Room::is_collision_player_to_vent(const int& player_id, const XMFL
 	XMFLOAT3 MotionVector = xmf3shift;
 	XMFLOAT3 tmp_position = current_position;
 	BoundingOrientedBox check_box = client.get_bounding_box();
+	
+
 	for (auto& object : m_vent_object) // 모든벽을 체크 후 값을 더해주는 방식이 좋아보임!
 	{
-		if (!object.m_check_bounding_box) {
-			if(player_id != m_tagger_id)
-				continue;
-		}
 		if (false == Is_near(current_position, object.Get_center(), 15))
 			continue;
+
+		if (!object.m_check_bounding_box) {
+			if (player_id != m_tagger_id)
+				continue;
+		}
+
 		if (check_box.Intersects(object.Get_BoundingBox()))
 		{
 			client.set_user_position(tmp_position);

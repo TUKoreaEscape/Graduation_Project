@@ -14,7 +14,7 @@ int Room::Select_Tagger()
 			continue;
 		server.m_clients[player_id].set_life_chip(true);
 	}
-	return tagger_id;
+	return m_tagger_id;
 }
 
 void Room::Start_Game()

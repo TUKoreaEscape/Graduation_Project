@@ -347,7 +347,6 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 	}
 
 	room.SetReady(packet->ready_type, user_id);
-	cout << room.All_Player_Ready() << endl;
 	int i = 0;
 	if (room.All_Player_Ready())
 	{
