@@ -247,6 +247,9 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 					else if (i == 2)
 					{
 						m_gamestate->ChangeSameLevelState();//CUSTOMIZING클릭
+						for (int i = 0; i < 6; ++i) {
+							m_nPrevCosInfoIndex[i] = m_pPlayer->FindPlayerPart(i);
+						}
 #if USE_NETWORK
 						Network& network = *Network::GetInstance();
 						network.Send_Ready_Packet(false);
@@ -267,8 +270,18 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			{
 				if (xPos >= customizingRect[i].left && xPos <= customizingRect[i].right && yPos >= customizingRect[i].top && yPos <= customizingRect[i].bottom)
 				{
-					if (i == 0) break; // save 클릭 break는 없애도됨
-					else if (i == 1) m_gamestate->ChangeSameLevelState();//QUIT클릭
+					if (i == 0) {
+						int partIndex[6]; // 여기에 순서대로 저장됨
+						for (int i = 0; i < 6; ++i) {
+							m_nPrevCosInfoIndex[i] = partIndex[i] = m_pPlayer->FindPlayerPart(i);
+						}
+					}
+					else if (i == 1) {
+						m_gamestate->ChangeSameLevelState();//QUIT클릭
+						for (int i = 0; i < 6; ++i) {
+							m_pPlayer->SetParts(PLAYER, i, m_nPrevCosInfoIndex[i]);
+						}
+					}
 					else if (i == 2) {
 						std::cout << "HEAD" << std::endl; // HEAD
 						m_nCosIndex = 5;

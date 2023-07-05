@@ -40,6 +40,7 @@ public:
 	GameState*		m_gamestate;
 
 	int m_nCosIndex{};
+	int m_nPrevCosInfoIndex[6];
 
 	void Update(HWND hWnd);
 	void KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
