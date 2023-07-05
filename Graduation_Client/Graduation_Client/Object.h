@@ -92,6 +92,7 @@ public:
 	bool IsInteraction = false;
 
 	InteractionUI* m_pInteractionUI = nullptr;
+	InteractionGaugeUI* m_pGaugeUI = nullptr;
 
 	float m_fPitch{}, m_fYaw{}, m_fRoll{};
 
@@ -111,6 +112,7 @@ public:
 	virtual void Interaction(int playerType) override {};
 
 	virtual void SetUI(InteractionUI* ui);
+	virtual void SetGaugeUI(InteractionGaugeUI* gauge);
 	virtual void SetAnswer(int index, bool answer) {};
 	virtual void SetSwitchValue(int index, bool value) {};
 	virtual void SetIndex(int index) {};
@@ -133,7 +135,7 @@ public:
 	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
 
 	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void update(float fElapsedTime);
+	virtual void update(float fElapsedTime) override;
 	virtual void SetPosition(XMFLOAT3 xmf3Position);
 	virtual void SetRotation(DIR d) override;
 

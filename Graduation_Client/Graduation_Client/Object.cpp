@@ -396,6 +396,10 @@ void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f );
 			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir);
 		}
+		if (m_pGaugeUI) {
+			m_pGaugeUI->SetPosition(m_xmf4x4ToParent._41 + 0.2f, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
+			m_pGaugeUI->BillboardRender(pd3dCommandList, m_dir);
+		}
 	}
 }
 
@@ -615,6 +619,13 @@ void InteractionObject::SetUI(InteractionUI* ui)
 	if (m_pInteractionUI) m_pInteractionUI->Release();
 	m_pInteractionUI = ui;
 	if (m_pInteractionUI) m_pInteractionUI->AddRef();
+}
+
+void InteractionObject::SetGaugeUI(InteractionGaugeUI* gauge)
+{
+	if (m_pGaugeUI) m_pGaugeUI->Release();
+	m_pGaugeUI = gauge;
+	if (m_pGaugeUI) m_pGaugeUI->AddRef();
 }
 
 InteractionUI::InteractionUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
@@ -1315,7 +1326,7 @@ InteractionGaugeUI::InteractionGaugeUI(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	SetMesh(pUIMesh);
 
 	Texture* pUITexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pUITexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Texture/Progress_Background.dds", RESOURCE_TEXTURE2D, 0);
+	pUITexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Texture/Login.dds", RESOURCE_TEXTURE2D, 0);
 
 	GameScene::CreateShaderResourceViews(pd3dDevice, pUITexture, 0, 17);
 
@@ -1325,7 +1336,7 @@ InteractionGaugeUI::InteractionGaugeUI(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 
 	renderer->SetMaterial(0, pUIMaterial);
 
-	SetScale(0.2f, 0.2f, 0.2f);
+	//SetScale(0.2f, 0.2f, 0.2f);
 	UpdateTransform(nullptr);
 }
 
@@ -1335,6 +1346,52 @@ InteractionGaugeUI::~InteractionGaugeUI()
 
 void InteractionGaugeUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList, DIR d)
 {
+	switch (d)
+	{
+	case DEGREE0:
+		//render(pd3dCommandList);
+		break;
+	case DEGREE90:
+		Rotate(0, 90, 0);
+		//render(pd3dCommandList);
+		//Rotate(0, -90, 0);
+		break;
+	case DEGREE180:
+		Rotate(0, 180, 0);
+		//render(pd3dCommandList);
+		//Rotate(0, -180, 0);
+		break;
+	default:
+		Rotate(0, -90, 0);
+		//render(pd3dCommandList);
+		//Rotate(0, 90, 0);
+		break;
+	}
+	XMFLOAT3 xmf3CameraPosition = Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition();
+
+	SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+
+	switch (d)
+	{
+	case DEGREE0:
+		render(pd3dCommandList);
+		break;
+	case DEGREE90:
+		//Rotate(0, 90, 0);
+		render(pd3dCommandList);
+		Rotate(0, -90, 0);
+		break;
+	case DEGREE180:
+		//Rotate(0, 180, 0);
+		render(pd3dCommandList);
+		Rotate(0, -180, 0);
+		break;
+	default:
+		//Rotate(0, -90, 0);
+		render(pd3dCommandList);
+		Rotate(0, 90, 0);
+		break;
+	}
 }
 
 void InteractionGaugeUI::Rotate(float fPitch, float fYaw, float fRoll)

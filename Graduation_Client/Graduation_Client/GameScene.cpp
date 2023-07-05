@@ -329,6 +329,8 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	if (pCeilModel) delete pCeilModel;
 	if (pCubeModel) delete pCubeModel;
 
+	m_pGauge = new InteractionGaugeUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/f.dds");
+
 	MakeVents(pd3dDevice, pd3dCommandList);
 	MakeDoors(pd3dDevice, pd3dCommandList);
 	MakePowers(pd3dDevice, pd3dCommandList);
@@ -878,6 +880,7 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		Vents[i] = new Vent();
 		Vents[i]->SetChild(pVentModel->m_pModelRootObject, true);
 		reinterpret_cast<Vent*>(Vents[i])->m_pInteractionUI = VentUI;
+		reinterpret_cast<Vent*>(Vents[i])->SetGaugeUI(m_pGauge);
 	}
 	Vents[0]->SetPosition(XMFLOAT3(97.2155f, 1.0061f, 40.43311f));
 	reinterpret_cast<Vent*>(Vents[0])->SetOpenPos(XMFLOAT3(98.94085f, 1.0061f, 42.29158f));
@@ -919,6 +922,7 @@ void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_pDoors[i] = new Door();
 		m_pDoors[i]->SetChild(pDoorModel->m_pModelRootObject, true);
 		reinterpret_cast<Door*>(m_pDoors[i])->m_pInteractionUI = doorUI;
+		reinterpret_cast<Door*>(m_pDoors[i])->SetGaugeUI(m_pGauge);
 	}
 	
 	m_pDoors[0]->SetPosition(XMFLOAT3(-29.73866f, 0.0f, 39.6f)); 
@@ -954,6 +958,7 @@ void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 		m_pPowers[i]->SetChild(pElecModel->m_pModelRootObject, true);
 		m_pPowers[i]->Init();
 		m_pPowers[i]->SetUI(PowerUI);
+		m_pPowers[i]->SetGaugeUI(m_pGauge);
 		//m_pPowers[i]->UpdateTransform(nullptr);
 	}
 
@@ -1097,6 +1102,7 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_pBoxes[i] = new ItemBox();
 		m_pBoxes[i]->SetChild(pBoxModel->m_pModelRootObject, true);
 		m_pBoxes[i]->SetUI(BoxUI);
+		m_pBoxes[i]->SetGaugeUI(m_pGauge); 
 		for (int j = 0; j < 6; ++j) {
 			if (Items[j]) {
 				m_pBoxes[i]->InitItems(j, Items[j]);
