@@ -178,7 +178,7 @@ void Vent::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 0.5f, m_xmf4x4ToParent._43);
 			else
 				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
-			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir, m_fGauge);
 		}
 	}
 }
@@ -390,6 +390,24 @@ void Door::update(float fElapsedTime)
 			IsWorking = false;
 		}
 	}
+	if (Input::GetInstance()->m_pPlayer->m_Type == TYPE_TAGGER) {
+		if (IsOpen)
+			m_fGauge = m_fCooltime / DOOR_CLOSE_COOLTIME_TAGGER;
+		else
+			m_fGauge = m_fCooltime / DOOR_OPEN_COOLTIME_TAGGER;
+	}
+	else if (Input::GetInstance()->m_pPlayer->m_Type == TYPE_PLAYER) {
+		if (IsOpen)
+			m_fGauge = m_fCooltime / DOOR_CLOSE_COOLTIME_PLAYER;
+		else
+			m_fGauge = m_fCooltime / DOOR_OPEN_COOLTIME_PLAYER;
+	}
+	else if (Input::GetInstance()->m_pPlayer->m_Type == TYPE_PLAYER_YET) {
+		if (IsOpen)
+			m_fGauge = m_fCooltime / DOOR_CLOSE_COOLTIME_PLAYER;
+		else
+			m_fGauge = m_fCooltime / DOOR_OPEN_COOLTIME_PLAYER;
+	}
 }
 
 void Door::SetPosition(XMFLOAT3 xmf3Position)
@@ -409,11 +427,7 @@ void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (IsNear) {
 		if (m_pInteractionUI) {
 			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f );
-			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir);
-		}
-		if (m_pGaugeUI) {
-			m_pGaugeUI->SetPosition(m_xmf4x4ToParent._41 + 0.2f, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
-			m_pGaugeUI->BillboardRender(pd3dCommandList, m_dir);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir, m_fGauge);
 		}
 	}
 }
@@ -444,7 +458,7 @@ void Door::Interaction(int playerType)
 			break;
 		case TYPE_PLAYER_YET:
 		case TYPE_PLAYER:
-			if (m_fCooltime >= DOOR_CLOSE_COOLTIME_PLYAER) {
+			if (m_fCooltime >= DOOR_CLOSE_COOLTIME_PLAYER) {
 				SetOpen(false);
 				cs_packet_request_open_door packet;
 				packet.size = sizeof(packet);
@@ -483,7 +497,7 @@ void Door::Interaction(int playerType)
 			break;
 		case TYPE_PLAYER_YET:
 		case TYPE_PLAYER:
-			if (m_fCooltime >= DOOR_OPEN_COOLTIME_PLYAER) {
+			if (m_fCooltime >= DOOR_OPEN_COOLTIME_PLAYER) {
 				SetOpen(true);
 				cs_packet_request_open_door packet;
 				packet.size = sizeof(packet);
@@ -636,13 +650,6 @@ void InteractionObject::SetUI(InteractionUI* ui)
 	if (m_pInteractionUI) m_pInteractionUI->AddRef();
 }
 
-void InteractionObject::SetGaugeUI(InteractionGaugeUI* gauge)
-{
-	if (m_pGaugeUI) m_pGaugeUI->Release();
-	m_pGaugeUI = gauge;
-	if (m_pGaugeUI) m_pGaugeUI->AddRef();
-}
-
 InteractionUI::InteractionUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
 {
 	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
@@ -673,8 +680,9 @@ InteractionUI::~InteractionUI()
 {
 }
 
-void InteractionUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList, DIR d)
+void InteractionUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList, DIR d, float gauge)
 {
+	UpdateShaderVariable(pd3dCommandList, gauge);
 	switch (d)
 	{
 	case DEGREE0:
@@ -729,6 +737,12 @@ void InteractionUI::Rotate(float fPitch, float fYaw, float fRoll)
 	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
 
 	UpdateTransform(NULL);
+}
+
+void InteractionUI::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, float gauge)
+{
+	float x = gauge;
+	pd3dCommandList->SetGraphicsRoot32BitConstants(18, 1, &x, 0);
 }
 
 PowerSwitch::PowerSwitch() : InteractionObject()
@@ -911,7 +925,7 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
 			else
 				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
-			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir, m_fGauge);
 		}
 	}
 }
@@ -1233,7 +1247,7 @@ void ItemBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (IsNear) {
 		if (m_pInteractionUI) {
 			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
-			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir);
+			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir, m_fGauge);
 		}
 	}
 }
@@ -1341,7 +1355,7 @@ InteractionGaugeUI::InteractionGaugeUI(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	SetMesh(pUIMesh);
 
 	Texture* pUITexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pUITexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Texture/Login.dds", RESOURCE_TEXTURE2D, 0);
+	pUITexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Texture/Progress_Background.dds", RESOURCE_TEXTURE2D, 0);
 
 	GameScene::CreateShaderResourceViews(pd3dDevice, pUITexture, 0, 17);
 

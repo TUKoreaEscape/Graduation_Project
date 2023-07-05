@@ -67,9 +67,10 @@ public:
 	InteractionUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName);
 	virtual ~InteractionUI();
 
-	void BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList, DIR d);
+	void BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList, DIR d, float gauge);
 
 	void Rotate(float fPitch, float fYaw, float fRoll) override;
+	void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, float gauge);
 };
 class InteractionGaugeUI : public GameObject
 {
@@ -92,13 +93,14 @@ public:
 	bool IsInteraction = false;
 
 	InteractionUI* m_pInteractionUI = nullptr;
-	InteractionGaugeUI* m_pGaugeUI = nullptr;
 
 	float m_fPitch{}, m_fYaw{}, m_fRoll{};
 
 	float volatile m_fCooltime;
 
 	DIR m_dir = DEGREE0;
+
+	float m_fGauge{};
 public:
 	InteractionObject();
 	virtual ~InteractionObject();
@@ -112,7 +114,6 @@ public:
 	virtual void Interaction(int playerType) override {};
 
 	virtual void SetUI(InteractionUI* ui);
-	virtual void SetGaugeUI(InteractionGaugeUI* gauge);
 	virtual void SetAnswer(int index, bool answer) {};
 	virtual void SetSwitchValue(int index, bool value) {};
 	virtual void SetIndex(int index) {};

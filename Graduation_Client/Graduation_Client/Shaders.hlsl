@@ -900,6 +900,11 @@ float4 PSUI(VS_UI_OUTPUT input) : SV_TARGET
 	return Color;
 }
 
+cbuffer cbGaugeInfo : register(b3)
+{
+	float gfGauge;
+};
+
 VS_UI_OUTPUT VSDoorUI(VS_UI_INPUT input)
 {
 	VS_UI_OUTPUT output;
@@ -913,5 +918,7 @@ VS_UI_OUTPUT VSDoorUI(VS_UI_INPUT input)
 float4 PSDoorUI(VS_UI_OUTPUT input) : SV_TARGET
 {
 	float4 Color = gtxtUITexture.Sample(gssWrap, input.uv);
+	if (input.uv.y - 1.0f > -gfGauge && Color.w < 0.1f) Color = float4(0.0f, 168.0f / 255.0f, 243.0f / 255.0f, 1.0f);
+	clip(Color.w - 0.1f);
 	return Color;
 }
