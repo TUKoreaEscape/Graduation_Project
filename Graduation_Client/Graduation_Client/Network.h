@@ -31,44 +31,52 @@ struct OtherPlayerPos {
 
 class Network {
 private:
-	static Network* NetworkInstance;
-	SOCKET			m_socket;
-	const char*		SERVER_ADDR = "172.30.1.20";
-	Server_Timer	m_server_counter;
-	Custom			data;
+	static Network*		NetworkInstance;
+	Network();
+
+private:
+	SOCKET				m_socket;
+	const char*			SERVER_ADDR = "172.30.1.20";
+	Server_Timer		m_server_counter;
+	Custom				data;
 
 	SHELLEXECUTEINFO	info;
 	HWND				hwnd_ExtMixerWin;
 	bool				m_shutdown = false;
 	bool				m_lifechip = false;
+
 public:
-	std::mutex pos_lock;
-	std::mutex other_pos_lock;
-	bool	m_recv_move = false;
-	int		m_my_id = -1;
-	int		m_join_room_number = -1;
-	int		m_page_num = 0;
-	std::thread send_thread;
+	std::mutex			pos_lock;
+	std::mutex			other_pos_lock;
+	bool				m_recv_move = false;
+	int					m_my_id = -1;
+	int					m_join_room_number = -1;
+	int					m_page_num = 0;
+	std::thread			send_thread;
 	//임시사용 변수입니다.
-	bool    m_login = false;
-	bool	m_join_room = false;
+	bool				m_login = false;
+	bool				m_join_room = false;
 
-	XMFLOAT3 m_pPlayer_Pos{ 0,0,0 };
-	XMFLOAT3 m_pPlayer_before_Pos{ 0,0,0 };
-	OtherPlayerPos Other_Player_Pos[5]{};
-	Player* m_pPlayer = nullptr;;
-	Player** m_ppOther = nullptr;
-	Door* m_pDoors[6];
-	InteractionObject* m_pPowers[5];
-	ItemBox* m_pBoxes[MAX_INGAME_ITEM];
+public:
+	XMFLOAT3			m_pPlayer_Pos{ 0,0,0 };
+	XMFLOAT3			m_pPlayer_before_Pos{ 0,0,0 };
+	OtherPlayerPos		Other_Player_Pos[5]{};
 
+public:
+	Player*				m_pPlayer = nullptr;;
+	Player**			m_ppOther = nullptr;
+	Door*				m_pDoors[6];
+	InteractionObject*	m_pPowers[5];
+	ItemBox*			m_pBoxes[MAX_INGAME_ITEM];
+	GameObject*			m_Vents[NUM_VENT];
+
+public:
 	static Network* GetInstance() {
 		if (NetworkInstance == NULL) {
 			NetworkInstance = new Network;
 		}
 		return NetworkInstance;
 	}
-	Network();
 	~Network();
 
 	void init_network();
@@ -88,6 +96,7 @@ public:
 	void Process_Game_Start(char* ptr);
 	void Process_Game_End(char* ptr);
 	void Process_Door_Update(char* ptr);
+	void Process_Hidden_Door_Update(char* ptr);
 	void Process_ElectronicSystem_Reset_By_Tagger(char* ptr);
 	void Process_ElectronicSystem_Reset_By_Player(char* ptr);
 	void Process_ElectronicSystemDoor_Update(char* ptr);

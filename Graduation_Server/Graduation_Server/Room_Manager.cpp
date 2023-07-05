@@ -87,10 +87,8 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 		}
 	}
 
-
-
 //======================= Door Object Read =======================
-	fopen_s(&pFile, "walls/DoorBB.bin", "rb");
+	fopen_s(&pFile, "walls/DoorBB0705.bin", "rb");
 	if (pFile)
 		rewind(pFile);
 	nReads = 0;
@@ -100,7 +98,7 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	for (unsigned int i = 0; i < nObjects; ++i)
 	{
 		// 여기서 door 추가할거임
-		cout << "Doors BoundingBox : " << static_cast<int>((float)i / (float)6 * 100) << "%로드 완료\r";
+		cout << "Doors and Vents BoundingBox : " << static_cast<int>((float)i / (float)6 * 100) << "%로드 완료\r";
 		nReads = (unsigned int)fread(&nStrLength, sizeof(unsigned char), 1, pFile);
 		nReads = (unsigned int)fread(&pstrToken, sizeof(char), nStrLength, pFile); // <Wall>:
 		nReads = (unsigned int)fread(&nStrLength, sizeof(unsigned char), 1, pFile);
@@ -121,20 +119,30 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 
 		XMFLOAT3 center_pos = XMFLOAT3(AABBCenter[0], AABBCenter[1], AABBCenter[2]);
 		XMFLOAT3 Extents = XMFLOAT3(AABBExtents[0], AABBExtents[1], AABBExtents[2]);
-		//cout << "Door - " << i + 1 << " - " << pstrGameObjectName << " Center - (" << AABBCenter[0] << ", " << AABBCenter[1] << ", " << AABBCenter[2] << "), Extents - (" << AABBExtents[0] << ", " << AABBExtents[1] << ", " << AABBExtents[2] << ")" << endl;
-		for (auto& _room : a_in_game_room)
-		{
-			_room.add_game_doors(i, OB_DOOR, center_pos, Extents);
+		
+		if (i < 6) {
+			cout << "Door - " << i + 1 << " - " << pstrGameObjectName << " Center - (" << AABBCenter[0] << ", " << AABBCenter[1] << ", " << AABBCenter[2] << "), Extents - (" << AABBExtents[0] << ", " << AABBExtents[1] << ", " << AABBExtents[2] << ")" << endl;
+			for (auto& _room : a_in_game_room)
+			{
+				_room.add_game_doors(i, OB_DOOR, center_pos, Extents);
+			}
+		}
+		else {
+			cout << "Vent - " << i + 1 << " - " << pstrGameObjectName << " Center - (" << AABBCenter[0] << ", " << AABBCenter[1] << ", " << AABBCenter[2] << "), Extents - (" << AABBExtents[0] << ", " << AABBExtents[1] << ", " << AABBExtents[2] << ")" << endl;
+			for (auto& _room : a_in_game_room)
+			{
+				_room.add_game_vents(i - 6, OB_DOOR, center_pos, Extents);
+			}
 		}
 	}
+	cout << "Doors and Vents BoundingBox : " << "100" << "%로드 완료\r";
+	cout << "Doors and Vents BoundingBox Load Success!                            " << endl;
 
 	for (auto& _room : a_in_game_room)
 	{
 		for (int i = 0; i < MAX_INGAME_ITEM; ++i)
 			_room.m_fix_item.emplace_back();
 	}
-	cout << "Doors BoundingBox : " << "100" << "%로드 완료\r";
-	cout << "Door Load Success!                                       " << endl;
 
 //======================= Electronic System Object Read =======================
 	nReads = 0;
@@ -161,9 +169,6 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	cout << "Electronic System Load Success!                            " << endl;
 
 	cout << "All Objects File Load Success!" << endl;
-	// 여긴 맵에 존재하는 고정된 오브젝트를 서버에 로드하는 공간입니다.
-
-
 }
 
 int RoomManager::Create_room(int user_id, int room_number) // 방생성을 요청받을경우 사용합니다. 

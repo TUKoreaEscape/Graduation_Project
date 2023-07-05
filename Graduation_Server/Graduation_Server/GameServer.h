@@ -111,6 +111,7 @@ public:
 	void	Process_Attack(const int user_id); // 공격을 처리하는 함수
 	void	Process_Customizing(const int user_id, void* buff); // 커스터마이징 정보를 처리하는 함수
 	void	Process_Door(const int user_id, void* buff); // 게임방 내 Door 열기,닫기를 처리하는 함수
+	void	Process_Vent(const int user_id, void* buff);
 	void	Process_Active_Altar(const int user_id);
 	void	Process_Altar_LifeChip_Update(const int user_id);
 	void	Process_ElectronicSystem_Open(const int user_id, void* buff); // 게임방 내 전력장치를 열기,닫기를 하는 함수

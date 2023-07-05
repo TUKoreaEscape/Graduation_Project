@@ -257,6 +257,8 @@ struct cs_packet_request_open_door {
 struct cs_packet_request_open_hidden_door {
 	unsigned char	size;
 	unsigned char	type;
+
+	unsigned char	door_num;
 };
 
 struct cs_packet_request_electronic_system_open {
@@ -376,6 +378,7 @@ namespace SC_PACKET
 		SC_PACKET_SELECT_TAGGER,
 		SC_PACKET_TAGGER_SKILL,
 		SC_PACKET_DOOR_UPDATE,
+		SC_PACKET_HIDDEN_DOOR_UPDATE,
 		SC_PACKET_ACTIVATE_ALTAR,
 		SC_PACKET_ALTAR_LIFECHIP_UPDATE,
 		SC_PACKET_ELECTRONIC_SYSTEM_DOOR_UPDATE,
@@ -611,6 +614,14 @@ struct sc_packet_open_door {
 	unsigned char	type;
 
 	unsigned char	door_number;
+	unsigned char	door_state;
+};
+
+struct sc_packet_open_hidden_door {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned char	door_num;
 	unsigned char	door_state;
 };
 

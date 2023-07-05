@@ -74,6 +74,29 @@ public:
 	Door_State get_state() { return m_state; }
 };
 
+class Vent : public GameObject {
+private:
+	int			m_door_id;
+	Door_State	m_state = Door_State::ST_CLOSE;
+
+public:		
+	mutex*								m_state_lock = nullptr;
+	bool								m_check_bounding_box = true;
+
+public:
+	Vent();
+	Vent(const unsigned int obj_id, Object_Type type, const XMFLOAT3& center, const XMFLOAT3& extents);
+	~Vent() = default;
+
+	void		init();
+
+	bool		process_door_event();
+	void		set_boundingbox_check(bool option) { m_check_bounding_box = option; }
+
+	void		Release();
+	Door_State	get_state() { return m_state; }
+};
+
 class ElectronicSystem : public GameObject {
 private:
 	int			m_system_id = -1;

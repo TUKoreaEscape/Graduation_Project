@@ -62,6 +62,56 @@ XMFLOAT4 GameObject::Get_orientation()
 	return m_orientation;
 }
 
+Vent::Vent()
+{
+	if (m_state_lock == nullptr)
+		m_state_lock = new mutex;
+}
+
+Vent::Vent(const unsigned int door_id, Object_Type type, const XMFLOAT3& center, const XMFLOAT3& extents)
+{
+	m_door_id = door_id;
+	m_type = type;
+	m_pos = center;
+	m_center = center;
+	m_extents = extents;
+	m_bounding_box = BoundingOrientedBox{ center, extents, XMFLOAT4(0,0,0,1) };
+	m_check_bounding_box = true;
+	if (m_state_lock == nullptr)
+		m_state_lock = new mutex;
+}
+
+void Vent::init()
+{
+	m_state_lock->lock();
+	m_state = ST_CLOSE;
+	m_check_bounding_box = true;
+	m_state_lock->unlock();
+}
+
+bool Vent::process_door_event()
+{
+	m_state_lock->lock();
+	if (m_state == ST_CLOSE)
+	{
+		m_state = ST_OPEN;
+		m_state_lock->unlock();
+	}
+
+	else if (m_state == ST_OPEN)
+	{
+		m_state = ST_CLOSE;
+		m_state_lock->unlock();
+	}
+	return true;
+}
+
+void Vent::Release()
+{
+	if (m_state_lock != nullptr)
+		delete m_state_lock;
+}
+
 Door::Door()
 {
 	if (m_state_lock == nullptr)

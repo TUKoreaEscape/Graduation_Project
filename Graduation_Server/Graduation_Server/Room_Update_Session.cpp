@@ -6,6 +6,14 @@ int Room::Select_Tagger()
 	mt19937 engine((unsigned int)time(NULL));
 	int tagger_id = engine() % 6;
 	m_tagger_id = in_player[tagger_id];
+
+	cGameServer& server = *cGameServer::GetInstance();
+
+	for (auto player_id : in_player) {
+		if (player_id == m_tagger_id)
+			continue;
+		server.m_clients[player_id].set_life_chip(true);
+	}
 	return tagger_id;
 }
 
@@ -16,6 +24,12 @@ void Room::Start_Game()
 	_room_state = GAME_ROOM_STATE::PLAYING;
 	_room_state_lock.unlock();
 	cGameServer& server = *cGameServer::GetInstance();
+
+	for (auto player_id : in_player) {
+		if (player_id == -1)
+			continue;
+		server.m_clients[player_id].set_life_chip(false);
+	}
 
 	sc_packet_update_room update_room_packet;
 	update_room_packet.size = sizeof(update_room_packet);

@@ -32,6 +32,7 @@ public:
 	vector<GameObject>				m_game_fix_object;
 	vector<GameObject>				m_game_wall;
 	vector<Door>					m_door_object;
+	vector<Vent>					m_vent_object;
 	vector<ElectronicSystem>		m_electrinic_system;
 	vector<EscapeSystem>			m_escape_system;
 	vector<GameItem>				m_fix_item;
@@ -85,6 +86,7 @@ public: // 서버 시작시 초기화하는 함수들
 	void	add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation);
 	void	add_game_walls(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents);
 	void	add_game_doors(const unsigned int door_id, Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents);
+	void	add_game_vents(const unsigned int door_id, Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents);
 	void	add_game_ElectronicSystem(const unsigned int id, Object_Type ob_type, XMFLOAT3& center, XMFLOAT3& extents);
 	void	add_fix_objects(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents);
 
@@ -136,6 +138,7 @@ public: // 충돌 관련 함수
 	CollisionInfo	is_collision_fix_object_to_player(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
 	CollisionInfo	is_collision_player_to_object(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
 	CollisionInfo	is_collision_player_to_door(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
+	CollisionInfo	is_collision_player_to_vent(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift);
 
 	char*	Get_Room_Name(char room_name[], int size);
 };

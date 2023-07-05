@@ -274,6 +274,15 @@ void Network::Process_Door_Update(char* ptr)
 		m_pDoors[static_cast<int>(packet->door_number)]->SetOpen(false);
 }
 
+void Network::Process_Hidden_Door_Update(char* ptr)
+{
+	sc_packet_open_hidden_door* packet = reinterpret_cast<sc_packet_open_hidden_door*>(ptr);
+	if (packet->door_state == 0)
+		m_Vents[static_cast<int>(packet->door_num)]->SetOpen(true);
+	else if (packet->door_state == 2)
+		m_Vents[static_cast<int>(packet->door_num)]->SetOpen(false);
+}
+
 void Network::Process_ElectronicSystem_Reset_By_Tagger(char* ptr)
 {
 	sc_packet_request_electronic_system_reset* packet = reinterpret_cast<sc_packet_request_electronic_system_reset*>(ptr);

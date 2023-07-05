@@ -205,9 +205,29 @@ void Vent::Interaction(int playerType)
 		break;
 	}
 	if (IsOpen) {
+#if USE_NETWORK
+		Network& network = *Network::GetInstance();
+
+		cs_packet_request_open_hidden_door packet;
+		packet.size = sizeof(packet);
+		packet.type = CS_PACKET::CS_PACKET_REQUEST_OPEN_HIDDEN_DOOR;
+		packet.door_num = Input::GetInstance()->m_pPlayer->m_vent_number;
+
+		network.send_packet(&packet);
+#endif
 		SetOpen(false);
 	}
 	else {
+#if USE_NETWORK
+		Network& network = *Network::GetInstance();
+
+		cs_packet_request_open_hidden_door packet;
+		packet.size = sizeof(packet);
+		packet.type = CS_PACKET::CS_PACKET_REQUEST_OPEN_HIDDEN_DOOR;
+		packet.door_num = m_door_number;
+
+		network.send_packet(&packet);
+#endif
 		SetOpen(true);
 	}
 }

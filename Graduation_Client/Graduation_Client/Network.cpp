@@ -585,6 +585,12 @@ void Network::ProcessPacket(char* ptr)
 		break;
 	}
 
+	case SC_PACKET::SC_PACKET_HIDDEN_DOOR_UPDATE:
+	{
+		Process_Hidden_Door_Update(ptr);
+		break;
+	}
+
 	case SC_PACKET::SC_PACKET_PICK_ITEM_INIT:
 	{
 		Process_Pick_Item_Init(ptr);

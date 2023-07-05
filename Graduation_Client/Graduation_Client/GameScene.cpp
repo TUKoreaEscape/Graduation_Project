@@ -353,6 +353,9 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	for (int i = 0; i < NUM_ITEMBOX; ++i)
 		m_network->m_pBoxes[i] = m_pBoxes[i];
 
+	for (int i = 0; i < NUM_VENT; ++i)
+		m_network->m_Vents[i] = Vents[i];
+
 	recv_thread = std::thread{ &Network::listen_thread, m_network };
 #endif
 }

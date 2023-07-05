@@ -88,6 +88,17 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 				collision_up_face = true;
 		}
 
+		CollisionInfo vent_check = join_room.is_collision_player_to_vent(user_id, current_player_position, current_shift);
+		if (vent_check.is_collision)
+		{
+			calculate_player_position = Add(current_player_position, vent_check.SlidingVector);
+			if (m_clients[user_id].get_user_position().y < 0)
+				calculate_player_position.y = 0;
+			current_shift = vent_check.SlidingVector;
+			if (vent_check.collision_face_num == 4)
+				collision_up_face = true;
+		}
+
 		CollisionInfo object_check = join_room.is_collision_player_to_object(user_id, current_player_position, current_shift);
 		if (object_check.is_collision)
 		{
@@ -564,6 +575,26 @@ void cGameServer::Process_Door(const int user_id, void* buff)
 		ev.obj_id = packet->door_num;
 		ev.room_number = m_clients[user_id].get_join_room_number();
 		m_timer_queue.push(ev);
+	}
+}
+
+void cGameServer::Process_Vent(const int user_id, void* buff)
+{
+	cs_packet_request_open_hidden_door* packet = reinterpret_cast<cs_packet_request_open_hidden_door*>(buff);
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+	room.m_vent_object[packet->door_num].process_door_event();
+
+	sc_packet_open_hidden_door update_packet;
+	update_packet.size = sizeof(update_packet);
+	update_packet.type = SC_PACKET::SC_PACKET_HIDDEN_DOOR_UPDATE;
+	update_packet.door_num = packet->door_num;
+	update_packet.door_state = room.m_vent_object[packet->door_num].get_state();
+
+	for (auto player_id : room.in_player) {
+		if (player_id == -1)
+			continue;
+		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
 	}
 }
 

@@ -64,7 +64,7 @@ void cGameServer::StartServer()
 
 	for (auto& worker : m_worker_threads)
 		worker.join();
-	
+	cout << endl;
 	cout << "워커스레드 종료" << endl;
 	for (auto& db_worker : m_database_thread)
 		db_worker.join();
@@ -335,7 +335,6 @@ void cGameServer::WorkerThread()
 
 		}
 	}
-	cout << "워커스레드 종료중" << endl;
 }
 
 void cGameServer::Accept(EXP_OVER* exp_over)
@@ -752,8 +751,13 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_PACKET_REQUEST_OPEN_DOOR:
 	{
-
 		Process_Door(user_id, p);
+		break;
+	}
+
+	case CS_PACKET::CS_PACKET_REQUEST_OPEN_HIDDEN_DOOR:
+	{
+		Process_Vent(user_id, p);
 		break;
 	}
 
@@ -796,7 +800,6 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_ADMIN_SERVER_END:
 	{
-		cout << "서버 종료 요청" << endl;
 		Server_End();
 		EXP_OVER* over = new EXP_OVER;
 		over->m_comp_op = OP_TYPE::OP_SERVER_END;

@@ -57,6 +57,7 @@ void Room::init_room_by_game_end()
 		if (player_id == -1)
 			continue;
 		server.m_clients[player_id].set_user_position(XMFLOAT3(static_cast<float>(6.f - ((float)i * 2.5)), 5.f, -4.f));
+		server.m_clients[player_id].set_life_chip(false);
 		i++;
 	}
 }
@@ -70,15 +71,6 @@ void Room::Create_Room(int make_player_id, int room_num, GAME_ROOM_STATE::TYPE r
 	in_player[Number_of_users] = make_player_id;
 	Number_of_users++;
 	remain_user = 6 - Number_of_users;
-
-	cGameServer& server = *cGameServer::GetInstance();
-	//init_fix_object_and_life_chip();
-	//TIMER_EVENT ev;
-	//ev.room_number = room_number;
-	//ev.event_type = EventType::UPDATE_MOVE;
-	//ev.cool_time = (float)((float)1 / SET_SERVER_UPDATE_FRAME);
-	//ev.event_time = chrono::system_clock::now();
-	//server.m_timer_queue.push(ev);
 }
 
 bool Room::Join_Player(int user_id)
@@ -183,7 +175,7 @@ void Room::init_fix_object_and_life_chip()
 	m_fix_item[MAX_INGAME_ITEM - 2].Set_Item_Type(GAME_ITEM::ITEM_WRENCH);
 	m_fix_item[MAX_INGAME_ITEM - 3].Set_Item_Type(GAME_ITEM::ITEM_DRIVER);
 
-	for (int i = 2; i < MAX_INGAME_ITEM - 3; ++i)
+	for (int i = 7; i < MAX_INGAME_ITEM - 3; ++i)
 		m_fix_item[i].Set_Item_Type(GAME_ITEM::ITEM_LIFECHIP);
 
 	sc_packet_pick_item_init item_init_packet;
@@ -217,6 +209,11 @@ void Room::add_fix_objects(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extent
 void Room::add_game_doors(const unsigned int door_id, Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents)
 {
 	m_door_object.emplace_back(Door(door_id, ob_type, center, extents));
+}
+
+void Room::add_game_vents(const unsigned int door_id, Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents)
+{
+	m_vent_object.emplace_back(Vent(door_id, ob_type, center, extents));
 }
 
 void Room::add_game_ElectronicSystem(const unsigned int id, Object_Type ob_type, XMFLOAT3& center, XMFLOAT3& extents)
@@ -343,6 +340,59 @@ CollisionInfo Room::is_collision_player_to_door(const int& player_id, const XMFL
 	for (auto& object : m_door_object) // 모든벽을 체크 후 값을 더해주는 방식이 좋아보임!
 	{
 		if (!object.m_check_bounding_box)
+			continue;
+		if (check_box.Intersects(object.Get_BoundingBox()))
+		{
+			client.set_user_position(tmp_position);
+			client.update_bounding_box_pos(tmp_position);
+			CollisionInfo collision_data = server.GetCollisionInfo(object.Get_BoundingBox(), player_bounding_box);
+			XMFLOAT3 SlidingVector = XMFLOAT3(0.0f, 0.0f, 0.0f);
+			XMFLOAT3 current_player_position = tmp_position;
+
+
+			float DotProduct = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&MotionVector), XMLoadFloat3(&collision_data.CollisionNormal)));
+
+			if (DotProduct < 0.0f)
+			{
+				XMFLOAT3 RejectionVector = XMFLOAT3(-DotProduct * collision_data.CollisionNormal.x, -DotProduct * collision_data.CollisionNormal.y, -DotProduct * collision_data.CollisionNormal.z);
+				SlidingVector = XMFLOAT3(MotionVector.x + RejectionVector.x, MotionVector.y + RejectionVector.y, MotionVector.z + RejectionVector.z);
+			}
+			else
+			{
+				SlidingVector = MotionVector;
+			}
+
+			return_data.is_collision = true;
+			return_data.SlidingVector = SlidingVector;
+			return_data.CollisionNormal = collision_data.CollisionNormal;
+			MotionVector = SlidingVector;
+			tmp_position = Add(tmp_position, SlidingVector);
+
+			client.set_user_position(current_position);
+			client.update_bounding_box_pos(current_position);
+			check_box.Center = tmp_position;
+		}
+	}
+	return return_data;
+}
+
+CollisionInfo Room::is_collision_player_to_vent(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift)
+{
+	cGameServer& server = *cGameServer::GetInstance();
+	CLIENT& client = *server.get_client_info(player_id);
+	CollisionInfo return_data;
+	return_data.is_collision = false;
+	return_data.CollisionNormal = XMFLOAT3(0, 0, 0);
+	return_data.SlidingVector = XMFLOAT3(0, 0, 0);
+	BoundingOrientedBox player_bounding_box = client.get_bounding_box();
+	XMFLOAT3 MotionVector = xmf3shift;
+	XMFLOAT3 tmp_position = current_position;
+	BoundingOrientedBox check_box = client.get_bounding_box();
+	for (auto& object : m_vent_object) // 모든벽을 체크 후 값을 더해주는 방식이 좋아보임!
+	{
+		if (!object.m_check_bounding_box && player_id != m_tagger_id)
+			continue;
+		if (false == Is_near(current_position, object.Get_center(), 15))
 			continue;
 		if (check_box.Intersects(object.Get_BoundingBox()))
 		{
