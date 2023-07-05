@@ -96,7 +96,7 @@ public:
 
 	float m_fPitch{}, m_fYaw{}, m_fRoll{};
 
-	float volatile m_fCooltime;
+	float volatile m_fCooltime{};
 
 	DIR m_dir = DEGREE0;
 
