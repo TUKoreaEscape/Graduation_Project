@@ -1010,6 +1010,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 		}
 	}
 	for (int i = 0; i < NUM_VENT; ++i) {
+		Vents[i]->update(elapsedTime);
 		if (reinterpret_cast<Vent*>(Vents[i])->IsPlayerNear(PlayerPos)) {
 			m_pPlayer->m_pNearVent = Vents[i];
 			IsNearVent = true;

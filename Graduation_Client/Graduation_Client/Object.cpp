@@ -92,12 +92,13 @@ void Vent::Rotate(float fPitch, float fYaw, float fRoll)
 
 void Vent::SetOpen(bool open)
 {
-	if (open) {
+	if (true == open) {
 		if (IsOpen) return;
 		Rotate(0, 90, 0);
 		SetPosition(m_xmf3OpenPosition);
 		UpdateTransform(NULL);
 		IsOpen = true;
+		m_fCooltime = 0;
 	}
 	else {
 		if (IsOpen == false) return;
@@ -194,21 +195,18 @@ void Vent::SetPosition(XMFLOAT3 xmf3Position)
 
 void Vent::Interaction(int playerType)
 {
+	if (true == IsOpen) return;
 	switch (playerType) {
 	case TYPE_TAGGER:
 		break;
 	case TYPE_PLAYER_YET:
 		break;
 	case TYPE_PLAYER:
+		if (m_fCooltime >= VENT_OPEN_COOLTIME)
+			SetOpen(true);
 		break;
 	case TYPE_DEAD_PLAYER:
 		break;
-	}
-	if (IsOpen) {
-		SetOpen(false);
-	}
-	else {
-		SetOpen(true);
 	}
 }
 
@@ -232,6 +230,14 @@ void Vent::SetRotation(DIR d)
 		Rotate(0, 270, 0);
 		break;
 	}
+}
+
+void Vent::update(float fElapsedTime)
+{
+	m_fCooltime += fElapsedTime;
+	if (IsOpen)
+		if (m_fCooltime >= VENT_CLOSE_COOLTIME)
+			SetOpen(false);
 }
 
 Door::Door() : InteractionObject()
@@ -1298,6 +1304,29 @@ void ItemBox::SetRotation(DIR d)
 
 InteractionGaugeUI::InteractionGaugeUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
 {
+	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
+	XMStoreFloat4x4(&m_xmf4x4ToParent, XMMatrixIdentity());
+
+	renderer->m_nMaterials = 1;
+	renderer->m_ppMaterials = new Material * [renderer->m_nMaterials];
+	renderer->m_ppMaterials[0] = new Material(0);
+
+	Mesh* pUIMesh = new TexturedRectMesh(pd3dDevice, pd3dCommandList, 0.0f, 0.0f, 0.6f, 0.2f);
+	SetMesh(pUIMesh);
+
+	Texture* pUITexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pUITexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Texture/Progress_Background.dds", RESOURCE_TEXTURE2D, 0);
+
+	GameScene::CreateShaderResourceViews(pd3dDevice, pUITexture, 0, 17);
+
+	Material* pUIMaterial = new Material(1);
+	pUIMaterial->SetTexture(pUITexture);
+	pUIMaterial->SetDoorUIShader();
+
+	renderer->SetMaterial(0, pUIMaterial);
+
+	SetScale(0.2f, 0.2f, 0.2f);
+	UpdateTransform(nullptr);
 }
 
 InteractionGaugeUI::~InteractionGaugeUI()
