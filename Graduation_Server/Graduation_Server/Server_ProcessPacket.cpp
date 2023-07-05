@@ -598,6 +598,8 @@ void cGameServer::Process_Vent(const int user_id, void* buff)
 	for (auto player_id : room.in_player) {
 		if (player_id == -1)
 			continue;
+		if (player_id == user_id)
+			continue;
 		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
 	}
 }

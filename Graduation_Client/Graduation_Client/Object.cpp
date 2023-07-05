@@ -212,6 +212,7 @@ void Vent::Interaction(int playerType)
 			packet.door_num = Input::GetInstance()->m_pPlayer->m_vent_number;
 
 			network.send_packet(&packet);
+			SetOpen(true);
 #endif
 #if !USE_NETWORK
 			SetOpen(true);
