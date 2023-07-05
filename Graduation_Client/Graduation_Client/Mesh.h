@@ -302,8 +302,8 @@ protected:
 class TexturedRectMesh : public Mesh
 {
 protected:
-	int								m_nWidth;
-	int								m_nLength;
+	float								m_nWidth;
+	float								m_nLength;
 
 protected:
 	XMFLOAT2* m_pxmf2TextureCoords0 = NULL;
@@ -313,11 +313,11 @@ protected:
 	D3D12_VERTEX_BUFFER_VIEW		m_d3dTextureCoord0BufferView;
 
 public:
-	TexturedRectMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int xStart, int zStart, int nWidth, int nLength);
+	TexturedRectMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float xStart, float zStart, float nWidth, float nLength);
 	virtual ~TexturedRectMesh();
 
-	int GetWidth() { return(m_nWidth); }
-	int GetLength() { return(m_nLength); }
+	float GetWidth() { return(m_nWidth); }
+	float GetLength() { return(m_nLength); }
 
 	virtual void ReleaseUploadBuffers();
 

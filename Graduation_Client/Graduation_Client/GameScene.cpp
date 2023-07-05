@@ -329,6 +329,8 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	if (pCeilModel) delete pCeilModel;
 	if (pCubeModel) delete pCubeModel;
 
+	m_pGauge = new InteractionGaugeUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/f.dds");
+
 	MakeVents(pd3dDevice, pd3dCommandList);
 	MakeDoors(pd3dDevice, pd3dCommandList);
 	MakePowers(pd3dDevice, pd3dCommandList);
@@ -881,6 +883,7 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		Vents[i] = new Vent();
 		Vents[i]->SetChild(pVentModel->m_pModelRootObject, true);
 		reinterpret_cast<Vent*>(Vents[i])->m_pInteractionUI = VentUI;
+		reinterpret_cast<Vent*>(Vents[i])->SetGaugeUI(m_pGauge);
 	}
 	Vents[0]->SetPosition(XMFLOAT3(97.2155f, 1.0061f, 40.43311f));
 	reinterpret_cast<Vent*>(Vents[0])->SetOpenPos(XMFLOAT3(98.94085f, 1.0061f, 42.29158f));
@@ -891,7 +894,7 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	Vents[2]->SetPosition(XMFLOAT3(20.43311f, 1.0061f, -77.6103f));
 	reinterpret_cast<Vent*>(Vents[2])->SetOpenPos(XMFLOAT3(22.29154f, 1.0061f, -75.88629f));
 	reinterpret_cast<Vent*>(Vents[2])->SetRotation(DEGREE90);
-	Vents[3]->SetPosition(XMFLOAT3(18.56689, 1.0061, -77.6103));
+	Vents[3]->SetPosition(XMFLOAT3(18.56689f, 1.0061f, -77.6103f));
 	reinterpret_cast<Vent*>(Vents[3])->SetOpenPos(XMFLOAT3(16.70864f, 1.0061f, -79.3296f));
 	reinterpret_cast<Vent*>(Vents[3])->SetRotation(DEGREE90);
 	Vents[4]->SetPosition(XMFLOAT3(-56.00388f, 1.033527f, -40.54385f));
@@ -922,6 +925,7 @@ void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_pDoors[i] = new Door();
 		m_pDoors[i]->SetChild(pDoorModel->m_pModelRootObject, true);
 		reinterpret_cast<Door*>(m_pDoors[i])->m_pInteractionUI = doorUI;
+		reinterpret_cast<Door*>(m_pDoors[i])->SetGaugeUI(m_pGauge);
 	}
 	
 	m_pDoors[0]->SetPosition(XMFLOAT3(-29.73866f, 0.0f, 39.6f)); 
@@ -957,18 +961,19 @@ void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 		m_pPowers[i]->SetChild(pElecModel->m_pModelRootObject, true);
 		m_pPowers[i]->Init();
 		m_pPowers[i]->SetUI(PowerUI);
+		m_pPowers[i]->SetGaugeUI(m_pGauge);
 		//m_pPowers[i]->UpdateTransform(nullptr);
 	}
 
-	m_pPowers[0]->SetPosition(XMFLOAT3(-0.7033535, 1.5, 76.76)); // piano
+	m_pPowers[0]->SetPosition(XMFLOAT3(-0.7033535f, 1.5f, 76.76f)); // piano
 	m_pPowers[0]->SetRotation(DEGREE270);
-	m_pPowers[1]->SetPosition(XMFLOAT3(-54.11389, 1.5, -66.95)); // classroom
+	m_pPowers[1]->SetPosition(XMFLOAT3(-54.11389f, 1.5f, -66.95f)); // classroom
 	m_pPowers[1]->SetRotation(DEGREE270);
-	m_pPowers[2]->SetPosition(XMFLOAT3(60.87, 1.5, -70)); // porest
+	m_pPowers[2]->SetPosition(XMFLOAT3(60.87f, 1.5f, -70.0f)); // porest
 	m_pPowers[2]->SetRotation(DEGREE180);
-	m_pPowers[3]->SetPosition(XMFLOAT3(67.6, 1.5, 40.6322)); // broadcastingroom
+	m_pPowers[3]->SetPosition(XMFLOAT3(67.6f, 1.5f, 40.6322f)); // broadcastingroom
 	m_pPowers[3]->SetRotation(DEGREE0);
-	m_pPowers[4]->SetPosition(XMFLOAT3(65.231, 1.5, -27.5)); // maze
+	m_pPowers[4]->SetPosition(XMFLOAT3(65.231f, 1.5f, -27.5f)); // maze
 	m_pPowers[4]->SetRotation(DEGREE270);
 
 	if (pElecModel) delete pElecModel;
@@ -1013,6 +1018,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 		}
 	}
 	for (int i = 0; i < NUM_VENT; ++i) {
+		Vents[i]->update(elapsedTime);
 		if (reinterpret_cast<Vent*>(Vents[i])->IsPlayerNear(PlayerPos)) {
 			m_pPlayer->m_pNearVent = Vents[i];
 			IsNearVent = true;
@@ -1080,7 +1086,8 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	LoadedModelInfo* pPliersModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Pliers.bin", nullptr);
 	LoadedModelInfo* pDriverModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Screwdriver_Cross.bin", nullptr);
 	LoadedModelInfo* pWrenchModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Wrench_Combination.bin", nullptr);
-	
+	LoadedModelInfo* pChipModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Chip.bin", nullptr);
+
 	Items[0] = new GameObject();
 	Items[0]->SetChild(pHammerModel->m_pModelRootObject, true);
 	Items[1] = new GameObject();
@@ -1091,12 +1098,15 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	Items[3]->SetChild(pPliersModel->m_pModelRootObject, true);
 	Items[4] = new GameObject();
 	Items[4]->SetChild(pDriverModel->m_pModelRootObject, true);
-	
+	Items[5] = new GameObject();
+	Items[5]->SetChild(pChipModel->m_pModelRootObject, true);
+
 	for (int i = 0; i < NUM_ITEMBOX; ++i) {
 		m_pBoxes[i] = new ItemBox();
 		m_pBoxes[i]->SetChild(pBoxModel->m_pModelRootObject, true);
 		m_pBoxes[i]->SetUI(BoxUI);
-		for (int j = 0; j < 5; ++j) {
+		m_pBoxes[i]->SetGaugeUI(m_pGauge); 
+		for (int j = 0; j < 6; ++j) {
 			if (Items[j]) {
 				m_pBoxes[i]->InitItems(j, Items[j]);
 			}
@@ -1156,4 +1166,5 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	if (pPliersModel) delete pPliersModel;
 	if (pDriverModel) delete pDriverModel;
 	if (pWrenchModel) delete pWrenchModel;
+	if (pChipModel) delete pChipModel;
 }
