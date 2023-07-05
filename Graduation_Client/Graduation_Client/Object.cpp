@@ -213,7 +213,9 @@ void Vent::Interaction(int playerType)
 
 			network.send_packet(&packet);
 #endif
+#if !USE_NETWORK
 			SetOpen(true);
+#endif
 		}
 		break;
 	case TYPE_DEAD_PLAYER:
