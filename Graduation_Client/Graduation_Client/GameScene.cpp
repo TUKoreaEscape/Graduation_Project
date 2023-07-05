@@ -1077,7 +1077,8 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	LoadedModelInfo* pPliersModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Pliers.bin", nullptr);
 	LoadedModelInfo* pDriverModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Screwdriver_Cross.bin", nullptr);
 	LoadedModelInfo* pWrenchModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Wrench_Combination.bin", nullptr);
-	
+	LoadedModelInfo* pChipModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Chip.bin", nullptr);
+
 	Items[0] = new GameObject();
 	Items[0]->SetChild(pHammerModel->m_pModelRootObject, true);
 	Items[1] = new GameObject();
@@ -1088,12 +1089,14 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	Items[3]->SetChild(pPliersModel->m_pModelRootObject, true);
 	Items[4] = new GameObject();
 	Items[4]->SetChild(pDriverModel->m_pModelRootObject, true);
-	
+	Items[5] = new GameObject();
+	Items[5]->SetChild(pChipModel->m_pModelRootObject, true);
+
 	for (int i = 0; i < NUM_ITEMBOX; ++i) {
 		m_pBoxes[i] = new ItemBox();
 		m_pBoxes[i]->SetChild(pBoxModel->m_pModelRootObject, true);
 		m_pBoxes[i]->SetUI(BoxUI);
-		for (int j = 0; j < 5; ++j) {
+		for (int j = 0; j < 6; ++j) {
 			if (Items[j]) {
 				m_pBoxes[i]->InitItems(j, Items[j]);
 			}
@@ -1153,4 +1156,5 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	if (pPliersModel) delete pPliersModel;
 	if (pDriverModel) delete pDriverModel;
 	if (pWrenchModel) delete pWrenchModel;
+	if (pChipModel) delete pChipModel;
 }
