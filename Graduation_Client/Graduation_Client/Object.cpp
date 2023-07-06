@@ -1408,11 +1408,14 @@ void ItemBox::Interaction(int playerType)
 		case TYPE_PLAYER:
 			if (m_item == GAME_ITEM::ITEM_NONE) break;
 			if (m_fCooltime >= GLOBAL_INTERACTION_COOLTIME) {
-				//if (Input::GetInstance()->m_pPlayer->PickUpItem(m_item))
-				Network& network = *Network::GetInstance();
-				network.Send_Picking_Fix_Object_Packet(m_item_box_index, m_item);
-				m_item = GAME_ITEM::ITEM_NONE;
-				m_fCooltime = 0;
+				if (Input::GetInstance()->m_pPlayer->PickUpItem(m_item)) {
+#if USE_NETWORK
+					Network& network = *Network::GetInstance();
+					network.Send_Picking_Fix_Object_Packet(m_item_box_index, m_item);
+#endif
+					m_item = GAME_ITEM::ITEM_NONE;
+					m_fCooltime = 0;
+				}
 			}
 			break;
 		}

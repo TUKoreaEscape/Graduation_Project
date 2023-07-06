@@ -170,7 +170,9 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			for (int i = 0; i < m_nPlayTagger; ++i) m_UITagger[i]->render(pd3dCommandList);
 		}
 		else {
-			for (int i = 0; i < m_nPlayPlayer; ++i) m_UIPlayer[i]->render(pd3dCommandList);
+			m_UIPlayer[0]->render(pd3dCommandList);
+			int index = m_pPlayer->GetItem();
+			if (index != -1) m_UIPlayer[1 + index]->render(pd3dCommandList);
 		}
 		break;
 	case ENDING_GAME:
@@ -1252,10 +1254,13 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pBoxes[16]->SetRotation(DEGREE180);
 	m_pBoxes[17]->SetPosition(37.7f, 0.0f, -0.4f);
 	m_pBoxes[17]->SetRotation(DEGREE270);
+	m_pBoxes[17]->SetItem(GAME_ITEM::ITEM_HAMMER);
 	m_pBoxes[18]->SetPosition(-34.2f, 0.0f, 0.5f);
 	m_pBoxes[18]->SetRotation(DEGREE270);
+	m_pBoxes[18]->SetItem(GAME_ITEM::ITEM_LIFECHIP);
 	m_pBoxes[19]->SetPosition(-3.7f, 0.0f, 16.734f);
 	m_pBoxes[19]->SetRotation(DEGREE0);
+	m_pBoxes[19]->SetItem(GAME_ITEM::ITEM_DRILL);
 	
 	if (pBoxModel) delete pBoxModel;
 

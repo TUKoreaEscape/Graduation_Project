@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "Camera.h"
 #include "Game_state.h"
+#include "protocol.h"
 
 #define DIR_FORWARD					0x01
 #define DIR_BACKWARD				0x02
@@ -142,4 +143,9 @@ public:
 	int							m_power_number = -1;
 	int							m_vent_number = -1;
 	int							m_itembox_number = -1;
+
+	GAME_ITEM::ITEM				m_got_item = GAME_ITEM::ITEM_NONE;
+
+	bool PickUpItem(GAME_ITEM::ITEM item);
+	int GetItem();
 };

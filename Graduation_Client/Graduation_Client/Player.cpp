@@ -375,6 +375,39 @@ void Player::SetLookAt(XMFLOAT3& xmf3Target, XMFLOAT3& xmf3Up)
 	m_xmf3Up = XMFLOAT3(0, 1, 0);
 }
 
+bool Player::PickUpItem(GAME_ITEM::ITEM item)
+{
+	if (item == GAME_ITEM::ITEM_NONE) return false;
+	if (item == GAME_ITEM::ITEM_LIFECHIP) {
+		if (GetType() == TYPE_DEAD_PLAYER) {
+			SetPlayerType(TYPE_PLAYER);
+			return true;
+		}
+		return false;
+	}
+	if (m_got_item != GAME_ITEM::ITEM_NONE) return false;
+	m_got_item = item;
+	return true;
+}
+
+int Player::GetItem()
+{
+	switch (m_got_item) {
+	case GAME_ITEM::ITEM_HAMMER:
+		return 0;
+	case GAME_ITEM::ITEM_DRILL:
+		return 1;
+	case GAME_ITEM::ITEM_WRENCH:
+		return 2;
+	case GAME_ITEM::ITEM_PLIERS:
+		return 3;
+	case GAME_ITEM::ITEM_DRIVER:
+		return 4;
+	default:
+		return -1;
+	}
+}
+
 void Player::ReleaseShaderVariables()
 {
 	//if (m_pCamera) m_pCamera->ReleaseShaderVariables();
