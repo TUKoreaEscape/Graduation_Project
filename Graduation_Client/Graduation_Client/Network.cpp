@@ -228,9 +228,7 @@ void Network::ProcessPacket(char* ptr)
 		
 	case SC_PACKET::SC_PACKET_LOGINFAIL:
 	{
-		std::cout << "========================================" << std::endl;
-		std::cout << ">>>>>> 로그인에 실패하였습니다@ <<<<<<" << std::endl;
-		std::cout << "========================================" << std::endl;
+		Input::GetInstance()->m_errorState = 1;
 		break;
 	}
 
@@ -254,17 +252,16 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_CREATE_ID_OK:
 	{
-		std::cout << "========================================" << std::endl;
-		std::cout << ">>> 아이디 생성에 성공하였습니다! <<<" << std::endl;
-		std::cout << "========================================" << std::endl;
+		Input::GetInstance()->m_cs_packet_login.size = sizeof(Input::GetInstance()->m_cs_packet_login);
+		Input::GetInstance()->m_cs_packet_login.type = CS_PACKET::CS_PACKET_LOGIN;
+
+		send_packet(&Input::GetInstance()->m_cs_packet_login);
 		break;
 	}
 
 	case SC_PACKET::SC_PACKET_CREATE_ID_FAIL:
 	{
-		std::cout << "========================================" << std::endl;
-		std::cout << ">>> 아이디 생성에 실패하였습니다! <<<" << std::endl;
-		std::cout << "========================================" << std::endl;
+		Input::GetInstance()->m_errorState = 2;
 		break;
 	}
 
