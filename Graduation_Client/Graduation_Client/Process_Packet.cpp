@@ -388,8 +388,12 @@ void Network::Process_Pick_Item_Update(char* ptr)
 	
 	m_pBoxes[packet->box_index]->m_item = GAME_ITEM::ITEM_NONE;
 	
-	if (packet->own_id == m_pPlayer->GetID())
-		; // 여기서 내가 가졌다는걸 처리해야함
+	if (packet->own_id == m_pPlayer->GetID()) {
+		if (packet->item_type == GAME_ITEM::ITEM_LIFECHIP)
+			m_pPlayer->SetType(TYPE_PLAYER);
+		else
+			m_pPlayer->m_got_item = packet->item_type;
+	}
 }
 
 void Network::Process_Active_Altar(char* ptr)

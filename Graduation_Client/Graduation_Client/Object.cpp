@@ -178,26 +178,15 @@ void Vent::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Vent::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	if (IsOpen) return;
 	if (Input::GetInstance()->m_pPlayer->m_Type == TYPE_TAGGER) return;
+	if (IsOpen) return;
 	if (IsNear) {
-		if (m_bIsBlocked) {
-			if (m_ppInteractionUIs[1]) {
-				if (m_dir == DEGREE90 || m_dir == DEGREE270)
-					m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.0f, m_xmf4x4ToParent._43);
-				else
-					m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
-				m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
-			}
-		}
-		else {
-			if (m_ppInteractionUIs[0]) {
-				if (m_dir == DEGREE90 || m_dir == DEGREE270)
-					m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.0f, m_xmf4x4ToParent._43);
-				else
-					m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
-				m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
-			}
+		if (m_ppInteractionUIs[0]) {
+			if (m_dir == DEGREE90 || m_dir == DEGREE270)
+				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.0f, m_xmf4x4ToParent._43);
+			else
+				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
+			m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
 		}
 	}
 }
@@ -214,7 +203,6 @@ void Vent::SetPosition(XMFLOAT3 xmf3Position)
 
 void Vent::Interaction(int playerType)
 {
-	if (true == m_bIsBlocked) return;
 	if (true == IsOpen) return;
 	switch (playerType) {
 	case TYPE_TAGGER:
@@ -1417,13 +1405,11 @@ void ItemBox::Interaction(int playerType)
 			if (m_item == GAME_ITEM::ITEM_NONE) break;
 			if (m_fCooltime >= GLOBAL_INTERACTION_COOLTIME) {
 				if (Input::GetInstance()->m_pPlayer->PickUpItem(m_item)) {
-#if USE_NETWORK
 					Network& network = *Network::GetInstance();
 					network.Send_Picking_Fix_Object_Packet(m_item_box_index, m_item);
-#endif
 					m_item = GAME_ITEM::ITEM_NONE;
-					m_fCooltime = 0;
 				}
+				m_fCooltime = 0;
 			}
 			break;
 		}
