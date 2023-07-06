@@ -40,6 +40,13 @@ Player::Player() : GameObject()
 
 void Player::ChangeCamera(GAME_STATE prev, GAME_STATE p)
 {
+	m_xmf3PrevRight = m_xmf3Right;
+	m_xmf3PrevUp = m_xmf3Up;
+	m_xmf3PrevLook = m_xmf3Look;
+	m_fPrevPitch = m_fPitch;
+	m_fPrevRoll = m_fRoll;
+	m_fPrevYaw = m_fYaw;
+
 	m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
 	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
@@ -80,8 +87,24 @@ void Player::ChangeCamera(GAME_STATE prev, GAME_STATE p)
 		m_pCamera->m_pPlayer = this;
 		break;
 	case PLAYING_GAME:
+		DeleteComponent<PowerInteractionCamera>();
+		AddComponent<FirstPersonCamera>();
+		m_pCamera = GetComponent<FirstPersonCamera>();
+		m_pCamera->m_pPlayer = this;
+		m_xmf3Right = m_xmf3PrevRight;
+		m_xmf3Up = m_xmf3PrevUp;
+		m_xmf3Look = m_xmf3PrevLook;
+		m_fPitch = m_fPrevPitch;
+		m_fRoll = m_fPrevRoll;
+		m_fYaw = m_fPrevYaw;
 		break;
 	case ENDING_GAME:
+		break;
+	case INTERACTION_POWER:
+		DeleteComponent<FirstPersonCamera>();
+		AddComponent<PowerInteractionCamera>();
+		m_pCamera = GetComponent<PowerInteractionCamera>();
+		m_pCamera->m_pPlayer = this;
 		break;
 	}
 }
@@ -266,13 +289,14 @@ void Player::update(float fTimeElapsed)
 	m_xmf3Shift = xmf3Velocity;
 	if (m_pPlayerUpdatedContext[0]) OnPlayerUpdateCallback(fTimeElapsed);
 
-	m_pCamera->SetPosition(Vector3::Add(m_xmf3Position, m_pCamera->GetOffset()));
-	/*DWORD nCurrentCameraMode = m_pCamera->GetMode();
-	if (m_pCameraUpdatedContext) OnCameraUpdateCallback(fTimeElapsed);
-	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->update(fTimeElapsed);
-	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);*/
-	m_pCamera->RegenerateViewMatrix();
-
+	if (Input::GetInstance()->m_gamestate->GetGameState() != INTERACTION_POWER) {
+		m_pCamera->SetPosition(Vector3::Add(m_xmf3Position, m_pCamera->GetOffset()));
+		/*DWORD nCurrentCameraMode = m_pCamera->GetMode();
+		if (m_pCameraUpdatedContext) OnCameraUpdateCallback(fTimeElapsed);
+		if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->update(fTimeElapsed);
+		if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);*/
+		m_pCamera->RegenerateViewMatrix();
+	}
 	fLength = Vector3::Length(m_xmf3Velocity);
 	float fDeceleration = (m_fFriction * fTimeElapsed);
 	if (fDeceleration > fLength) fDeceleration = fLength;

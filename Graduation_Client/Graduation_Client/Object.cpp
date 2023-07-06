@@ -675,6 +675,20 @@ void InteractionObject::SetUI(int index, InteractionUI* ui)
 	if (m_ppInteractionUIs[index]) m_ppInteractionUIs[index]->AddRef();
 }
 
+int InteractionObject::GetDIR() const
+{
+	switch(m_dir) {
+		case DEGREE0:
+			return 0;
+		case DEGREE90:
+			return 1;
+		case DEGREE180:
+			return 2;
+		default:
+			return 3;
+	}
+}
+
 InteractionUI::InteractionUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
 {
 	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
@@ -875,6 +889,7 @@ void PowerSwitch::update(float fElapsedTime)
 	if (IsNear == false) {
 		m_bIsOperating = false;
 		m_fCooltime = 0;
+		Input::GetInstance()->m_gamestate->ChangeSameLevelState();
 		return;
 	}
 	if (false == IsOpen) return;
@@ -895,16 +910,19 @@ void PowerSwitch::update(float fElapsedTime)
 		Reset();
 		m_bIsOperating = false;
 		m_fCooltime = 0;
+		Input::GetInstance()->m_gamestate->ChangeSameLevelState();
 	}
 	if (keyBuffer['f'] & 0xF0 || keyBuffer['F'] & 0xF0) {
 		if (m_fCooltime < GLOBAL_INTERACTION_COOLTIME) return;
 		if (false == CheckAnswer()) {
 			Reset();
 			m_bIsOperating = false;
+			Input::GetInstance()->m_gamestate->ChangeSameLevelState();
 			return;
 		}
 		m_bClear = true;
 		m_bIsOperating = false;
+		Input::GetInstance()->m_gamestate->ChangeSameLevelState();
 #if USE_NETWORK
 		cs_packet_request_electronic_system_activate packet;
 		packet.size = sizeof(packet);
@@ -1042,6 +1060,7 @@ void PowerSwitch::Interaction(int playerType)
 			if (m_fCooltime >= GLOBAL_INTERACTION_COOLTIME) {
 				m_fCooltime = 0;
 				m_bIsOperating = true;
+				Input::GetInstance()->m_gamestate->ChangeSameLevelState();
 			}
 			break;
 		}
@@ -1092,18 +1111,30 @@ void PowerSwitch::SetRotation(DIR d)
 	{
 	case DEGREE0:
 		m_dir = DEGREE0;
+		m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
+		m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
 		break;
 	case DEGREE90:
 		m_dir = DEGREE90;
-		Rotate(0, 90, 0);
+		Rotate(0, 90, 0); 
+		m_xmf3Right = XMFLOAT3(0.0f, 0.0f, -1.0f);
+		m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		m_xmf3Look = XMFLOAT3(1.0f, 0.0f, 0.0f);
 		break;
 	case DEGREE180:
 		m_dir = DEGREE180;
 		Rotate(0, 180, 0);
+		m_xmf3Right = XMFLOAT3(-1.0f, 0.0f, 0.0f);
+		m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		m_xmf3Look = XMFLOAT3(0.0f, 0.0f, -1.0f);
 		break;
 	default:
 		m_dir = DEGREE270;
 		Rotate(0, 270, 0);
+		m_xmf3Right = XMFLOAT3(0.0f, 0.0f, 1.0f);
+		m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		m_xmf3Look = XMFLOAT3(1.0f, 0.0f, 0.0f);
 		break;
 	}
 }

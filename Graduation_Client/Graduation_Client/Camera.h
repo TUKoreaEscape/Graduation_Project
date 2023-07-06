@@ -148,3 +148,13 @@ public:
 	virtual void update(float elapsedTime);
 	virtual void SetLookAt(XMFLOAT3& vLookAt);
 };
+
+class PowerInteractionCamera : public Camera
+{
+public:
+	GameObject* Power = nullptr;
+public:
+	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void update(float elapsedTime);
+	virtual void SetLookAt(XMFLOAT3& vLookAt);
+};

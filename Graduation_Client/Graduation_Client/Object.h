@@ -116,6 +116,10 @@ public:
 	virtual void SetIndex(int index) {};
 	virtual void SetActivate(bool value) {};
 	virtual void SetRotation(DIR d) {};
+
+	virtual XMFLOAT3 GetPosition() { return(XMFLOAT3(m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43)); }
+
+	virtual int GetDIR() const;
 };
 
 class Door : public InteractionObject

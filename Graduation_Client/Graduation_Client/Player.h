@@ -142,4 +142,11 @@ public:
 	int							m_power_number = -1;
 	int							m_vent_number = -1;
 	int							m_itembox_number = -1;
+
+	XMFLOAT3						m_xmf3PrevRight = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	XMFLOAT3						m_xmf3PrevUp = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	XMFLOAT3						m_xmf3PrevLook = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	float m_fPrevPitch = 0.0f;
+	float m_fPrevRoll = 0.0f;
+	float m_fPrevYaw = 0.0f;
 };

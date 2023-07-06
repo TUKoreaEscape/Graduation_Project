@@ -157,6 +157,9 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	case ENDING_GAME:
 		for (int i = 0; i < m_Ending; ++i) m_UIEnding[i]->render(pd3dCommandList);
 		break;
+	case INTERACTION_POWER:
+		if ((m_pPlayer->m_pNearInteractionObejct))
+			reinterpret_cast<PowerSwitch*>(m_pPlayer->m_pNearInteractionObejct)->UIrender(pd3dCommandList);
 	}
 }
 
@@ -751,6 +754,16 @@ void GameScene::CreateShaderResourceViews(ID3D12Device* pd3dDevice, Texture* pTe
 	int nRootParameters = pTexture->GetRootParameters();
 	for (int j = 0; j < nRootParameters; j++) pTexture->SetRootParameterIndex(j, nRootParameterStartIndex + j);
 
+}
+
+void GameScene::Powerrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	for (int i = 0; i < m_nWalls; ++i)
+	{
+		if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
+	}
+	if ((m_pPlayer->m_pNearInteractionObejct))
+		m_pPlayer->m_pNearInteractionObejct->render(pd3dCommandList);
 }
 
 void GameScene::LoadSceneObjectsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName)
