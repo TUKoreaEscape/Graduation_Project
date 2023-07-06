@@ -859,6 +859,7 @@ void PowerSwitch::Rotate(float fPitch, float fYaw, float fRoll)
 void PowerSwitch::SetOpen(bool Open)
 {
 	IsOpen = Open;
+	m_fCooltime = 0;
 }
 
 void PowerSwitch::SetActivate(bool value)
@@ -869,12 +870,14 @@ void PowerSwitch::SetActivate(bool value)
 void PowerSwitch::update(float fElapsedTime)
 {
 	if (m_bClear) return;
+	m_fCooltime += fElapsedTime;
 	if (m_bIsOperating == false) return;
 	if (IsNear == false) {
 		m_bIsOperating = false;
+		m_fCooltime = 0;
 		return;
 	}
-	m_fCooltime += fElapsedTime;
+	if (false == IsOpen) return;
 	UCHAR keyBuffer[256];
 	memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
 	if (keyBuffer['1'] & 0xF0) OperateKnob(0);
@@ -891,8 +894,10 @@ void PowerSwitch::update(float fElapsedTime)
 	if (keyBuffer['c'] & 0xF0 || keyBuffer['C'] & 0xF0) {
 		Reset();
 		m_bIsOperating = false;
+		m_fCooltime = 0;
 	}
-	if (keyBuffer['v'] & 0xF0 || keyBuffer['V'] & 0xF0) {
+	if (keyBuffer['f'] & 0xF0 || keyBuffer['F'] & 0xF0) {
+		if (m_fCooltime < GLOBAL_INTERACTION_COOLTIME) return;
 		if (false == CheckAnswer()) {
 			Reset();
 			m_bIsOperating = false;
@@ -951,14 +956,49 @@ void PowerSwitch::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	int playerType = Input::GetInstance()->m_pPlayer->GetType();
 	if (m_bClear) return;
 	if (IsNear) {
-		if (m_ppInteractionUIs[0]) {
-			if (IsRot)
-				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
-			else
-				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
-			m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+		if (false == IsOpen) {
+			if (playerType == TYPE_PLAYER) {
+				if (m_ppInteractionUIs[0]) {
+					if (IsRot)
+						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
+					else
+						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+				}
+			}
+		}
+		else {
+			if (playerType == TYPE_TAGGER) {
+				if (m_ppInteractionUIs[1]) {
+					if (IsRot)
+						m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
+					else
+						m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+				}
+				return;
+			}
+			if (m_bIsOperating) {
+				if (m_ppInteractionUIs[3]) {
+					if (IsRot)
+						m_ppInteractionUIs[3]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
+					else
+						m_ppInteractionUIs[3]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					m_ppInteractionUIs[3]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+				}
+			}
+			else {
+				if (m_ppInteractionUIs[0]) {
+					if (IsRot)
+						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
+					else
+						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+				}
+			}
 		}
 	}
 }
@@ -966,7 +1006,6 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 void PowerSwitch::Interaction(int playerType)
 {
 	if (m_bClear) return;
-	if (m_bIsOperating) return;
 	if (IsOpen) {
 		switch (playerType) {
 		case TYPE_TAGGER:
@@ -999,7 +1038,11 @@ void PowerSwitch::Interaction(int playerType)
 
 		case TYPE_PLAYER:
 		{
-			m_bIsOperating = true;
+			if (m_bIsOperating) break;
+			if (m_fCooltime >= GLOBAL_INTERACTION_COOLTIME) {
+				m_fCooltime = 0;
+				m_bIsOperating = true;
+			}
 			break;
 		}
 		case TYPE_DEAD_PLAYER:
@@ -1287,15 +1330,16 @@ void ItemBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (IsNear) {
 		if (true == IsOpen) {
 			if (playerType == TYPE_PLAYER) {
+				if (m_item == GAME_ITEM::ITEM_NONE) return;
 				if (m_ppInteractionUIs[2]) {
-					m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
-					m_ppInteractionUIs[2]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+					m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43);
+					m_ppInteractionUIs[2]->BillboardRender(pd3dCommandList, m_dir, 0.0f, m_nUIType);
 				}
 			}
 			else if (playerType == TYPE_TAGGER) {
 				if (m_ppInteractionUIs[1]) {
 					m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
-					m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+					m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, 0.0f, m_nUIType);
 				}
 			}
 		}
@@ -1312,28 +1356,30 @@ void ItemBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void ItemBox::update(float fElapsedTime)
 {
-	if (IsInteraction) {
-		if (IsNear) {
-			if (!IsOpen)
+	if (IsOpen) {
+		m_fCooltime += fElapsedTime;
+	}
+	else {
+		if (IsInteraction) {
+			if (IsNear) {
 				m_fCooltime += fElapsedTime;
-			else
-				m_fCooltime = 0;
-			UCHAR keyBuffer[256];
-			memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
-			if (((keyBuffer['f'] & 0xF0) == false) && ((keyBuffer['F'] & 0xF0) == false)) {
-				m_fCooltime = 0;
+
+				UCHAR keyBuffer[256];
+				memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
+				if (((keyBuffer['f'] & 0xF0) == false) && ((keyBuffer['F'] & 0xF0) == false)) {
+					m_fCooltime = 0;
+					IsInteraction = false;
+				}
+			}
+			else {
 				IsInteraction = false;
+				m_fCooltime = 0;
 			}
 		}
 		else {
-			IsInteraction = false;
 			m_fCooltime = 0;
 		}
 	}
-	else {
-		m_fCooltime = 0;
-	}
-	if (Input::GetInstance()->m_pPlayer->m_Type == TYPE_TAGGER) m_fCooltime = 0;
 	m_fGauge = m_fCooltime / BOX_OPEN_COOLTIME;
 }
 
@@ -1345,8 +1391,15 @@ void ItemBox::Interaction(int playerType)
 		case TYPE_TAGGER:
 			SetOpen(false);
 		case TYPE_PLAYER_YET:
+			break;
 		case TYPE_DEAD_PLAYER:
 		case TYPE_PLAYER:
+			if (m_item == GAME_ITEM::ITEM_NONE) break;
+			if (m_fCooltime >= GLOBAL_INTERACTION_COOLTIME) {
+				//if (Input::GetInstance()->m_pPlayer->PickUpItem(m_item))
+				m_item = GAME_ITEM::ITEM_NONE;
+				m_fCooltime = 0;
+			}
 			break;
 		}
 	}
