@@ -165,6 +165,15 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < NUM_ITEMBOX; ++i) {
 			reinterpret_cast<ItemBox*>(m_pBoxes[i])->UIrender(pd3dCommandList);
 		}
+		for (int i = 0; i < m_nPlay; ++i) m_UIPlay[i]->render(pd3dCommandList);
+		if (m_pPlayer->GetType() == TYPE_TAGGER) {
+			for (int i = 0; i < m_nPlayTagger; ++i) m_UITagger[i]->render(pd3dCommandList);
+		}
+		else {
+			m_UIPlayer[0]->render(pd3dCommandList);
+			int index = m_pPlayer->GetItem();
+			if (index != -1) m_UIPlayer[1 + index]->render(pd3dCommandList);
+		}
 		break;
 	case ENDING_GAME:
 		for (int i = 0; i < m_Ending; ++i) m_UIEnding[i]->render(pd3dCommandList);
@@ -292,6 +301,31 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_UIEnding[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Ending.dds", 0.0f, 0.0f, 2.0f, 2.0f);
 	m_UIEnding[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.8f, -0.8f, 0.15f, 0.1f);
 
+	m_nPlay = 3;
+	m_UIPlay = new GameObject * [m_nPlay];
+	m_UIPlay[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.8f, -0.75f, 0.3f, 0.4f);
+	m_UIPlay[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/life2.dds", 0.8f, -0.75f, 0.3f, 0.4f);
+	m_UIPlay[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.0f, 0.75f, 0.6f, 0.4f);
+	
+
+	m_nPlayPlayer = 1 + 5 + 1;
+	m_UIPlayer = new GameObject * [m_nPlayPlayer];
+	m_UIPlayer[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", -0.75f, -0.75f, 0.4f, 0.4f);
+	m_UIPlayer[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Hammer.dds", -0.75f, -0.75f, 0.4f, 0.4f);
+	m_UIPlayer[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Drill.dds", -0.75f, -0.75f, 0.4f, 0.4f);
+	m_UIPlayer[3] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Wrench.dds", -0.75f, -0.75f, 0.4f, 0.4f);
+	m_UIPlayer[4] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Pliers.dds", -0.75f, -0.75f, 0.4f, 0.4f);
+	m_UIPlayer[5] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Driver.dds", -0.75f, -0.75f, 0.4f, 0.4f);
+	m_UIPlayer[6] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", -0.75f, -0.75f, 0.4f, 0.4f);
+
+	m_nPlayTagger = 3 + 3;
+	m_UITagger = new GameObject * [m_nPlayTagger];
+	m_UITagger[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", -0.8f, -0.8f, 0.3f, 0.3f);
+	m_UITagger[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", -0.8f, -0.45f, 0.3f, 0.3f);
+	m_UITagger[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", -0.8f, -0.1f, 0.3f, 0.3f);
+	m_UITagger[3] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/life.dds", -0.8f, -0.8f, 0.3f, 0.3f);
+	m_UITagger[4] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/life.dds", -0.8f, -0.45f, 0.3f, 0.3f);
+	m_UITagger[5] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/life.dds", -0.8f, -0.1f, 0.3f, 0.3f);
 
 	LPVOID m_pTerrain[ROOM_COUNT]{ m_pMainTerrain ,m_pPianoTerrain,m_pBroadcastTerrain, m_pCubeTerrain ,m_pForestTerrain,m_pClassroomTerrain };
 	
@@ -1220,10 +1254,13 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pBoxes[16]->SetRotation(DEGREE180);
 	m_pBoxes[17]->SetPosition(37.7f, 0.0f, -0.4f);
 	m_pBoxes[17]->SetRotation(DEGREE270);
+	m_pBoxes[17]->SetItem(GAME_ITEM::ITEM_HAMMER);
 	m_pBoxes[18]->SetPosition(-34.2f, 0.0f, 0.5f);
 	m_pBoxes[18]->SetRotation(DEGREE270);
+	m_pBoxes[18]->SetItem(GAME_ITEM::ITEM_LIFECHIP);
 	m_pBoxes[19]->SetPosition(-3.7f, 0.0f, 16.734f);
 	m_pBoxes[19]->SetRotation(DEGREE0);
+	m_pBoxes[19]->SetItem(GAME_ITEM::ITEM_DRILL);
 	
 	if (pBoxModel) delete pBoxModel;
 

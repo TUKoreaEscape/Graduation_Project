@@ -897,6 +897,8 @@ VS_UI_OUTPUT VSUI(VS_UI_INPUT input, uint nVertexID : SV_VertexID)
 float4 PSUI(VS_UI_OUTPUT input) : SV_TARGET
 {
 	float4 Color = gtxtUITexture.Sample(gssWrap, input.uv);
+	//Color *= 0.2f;
+	clip(Color.w - 0.1f);
 	return Color;
 }
 
