@@ -112,6 +112,7 @@ public:
 	void Process_Altar_LifeChip_Update(char* ptr);
 
 	// 술래 스킬 적용하는 부분!
+	void Process_Activate_Tagger_Skill(char* ptr);
 	void Process_Use_First_Tagger_Skill(char* ptr);
 	void Process_Use_Second_Tagger_Skill(char* ptr);
 	void Process_Use_Third_Tagger_Skill(char* ptr);
@@ -130,7 +131,7 @@ public:
 
 	// 게임 플레이시 사용하는 패킷전송 함수
 	void Send_Use_Tagger_Skill(int skill_type);
-	void Send_Picking_Fix_Object_Packet(short item_type);
+	void Send_Picking_Fix_Object_Packet(int box_index, GAME_ITEM::ITEM item_type);
 	void Send_Fix_Object_Box_Update(short box_num, bool value);
 	void Send_Attack_Packet();
 

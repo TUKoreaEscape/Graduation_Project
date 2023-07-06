@@ -854,11 +854,6 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 	if (item_index == -1)
 		return;
 
-	bool ret = room.Pick_Item(item_index);
-
-	if (ret == false)
-		return;
-
 	if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_DRILL)
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_DRILL, true);
 	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_HAMMER)

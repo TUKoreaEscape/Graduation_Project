@@ -311,6 +311,7 @@ struct cs_packet_pick_fix_item {
 	unsigned char	type;
 
 	unsigned short	index;
+	GAME_ITEM::ITEM item_type;
 };
 
 struct cs_packet_request_exit_room {

@@ -87,15 +87,15 @@ void Network::Send_Loading_Success_Packet()
 	send_packet(&packet);
 }
 
-void Network::Send_Picking_Fix_Object_Packet(short index)
+void Network::Send_Picking_Fix_Object_Packet(int box_index, GAME_ITEM::ITEM item_type)
 {
 	cs_packet_pick_fix_item packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET::CS_PACKET_PICK_ITEM;
-	packet.index = index;
+	packet.index = box_index;
+	packet.item_type = item_type;
 
 	send_packet(&packet);
-	// 이쪽은 생명칩 OR 다른 오브젝트가 주변에 있을때 획득요청을 합니다.
 }
 
 void Network::Send_Fix_Object_Box_Update(short box_num, bool value)
@@ -108,6 +108,8 @@ void Network::Send_Fix_Object_Box_Update(short box_num, bool value)
 
 	send_packet(&packet);
 }
+
+
 
 void Network::Send_Attack_Packet()
 {

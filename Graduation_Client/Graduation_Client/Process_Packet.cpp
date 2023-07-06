@@ -384,7 +384,12 @@ void Network::Process_Pick_Item_Box_Update(char* ptr)
 
 void Network::Process_Pick_Item_Update(char* ptr)
 {
-
+	sc_packet_pick_fix_item_update* packet = reinterpret_cast<sc_packet_pick_fix_item_update*>(ptr);
+	
+	m_pBoxes[packet->box_index]->m_item = GAME_ITEM::ITEM_NONE;
+	
+	if (packet->own_id == m_pPlayer->GetID())
+		; // 여기서 내가 가졌다는걸 처리해야함
 }
 
 void Network::Process_Active_Altar(char* ptr)
@@ -397,6 +402,15 @@ void Network::Process_Altar_LifeChip_Update(char* ptr)
 {
 	sc_packet_altar_lifechip_update* packet = reinterpret_cast<sc_packet_altar_lifechip_update*>(ptr);
 	packet->lifechip_count; // 이게 현재 수집된 생명칩 갯수임
+}
+
+void Network::Process_Activate_Tagger_Skill(char* ptr)
+{
+	sc_packet_tagger_skill* packet = reinterpret_cast<sc_packet_tagger_skill*>(ptr);
+	
+	packet->first_skill;
+	packet->second_skill;
+	packet->third_skill;
 }
 
 void Network::Process_Use_First_Tagger_Skill(char* ptr)

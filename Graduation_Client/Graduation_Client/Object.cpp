@@ -1397,6 +1397,8 @@ void ItemBox::Interaction(int playerType)
 			if (m_item == GAME_ITEM::ITEM_NONE) break;
 			if (m_fCooltime >= GLOBAL_INTERACTION_COOLTIME) {
 				//if (Input::GetInstance()->m_pPlayer->PickUpItem(m_item))
+				Network& network = *Network::GetInstance();
+				network.Send_Picking_Fix_Object_Packet(m_item_box_index, m_item);
 				m_item = GAME_ITEM::ITEM_NONE;
 				m_fCooltime = 0;
 			}
@@ -1412,16 +1414,16 @@ void ItemBox::Interaction(int playerType)
 		case TYPE_PLAYER:
 			if (m_fCooltime >= BOX_OPEN_COOLTIME) {
 				SetOpen(true);
+#if USE_NETWORK
+				Network& network = *Network::GetInstance();
+				network.Send_Fix_Object_Box_Update(m_item_box_index, IsOpen);
+#endif
 				m_fCooltime = 0;
 				IsInteraction = false;
 			}
 			break;
 		}
 	}
-#if USE_NETWORK
-	Network& network = *Network::GetInstance();
-	network.Send_Fix_Object_Box_Update(m_item_box_index, IsOpen);
-#endif
 }
 
 void ItemBox::SetOpen(bool open)

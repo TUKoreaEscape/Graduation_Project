@@ -122,8 +122,8 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	case LOGIN:
 		for (int i = 0; i < m_nLogin; ++i)
 		{
-			m_UILogin[i]->render(pd3dCommandList);
 			if (i > 2) break;
+			m_UILogin[i]->render(pd3dCommandList);
 		}
 		if (Input::GetInstance()->m_errorState != 0)
 		{

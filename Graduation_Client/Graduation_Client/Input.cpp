@@ -134,7 +134,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:
-		if (!m_pPlayer->IsAttack() && (m_gamestate->GetGameState() == PLAYING_GAME || m_gamestate->GetGameState() == READY_TO_GAME))
+		if (!m_pPlayer->IsAttack() && m_gamestate->GetGameState() == PLAYING_GAME)
 		{
 #if USE_NETWORK
 			Network& network = *Network::GetInstance();
@@ -164,14 +164,17 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			}
 			else if (xPos >= logininfoRect[0].left && xPos <= logininfoRect[0].right && yPos >= logininfoRect[0].top && yPos <= logininfoRect[0].bottom) //Login
 			{
+#if USE_NETWORK
 				Network& network = *Network::GetInstance();
 				m_cs_packet_login.size = sizeof(m_cs_packet_login);
 				m_cs_packet_login.type = CS_PACKET::CS_PACKET_LOGIN;
 
 				network.send_packet(&m_cs_packet_login);
+#endif
 			}
 			else if (xPos >= logininfoRect[1].left && xPos <= logininfoRect[1].right && yPos >= logininfoRect[1].top && yPos <= logininfoRect[1].bottom) //Create ID
 			{
+#if USE_NETWORK
 				Network& network = *Network::GetInstance();
 				cs_packet_create_id packet;
 				packet.size = sizeof(packet);
@@ -180,6 +183,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 				memcpy(packet.pass_word, m_cs_packet_login.pass_word, sizeof(m_cs_packet_login.pass_word));
 				
 				network.send_packet(&packet);
+#endif
 			}
 			else if (xPos >= logininfoRect[2].left && xPos <= logininfoRect[2].right && yPos >= logininfoRect[2].top && yPos <= logininfoRect[2].bottom)//Login fail
 			{

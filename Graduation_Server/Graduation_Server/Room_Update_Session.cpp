@@ -10,6 +10,8 @@ int Room::Select_Tagger()
 	cGameServer& server = *cGameServer::GetInstance();
 
 	for (int player_id : in_player) {
+		if (player_id == -1)
+			continue;
 		if (player_id == m_tagger_id)
 			continue;
 		server.m_clients[player_id].set_life_chip(true);

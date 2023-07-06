@@ -252,10 +252,7 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_CREATE_ID_OK:
 	{
-		Input::GetInstance()->m_cs_packet_login.size = sizeof(Input::GetInstance()->m_cs_packet_login);
-		Input::GetInstance()->m_cs_packet_login.type = CS_PACKET::CS_PACKET_LOGIN;
-
-		send_packet(&Input::GetInstance()->m_cs_packet_login);
+		Input::GetInstance()->m_SuccessState = 1;
 		break;
 	}
 
@@ -603,6 +600,7 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_PICK_ITEM_UPDATE:
 	{
+		Process_Pick_Item_Update(ptr);
 		break;
 	}
 
@@ -637,6 +635,12 @@ void Network::ProcessPacket(char* ptr)
 		Input::GetInstance()->m_Roominfo[calcul_num].join_member = packet->join_member;
 		Input::GetInstance()->m_Roominfo[calcul_num].state = packet->state;
 		Input::GetInstance()->m_Roominfo[calcul_num].room_number = packet->room_number;
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_TAGGER_SKILL:
+	{
+		Process_Activate_Tagger_Skill(ptr);
 		break;
 	}
 
