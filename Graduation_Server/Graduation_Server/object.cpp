@@ -359,6 +359,13 @@ bool GameItem::Pict_Item()
 	return false;
 }
 
+void GameItem::Set_Box_Open(bool value)
+{
+	m_state_lock->lock();
+	m_is_open = value;
+	m_state_lock->unlock();
+}
+
 void GameItem::Release()
 {
 	delete m_state_lock;

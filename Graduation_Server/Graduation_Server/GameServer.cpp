@@ -472,7 +472,7 @@ void cGameServer::Disconnect(const unsigned int _user_id) // ≈¨∂Û¿Ãæ∆Æ ø¨∞·¿ª «
 		request.request_custom_data = custom_data;
 		request.request_id = _user_id;
 		request.request_custom_data;
-		request.request_name = convertID;
+		request.request_name = convertID; 
 		m_database->insert_request(request);
 	}
 	// ø©±‚º≠ √ ±‚»≠

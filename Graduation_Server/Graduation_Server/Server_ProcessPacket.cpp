@@ -819,17 +819,17 @@ void cGameServer::Process_Item_Box_Update(const int user_id, void* buff)
 
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
+	room.m_fix_item[packet->index].Set_Box_Open(packet->is_open);
+
 	sc_packet_item_box_update update_packet;
 	update_packet.size = sizeof(update_packet);
 	update_packet.type = SC_PACKET::SC_PACKET_ITEM_BOX_UPDATE;
 	update_packet.box_index = packet->index;
-	update_packet.is_open = packet->is_open;
+	update_packet.is_open = room.m_fix_item[packet->index].Is_Box_Open();
 
 	for (int player_id : room.in_player)
 	{
 		if (player_id == -1)
-			continue;
-		if (player_id == user_id)
 			continue;
 		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
 	}

@@ -1388,8 +1388,16 @@ void ItemBox::Interaction(int playerType)
 	IsInteraction = true;
 	if (IsOpen) {
 		switch (playerType) {
-		case TYPE_TAGGER:
+		case TYPE_TAGGER: 
+		{
+#if !USE_NETWORK
 			SetOpen(false);
+#endif
+#if USE_NETWORK
+			Network& network = *Network::GetInstance();
+			network.Send_Fix_Object_Box_Update(m_item_box_index, false);
+#endif
+		}
 		case TYPE_PLAYER_YET:
 			break;
 		case TYPE_DEAD_PLAYER:
@@ -1413,10 +1421,12 @@ void ItemBox::Interaction(int playerType)
 			break;
 		case TYPE_PLAYER:
 			if (m_fCooltime >= BOX_OPEN_COOLTIME) {
+#if !USE_NETWORK
 				SetOpen(true);
+#endif
 #if USE_NETWORK
 				Network& network = *Network::GetInstance();
-				network.Send_Fix_Object_Box_Update(m_item_box_index, IsOpen);
+				network.Send_Fix_Object_Box_Update(m_item_box_index, true);
 #endif
 				m_fCooltime = 0;
 				IsInteraction = false;
