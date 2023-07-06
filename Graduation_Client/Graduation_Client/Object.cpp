@@ -74,6 +74,11 @@ HeightMapTerrain::~HeightMapTerrain(void)
 
 Vent::Vent() : InteractionObject()
 {
+	m_nUIs = 2;
+	m_ppInteractionUIs = new InteractionUI * [m_nUIs];	
+	for (int i = 0; i < m_nUIs; ++i) {
+		m_ppInteractionUIs[i] = nullptr;
+	}
 	m_nUIType = VENT_UI;
 }
 
@@ -176,12 +181,12 @@ void Vent::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (Input::GetInstance()->m_pPlayer->m_Type == TYPE_TAGGER) return;
 	if (IsOpen) return;
 	if (IsNear) {
-		if (m_pInteractionUI) {
+		if (m_ppInteractionUIs[0]) {
 			if (IsRot)
-				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.0f, m_xmf4x4ToParent._43);
+				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.0f, m_xmf4x4ToParent._43);
 			else
-				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
-			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
+			m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
 		}
 	}
 }
@@ -262,6 +267,11 @@ void Vent::update(float fElapsedTime)
 
 Door::Door() : InteractionObject()
 {
+	m_nUIs = 3;
+	m_ppInteractionUIs = new InteractionUI * [m_nUIs];
+	for (int i = 0; i < m_nUIs; ++i) {
+		m_ppInteractionUIs[i] = nullptr;
+	}
 	m_nUIType = DOOR_UI;
 }
 
@@ -429,11 +439,20 @@ void Door::SetPosition(XMFLOAT3 xmf3Position)
 
 void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	//int playerType = Input::GetInstance()->m_pPlayer->GetType();
 	if (IsWorking) return;
 	if (IsNear) {
-		if (m_pInteractionUI) {
-			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f );
-			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+		if (true == IsOpen) {
+			if (m_ppInteractionUIs[1]) {
+				m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
+				m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+			}
+		}
+		else {
+			if (m_ppInteractionUIs[0]) {
+				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
+				m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+			}
 		}
 	}
 }
@@ -649,11 +668,11 @@ InteractionObject::~InteractionObject()
 {
 }
 
-void InteractionObject::SetUI(InteractionUI* ui)
+void InteractionObject::SetUI(int index, InteractionUI* ui)
 {
-	if (m_pInteractionUI) m_pInteractionUI->Release();
-	m_pInteractionUI = ui;
-	if (m_pInteractionUI) m_pInteractionUI->AddRef();
+	if (m_ppInteractionUIs[index]) m_ppInteractionUIs[index]->Release();
+	m_ppInteractionUIs[index] = ui;
+	if (m_ppInteractionUIs[index]) m_ppInteractionUIs[index]->AddRef();
 }
 
 InteractionUI::InteractionUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
@@ -755,6 +774,11 @@ void InteractionUI::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandL
 
 PowerSwitch::PowerSwitch() : InteractionObject()
 {
+	m_nUIs = 5;
+	m_ppInteractionUIs = new InteractionUI * [m_nUIs];	
+	for (int i = 0; i < m_nUIs; ++i) {
+		m_ppInteractionUIs[i] = nullptr;
+	}
 	IsOpen = false;
 	m_nUIType = POWER_UI;
 }
@@ -929,12 +953,12 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (m_bClear) return;
 	if (IsNear) {
-		if (m_pInteractionUI) {
+		if (m_ppInteractionUIs[0]) {
 			if (IsRot)
-				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
+				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
 			else
-				m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
-			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+			m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
 		}
 	}
 }
@@ -1132,6 +1156,11 @@ void Item::Interaction(int playerType)
 
 ItemBox::ItemBox() : InteractionObject()
 {
+	m_nUIs = 4;
+	m_ppInteractionUIs = new InteractionUI * [m_nUIs];
+	for (int i = 0; i < m_nUIs; ++i) {
+		m_ppInteractionUIs[i] = nullptr;
+	}
 	m_nUIType = BOX_UI;
 	m_dir = DEGREE0;
 	for (int i = 0; i < 6; ++i) {
@@ -1254,10 +1283,29 @@ void ItemBox::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void ItemBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	int playerType = Input::GetInstance()->m_pPlayer->GetType();
 	if (IsNear) {
-		if (m_pInteractionUI) {
-			m_pInteractionUI->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
-			m_pInteractionUI->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+		if (true == IsOpen) {
+			if (playerType == TYPE_PLAYER) {
+				if (m_ppInteractionUIs[2]) {
+					m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
+					m_ppInteractionUIs[2]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+				}
+			}
+			else if (playerType == TYPE_TAGGER) {
+				if (m_ppInteractionUIs[1]) {
+					m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
+					m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+				}
+			}
+		}
+		else {
+			if (playerType == TYPE_PLAYER) {
+				if (m_ppInteractionUIs[0]) {
+					m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
+					m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+				}
+			}
 		}
 	}
 }
@@ -1285,6 +1333,7 @@ void ItemBox::update(float fElapsedTime)
 	else {
 		m_fCooltime = 0;
 	}
+	if (Input::GetInstance()->m_pPlayer->m_Type == TYPE_TAGGER) m_fCooltime = 0;
 	m_fGauge = m_fCooltime / BOX_OPEN_COOLTIME;
 }
 

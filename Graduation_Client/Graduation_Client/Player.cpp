@@ -347,6 +347,7 @@ void Player::OnPrepareRender()
 void Player::SetPlayerType(int type)
 {
 	m_playerType = type;
+	m_Type = type;
 }
 
 void Player::render(ID3D12GraphicsCommandList* pd3dCommandList)

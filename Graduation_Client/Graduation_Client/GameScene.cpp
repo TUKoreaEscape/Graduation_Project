@@ -337,6 +337,15 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	if (pCeilModel) delete pCeilModel;
 	if (pCubeModel) delete pCubeModel;
 
+	m_nObejctsUIs = 6;
+	m_ppObjectsUIs = new InteractionUI* [m_nObejctsUIs];
+	m_ppObjectsUIs[0] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fOpen.dds");
+	m_ppObjectsUIs[1] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fClose.dds");
+	m_ppObjectsUIs[2] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fPick.dds");
+	m_ppObjectsUIs[3] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fRepair.dds");
+	m_ppObjectsUIs[4] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/cCancel.dds");
+	m_ppObjectsUIs[5] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/block.dds");
+
 	MakeVents(pd3dDevice, pd3dCommandList);
 	MakeDoors(pd3dDevice, pd3dCommandList);
 	MakePowers(pd3dDevice, pd3dCommandList);
@@ -888,12 +897,12 @@ void GameScene::LoadSceneBushFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	LoadedModelInfo* pVentModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/airvent.bin", nullptr);
-	InteractionUI* VentUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fOpen.dds");
 
 	for (int i = 0; i < NUM_VENT; ++i) {
 		Vents[i] = new Vent();
 		Vents[i]->SetChild(pVentModel->m_pModelRootObject, true);
-		reinterpret_cast<Vent*>(Vents[i])->m_pInteractionUI = VentUI;
+		reinterpret_cast<Vent*>(Vents[i])->SetUI(0, m_ppObjectsUIs[0]);
+		reinterpret_cast<Vent*>(Vents[i])->SetUI(1, m_ppObjectsUIs[5]);
 	}
 	Vents[0]->SetPosition(XMFLOAT3(97.2155f, 1.0061f, 40.43311f));
 	reinterpret_cast<Vent*>(Vents[0])->SetOpenPos(XMFLOAT3(98.94085f, 1.0061f, 42.29158f));
@@ -929,12 +938,13 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	LoadedModelInfo* pDoorModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Future_Door_Final.bin", nullptr);
-	InteractionUI* doorUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fOpen.dds");
-
+	
 	for (int i = 0; i < NUM_DOOR; ++i) {
 		m_pDoors[i] = new Door();
 		m_pDoors[i]->SetChild(pDoorModel->m_pModelRootObject, true);
-		reinterpret_cast<Door*>(m_pDoors[i])->m_pInteractionUI = doorUI;
+		reinterpret_cast<Door*>(m_pDoors[i])->SetUI(0, m_ppObjectsUIs[0]);
+		reinterpret_cast<Door*>(m_pDoors[i])->SetUI(1, m_ppObjectsUIs[1]);
+		reinterpret_cast<Door*>(m_pDoors[i])->SetUI(2, m_ppObjectsUIs[5]);
 	}
 	
 	m_pDoors[0]->SetPosition(XMFLOAT3(-29.73866f, 0.0f, 39.6f)); 
@@ -962,14 +972,17 @@ void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	LoadedModelInfo* pElecModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Power.bin", nullptr);
-	InteractionUI* PowerUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fOpen.dds");
-
+	
 	pElecModel->m_pModelRootObject->SetScale(0.5, 0.5, 0.5);
 	for (int i = 0; i < NUM_POWER; ++i) {
 		m_pPowers[i] = new PowerSwitch();
 		m_pPowers[i]->SetChild(pElecModel->m_pModelRootObject, true);
 		m_pPowers[i]->Init();
-		m_pPowers[i]->SetUI(PowerUI);
+		m_pPowers[i]->SetUI(0, m_ppObjectsUIs[0]);
+		m_pPowers[i]->SetUI(1, m_ppObjectsUIs[1]);
+		m_pPowers[i]->SetUI(2, m_ppObjectsUIs[3]);
+		m_pPowers[i]->SetUI(3, m_ppObjectsUIs[4]);
+		m_pPowers[i]->SetUI(4, m_ppObjectsUIs[5]);
 		//m_pPowers[i]->UpdateTransform(nullptr);
 	}
 
@@ -1088,7 +1101,6 @@ void GameScene::CheckCameraPos(const XMFLOAT3 camera)
 void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	LoadedModelInfo* pBoxModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/AmmoBox.bin", nullptr);
-	InteractionUI* BoxUI = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fOpen.dds");
 	LoadedModelInfo* pDrillModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Drill.bin", nullptr);
 	LoadedModelInfo* pHammerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Hammer_01.bin", nullptr);
 	LoadedModelInfo* pPliersModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Pliers.bin", nullptr);
@@ -1112,7 +1124,10 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	for (int i = 0; i < NUM_ITEMBOX; ++i) {
 		m_pBoxes[i] = new ItemBox();
 		m_pBoxes[i]->SetChild(pBoxModel->m_pModelRootObject, true);
-		m_pBoxes[i]->SetUI(BoxUI);
+		m_pBoxes[i]->SetUI(0,m_ppObjectsUIs[0]);
+		m_pBoxes[i]->SetUI(1, m_ppObjectsUIs[1]);
+		m_pBoxes[i]->SetUI(2, m_ppObjectsUIs[2]); 
+		m_pBoxes[i]->SetUI(3, m_ppObjectsUIs[5]);
 		for (int j = 0; j < 6; ++j) {
 			if (Items[j]) {
 				m_pBoxes[i]->InitItems(j, Items[j]);

@@ -87,7 +87,8 @@ public:
 
 	bool IsInteraction = false;
 
-	InteractionUI* m_pInteractionUI = nullptr;
+	InteractionUI** m_ppInteractionUIs = nullptr;
+	int m_nUIs{};
 	int m_nUIType = -1;
 
 	float m_fPitch{}, m_fYaw{}, m_fRoll{};
@@ -109,7 +110,7 @@ public:
 
 	virtual void Interaction(int playerType) override {};
 
-	virtual void SetUI(InteractionUI* ui);
+	virtual void SetUI(int index, InteractionUI* ui);
 	virtual void SetAnswer(int index, bool answer) {};
 	virtual void SetSwitchValue(int index, bool value) {};
 	virtual void SetIndex(int index) {};

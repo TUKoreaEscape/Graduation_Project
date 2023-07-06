@@ -17,7 +17,7 @@ enum class PVSROOM {
 	CUBE_ROOM
 };
 
-class InteractionGaugeUI;
+class InteractionUI;
 class InteractionObject;
 class ItemBox;
 //GameScene과 Scene을 분리해놓은 이유
@@ -78,6 +78,9 @@ public:
 	PVSROOM m_pvsCamera;
 
 	GameObject* Items[NUM_ITEMS];
+
+	InteractionUI** m_ppObjectsUIs = nullptr;
+	int m_nObejctsUIs{};
 protected:
 	static ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap;
 
