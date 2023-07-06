@@ -100,7 +100,7 @@ void Vent::SetOpen(bool open)
 {
 	if (true == open) {
 		if (IsOpen) return;
-		Rotate(0, 90, 0);
+		Rotate(90, 0, 0);
 		SetPosition(m_xmf3OpenPosition);
 		UpdateTransform(NULL);
 		IsOpen = true;
@@ -108,7 +108,7 @@ void Vent::SetOpen(bool open)
 	}
 	else {
 		if (IsOpen == false) return;
-		Rotate(0, -90, 0);
+		Rotate(-90, 0, 0);
 		SetPosition(m_xmf3ClosePosition);
 		UpdateTransform(NULL);
 		IsOpen = false;
@@ -182,7 +182,7 @@ void Vent::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (IsOpen) return;
 	if (IsNear) {
 		if (m_ppInteractionUIs[0]) {
-			if (IsRot)
+			if (m_dir == DEGREE90 || m_dir == DEGREE270)
 				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.0f, m_xmf4x4ToParent._43);
 			else
 				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);

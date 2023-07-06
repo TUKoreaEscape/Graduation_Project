@@ -905,6 +905,32 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		reinterpret_cast<Vent*>(Vents[i])->SetUI(1, m_ppObjectsUIs[5]);
 	}
 	Vents[0]->SetPosition(XMFLOAT3(97.2155f, 1.0061f, 40.43311f));
+	reinterpret_cast<Vent*>(Vents[0])->SetOpenPos(XMFLOAT3(97.2155f, 2.0061f, 41.43311f));
+	reinterpret_cast<Vent*>(Vents[0])->SetRotation(DEGREE0);
+	Vents[1]->SetPosition(XMFLOAT3(97.27f, 1.0061f, -40.43311f));
+	reinterpret_cast<Vent*>(Vents[1])->SetOpenPos(XMFLOAT3(97.27f, 2.0061f, -41.43311f));
+	reinterpret_cast<Vent*>(Vents[1])->SetRotation(DEGREE180);
+	Vents[2]->SetPosition(XMFLOAT3(20.43311f, 1.0061f, -77.6103f));
+	reinterpret_cast<Vent*>(Vents[2])->SetOpenPos(XMFLOAT3(21.43311f, 2.0061f, -77.6103f));
+	reinterpret_cast<Vent*>(Vents[2])->SetRotation(DEGREE90);
+	Vents[3]->SetPosition(XMFLOAT3(18.56689f, 1.0061f, -77.6103f));
+	reinterpret_cast<Vent*>(Vents[3])->SetOpenPos(XMFLOAT3(17.56689f, 2.0061f, -77.6103f));
+	reinterpret_cast<Vent*>(Vents[3])->SetRotation(DEGREE270);
+	Vents[4]->SetPosition(XMFLOAT3(-56.00388f, 1.0061f, -40.54385f));
+	reinterpret_cast<Vent*>(Vents[4])->SetOpenPos(XMFLOAT3(-56.00388f, 2.0061f, -41.54385f));
+	reinterpret_cast<Vent*>(Vents[4])->SetRotation(DEGREE180);
+	Vents[5]->SetPosition(XMFLOAT3(-56.04684f, 1.0061f, 40.43311f));
+	reinterpret_cast<Vent*>(Vents[5])->SetOpenPos(XMFLOAT3(-56.04684f, 2.0061f, 41.43311f));
+	reinterpret_cast<Vent*>(Vents[5])->SetRotation(DEGREE0);
+	Vents[6]->SetPosition(XMFLOAT3(35.994f, 1.0061f, 40.56689f));
+	reinterpret_cast<Vent*>(Vents[6])->SetOpenPos(XMFLOAT3(35.994f, 2.0061f, 41.56689f));
+	reinterpret_cast<Vent*>(Vents[6])->SetRotation(DEGREE0);
+	Vents[7]->SetPosition(XMFLOAT3(35.96133f, 1.0061f, 23.56689f));
+	reinterpret_cast<Vent*>(Vents[7])->SetOpenPos(XMFLOAT3(35.96133f, 2.0061f, 22.56689f));
+	reinterpret_cast<Vent*>(Vents[7])->SetRotation(DEGREE180);
+
+
+	/*Vents[0]->SetPosition(XMFLOAT3(97.2155f, 1.0061f, 40.43311f));
 	reinterpret_cast<Vent*>(Vents[0])->SetOpenPos(XMFLOAT3(98.94085f, 1.0061f, 42.29158f));
 	reinterpret_cast<Vent*>(Vents[0])->SetRotation(DEGREE0);
 	Vents[1]->SetPosition(XMFLOAT3(97.27f, 1.0061f, -40.43311f));
@@ -928,6 +954,7 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	Vents[7]->SetPosition(XMFLOAT3(35.96133f, 1.0061f, 23.56689f));
 	reinterpret_cast<Vent*>(Vents[7])->SetOpenPos(XMFLOAT3(34.23397f, 1.0061f, 21.70837f));
 	reinterpret_cast<Vent*>(Vents[7])->SetRotation(DEGREE0);
+	*/
 	for (int i = 0; i < NUM_VENT; ++i) {
 		Vents[i]->UpdateTransform(nullptr);
 	}
