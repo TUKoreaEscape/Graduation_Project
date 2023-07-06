@@ -164,6 +164,24 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 				m_inputState = 2;
 				//std::cout << "비밀번호 칸 클릭!" << std::endl;
 			}
+			else if (xPos >= logininfoRect[0].left && xPos <= logininfoRect[0].right && yPos >= logininfoRect[0].top && yPos <= logininfoRect[0].bottom) //Login
+			{
+				//std::cout << "비밀번호 칸 클릭!" << std::endl;
+			}
+			else if (xPos >= logininfoRect[1].left && xPos <= logininfoRect[1].right && yPos >= logininfoRect[1].top && yPos <= logininfoRect[1].bottom) //Create ID
+			{
+				//std::cout << "비밀번호 칸 클릭!" << std::endl;
+			}
+			else if (xPos >= logininfoRect[2].left && xPos <= logininfoRect[2].right && yPos >= logininfoRect[2].top && yPos <= logininfoRect[2].bottom)//Login fail
+			{
+				m_errorState = 0;
+				//std::cout << "비밀번호 칸 클릭!" << std::endl;
+			}
+			else if (xPos >= logininfoRect[3].left && xPos <= logininfoRect[3].right && yPos >= logininfoRect[3].top && yPos <= logininfoRect[3].bottom)//Same ID
+			{
+				m_errorState = 0;
+				//std::cout << "비밀번호 칸 클릭!" << std::endl;
+			}
 			else
 			{
 				m_inputState = 0;
