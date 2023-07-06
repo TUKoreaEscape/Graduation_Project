@@ -173,6 +173,7 @@ void Vent::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Vent::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (Input::GetInstance()->m_pPlayer->m_Type == TYPE_TAGGER) return;
 	if (IsOpen) return;
 	if (IsNear) {
 		if (m_pInteractionUI) {
@@ -1265,7 +1266,7 @@ void ItemBox::update(float fElapsedTime)
 {
 	if (IsInteraction) {
 		if (IsNear) {
-			if (!IsWorking)
+			if (!IsOpen)
 				m_fCooltime += fElapsedTime;
 			else
 				m_fCooltime = 0;
