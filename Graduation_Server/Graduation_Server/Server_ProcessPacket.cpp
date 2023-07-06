@@ -339,7 +339,7 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 	ready_packet.type = SC_PACKET::SC_PACKET_READY;
 	ready_packet.id = user_id;
 	ready_packet.ready_type = packet->ready_type;
-	for (auto player_id : room.in_player)
+	for (int player_id : room.in_player)
 	{
 		if (player_id == -1 || player_id == user_id)
 			continue;
@@ -384,7 +384,7 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 		sc_packet_game_start start_packet;
 		start_packet.size = sizeof(start_packet);
 		start_packet.type = SC_PACKET::SC_PACKET_GAME_START;
-		for (auto player_id : room.in_player)
+		for (int player_id : room.in_player)
 		{
 			if (player_id == -1)
 				continue;
@@ -573,7 +573,7 @@ void cGameServer::Process_Door(const int user_id, void* buff)
 	door_packet.door_number = static_cast<int>(packet->door_num);
 	door_packet.door_state = room.Get_Door_State(static_cast<int>(packet->door_num));
 
-	for (auto player_id : room.in_player) {
+	for (int player_id : room.in_player) {
 		if (player_id == -1)
 			continue;
 		m_clients[player_id].do_send(sizeof(door_packet), &door_packet);
@@ -619,7 +619,7 @@ void cGameServer::Process_Vent(const int user_id, void* buff)
 	update_packet.door_num = packet->door_num;
 	update_packet.door_state = room.m_vent_object[static_cast<int>(packet->door_num)].get_state();
 
-	for (auto player_id : room.in_player) {
+	for (int player_id : room.in_player) {
 		if (player_id == -1)
 			continue;
 		if (player_id == user_id)
@@ -674,7 +674,7 @@ void cGameServer::Process_ElectronicSystem_Open(const int user_id, void* buff)
 	es_packet.es_num = packet->es_num;
 	es_packet.es_state = room.Get_EletronicSystem_State(static_cast<int>(packet->es_num));
 
-	for (auto player_id : room.in_player) {
+	for (int player_id : room.in_player) {
 		if (player_id == -1)
 			continue;
 		m_clients[player_id].do_send(sizeof(es_packet), &es_packet);
@@ -716,7 +716,7 @@ void cGameServer::Process_ElectronicSystem_Reset_By_Player(const int user_id, vo
 	update_packet.type = SC_PACKET::SC_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_PLAYER;
 	update_packet.switch_index = packet->switch_index;
 
-	for (auto player_id : room.in_player)
+	for (int player_id : room.in_player)
 	{
 		if (player_id == -1)
 			continue;
@@ -740,7 +740,7 @@ void cGameServer::Process_ElectronicSystem_Reset_By_Tagger(const int user_id, vo
 	update_packet.type = SC_PACKET::SC_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_TAGGER;
 	update_packet.switch_index = packet->switch_index;
 
-	for (auto player_id : room.in_player)
+	for (int player_id : room.in_player)
 	{
 		if (player_id == -1)
 			continue;
@@ -793,7 +793,7 @@ void cGameServer::Process_ElectronicSystem_Activate(const int user_id, void* buf
 	else
 		update_packet.activate = false;
 
-	for (auto player_id : room.in_player)
+	for (int player_id : room.in_player)
 	{
 		if (player_id == -1)
 			continue;
@@ -825,7 +825,7 @@ void cGameServer::Process_Item_Box_Update(const int user_id, void* buff)
 	update_packet.box_index = packet->index;
 	update_packet.is_open = packet->is_open;
 
-	for (auto player_id : room.in_player)
+	for (int player_id : room.in_player)
 	{
 		if (player_id == -1)
 			continue;
@@ -878,7 +878,7 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 	item_packet.box_index = packet->index;
 	item_packet.item_show = false;
 
-	for (auto player_id : room.in_player)
+	for (int player_id : room.in_player)
 	{
 		if (player_id == -1)
 			continue;
@@ -897,7 +897,7 @@ void cGameServer::Process_Active_Altar(const int user_id)
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_ACTIVATE_ALTAR;
 
-	for (auto player_id : room.in_player)
+	for (int player_id : room.in_player)
 	{
 		if (player_id == -1)
 			continue;
@@ -915,7 +915,7 @@ void cGameServer::Process_Altar_LifeChip_Update(const int user_id)
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_ALTAR_LIFECHIP_UPDATE;
 	packet.lifechip_count = room.m_altar->Get_Life_Chip();
-	for (auto player_id : room.in_player)
+	for (int player_id : room.in_player)
 	{
 		if (player_id == -1)
 			continue;

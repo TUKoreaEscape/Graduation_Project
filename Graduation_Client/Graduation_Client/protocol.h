@@ -593,6 +593,13 @@ struct sc_packet_use_second_tagger_skill {
 	bool			is_start;
 };
 
+struct sc_packet_use_third_tagger_skill {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			unactivate_vent;
+};
+
 struct sc_other_player_move {
 	unsigned char	size;
 	unsigned char	type;

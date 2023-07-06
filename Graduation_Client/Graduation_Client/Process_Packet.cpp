@@ -427,5 +427,8 @@ void Network::Process_Use_Second_Tagger_Skill(char* ptr)
 
 void Network::Process_Use_Third_Tagger_Skill(char* ptr)
 {
+	sc_packet_use_third_tagger_skill* packet = reinterpret_cast<sc_packet_use_third_tagger_skill*>(ptr);
 
+	// 코드상으로 비활성화 하는 친구가 있어야함
+	m_Vents[packet->unactivate_vent];
 }

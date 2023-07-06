@@ -58,7 +58,7 @@ void Room::init_room_by_game_end()
 
 	cGameServer& server = *cGameServer::GetInstance();
 	int i = 0;
-	for (auto player_id : in_player)
+	for (int player_id : in_player)
 	{
 		if (player_id == -1)
 			continue;
@@ -120,7 +120,7 @@ void Room::Exit_Player(int user_id)
 
 
 		cGameServer& server = *cGameServer::GetInstance();
-		for (auto player_id : in_player)
+		for (int player_id : in_player)
 		{
 			if (player_id == -1)
 				continue;
@@ -193,7 +193,7 @@ void Room::init_fix_object_and_life_chip()
 		item_init_packet.data[i].item_type = m_fix_item[i].Get_Item_Type();
 	}
 
-	for (auto player_id : in_player)
+	for (int player_id : in_player)
 		cGameServer::GetInstance()->m_clients[player_id].do_send(sizeof(item_init_packet), &item_init_packet);
 }
 
@@ -313,7 +313,7 @@ void Room::Tagger_Use_First_Skill()
 			packet.electronic_system_close[i] = true;
 	}
 
-	for (auto player_id : in_player) {
+	for (int player_id : in_player) {
 		if (player_id == -1)
 			continue;
 		server.m_clients[player_id].do_send(sizeof(packet), &packet);
@@ -336,7 +336,7 @@ void Room::Tagger_Use_Second_Skill(int room_number)
 	packet.type = SC_PACKET::SC_PACKET_USE_SECOND_TAGGER_SKILL;
 	packet.is_start = true;
 
-	for (auto player_id : in_player) {
+	for (int player_id : in_player) {
 		if (player_id == -1)
 			continue;
 		server.m_clients[player_id].do_send(sizeof(packet), &packet);
@@ -345,7 +345,22 @@ void Room::Tagger_Use_Second_Skill(int room_number)
 
 void Room::Tagger_Use_Third_Skill()
 {
+	srand(time(NULL));
+	
+	cGameServer& server = *cGameServer::GetInstance();
 
+	int unactive_vent_number = rand() % m_vent_object.size();
+
+	sc_packet_use_third_tagger_skill packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_USE_THIRD_TAGGER_SKILL;
+	packet.unactivate_vent = unactive_vent_number;
+
+	for (int player_id : in_player) {
+		if (player_id == -1)
+			continue;
+		server.m_clients[player_id].do_send(sizeof(packet), &packet);
+	}
 }
 
 void Room::Update_Player_Position() // 사용하지 않습니다.
