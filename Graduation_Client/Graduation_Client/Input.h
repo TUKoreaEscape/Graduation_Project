@@ -35,6 +35,7 @@ public:
 
 	int								m_inputState = 0; //0->x , 1->Id입력, 2->password입력
 	int								m_errorState = 0;
+	int								m_SuccessState = 0;
 
 	float speed = 60.0f;
 

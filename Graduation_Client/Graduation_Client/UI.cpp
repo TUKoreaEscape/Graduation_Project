@@ -3,7 +3,7 @@
 
 RECT_FLOAT idRect{ 0,0,0,0 };
 RECT_FLOAT passwordRect{ 0,0,0,0 };
-RECT_FLOAT logininfoRect[4]{ 0, };
+RECT_FLOAT logininfoRect[5]{ 0, };
 RECT_FLOAT roominfoRect[6]{ 0, };
 RECT_FLOAT roomPageRect[2]{ 0, };
 RECT_FLOAT pageNumRect{ 0,0,0,0 };
@@ -25,6 +25,7 @@ void UpdateRectSize(HWND hWnd)
 	logininfoRect[1] = RECT_FLOAT{ clientWidth / float(1600.0 / 415.0), clientHeight / float(900.0 / 665.0), clientWidth / float(1600.0 / 575.0), clientHeight / float(900.0 / 725.0) };
 	logininfoRect[2] = RECT_FLOAT{ clientWidth / float(1600.0 / 480.0), clientHeight / float(900.0 / 460.0), clientWidth / float(1600.0 / 1120.0), clientHeight / float(900.0 / 620.0) };
 	logininfoRect[3] = RECT_FLOAT{ clientWidth / float(1600.0 / 480.0), clientHeight / float(900.0 / 460.0), clientWidth / float(1600.0 / 1120.0), clientHeight / float(900.0 / 620.0) };
+	logininfoRect[4] = RECT_FLOAT{ clientWidth / float(1600.0 / 480.0), clientHeight / float(900.0 / 460.0), clientWidth / float(1600.0 / 1120.0), clientHeight / float(900.0 / 620.0) };
 
 	roominfoRect[0] = RECT_FLOAT{ clientWidth / float(1600.0 / 280.0), clientHeight / float(900.0 / 45.0), clientWidth / float(1600.0 / 680.0), clientHeight / float(900.0 / 225.0) };
 	roominfoRect[1] = RECT_FLOAT{ clientWidth / float(1600.0 / 920.0), clientHeight / float(900.0 / 45.0), clientWidth / float(1600.0 / 1320.0), clientHeight / float(900.0 / 225.0) };

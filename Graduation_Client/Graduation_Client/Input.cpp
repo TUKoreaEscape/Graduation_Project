@@ -184,14 +184,23 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			else if (xPos >= logininfoRect[2].left && xPos <= logininfoRect[2].right && yPos >= logininfoRect[2].top && yPos <= logininfoRect[2].bottom)//Login fail
 			{
 				m_errorState = 0;
+				m_SuccessState = 0;
 			}
 			else if (xPos >= logininfoRect[3].left && xPos <= logininfoRect[3].right && yPos >= logininfoRect[3].top && yPos <= logininfoRect[3].bottom)//Same ID
 			{
+				m_errorState = 0;
+				m_SuccessState = 0;
+			}
+			else if (xPos >= logininfoRect[4].left && xPos <= logininfoRect[4].right && yPos >= logininfoRect[4].top && yPos <= logininfoRect[4].bottom)//SuccessfullycreatedID
+			{
+				m_SuccessState = 0;
 				m_errorState = 0;
 			}
 			else
 			{
 				m_inputState = 0;
+				m_SuccessState = 0;
+				m_errorState = 0;
 			}
 		}
 		else if (m_gamestate->GetGameState() == ROOM_SELECT)

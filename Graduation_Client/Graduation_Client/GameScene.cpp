@@ -120,9 +120,10 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	switch (GameState::GetInstance()->GetGameState()) {
 	case LOGIN:
-		for (int i = 0; i < m_nLogin-2; ++i)
+		for (int i = 0; i < m_nLogin; ++i)
 		{
 			m_UILogin[i]->render(pd3dCommandList);
+			if (i > 2) break;
 		}
 		if (Input::GetInstance()->m_errorState != 0)
 		{
@@ -130,6 +131,7 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			else if (Input::GetInstance()->m_errorState == 2) m_UILogin[4]->render(pd3dCommandList);
 			
 		}
+		if (Input::GetInstance()->m_SuccessState) m_UILogin[5]->render(pd3dCommandList);
 		break;
 	case ROOM_SELECT:
 		for (int i = 0; i < m_nRoomSelect; ++i) m_UIRoomSelect[i]->render(pd3dCommandList);
@@ -242,13 +244,14 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pClassroomTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), -20, -60, 81, 41, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
 
 	//UI생성 영역 dds파일 다음 x,y,width,height가 순서대로 들어간다. 아무것도 넣지않으면 화면중앙에 1x1사이즈로 나온다.
-	m_nLogin = 5;
+	m_nLogin = 6;
 	m_UILogin = new GameObject * [m_nLogin];
 	m_UILogin[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Login.dds", 0.0f, 0.0f, 2.0f, 2.0f);
 	m_UILogin[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/LoginButton.dds", -0.67f, -0.55f, 0.2f, 0.14f);
 	m_UILogin[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/CreateID.dds", -0.38f, -0.55f, 0.2f, 0.14f);
 	m_UILogin[3] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Loginfail.dds", 0.0f, -0.2f, 0.8f, 0.35f);
 	m_UILogin[4] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SameID.dds", 0.0f, -0.2f, 0.8f, 0.35f);
+	m_UILogin[5] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SuccessfullycreatedID.dds", 0.0f, -0.2f, 0.8f, 0.35f);
 
 	m_nRoomSelect = 9;
 	m_UIRoomSelect = new GameObject * [m_nRoomSelect];
