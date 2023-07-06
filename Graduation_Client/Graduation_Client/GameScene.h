@@ -47,12 +47,18 @@ public:
 	int m_nWaitingRoom;
 	int m_nCustomizing;
 	int m_Ending;
+	int m_nPlay;
+	int m_nPlayPlayer;
+	int m_nPlayTagger;
 
 	GameObject** m_UILogin = nullptr;
 	GameObject** m_UIRoomSelect = nullptr;
 	GameObject** m_UIWaitingRoom = nullptr;
 	GameObject** m_UICustomizing = nullptr;
 	GameObject** m_UIEnding = nullptr;
+	GameObject** m_UIPlay = nullptr;
+	GameObject** m_UIPlayer = nullptr;
+	GameObject** m_UITagger = nullptr;
 
 	GameObject* m_pCeilling = nullptr;
 
