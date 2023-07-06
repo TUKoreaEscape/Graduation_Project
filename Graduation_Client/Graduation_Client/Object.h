@@ -98,6 +98,8 @@ public:
 	DIR m_dir = DEGREE0;
 
 	float m_fGauge{};
+
+	bool m_bIsBlocked = false;
 public:
 	InteractionObject();
 	virtual ~InteractionObject();
@@ -116,6 +118,8 @@ public:
 	virtual void SetIndex(int index) {};
 	virtual void SetActivate(bool value) {};
 	virtual void SetRotation(DIR d) {};
+
+	virtual void SetBlock() { m_bIsBlocked = true; };
 };
 
 class Door : public InteractionObject
