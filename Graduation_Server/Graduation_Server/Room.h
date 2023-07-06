@@ -108,6 +108,11 @@ public:
 	void	Update_Door(const int door_num);
 	void	Update_ElectronicSystem_Door(const int es_num, bool value);
 
+public: // 술래 스킬 사용 관련 함수들
+	void	Tagger_Use_First_Skill();
+	void	Tagger_Use_Second_Skill(int room_number);
+	void	Tagger_Use_Third_Skill();
+
 public: // 인게임 오브젝트 state 받아야하는 공간
 	Door_State Get_Door_State(const int door_num) { return m_door_object[door_num].get_state(); }
 	ES_State   Get_EletronicSystem_State(const int es_num) { return m_electrinic_system[es_num].get_state(); }

@@ -268,6 +268,33 @@ void cGameServer::WorkerThread()
 			break;
 		}
 
+		case OP_TYPE::OP_USE_FIRST_TAGGER_SKILL:
+		{
+			break;
+		}
+
+		case OP_TYPE::OP_USE_SECOND_TAGGER_SKILL:
+		{
+			sc_packet_use_second_tagger_skill packet;
+			packet.size = sizeof(packet);
+			packet.type = SC_PACKET::SC_PACKET_USE_SECOND_TAGGER_SKILL;
+			packet.is_start = false;
+
+			Room& room = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
+			
+			for (auto player_id : room.in_player) {
+				if (player_id == -1)
+					continue;
+				m_clients[player_id].do_send(sizeof(packet), &packet);
+			}
+			break;
+		}
+
+		case OP_TYPE::OP_USE_THIRD_TAGGER_SKILL:
+		{
+			break;
+		}
+
 		case OP_TYPE::OP_VENT_CLOSE:
 		{
 			TIMER_EVENT ev = reinterpret_cast<TIMER_EVENT&>(exp_over->m_wsa_buf);
@@ -747,6 +774,24 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	case CS_PACKET::CS_PACKET_ATTACK:
 	{
 		Process_Attack(user_id);
+		break;
+	}
+
+	case CS_PACKET::CS_PACKET_USE_FIRST_TAGGER_SKILL:
+	{
+		Process_Use_Tagger_Skill(user_id, 0);
+		break;
+	}
+
+	case CS_PACKET::CS_PACKET_USE_SECOND_TAGGER_SKILL:
+	{
+		Process_Use_Tagger_Skill(user_id, 1);
+		break;
+	}
+
+	case CS_PACKET::CS_PACKET_USE_THIRD_TAGGER_SKILL:
+	{
+		Process_Use_Tagger_Skill(user_id, 2);
 		break;
 	}
 

@@ -292,7 +292,7 @@ void DataBase::DataBaseThread()
 					Save_Customizing(request.request_name, init_data);
 				}
 				else // id 생성 실패
-					server.send_create_id_fail_packet(request.request_id, reason);
+					server.send_create_id_fail_packet(request.request_id, reason); // reason 0는 ID중복임
 				break;
 			}
 

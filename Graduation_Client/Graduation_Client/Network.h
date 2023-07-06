@@ -7,7 +7,7 @@
 #include "Server_Timer.h"
 
 #define  DIR_NO 100
-#define  USE_NETWORK 0
+#define  USE_NETWORK 1
 #define	 USE_VOICE 0
 
 class Door;
@@ -110,6 +110,11 @@ public:
 	void Process_Pick_Item_Update(char* ptr);
 	void Process_Active_Altar(char* ptr);
 	void Process_Altar_LifeChip_Update(char* ptr);
+
+	// 술래 스킬 적용하는 부분!
+	void Process_Use_First_Tagger_Skill(char* ptr);
+	void Process_Use_Second_Tagger_Skill(char* ptr);
+	void Process_Use_Third_Tagger_Skill(char* ptr);
 
 	// 게임 시작 전 사용하는 함수들
 	void Send_Request_Room_Info(int page);

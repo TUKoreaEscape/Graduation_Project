@@ -377,6 +377,9 @@ namespace SC_PACKET
 		SC_PACKET_LIFE_CHIP_UPDATE,
 		SC_PACKET_SELECT_TAGGER,
 		SC_PACKET_TAGGER_SKILL,
+		SC_PACKET_USE_FIRST_TAGGER_SKILL,
+		SC_PACKET_USE_SECOND_TAGGER_SKILL,
+		SC_PACKET_USE_THIRD_TAGGER_SKILL,
 		SC_PACKET_DOOR_UPDATE,
 		SC_PACKET_HIDDEN_DOOR_UPDATE,
 		SC_PACKET_ACTIVATE_ALTAR,
@@ -576,6 +579,19 @@ struct sc_packet_tagger_skill {
 	bool			third_skill;
 };
 
+struct sc_packet_use_first_tagger_skill {
+	unsigned char	size;
+	unsigned char	type;
+
+	bool			electronic_system_close[5];
+};
+
+struct sc_packet_use_second_tagger_skill {
+	unsigned char	size;
+	unsigned char	type;
+
+	bool			is_start;
+};
 
 struct sc_other_player_move {
 	unsigned char	size;

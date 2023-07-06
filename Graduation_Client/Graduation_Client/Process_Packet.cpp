@@ -398,3 +398,34 @@ void Network::Process_Altar_LifeChip_Update(char* ptr)
 	sc_packet_altar_lifechip_update* packet = reinterpret_cast<sc_packet_altar_lifechip_update*>(ptr);
 	packet->lifechip_count; // 이게 현재 수집된 생명칩 갯수임
 }
+
+void Network::Process_Use_First_Tagger_Skill(char* ptr)
+{
+	sc_packet_use_first_tagger_skill* packet = reinterpret_cast<sc_packet_use_first_tagger_skill*>(ptr);
+	
+	for (int i = 0; i < 5; ++i) {
+		if (packet[i].electronic_system_close[i])
+			m_pPowers[i]->SetOpen(false);
+		else
+			m_pPowers[i]->SetOpen(true);
+	}
+}
+
+void Network::Process_Use_Second_Tagger_Skill(char* ptr)
+{
+	sc_packet_use_second_tagger_skill* packet = reinterpret_cast<sc_packet_use_second_tagger_skill*>(ptr);
+
+	if (packet->is_start) {
+		for (int i = 0; i < 6; ++i)
+			m_pDoors[i];
+	}
+	else {
+		for (int i = 0; i < 6; ++i)
+			m_pDoors[i];
+	}
+}
+
+void Network::Process_Use_Third_Tagger_Skill(char* ptr)
+{
+
+}

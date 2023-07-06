@@ -266,8 +266,7 @@ void Room::Activate_Altar()
 	m_altar->Set_Valid(true);
 }
 
-void Room::Set_Electronic_System_ONOFF
-()
+void Room::Set_Electronic_System_ONOFF()
 {
 	mt19937 engine((unsigned int)time(NULL));
 	for (int i = 0; i < NUMBER_OF_ELECTRONIC; ++i)
@@ -295,6 +294,58 @@ bool Room::All_Player_Loading()
 			return false;
 	}
 	return true;
+}
+
+void Room::Tagger_Use_First_Skill()
+{
+	cGameServer& server = *cGameServer::GetInstance();
+
+	for (int i = 0; i < m_electrinic_system.size(); ++i)
+		m_electrinic_system[i].Set_Close_Electronic_System();
+
+	sc_packet_use_first_tagger_skill packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_USE_FIRST_TAGGER_SKILL;
+	for (int i = 0; i < m_electrinic_system.size(); ++i) {
+		if (m_electrinic_system[i].get_state() == ES_OPEN)
+			packet.electronic_system_close[i] = false;
+		else
+			packet.electronic_system_close[i] = true;
+	}
+
+	for (auto player_id : in_player) {
+		if (player_id == -1)
+			continue;
+		server.m_clients[player_id].do_send(sizeof(packet), &packet);
+	}
+}
+
+void Room::Tagger_Use_Second_Skill(int room_number)
+{
+	cGameServer& server = *cGameServer::GetInstance();
+
+	TIMER_EVENT ev;
+	ev.room_number = room_number;
+	ev.event_type = EventType::USE_SECOND_TAGGER_SKILL;
+	ev.event_time = chrono::system_clock::now() + 30s;
+
+	server.m_timer_queue.push(ev);
+
+	sc_packet_use_second_tagger_skill packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_USE_SECOND_TAGGER_SKILL;
+	packet.is_start = true;
+
+	for (auto player_id : in_player) {
+		if (player_id == -1)
+			continue;
+		server.m_clients[player_id].do_send(sizeof(packet), &packet);
+	}
+}
+
+void Room::Tagger_Use_Third_Skill()
+{
+
 }
 
 void Room::Update_Player_Position() // 사용하지 않습니다.

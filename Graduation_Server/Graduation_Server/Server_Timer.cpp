@@ -173,6 +173,14 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		return;
 	}
 
+	case EventType::USE_SECOND_TAGGER_SKILL:
+	{
+		EXP_OVER* over = new EXP_OVER;
+		over->m_comp_op = OP_TYPE::OP_USE_SECOND_TAGGER_SKILL;
+		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
+		return;
+	}
+
 	case EventType::GAME_END:
 	{
 		EXP_OVER* over = new EXP_OVER;

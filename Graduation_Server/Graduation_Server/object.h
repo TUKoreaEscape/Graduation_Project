@@ -122,6 +122,7 @@ public:
 	bool Get_On_Off_Switch_Correct_Value(int idx) { return m_correct_on_off_switch[idx]; }
 
 	void Set_On_Off_Switch_Value(int idx, bool value) { m_check_on_off_switch[idx] = value; }
+	void Set_Close_Electronic_System();
 
 	bool Activate_ElectronicSystem();
 

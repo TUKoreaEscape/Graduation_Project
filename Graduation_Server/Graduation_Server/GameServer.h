@@ -35,6 +35,9 @@ enum class EventType : char
 	OPEN_TAGGER_SKILL_FIRST,
 	OPEN_TAGGER_SKILL_SECOND,
 	OPEN_TAGGER_SKILL_THIRD,
+	USE_FIRST_TAGGER_SKILL,
+	USE_SECOND_TAGGER_SKILL,
+	USE_THIRD_TAGGER_SKILL,
 	GAME_END,
 	SERVER_END
 };
@@ -120,6 +123,7 @@ public:
 	void	Process_ElectronicSystem_Reset_By_Player(const int user_id, void* buff);
 	void	Process_ElectronicSystem_Control(const int user_id, void* buff); // 게임방 내 전력장치 스위치 on,off를 처리, 수리를 체크하는 함수
 	void	Process_ElectronicSystem_Activate(const int user_id, void* buff);
+	void	Process_Use_Tagger_Skill(const int user_id, int skill_number);
 	void	Process_Item_Box_Update(const int user_id, void* buff);
 	void	Process_Pick_Fix_Item(const int user_id, void* buff);
 	void	Process_Event(const TIMER_EVENT& ev); // 이벤트를 처리, worker thread로 넘기는 역할을 함 *매우중요*

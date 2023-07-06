@@ -557,6 +557,7 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_PLAYER:
 	{
+		Process_ElectronicSystem_Reset_By_Player(ptr);
 		break;
 	}
 
@@ -639,6 +640,24 @@ void Network::ProcessPacket(char* ptr)
 		Input::GetInstance()->m_Roominfo[calcul_num].join_member = packet->join_member;
 		Input::GetInstance()->m_Roominfo[calcul_num].state = packet->state;
 		Input::GetInstance()->m_Roominfo[calcul_num].room_number = packet->room_number;
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_USE_FIRST_TAGGER_SKILL:
+	{
+		Process_Use_First_Tagger_Skill(ptr);
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_USE_SECOND_TAGGER_SKILL:
+	{
+		Process_Use_Second_Tagger_Skill(ptr);
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_USE_THIRD_TAGGER_SKILL:
+	{
+		Process_Use_Third_Tagger_Skill(ptr);
 		break;
 	}
 

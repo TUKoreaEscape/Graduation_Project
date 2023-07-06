@@ -628,6 +628,37 @@ void cGameServer::Process_Vent(const int user_id, void* buff)
 	}
 }
 
+void cGameServer::Process_Use_Tagger_Skill(const int user_id, int skill_number)
+{
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+	if (room.Get_Tagger_ID() != user_id)
+		return;
+
+	switch (skill_number) {
+	case 0: // firt skill use
+		if (m_clients[user_id].get_first_skill_enable()) {
+			room.Tagger_Use_First_Skill();
+			m_clients[user_id].use_first_skill();
+		}
+		break;
+
+	case 1: // second skill use
+		if (m_clients[user_id].get_second_skill_enable()) {
+			room.Tagger_Use_Second_Skill(m_clients[user_id].get_join_room_number());
+			m_clients[user_id].use_second_skill();
+		}
+		break;
+
+	case 2: // third skill use
+		if (m_clients[user_id].get_third_skill_enable()) {
+			room.Tagger_Use_Third_Skill();
+			m_clients[user_id].use_third_skill();
+		}
+		break;
+	}
+}
+
 void cGameServer::Process_ElectronicSystem_Open(const int user_id, void* buff)
 {
 	cs_packet_request_electronic_system_open* packet = reinterpret_cast<cs_packet_request_electronic_system_open*>(buff);
@@ -688,6 +719,8 @@ void cGameServer::Process_ElectronicSystem_Reset_By_Player(const int user_id, vo
 	for (auto player_id : room.in_player)
 	{
 		if (player_id == -1)
+			continue;
+		if (player_id == user_id)
 			continue;
 		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
 	}
@@ -795,6 +828,8 @@ void cGameServer::Process_Item_Box_Update(const int user_id, void* buff)
 	for (auto player_id : room.in_player)
 	{
 		if (player_id == -1)
+			continue;
+		if (player_id == user_id)
 			continue;
 		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
 	}

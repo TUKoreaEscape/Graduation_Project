@@ -207,6 +207,14 @@ void ElectronicSystem::Reset()
 	}
 }
 
+void ElectronicSystem::Set_Close_Electronic_System()
+{
+	m_state_lock->lock();
+	if(m_fixed_system == false)
+		m_state = ES_CLOSE;
+	m_state_lock->unlock();
+}
+
 void ElectronicSystem::Update_Object(bool value)
 {
 	m_state_lock->lock();
