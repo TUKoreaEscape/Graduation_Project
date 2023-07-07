@@ -165,7 +165,10 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < NUM_ITEMBOX; ++i) {
 			reinterpret_cast<ItemBox*>(m_pBoxes[i])->UIrender(pd3dCommandList);
 		}
-		for (int i = 0; i < m_nPlay; ++i) m_UIPlay[i]->render(pd3dCommandList);
+		for (int i = 0; i < m_nPlay - 1; ++i) m_UIPlay[i]->render(pd3dCommandList);
+		if (m_pPlayer->GetType() == TYPE_PLAYER)reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(1.0f);
+		else  reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(-1.0f);
+		m_UIPlay[2]->render(pd3dCommandList);
 		if (m_pPlayer->GetType() == TYPE_TAGGER) {
 			for (int i = 0; i < 3; ++i) {
 				if (m_pPlayer->GetTaggerSkill(i)) {
@@ -314,8 +317,8 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_nPlay = 3;
 	m_UIPlay = new GameObject * [m_nPlay];
 	m_UIPlay[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.8f, -0.75f, 0.3f, 0.4f);
-	m_UIPlay[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/life2.dds", 0.8f, -0.75f, 0.3f, 0.4f);
-	m_UIPlay[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.0f, 0.75f, 0.6f, 0.4f);
+	m_UIPlay[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.0f, 0.75f, 0.6f, 0.4f);
+	m_UIPlay[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/life2.dds", 0.8f, -0.75f, 0.3f, 0.4f);
 	
 
 	m_nPlayPlayer = 1 + 5;
