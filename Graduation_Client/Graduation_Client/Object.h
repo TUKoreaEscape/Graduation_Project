@@ -13,6 +13,8 @@ constexpr int DOOR_UI = 1;
 constexpr int VENT_UI = 2;
 constexpr int BOX_UI = 3;
 constexpr int POWER_UI = 4;
+constexpr int BLOCKED_UI = 5;
+constexpr int INGAME_UI = 6;
 
 enum DIR {
 	DEGREE0 = 0,
@@ -52,18 +54,6 @@ public:
 	XMFLOAT3 GetScale() { return(m_xmf3Scale); }
 	float GetWidth() { return(m_nWidth * m_xmf3Scale.x); }
 	float GetLength() { return(m_nLength * m_xmf3Scale.z); }
-};
-
-class DoorUI : public GameObject
-{
-public:
-	DoorUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName);
-	virtual ~DoorUI();
-
-	void BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList);
-
-	void Rotate(float fPitch, float fYaw, float fRoll) override;
-
 };
 
 class InteractionUI : public GameObject
@@ -277,4 +267,20 @@ public:
 
 	XMFLOAT4X4 m_xmf4x4CapMatrix;
 	XMFLOAT4X4 m_xmf4x4CapOpenMatrix;
+};
+
+class IngameUI : public GameObject
+{
+public:
+	int m_UIType = INGAME_UI;
+	float m_fGauge{1};
+public:
+	IngameUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName, float x = 0.0f, float y = 0.0f, float width = 1.0f, float height = 1.0f);
+	virtual ~IngameUI();
+
+	void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, float gauge, int type);
+	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
+	void UIrender(ID3D12GraphicsCommandList* pd3dCommandList, float gauge, int type);
+
+	void SetGuage(float f) { m_fGauge = f; };
 };
