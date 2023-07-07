@@ -62,8 +62,11 @@ void Network::Send_Exit_Room()
 
 	send_packet(&packet);
 
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < 5; ++i) {
 		m_ppOther[i]->SetID(-1);
+		m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+		m_ppOther[i]->SetTrackAnimationSet(0, 9);
+	}
 }
 
 void Network::Send_Ready_Packet(bool is_ready)
