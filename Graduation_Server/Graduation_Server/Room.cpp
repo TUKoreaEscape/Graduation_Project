@@ -62,7 +62,7 @@ void Room::init_room_by_game_end()
 	{
 		if (player_id == -1)
 			continue;
-		server.m_clients[player_id].set_user_position(XMFLOAT3(static_cast<float>(6.f - ((float)i * 2.5)), 5.f, -4.f));
+		server.m_clients[player_id].set_user_position(XMFLOAT3(static_cast<float>(6.f - ((float)i * 2.5)), 5.f, -10.f));
 		server.m_clients[player_id].set_life_chip(false);
 		i++;
 	}

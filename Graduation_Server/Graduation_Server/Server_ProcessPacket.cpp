@@ -356,7 +356,7 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 				i++;
 				continue;
 			}
-			m_clients[put_id].set_user_position(XMFLOAT3(static_cast<float>(4.f - ((float)i * 2.5)), 5.f, -4.f));
+			m_clients[put_id].set_user_position(XMFLOAT3(static_cast<float>(4.f - ((float)i * 2.5)), 5.f, -10.f));
 			sc_packet_init_position init_packet;
 			init_packet.size = sizeof(init_packet);
 			init_packet.type = SC_PACKET::SC_PACKET_INIT_POSITION;

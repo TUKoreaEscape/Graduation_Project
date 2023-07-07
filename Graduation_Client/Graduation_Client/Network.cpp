@@ -640,6 +640,7 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_TAGGER_SKILL:
 	{
+		std::cout << "술래스킬 개방" << std::endl;
 		Process_Activate_Tagger_Skill(ptr);
 		break;
 	}

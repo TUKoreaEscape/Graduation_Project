@@ -198,7 +198,7 @@ void cGameServer::WorkerThread()
 
 			TIMER_EVENT next_ev;
 			next_ev.room_number = static_cast<int>(iocp_key);
-			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(FIRST_SKILL_ENABLE_TIME);
+			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(FIRST_TAGGER_SKILL_OPEN_SECOND);
 			next_ev.event_type = EventType::OPEN_TAGGER_SKILL_FIRST;
 			m_timer_queue.push(next_ev);
 			break;
@@ -207,6 +207,9 @@ void cGameServer::WorkerThread()
 		case OP_TYPE::OP_FIRST_TAGGER_SKILL_OPEN:
 		{
 			Room& rl = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
+
+			if (rl.Get_Tagger_ID() == -1)
+				return;
 			m_clients[rl.Get_Tagger_ID()].set_first_skill_enable();
 
 			sc_packet_tagger_skill packet;
@@ -221,7 +224,7 @@ void cGameServer::WorkerThread()
 
 			TIMER_EVENT next_ev;
 			next_ev.room_number = static_cast<int>(iocp_key);
-			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(SECOND_SKILL_ENABLE_TIME);
+			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(SECOND_TAGGER_SKILL_OPEN_SECOND);
 			next_ev.event_type = EventType::OPEN_TAGGER_SKILL_SECOND;
 			m_timer_queue.push(next_ev);
 			break;
@@ -230,6 +233,9 @@ void cGameServer::WorkerThread()
 		case OP_TYPE::OP_SECOND_TAGGER_SKILL_OPEN:
 		{
 			Room& rl = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
+			if (rl.Get_Tagger_ID() == -1)
+				return;
+
 			m_clients[rl.Get_Tagger_ID()].set_second_skill_enable();
 
 			sc_packet_tagger_skill packet;
@@ -245,7 +251,7 @@ void cGameServer::WorkerThread()
 
 			TIMER_EVENT next_ev;
 			next_ev.room_number = static_cast<int>(iocp_key);
-			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(THIRD_SKILL_ENABLE_TIME);
+			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(THIRD_TAGGER_SKILL_OPEN_SECOND);
 			next_ev.event_type = EventType::OPEN_TAGGER_SKILL_THIRD;
 			m_timer_queue.push(next_ev);
 			break;
@@ -254,6 +260,9 @@ void cGameServer::WorkerThread()
 		case OP_TYPE::OP_THIRD_TAGGER_SKILL_OPEN:
 		{
 			Room& rl = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
+			if (rl.Get_Tagger_ID() == -1)
+				return;
+
 			m_clients[rl.Get_Tagger_ID()].set_third_skill_enable();
 
 			sc_packet_tagger_skill packet;

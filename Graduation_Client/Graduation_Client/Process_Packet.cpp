@@ -361,23 +361,6 @@ void Network::Process_Pick_Item_Init(char* ptr)
 			}
 		}
 	}
-
-	for (int i = 0; i < MAX_INGAME_ITEM; ++i) {
-		std::cout << "Item [" << m_pBoxes[i]->m_item_box_index << "] Type : ";
-		if (m_pBoxes[i]->m_item == GAME_ITEM::ITEM_LIFECHIP)
-			std::cout << "ITEM_LIFECHIP" << std::endl;
-		if (m_pBoxes[i]->m_item == GAME_ITEM::ITEM_DRILL)
-			std::cout << "ITEM_DRILL" << std::endl;
-		if (m_pBoxes[i]->m_item == GAME_ITEM::ITEM_HAMMER)
-			std::cout << "ITEM_HAMMER" << std::endl;
-		if (m_pBoxes[i]->m_item == GAME_ITEM::ITEM_NONE)
-			std::cout << "ITEM_NONE" << std::endl;
-		if (m_pBoxes[i]->m_item == GAME_ITEM::ITEM_PLIERS)
-			std::cout << "ITEM_PLIERS" << std::endl;
-		if (m_pBoxes[i]->m_item == GAME_ITEM::ITEM_WRENCH)
-			std::cout << "ITEM_WRENCH" << std::endl;
-
-	}
 }
 
 void Network::Process_Pick_Item_Box_Update(char* ptr)
@@ -418,10 +401,16 @@ void Network::Process_Altar_LifeChip_Update(char* ptr)
 void Network::Process_Activate_Tagger_Skill(char* ptr)
 {
 	sc_packet_tagger_skill* packet = reinterpret_cast<sc_packet_tagger_skill*>(ptr);
-	
-	packet->first_skill;
-	packet->second_skill;
-	packet->third_skill;
+
+	std::cout << "first skill : " << packet->first_skill << std::endl;
+	std::cout << "second_skill : " << packet->second_skill << std::endl;
+	std::cout << "third_skill : " << packet->third_skill << std::endl;
+	if (packet->first_skill)
+		m_pPlayer->SetTaggerSkill(0);
+	if (packet->second_skill)
+		m_pPlayer->SetTaggerSkill(1);
+	if (packet->third_skill)
+		m_pPlayer->SetTaggerSkill(2);
 }
 
 void Network::Process_Use_First_Tagger_Skill(char* ptr)
@@ -453,7 +442,5 @@ void Network::Process_Use_Second_Tagger_Skill(char* ptr)
 void Network::Process_Use_Third_Tagger_Skill(char* ptr)
 {
 	sc_packet_use_third_tagger_skill* packet = reinterpret_cast<sc_packet_use_third_tagger_skill*>(ptr);
-
-	// 코드상으로 비활성화 하는 친구가 있어야함
-	m_Vents[packet->unactivate_vent];
+	reinterpret_cast<Vent*>(m_Vents[packet->unactivate_vent])->SetBlock();
 }
