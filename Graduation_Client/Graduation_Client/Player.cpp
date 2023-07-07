@@ -36,6 +36,10 @@ Player::Player() : GameObject()
 	AddComponent<ThirdPersonCamera>();
 	m_pCamera = GetComponent<ThirdPersonCamera>();
 	m_pCamera->m_pPlayer = this;
+
+	for (int i = 0; i < 3; ++i) {
+		m_bTaggerSkills[i] = false;
+	}
 }
 
 void Player::ChangeCamera(GAME_STATE prev, GAME_STATE p)
@@ -406,6 +410,27 @@ int Player::GetItem()
 	default:
 		return -1;
 	}
+}
+
+bool Player::GetTaggerSkill(int index)
+{
+	if (GetType() != TYPE_TAGGER) return false;
+	return m_bTaggerSkills[index];
+}
+
+void Player::SetTaggerSkill(int index)
+{
+	if (GetType() != TYPE_TAGGER) return;
+	m_bTaggerSkills[index] = true;
+}
+
+bool Player::UseTaggerSkill(int index)
+{
+	if (GetType() != TYPE_TAGGER) return false;
+	if (false == m_bTaggerSkills[index]) return false;
+	m_bTaggerSkills[index] = false;
+	// Do Skill here maybe
+	return true;
 }
 
 void Player::ReleaseShaderVariables()

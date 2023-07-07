@@ -146,6 +146,12 @@ public:
 
 	GAME_ITEM::ITEM				m_got_item = GAME_ITEM::ITEM_NONE;
 
+	bool						m_bTaggerSkills[3];
+
 	bool PickUpItem(GAME_ITEM::ITEM item);
 	int GetItem();
+
+	bool GetTaggerSkill(int index);
+	void SetTaggerSkill(int index);
+	bool UseTaggerSkill(int index);
 };

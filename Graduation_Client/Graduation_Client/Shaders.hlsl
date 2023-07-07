@@ -912,12 +912,19 @@ cbuffer cbGaugeInfo : register(b3)
 #define VENT_UI 2
 #define BOX_UI 3
 #define POWER_UI 4
+#define BLOCKED_UI 5
+#define INGAME_UI 6
 
 VS_UI_OUTPUT VSDoorUI(VS_UI_INPUT input)
 {
 	VS_UI_OUTPUT output;
 
-	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	if (gnUIType == INGAME_UI) {
+		output.position = float4(input.position, 1.0f);
+	}
+	else {
+		output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	}
 	output.uv = input.uv;
 
 	return output;
@@ -938,6 +945,18 @@ float4 PSDoorUI(VS_UI_OUTPUT input) : SV_TARGET
 	else if (gnUIType == BOX_UI) {
 		if (input.uv.y - 1.0f > -gfGauge && Color.w < 0.1f)
 			Color = float4(0.0f, 243.0f / 255.0f, 168.0f / 255.0f, 1.0f);
+	}
+	else if (gnUIType == BLOCKED_UI) {
+		if (input.uv.y > 1.0f - gfGauge && Color.w < 0.1f) {
+			Color = float4(1.0f, 0.0f, 0.0f, 1.0f);
+		}
+	}
+	else if (gnUIType == INGAME_UI) {
+		if (gfGauge <= 0.0f) {
+			Color *= 0.5f;
+			if (Color.w < 0.1f)
+				Color = float4(0.3f, 0.3f, 0.3f, 1.0f);
+		}
 	}
 	clip(Color.w - 0.1f);
 	return Color;
