@@ -193,8 +193,30 @@ void Room::init_fix_object_and_life_chip()
 		item_init_packet.data[i].item_type = m_fix_item[i].Get_Item_Type();
 	}
 
-	for (int player_id : in_player)
+#if PRINT
+	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
+	{
+		cout << "Item [" << item_init_packet.data[i].item_box_index << "] Type : ";
+		if (item_init_packet.data[i].item_type == GAME_ITEM::ITEM_LIFECHIP)
+			std::cout << "ITEM_LIFECHIP" << std::endl;
+		if (item_init_packet.data[i].item_type == GAME_ITEM::ITEM_DRILL)
+			std::cout << "ITEM_DRILL" << std::endl;
+		if (item_init_packet.data[i].item_type == GAME_ITEM::ITEM_HAMMER)
+			std::cout << "ITEM_HAMMER" << std::endl;
+		if (item_init_packet.data[i].item_type == GAME_ITEM::ITEM_NONE)
+			std::cout << "ITEM_NONE" << std::endl;
+		if (item_init_packet.data[i].item_type == GAME_ITEM::ITEM_PLIERS)
+			std::cout << "ITEM_PLIERS" << std::endl;
+		if (item_init_packet.data[i].item_type == GAME_ITEM::ITEM_WRENCH)
+			std::cout << "ITEM_WRENCH" << std::endl;
+	}
+#endif
+
+	for (int player_id : in_player) {
+		if (player_id == -1)
+			continue;
 		cGameServer::GetInstance()->m_clients[player_id].do_send(sizeof(item_init_packet), &item_init_packet);
+	}
 }
 
 void Room::add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation)

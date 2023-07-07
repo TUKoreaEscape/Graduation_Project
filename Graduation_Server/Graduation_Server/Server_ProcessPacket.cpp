@@ -854,16 +854,30 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 	if (item_index == -1)
 		return;
 
-	if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_DRILL)
+	if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_DRILL) // 1
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_DRILL, true);
-	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_HAMMER)
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_HAMMER) // 0
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_HAMMER, true);
-	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_PLIERS)
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_PLIERS) // 3
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_PLIERS, true);
-	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_WRENCH)
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_WRENCH) // 2
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_WRENCH, true);
-	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_LIFECHIP)
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_LIFECHIP) // 5
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, true);
+
+#if PRINT
+	std::cout << "Item_box_index [" << item_index << "] : ";
+	if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_DRILL) // 1
+		cout << "ITEM_DRILL" << endl;
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_HAMMER) // 0
+		cout << "ITEM_HAMMER" << endl;
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_PLIERS) // 3
+		cout << "ITEM_PLIERS" << endl;
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_WRENCH) // 2
+		cout << "ITEM_WRENCH" << endl;
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_LIFECHIP) // 5
+		cout << "ITEM_LIFECHIP" << endl;
+#endif
 
 	sc_packet_pick_fix_item_update item_packet;
 	item_packet.size = sizeof(item_packet);

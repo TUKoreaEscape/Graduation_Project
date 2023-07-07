@@ -353,26 +353,30 @@ void Network::Process_Pick_Item_Init(char* ptr)
 
 	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
 	{
-		//std::cout << "Item [" << packet->data[i].item_box_index << "] Type : ";
-		//if (packet->data[i].item_type == GAME_ITEM::ITEM_LIFECHIP)
-		//	std::cout << "ITEM_LIFECHIP" << std::endl;
-		//if (packet->data[i].item_type == GAME_ITEM::ITEM_DRILL)
-		//	std::cout << "ITEM_DRILL" << std::endl;
-		//if (packet->data[i].item_type == GAME_ITEM::ITEM_HAMMER)
-		//	std::cout << "ITEM_HAMMER" << std::endl;
-		//if (packet->data[i].item_type == GAME_ITEM::ITEM_NONE)
-		//	std::cout << "ITEM_NONE" << std::endl;
-		//if (packet->data[i].item_type == GAME_ITEM::ITEM_PLIERS)
-		//	std::cout << "ITEM_PLIERS" << std::endl;
-		//if (packet->data[i].item_type == GAME_ITEM::ITEM_WRENCH)
-		//	std::cout << "ITEM_WRENCH" << std::endl;
-
 		for (int idx = 0; idx < MAX_INGAME_ITEM; ++idx)
 		{
-			if (m_pBoxes[i]->m_item_box_index != packet->data[idx].item_box_index)
-				continue;
-			m_pBoxes[i]->SetItem(packet->data[idx].item_type);
+			if (m_pBoxes[i]->m_item_box_index == packet->data[idx].item_box_index) {
+				m_pBoxes[i]->SetItem(packet->data[idx].item_type);
+				break;
+			}
 		}
+	}
+
+	for (int i = 0; i < MAX_INGAME_ITEM; ++i) {
+		std::cout << "Item [" << m_pBoxes[i]->m_item_box_index << "] Type : ";
+		if (m_pBoxes[i]->m_item == GAME_ITEM::ITEM_LIFECHIP)
+			std::cout << "ITEM_LIFECHIP" << std::endl;
+		if (m_pBoxes[i]->m_item == GAME_ITEM::ITEM_DRILL)
+			std::cout << "ITEM_DRILL" << std::endl;
+		if (m_pBoxes[i]->m_item == GAME_ITEM::ITEM_HAMMER)
+			std::cout << "ITEM_HAMMER" << std::endl;
+		if (m_pBoxes[i]->m_item == GAME_ITEM::ITEM_NONE)
+			std::cout << "ITEM_NONE" << std::endl;
+		if (m_pBoxes[i]->m_item == GAME_ITEM::ITEM_PLIERS)
+			std::cout << "ITEM_PLIERS" << std::endl;
+		if (m_pBoxes[i]->m_item == GAME_ITEM::ITEM_WRENCH)
+			std::cout << "ITEM_WRENCH" << std::endl;
+
 	}
 }
 
@@ -386,6 +390,9 @@ void Network::Process_Pick_Item_Update(char* ptr)
 {
 	sc_packet_pick_fix_item_update* packet = reinterpret_cast<sc_packet_pick_fix_item_update*>(ptr);
 	
+	if (packet->item_type == GAME_ITEM::ITEM_NONE)
+		return;
+
 	m_pBoxes[packet->box_index]->m_item = GAME_ITEM::ITEM_NONE;
 	
 	if (packet->own_id == m_pPlayer->GetID()) {
