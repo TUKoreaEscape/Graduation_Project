@@ -178,15 +178,26 @@ void Vent::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Vent::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	if (Input::GetInstance()->m_pPlayer->m_Type == TYPE_TAGGER) return;
 	if (IsOpen) return;
+	if (Input::GetInstance()->m_pPlayer->m_Type == TYPE_TAGGER) return;
 	if (IsNear) {
-		if (m_ppInteractionUIs[0]) {
-			if (m_dir == DEGREE90 || m_dir == DEGREE270)
-				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.0f, m_xmf4x4ToParent._43);
-			else
-				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
-			m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+		if (m_bIsBlocked) {
+			if (m_ppInteractionUIs[1]) {
+				if (m_dir == DEGREE90 || m_dir == DEGREE270)
+					m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.0f, m_xmf4x4ToParent._43);
+				else
+					m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
+				m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, 1.0f, BLOCKED_UI);
+			}
+		}
+		else {
+			if (m_ppInteractionUIs[0]) {
+				if (m_dir == DEGREE90 || m_dir == DEGREE270)
+					m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.0f, m_xmf4x4ToParent._43);
+				else
+					m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
+				m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
+			}
 		}
 	}
 }
@@ -203,6 +214,7 @@ void Vent::SetPosition(XMFLOAT3 xmf3Position)
 
 void Vent::Interaction(int playerType)
 {
+	if (true == m_bIsBlocked) return;
 	if (true == IsOpen) return;
 	switch (playerType) {
 	case TYPE_TAGGER:
@@ -445,13 +457,13 @@ void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		if (true == IsOpen) {
 			if (m_ppInteractionUIs[1]) {
 				m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
-				m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+				m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 			}
 		}
 		else {
 			if (m_ppInteractionUIs[0]) {
 				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
-				m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+				m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 			}
 		}
 	}
@@ -616,50 +628,6 @@ UIObject::~UIObject()
 {
 }
 
-DoorUI::DoorUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
-{
-	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
-	XMStoreFloat4x4(&m_xmf4x4ToParent, XMMatrixIdentity());
-	renderer->m_nMaterials = 1;
-	renderer->m_ppMaterials = new Material * [renderer->m_nMaterials];
-	renderer->m_ppMaterials[0] = new Material(0);
-
-	Mesh* pUIMesh = new TexturedRectMesh(pd3dDevice, pd3dCommandList, -0.5, -0.5, 1, 1);
-	SetMesh(pUIMesh);
-
-	Texture* pUITexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pUITexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, pstrFileName, RESOURCE_TEXTURE2D, 0);
-
-	GameScene::CreateShaderResourceViews(pd3dDevice, pUITexture, 0, 17);
-
-	Material* pUIMaterial = new Material(1);
-	pUIMaterial->SetTexture(pUITexture);
-	pUIMaterial->SetDoorUIShader();
-
-	renderer->SetMaterial(0, pUIMaterial);
-}
-
-DoorUI::~DoorUI()
-{
-}
-
-void DoorUI::BillboardRender(ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	XMFLOAT3 xmf3CameraPosition = Input::GetInstance()->m_pPlayer->m_pCamera->GetPosition();
-
-	SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-
-	render(pd3dCommandList);
-}
-
-void DoorUI::Rotate(float fPitch, float fYaw, float fRoll)
-{
-	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
-	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
-
-	UpdateTransform(NULL);
-}
-
 InteractionObject::InteractionObject() : GameObject()
 {
 }
@@ -766,7 +734,7 @@ void InteractionUI::Rotate(float fPitch, float fYaw, float fRoll)
 
 void InteractionUI::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, float gauge, int type)
 {
-	float x = gauge * 0.8f;
+	float x = gauge;
 	int t = type;
 	pd3dCommandList->SetGraphicsRoot32BitConstants(18, 1, &x, 0);
 	pd3dCommandList->SetGraphicsRoot32BitConstants(18, 1, &t, 1);
@@ -966,7 +934,7 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
 					else
 						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
-					m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+					m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 				}
 			}
 		}
@@ -977,7 +945,7 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 						m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
 					else
 						m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
-					m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+					m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 				}
 				return;
 			}
@@ -987,7 +955,7 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 						m_ppInteractionUIs[3]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
 					else
 						m_ppInteractionUIs[3]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
-					m_ppInteractionUIs[3]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+					m_ppInteractionUIs[3]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 				}
 			}
 			else {
@@ -996,7 +964,7 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
 					else
 						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
-					m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+					m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 				}
 			}
 		}
@@ -1347,7 +1315,7 @@ void ItemBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			if (playerType == TYPE_PLAYER) {
 				if (m_ppInteractionUIs[0]) {
 					m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
-					m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge, m_nUIType);
+					m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 				}
 			}
 		}
@@ -1405,11 +1373,13 @@ void ItemBox::Interaction(int playerType)
 			if (m_item == GAME_ITEM::ITEM_NONE) break;
 			if (m_fCooltime >= GLOBAL_INTERACTION_COOLTIME) {
 				if (Input::GetInstance()->m_pPlayer->PickUpItem(m_item)) {
+#if USE_NETWORK
 					Network& network = *Network::GetInstance();
 					network.Send_Picking_Fix_Object_Packet(m_item_box_index, m_item);
-					m_item = GAME_ITEM::ITEM_NONE;
+#endif
+					m_item = GAME_ITEM::ITEM_NONE;			
+					m_fCooltime = 0;
 				}
-				m_fCooltime = 0;
 			}
 			break;
 		}
@@ -1494,4 +1464,50 @@ void ItemBox::SetRotation(DIR d)
 		Rotate(0, -90, 0);
 		break;
 	}
+}
+
+IngameUI::IngameUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName, float x, float y, float width, float height)
+{
+	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
+	XMStoreFloat4x4(&m_xmf4x4ToParent, XMMatrixIdentity());
+	renderer->m_nMaterials = 1;
+	renderer->m_ppMaterials = new Material * [renderer->m_nMaterials];
+	renderer->m_ppMaterials[0] = new Material(0);
+
+	UIMesh* pUIMesh = new UIMesh(pd3dDevice, pd3dCommandList, x, y, width, height);
+	SetMesh(pUIMesh);
+
+	Texture* pUITexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pUITexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, pstrFileName, RESOURCE_TEXTURE2D, 0);
+
+	GameScene::CreateShaderResourceViews(pd3dDevice, pUITexture, 0, 17);
+
+	Material* pUIMaterial = new Material(1);
+	pUIMaterial->SetTexture(pUITexture);
+	pUIMaterial->SetDoorUIShader();
+
+	renderer->SetMaterial(0, pUIMaterial);
+}
+
+IngameUI::~IngameUI()
+{
+}
+
+void IngameUI::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, float gauge, int type)
+{
+	float x = gauge;
+	int t = type;
+	pd3dCommandList->SetGraphicsRoot32BitConstants(18, 1, &x, 0);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(18, 1, &t, 1);
+}
+
+void IngameUI::render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	UIrender(pd3dCommandList, m_fGauge, m_UIType);
+}
+
+void IngameUI::UIrender(ID3D12GraphicsCommandList* pd3dCommandList, float gauge, int type)
+{
+	UpdateShaderVariable(pd3dCommandList, gauge, type);
+	GameObject::render(pd3dCommandList);
 }
