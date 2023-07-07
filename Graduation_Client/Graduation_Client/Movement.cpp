@@ -86,6 +86,43 @@ void CommonMovement::update(float elapsedTime)
 			}
 		}
 
+		if (keyBuffer['1'] & 0xF0)
+		{
+#if USE_NETWORK
+			if (Input::GetInstance()->m_pPlayer->GetType() == TYPE_TAGGER)
+			{
+				Network& network = *Network::GetInstance();
+				network.Send_Use_Tagger_Skill(1);
+				Input::GetInstance()->m_pPlayer->UseTaggerSkill(0);
+			}
+#endif
+
+		}
+
+		if (keyBuffer['2'] & 0xF0)
+		{
+#if USE_NETWORK
+			if (Input::GetInstance()->m_pPlayer->GetType() == TYPE_TAGGER)
+			{
+				Network& network = *Network::GetInstance();
+				network.Send_Use_Tagger_Skill(2);
+				Input::GetInstance()->m_pPlayer->UseTaggerSkill(1);
+			}
+#endif
+		}
+
+		if (keyBuffer['3'] & 0xF0)
+		{
+#if USE_NETWORK
+			if (Input::GetInstance()->m_pPlayer->GetType() == TYPE_TAGGER)
+			{
+				Network& network = *Network::GetInstance();
+				network.Send_Use_Tagger_Skill(3);
+				Input::GetInstance()->m_pPlayer->UseTaggerSkill(2);
+			}
+#endif
+		}
+
 		if (dwDirection)
 		{
 			if ((dwDirection == DIR_NOT_FB) ||
