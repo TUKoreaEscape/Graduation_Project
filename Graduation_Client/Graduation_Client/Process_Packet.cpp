@@ -89,8 +89,24 @@ void Network::Process_Game_End(char* ptr)
 void Network::Process_LifeChip_Update(char* ptr)
 {
 	sc_packet_life_chip_update* packet = reinterpret_cast<sc_packet_life_chip_update*>(ptr);
-	packet->id;
-	packet->life_chip;
+
+	if (m_pPlayer->GetID() == packet->id) {
+		if (false == packet->life_chip)
+			m_pPlayer->SetPlayerType(TYPE_DEAD_PLAYER);
+		else
+			m_pPlayer->SetPlayerType(TYPE_PLAYER);
+		return;
+	}
+
+	for (int i = 0; i < 5; ++i){
+		if (m_ppOther[i]->GetID() == packet->id) {
+			if (false == packet->life_chip)
+				m_ppOther[i]->SetPlayerType(TYPE_DEAD_PLAYER);
+			else
+				m_ppOther[i]->SetPlayerType(TYPE_PLAYER);
+			return;
+		}
+	}
 }
 
 void Network::Process_Player_Move(char* ptr)

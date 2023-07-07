@@ -147,6 +147,15 @@ void cGameServer::send_life_chip_update(const unsigned int id) // 생명칩 일괄 전
 	m_clients[id].do_send(sizeof(packet), &packet);
 }
 
+void cGameServer::send_correct_life_chip(const unsigned int id)
+{
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[id].get_join_room_number());
+
+	// 이쪽으로 넘어온 경우 술래가 다른 플레이어 공격에 성공한것임
+	// 즉 술래에게 지금 수집한 생명칩이 있음을 전달해야함
+	// 이후 술래가 재단에 가서 생명칩을 보관하면 방에 수집한 생명칩 갯수를 업데이트, 일정 갯수를 채운 경우 게임 종료 처리 해야함.
+}
+
 void cGameServer::send_voice_data(const unsigned int id)
 {
 	sc_packet_voice_data packet;

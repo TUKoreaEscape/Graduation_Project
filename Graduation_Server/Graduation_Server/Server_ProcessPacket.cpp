@@ -549,10 +549,11 @@ void cGameServer::Process_Attack(const int user_id)
 
 				m_timer_queue.push(ev);
 
-				if (m_clients[other_player_id].get_life_chip())
+				if (m_clients[other_player_id].get_life_chip() && room.Get_Tagger_ID() == user_id)
 				{
 					m_clients[other_player_id].set_life_chip(false);
 					send_life_chip_update(other_player_id);
+					send_correct_life_chip(user_id);
 				}
 			}
 		}
