@@ -288,6 +288,13 @@ void Room::Activate_Altar()
 	m_altar->Set_Valid(true);
 }
 
+bool Room::Is_Tagger_Winner()
+{
+	if (m_altar->Get_Life_Chip() == GAME_END_COLLECT_CHIP)
+		return true;
+	return false;
+}
+
 void Room::Set_Electronic_System_ONOFF()
 {
 	mt19937 engine((unsigned int)time(NULL));

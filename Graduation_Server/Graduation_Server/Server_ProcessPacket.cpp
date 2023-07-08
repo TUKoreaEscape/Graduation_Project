@@ -549,8 +549,9 @@ void cGameServer::Process_Attack(const int user_id)
 
 				m_timer_queue.push(ev);
 
-				if (m_clients[other_player_id].get_life_chip() && room.Get_Tagger_ID() == user_id)
+				if (m_clients[other_player_id].get_life_chip() && room.Get_Tagger_ID() == user_id && room.Is_Tagger_Get_Life_Chip() == false)
 				{
+					room.Tagger_Get_Life_Chip(true);
 					m_clients[other_player_id].set_life_chip(false);
 					send_life_chip_update(other_player_id);
 					send_correct_life_chip(user_id);
@@ -919,7 +920,7 @@ void cGameServer::Process_Altar_LifeChip_Update(const int user_id)
 {
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 	room.m_altar->Add_Life_Chip();
-
+	room.Tagger_Get_Life_Chip(false);
 
 	sc_packet_altar_lifechip_update packet;
 	packet.size = sizeof(packet);
@@ -930,6 +931,11 @@ void cGameServer::Process_Altar_LifeChip_Update(const int user_id)
 		if (player_id == -1)
 			continue;
 		m_clients[player_id].do_send(sizeof(packet), &packet);
+	}
+
+	if (room.Is_Tagger_Winner())
+	{
+		// 여기는 Tagger가 승리한 조건을 달성한 경우 활성화
 	}
 }
 
