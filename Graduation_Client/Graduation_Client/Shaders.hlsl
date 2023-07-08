@@ -954,8 +954,8 @@ float4 PSDoorUI(VS_UI_OUTPUT input) : SV_TARGET
 	else if (gnUIType == INGAME_UI) {
 		if (gfGauge <= 0.0f) {
 			Color *= 0.5f;
-			if (Color.w < 0.1f)
-				Color = float4(0.3f, 0.3f, 0.3f, 1.0f);
+			//if (Color.w < 0.1f)
+				//Color = float4(0.3f, 0.3f, 0.3f, 1.0f);
 		}
 	}
 	clip(Color.w - 0.1f);
