@@ -58,7 +58,7 @@ void Room::init_room_by_game_end()
 
 	cGameServer& server = *cGameServer::GetInstance();
 	int i = 0;
-	for (int player_id : in_player)
+	for (int& player_id : in_player)
 	{
 		if (player_id == -1)
 			continue;
@@ -120,7 +120,7 @@ void Room::Exit_Player(int user_id)
 
 
 		cGameServer& server = *cGameServer::GetInstance();
-		for (int player_id : in_player)
+		for (int& player_id : in_player)
 		{
 			if (player_id == -1)
 				continue;
@@ -212,7 +212,7 @@ void Room::init_fix_object_and_life_chip()
 	}
 #endif
 
-	for (int player_id : in_player) {
+	for (int& player_id : in_player) {
 		if (player_id == -1)
 			continue;
 		cGameServer::GetInstance()->m_clients[player_id].do_send(sizeof(item_init_packet), &item_init_packet);
@@ -342,7 +342,7 @@ void Room::Tagger_Use_First_Skill()
 			packet.electronic_system_close[i] = true;
 	}
 
-	for (int player_id : in_player) {
+	for (int& player_id : in_player) {
 		if (player_id == -1)
 			continue;
 		server.m_clients[player_id].do_send(sizeof(packet), &packet);
@@ -365,7 +365,7 @@ void Room::Tagger_Use_Second_Skill(int room_number)
 	packet.type = SC_PACKET::SC_PACKET_USE_SECOND_TAGGER_SKILL;
 	packet.is_start = true;
 
-	for (int player_id : in_player) {
+	for (int& player_id : in_player) {
 		if (player_id == -1)
 			continue;
 		server.m_clients[player_id].do_send(sizeof(packet), &packet);
@@ -385,7 +385,7 @@ void Room::Tagger_Use_Third_Skill()
 	packet.type = SC_PACKET::SC_PACKET_USE_THIRD_TAGGER_SKILL;
 	packet.unactivate_vent = unactive_vent_number;
 
-	for (int player_id : in_player) {
+	for (int& player_id : in_player) {
 		if (player_id == -1)
 			continue;
 		server.m_clients[player_id].do_send(sizeof(packet), &packet);

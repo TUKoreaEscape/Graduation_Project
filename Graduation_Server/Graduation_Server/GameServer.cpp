@@ -291,7 +291,7 @@ void cGameServer::WorkerThread()
 
 			Room& room = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
 			
-			for (int player_id : room.in_player) {
+			for (int& player_id : room.in_player) {
 				if (player_id == -1)
 					continue;
 				m_clients[player_id].do_send(sizeof(packet), &packet);
@@ -315,7 +315,7 @@ void cGameServer::WorkerThread()
 			packet.type = SC_PACKET::SC_PACKET_HIDDEN_DOOR_UPDATE;
 			packet.door_num = ev.obj_id;
 			packet.door_state = room.m_vent_object[ev.obj_id].get_state();
-			for (int player_id : room.in_player) {
+			for (int& player_id : room.in_player) {
 				if (player_id == -1)
 					continue;
 				m_clients[player_id].do_send(sizeof(packet), &packet);
