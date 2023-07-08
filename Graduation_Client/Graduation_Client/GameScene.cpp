@@ -189,12 +189,30 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		}
 		break;
 	case ENDING_GAME:
+		for (int i = 0; i < 5; ++i)
+			m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+		m_ppPlayers[0]->SetPosition(XMFLOAT3(6.0f, 0.0f, -5.0f));
+		m_ppPlayers[1]->SetPosition(XMFLOAT3(3.0f, 0.0f, -5.0f));
+		m_ppPlayers[2]->SetPosition(XMFLOAT3(-3.0f, 0.0f, -5.0f));
+		m_ppPlayers[3]->SetPosition(XMFLOAT3(-6.0f, 0.0f, -5.0f));
+		m_ppPlayers[4]->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
+		m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -3.0f));
+		m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
 		for (int i = 0; i < m_Ending; ++i) m_UIEnding[i]->render(pd3dCommandList);
 		break;
 	}
 }
 
 void GameScene::WaitingRoomrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
+	m_pPlayer->m_pCamera->update(pd3dCommandList);
+	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
+	Scene::render(pd3dCommandList);
+}
+
+void GameScene::Endingrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
