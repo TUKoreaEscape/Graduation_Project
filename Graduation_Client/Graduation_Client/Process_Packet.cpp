@@ -39,7 +39,6 @@ void Network::Process_Ready(char* ptr)
 void Network::Process_Init_Position(char* ptr)
 {
 	sc_packet_init_position* packet = reinterpret_cast<sc_packet_init_position*>(ptr);
-	std::cout << "init position에서 state 전환" << std::endl;
 
 	for (int i = 0; i < 6; ++i) {
 		if (m_pPlayer->GetID() == packet->user_id[i]) {
@@ -73,7 +72,6 @@ void Network::Process_Game_Start(char* ptr)
 void Network::Process_Game_End(char* ptr)
 {
 	sc_packet_game_end* packet = reinterpret_cast<sc_packet_game_end*>(ptr);
-	std::cout << "Game_End 에서 state 전환" << std::endl;
 	GameState& game_state = *GameState::GetInstance();
 	game_state.ChangeNextState();
 
@@ -90,6 +88,8 @@ void Network::Process_Game_End(char* ptr)
 		m_pPowers[i]->SetOpen(false);
 	for (int i = 0; i < 8; ++i)
 		m_Vents[i]->SetOpen(false);
+	m_lifechip = false;
+	m_pPlayer->m_got_item = GAME_ITEM::ITEM_NONE;
 }
 
 void Network::Process_LifeChip_Update(char* ptr)

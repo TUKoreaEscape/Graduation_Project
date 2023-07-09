@@ -396,7 +396,6 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 				}
 #endif
 				m_cs_packet_ready.ready_type = false;
-				std::cout << "Ending_Game에서 exit를 눌렀음" << std::endl;
 				m_gamestate->ChangeNextState();//QUIT클릭
 			}
 			//InputRoomInfo();
