@@ -65,6 +65,7 @@ public:
 public:
 	Player*				m_pPlayer = nullptr;;
 	Player**			m_ppOther = nullptr;
+	GameObject**		m_UIPlay = nullptr;
 	Door*				m_pDoors[6];
 	InteractionObject*	m_pPowers[5];
 	ItemBox*			m_pBoxes[MAX_INGAME_ITEM];
@@ -105,6 +106,7 @@ public:
 	void Process_ElectronicSystem_Activate(char* ptr);
 	void Process_Attack_Packet(char* ptr);
 	void Process_LifeChip_Update(char* ptr);
+	void Process_Tagger_Collect_LifeChip(char* ptr);
 	void Process_Pick_Item_Init(char* ptr);
 	void Process_Pick_Item_Box_Update(char* ptr);
 	void Process_Pick_Item_Update(char* ptr);

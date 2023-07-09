@@ -376,6 +376,7 @@ namespace SC_PACKET
 		SC_PACKET_ELECTRONIC_SWITCH_INIT,
 		SC_PACKET_CALCULATE_MOVE,
 		SC_PACKET_LIFE_CHIP_UPDATE,
+		SC_PACKET_TAGGER_CORRECT_LIFE_CHIP,
 		SC_PACKET_SELECT_TAGGER,
 		SC_PACKET_TAGGER_SKILL,
 		SC_PACKET_USE_FIRST_TAGGER_SKILL,
@@ -557,6 +558,13 @@ struct sc_packet_life_chip_update {
 	unsigned char	type;
 
 	short			id;
+	bool			life_chip;
+};
+
+struct sc_packet_tagger_correct_life_chip {
+	unsigned char	size;
+	unsigned char	type;
+
 	bool			life_chip;
 };
 

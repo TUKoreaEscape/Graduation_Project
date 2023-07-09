@@ -319,7 +319,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_UIPlay[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.8f, -0.75f, 0.3f, 0.4f);
 	m_UIPlay[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.0f, 0.75f, 0.6f, 0.4f);
 	m_UIPlay[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/life2.dds", 0.8f, -0.75f, 0.3f, 0.4f);
-	
+
 
 	m_nPlayPlayer = 1 + 5;
 	m_UIPlayer = new GameObject * [m_nPlayPlayer];
@@ -423,6 +423,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_network->init_network();
 	m_network->m_pPlayer = m_pPlayer;
 	m_network->m_ppOther = m_ppPlayers;
+	m_network->m_UIPlay = m_UIPlay;
 	
 	for(int i = 0; i < 6; ++i)
 		m_network->m_pDoors[i] = m_pDoors[i];

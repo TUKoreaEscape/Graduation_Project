@@ -491,6 +491,12 @@ void Network::ProcessPacket(char* ptr)
 		break;
 	}
 
+	case SC_PACKET::SC_PACKET_TAGGER_CORRECT_LIFE_CHIP:
+	{
+		Process_Tagger_Collect_LifeChip(ptr);
+		break;
+	}
+
 	case SC_PACKET::SC_PACKET_CUSTOMIZING:
 	{
 		sc_packet_customizing_update* packet = reinterpret_cast<sc_packet_customizing_update*>(ptr);

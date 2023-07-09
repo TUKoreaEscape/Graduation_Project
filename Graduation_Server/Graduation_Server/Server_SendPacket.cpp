@@ -154,6 +154,13 @@ void cGameServer::send_correct_life_chip(const unsigned int id)
 	// 이쪽으로 넘어온 경우 술래가 다른 플레이어 공격에 성공한것임
 	// 즉 술래에게 지금 수집한 생명칩이 있음을 전달해야함
 	// 이후 술래가 재단에 가서 생명칩을 보관하면 방에 수집한 생명칩 갯수를 업데이트, 일정 갯수를 채운 경우 게임 종료 처리 해야함.
+
+	sc_packet_tagger_correct_life_chip packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_TAGGER_CORRECT_LIFE_CHIP;
+	packet.life_chip = true;
+
+	m_clients[id].do_send(sizeof(packet), &packet);
 }
 
 void cGameServer::send_voice_data(const unsigned int id)

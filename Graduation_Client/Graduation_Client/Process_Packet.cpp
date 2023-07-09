@@ -109,6 +109,17 @@ void Network::Process_LifeChip_Update(char* ptr)
 	}
 }
 
+void Network::Process_Tagger_Collect_LifeChip(char* ptr)
+{
+	sc_packet_tagger_correct_life_chip* packet = reinterpret_cast<sc_packet_tagger_correct_life_chip*>(ptr);
+	if (m_pPlayer->GetType() == TYPE_TAGGER) {
+		if(packet->life_chip)
+			reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(1.0f);
+		else
+			reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(-1.0f);
+	}
+}
+
 void Network::Process_Player_Move(char* ptr)
 {
 	m_pPlayer_before_Pos = m_pPlayer_Pos;
