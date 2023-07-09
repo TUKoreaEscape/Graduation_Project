@@ -43,12 +43,12 @@ private:
 	SHELLEXECUTEINFO	info;
 	HWND				hwnd_ExtMixerWin;
 	bool				m_shutdown = false;
-	bool				m_lifechip = false;
 
 public:
 	std::mutex			pos_lock;
 	std::mutex			other_pos_lock;
 	bool				m_recv_move = false;
+	bool				m_lifechip = false;
 	int					m_my_id = -1;
 	int					m_join_room_number = -1;
 	int					m_page_num = 0;

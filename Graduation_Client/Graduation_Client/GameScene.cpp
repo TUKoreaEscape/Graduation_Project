@@ -166,8 +166,16 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			reinterpret_cast<ItemBox*>(m_pBoxes[i])->UIrender(pd3dCommandList);
 		}
 		for (int i = 0; i < m_nPlay - 1; ++i) m_UIPlay[i]->render(pd3dCommandList);
+
 		if (m_pPlayer->GetType() == TYPE_PLAYER)reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(1.0f);
-		else  reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(-1.0f);
+		else {
+			reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(-1.0f);
+#if USE_NETWORK
+			if(m_network->m_lifechip == true)
+				reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(1.0f);
+#endif		
+		}
+
 		m_UIPlay[2]->render(pd3dCommandList);
 		if (m_pPlayer->GetType() == TYPE_TAGGER) {
 			for (int i = 0; i < 3; ++i) {

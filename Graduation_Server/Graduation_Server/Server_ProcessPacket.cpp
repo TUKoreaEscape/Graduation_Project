@@ -334,18 +334,6 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 	m_clients[user_id].m_is_ready = packet->ready_type;
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
-	sc_packet_ready ready_packet;
-	ready_packet.size = sizeof(ready_packet);
-	ready_packet.type = SC_PACKET::SC_PACKET_READY;
-	ready_packet.id = user_id;
-	ready_packet.ready_type = packet->ready_type;
-	for (int& player_id : room.in_player)
-	{
-		if (player_id == -1 || player_id == user_id)
-			continue;
-		m_clients[player_id].do_send(sizeof(ready_packet), &ready_packet);
-	}
-
 	room.SetReady(packet->ready_type, user_id);
 	int i = 0;
 	if (room.All_Player_Ready())
@@ -398,6 +386,19 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 			m_clients[player_id].do_send(sizeof(start_packet), &start_packet);
 		}
 		room.Start_Game();
+	}
+	else {
+		sc_packet_ready ready_packet;
+		ready_packet.size = sizeof(ready_packet);
+		ready_packet.type = SC_PACKET::SC_PACKET_READY;
+		ready_packet.id = user_id;
+		ready_packet.ready_type = packet->ready_type;
+		for (int& player_id : room.in_player)
+		{
+			if (player_id == -1 || player_id == user_id)
+				continue;
+			m_clients[player_id].do_send(sizeof(ready_packet), &ready_packet);
+		}
 	}
 }
 

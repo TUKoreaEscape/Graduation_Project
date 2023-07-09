@@ -112,11 +112,16 @@ void Network::Process_LifeChip_Update(char* ptr)
 void Network::Process_Tagger_Collect_LifeChip(char* ptr)
 {
 	sc_packet_tagger_correct_life_chip* packet = reinterpret_cast<sc_packet_tagger_correct_life_chip*>(ptr);
-	if (m_pPlayer->GetType() == TYPE_TAGGER) {
-		if(packet->life_chip)
-			reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(1.0f);
-		else
-			reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(-1.0f);
+	std::cout << "술래 생명칩 업데이트 패킷 도착" << std::endl;
+	if (packet->life_chip == true) {
+		reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(1.0f);
+		std::cout << "술래가 생명칩 획득! UI 하얀색 변경" << std::endl;
+		m_lifechip = true;
+	}
+	else {
+		reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(-1.0f);
+		std::cout << "술래가 생명칩 보관! UI 회색 변경" << std::endl;
+		m_lifechip = false;
 	}
 }
 
