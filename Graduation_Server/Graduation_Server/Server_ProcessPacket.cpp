@@ -335,7 +335,7 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
 	room.SetReady(packet->ready_type, user_id);
-	int i = 0;
+	int index = 0;
 	if (room.All_Player_Ready())
 	{
 		for (int i = 0; i < room.in_player.size(); ++i) {
@@ -348,10 +348,10 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 		for (auto put_id : room.in_player)
 		{
 			if (put_id == -1) {
-				i++;
+				index++;
 				continue;
 			}
-			m_clients[put_id].set_user_position(XMFLOAT3(static_cast<float>(4.f - ((float)i * 2.5)), 5.f, -10.f));
+			m_clients[put_id].set_user_position(XMFLOAT3(static_cast<float>(4.f - ((float)index * 2.5)), 5.f, -10.f));
 			sc_packet_init_position init_packet;
 			init_packet.size = sizeof(init_packet);
 			init_packet.type = SC_PACKET::SC_PACKET_INIT_POSITION;
@@ -365,27 +365,14 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 					continue;
 				m_clients[recv_id].do_send(sizeof(init_packet), &init_packet);
 			}
-			i++;
+			index++;
 		}
+		TIMER_EVENT ev;
+		ev.event_type = EventType::GAME_START;
+		ev.event_time = chrono::system_clock::now() + 2s;
+		ev.room_number = m_clients[user_id].get_join_room_number();
 
-		for (auto player_index : room.in_player) {
-			send_game_start_packet(player_index);
-			m_clients[player_index]._state_lock.lock();
-			m_clients[player_index].set_state(CLIENT_STATE::ST_INGAME);
-			m_clients[player_index]._state_lock.unlock();
-		}
-		// 모든 플레이어가 레디가 된 경우 이제 게임을 시작하게 바꿔줘야하는 부분!
-
-		sc_packet_game_start start_packet;
-		start_packet.size = sizeof(start_packet);
-		start_packet.type = SC_PACKET::SC_PACKET_GAME_START;
-		for (int& player_id : room.in_player)
-		{
-			if (player_id == -1)
-				continue;
-			m_clients[player_id].do_send(sizeof(start_packet), &start_packet);
-		}
-		room.Start_Game();
+		m_timer_queue.push(ev);
 	}
 	else {
 		sc_packet_ready ready_packet;
@@ -402,12 +389,28 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 	}
 }
 
-void cGameServer::Process_Game_Start(const int user_id)
+void cGameServer::Process_Game_Start(const int room_number)
 {
-	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
-	room.SetLoading(true, user_id);
-	if (room.All_Player_Loading())
-		room.Start_Game();
+	Room& room = *m_room_manager->Get_Room_Info(room_number);
+
+	for (auto player_index : room.in_player) {
+		send_game_start_packet(player_index);
+		m_clients[player_index]._state_lock.lock();
+		m_clients[player_index].set_state(CLIENT_STATE::ST_INGAME);
+		m_clients[player_index]._state_lock.unlock();
+	}
+	// 모든 플레이어가 레디가 된 경우 이제 게임을 시작하게 바꿔줘야하는 부분!
+
+	sc_packet_game_start start_packet;
+	start_packet.size = sizeof(start_packet);
+	start_packet.type = SC_PACKET::SC_PACKET_GAME_START;
+	for (int& player_id : room.in_player)
+	{
+		if (player_id == -1)
+			continue;
+		m_clients[player_id].do_send(sizeof(start_packet), &start_packet);
+	}
+	room.Start_Game();
 }
 
 void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)

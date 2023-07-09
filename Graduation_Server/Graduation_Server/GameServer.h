@@ -28,6 +28,7 @@ class RoomManager;
 enum class EventType : char
 {
 	CHECK_NUM_OF_SERVER_ACCEPT_USER,
+	GAME_START,
 	OPEN_DOOR,
 	CLOSE_DOOR,
 	OPEN_ELECTRONIC,
@@ -117,7 +118,7 @@ public:
 	void	Process_Join_Room(const int user_id, void* buff); // 방 접속 요청을 처리하는 함수
 	void	Process_Exit_Room(const int user_id, void* buff); // 방에서 나가는 요청을 처리하는 함수
 	void	Process_Ready(const int user_id, void* buff); // 게임방에서 준비완료됨을 처리하는 함수
-	void	Process_Game_Start(const int user_id); // 게임방에서 게임이 시작함을 처리하는 함수
+	void	Process_Game_Start(const int room_number); // 게임방에서 게임이 시작함을 처리하는 함수
 	void	Process_Attack(const int user_id); // 공격을 처리하는 함수
 	void	Process_Customizing(const int user_id, void* buff); // 커스터마이징 정보를 처리하는 함수
 	void	Process_Door(const int user_id, void* buff); // 게임방 내 Door 열기,닫기를 처리하는 함수

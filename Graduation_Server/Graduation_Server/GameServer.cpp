@@ -159,6 +159,14 @@ void cGameServer::WorkerThread()
 			break;
 		}
 
+		case OP_TYPE::OP_GAME_START:
+		{
+			cout << "게임 시작" << endl;
+			Process_Game_Start(static_cast<int>(iocp_key));
+			delete exp_over;
+			break;
+		}
+
 		case OP_TYPE::OP_SELECT_TAGGER:
 		{
 			Room& rl = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
@@ -760,12 +768,6 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	case CS_PACKET::CS_PACKET_REQUEST_ROOM_INFO:
 	{
 		Process_Request_Room_Info(user_id, p);
-		break;
-	}
-
-	case CS_PACKET::CS_PACKET_GAME_LOADING_SUCCESS:
-	{
-		Process_Game_Start(user_id);
 		break;
 	}
 
