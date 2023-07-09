@@ -345,28 +345,30 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 			m_clients[room.in_player[i]].set_life_chip(true);
 		}
 
+		sc_packet_init_position init_packet;
+		init_packet.size = sizeof(init_packet);
+		init_packet.type = SC_PACKET::SC_PACKET_INIT_POSITION;
 		for (auto put_id : room.in_player)
 		{
 			if (put_id == -1) {
+				init_packet.position[index] = XMFLOAT3(-100, -100, -100);
+				init_packet.user_id[index] = -1;
 				index++;
 				continue;
 			}
 			m_clients[put_id].set_user_position(XMFLOAT3(static_cast<float>(4.f - ((float)index * 2.5)), 5.f, -10.f));
-			sc_packet_init_position init_packet;
-			init_packet.size = sizeof(init_packet);
-			init_packet.type = SC_PACKET::SC_PACKET_INIT_POSITION;
-			init_packet.user_id = put_id;
-			init_packet.position = m_clients[put_id].get_user_position();
-			init_packet.yaw = m_clients[put_id].get_user_yaw();
-
-			for (auto recv_id : room.in_player)
-			{
-				if (recv_id == -1)
-					continue;
-				m_clients[recv_id].do_send(sizeof(init_packet), &init_packet);
-			}
+			init_packet.user_id[index] = put_id;
+			init_packet.position[index] = m_clients[put_id].get_user_position();
 			index++;
 		}
+
+		for (auto recv_id : room.in_player)
+		{
+			if (recv_id == -1)
+				continue;
+			m_clients[recv_id].do_send(sizeof(init_packet), &init_packet);
+		}
+
 		TIMER_EVENT ev;
 		ev.event_type = EventType::GAME_START;
 		ev.event_time = chrono::system_clock::now() + 2s;

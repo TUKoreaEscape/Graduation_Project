@@ -517,9 +517,8 @@ struct sc_packet_init_position {
 	unsigned char		size;
 	unsigned char		type;
 
-	unsigned int		user_id;
-	DirectX::XMFLOAT3	position;
-	float				yaw;
+	unsigned short		user_id[6];
+	DirectX::XMFLOAT3	position[6];
 };
 
 struct sc_packet_game_start { // 게임 시작을 방에 있는 플레이어에게 알려줌

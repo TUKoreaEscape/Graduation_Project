@@ -39,16 +39,23 @@ void Network::Process_Ready(char* ptr)
 void Network::Process_Init_Position(char* ptr)
 {
 	sc_packet_init_position* packet = reinterpret_cast<sc_packet_init_position*>(ptr);
+	std::cout << "init position에서 state 전환" << std::endl;
 
-	if (m_pPlayer->GetID() == packet->user_id) {
-		m_pPlayer->SetPosition(packet->position, true);
-		m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-		m_pPlayer->SetTrackAnimationSet(0, 0);
+	for (int i = 0; i < 6; ++i) {
+		if (m_pPlayer->GetID() == packet->user_id[i]) {
+			m_pPlayer->SetPosition(packet->position[i], true);
+			m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_pPlayer->SetTrackAnimationSet(0, 0);
+			GameState& game_state = *GameState::GetInstance();
+			game_state.ChangeNextState();
+			break;
+		}
 	}
-	else {
-		for (int i = 0; i < 5; ++i) {
-			if (m_ppOther[i]->GetID() == packet->user_id) {
-				m_ppOther[i]->SetPosition(packet->position, true);
+
+	for (int i = 0; i < 5; ++i) {
+		for (int j = 0; j < 6; ++j) {
+			if (m_ppOther[i]->GetID() == packet->user_id[j]) {
+				m_ppOther[i]->SetPosition(packet->position[j], true);
 				m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 				m_ppOther[i]->SetTrackAnimationSet(0, 0);
 			}
@@ -59,15 +66,14 @@ void Network::Process_Init_Position(char* ptr)
 void Network::Process_Game_Start(char* ptr)
 {
 	sc_packet_game_start* packet = reinterpret_cast<sc_packet_game_start*>(ptr);
-
 	GameState& game_state = *GameState::GetInstance();
-	game_state.ChangeNextState();
+	game_state.SetLoading(0.0f);
 }
 
 void Network::Process_Game_End(char* ptr)
 {
 	sc_packet_game_end* packet = reinterpret_cast<sc_packet_game_end*>(ptr);
-	
+	std::cout << "Game_End 에서 state 전환" << std::endl;
 	GameState& game_state = *GameState::GetInstance();
 	game_state.ChangeNextState();
 
@@ -112,15 +118,12 @@ void Network::Process_LifeChip_Update(char* ptr)
 void Network::Process_Tagger_Collect_LifeChip(char* ptr)
 {
 	sc_packet_tagger_correct_life_chip* packet = reinterpret_cast<sc_packet_tagger_correct_life_chip*>(ptr);
-	std::cout << "술래 생명칩 업데이트 패킷 도착" << std::endl;
 	if (packet->life_chip == true) {
 		reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(1.0f);
-		std::cout << "술래가 생명칩 획득! UI 하얀색 변경" << std::endl;
 		m_lifechip = true;
 	}
 	else {
 		reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(-1.0f);
-		std::cout << "술래가 생명칩 보관! UI 회색 변경" << std::endl;
 		m_lifechip = false;
 	}
 }
@@ -348,12 +351,10 @@ void Network::Process_ElectrinicSystem_Init(char* ptr)
 
 	for (int i = 0; i < 5; ++i)
 	{
-		std::cout << "EletronicSystem Correct : ";
 		m_pPowers[i]->SetIndex(i);
 		m_pPowers[i]->SetActivate(false);
 		for (int idx = 0; idx < 10; ++idx)
 		{
-			std::cout << static_cast<int>(packet->data[i].value[idx]) << " ";
 			m_pPowers[i]->SetAnswer(idx, packet->data[i].value[idx]);
 			m_pPowers[i]->SetSwitchValue(idx, false);
 		}

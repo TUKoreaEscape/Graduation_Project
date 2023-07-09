@@ -237,7 +237,7 @@ void Network::ProcessPacket(char* ptr)
 		//std::cout << "recv login ok" << std::endl;
 		sc_packet_login_ok* recv_packet = reinterpret_cast<sc_packet_login_ok*>(ptr);
 		m_pPlayer->SetID(recv_packet->id);
-
+		std::cout << "Login OK에서 state 전환" << std::endl;
 		GameState& game_state = *GameState::GetInstance();
 		game_state.ChangeNextState();
 
@@ -292,7 +292,7 @@ void Network::ProcessPacket(char* ptr)
 
 		GetProcessId(info.hProcess); // retrieve PID
 #endif
-
+		std::cout << "JOIN_ROOM_SUCCESS에서 state 전환" << std::endl;
 		GameState& game_state = *GameState::GetInstance();
 		game_state.ChangeNextState();
 
@@ -331,6 +331,7 @@ void Network::ProcessPacket(char* ptr)
 
 		GetProcessId(info.hProcess); // retrieve PID
 #endif
+		std::cout << "CREATE_ROOM_OK에서 state 전환" << std::endl;
 		GameState& game_state = *GameState::GetInstance();
 		game_state.ChangeNextState();
 		//Send_Ready_Packet(true);
@@ -448,9 +449,11 @@ void Network::ProcessPacket(char* ptr)
 				m_ppOther[i]->SetPlayerType(TYPE_PLAYER);
 		}
 
-		std::cout << std::endl;
-		std::cout << "Player (Server ID) [" << packet->id << "] 가 술래로 결정되었습니다. 외곽선이 빨간선으로 바뀝니다." << std::endl;
-
+		//std::cout << std::endl;
+		//std::cout << "Player (Server ID) [" << packet->id << "] 가 술래로 결정되었습니다. 외곽선이 빨간선으로 바뀝니다." << std::endl;
+		std::cout << "Selete Tagger 에서 state 전환" << std::endl;
+		GameState& game_state = *GameState::GetInstance();
+		game_state.ChangeNextState();
 		break;
 	}
 
@@ -646,7 +649,6 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_TAGGER_SKILL:
 	{
-		std::cout << "술래스킬 개방" << std::endl;
 		Process_Activate_Tagger_Skill(ptr);
 		break;
 	}
