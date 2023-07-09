@@ -350,6 +350,13 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 	int i = 0;
 	if (room.All_Player_Ready())
 	{
+		for (int i = 0; i < room.in_player.size(); ++i) {
+			if (room.in_player[i] == -1)
+				continue;
+			m_clients[room.in_player[i]].set_user_position(XMFLOAT3(static_cast<float>(6.f - ((float)i * 2.5)), 5.f, -10.f));
+			m_clients[room.in_player[i]].set_life_chip(true);
+		}
+
 		for (auto put_id : room.in_player)
 		{
 			if (put_id == -1) {
@@ -553,7 +560,18 @@ void cGameServer::Process_Attack(const int user_id)
 				{
 					room.Tagger_Get_Life_Chip(true);
 					m_clients[other_player_id].set_life_chip(false);
-					send_life_chip_update(other_player_id);
+
+					sc_packet_life_chip_update update_packet;
+					update_packet.size = sizeof(update_packet);
+					update_packet.type = SC_PACKET::SC_PACKET_LIFE_CHIP_UPDATE;
+					update_packet.id = other_player_id;
+					update_packet.life_chip = m_clients[other_player_id].get_life_chip();
+
+					for (auto player_id : room.in_player) {
+						if (player_id == -1)
+							continue;
+						m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
+					}
 					send_correct_life_chip(user_id);
 				}
 			}
