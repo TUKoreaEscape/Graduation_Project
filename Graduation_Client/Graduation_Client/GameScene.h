@@ -50,6 +50,7 @@ public:
 	int m_nPlay;
 	int m_nPlayPlayer;
 	int m_nPlayTagger;
+	int m_nLoading;
 
 	GameObject** m_UILogin = nullptr;
 	GameObject** m_UIRoomSelect = nullptr;
@@ -59,6 +60,7 @@ public:
 	GameObject** m_UIPlay = nullptr;
 	GameObject** m_UIPlayer = nullptr;
 	GameObject** m_UITagger = nullptr;
+	GameObject** m_UILoading = nullptr;
 
 	GameObject* m_pCeilling = nullptr;
 

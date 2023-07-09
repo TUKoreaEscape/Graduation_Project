@@ -152,6 +152,8 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < m_nCustomizing; ++i) m_UICustomizing[i]->render(pd3dCommandList);
 		break;
 	case READY_TO_GAME:
+		if (GameState::GetInstance()->IsLoading()) for (int i = 0; i < m_nLoading; ++i) m_UILoading[i]->render(pd3dCommandList);
+		break;
 	case PLAYING_GAME:
 		for (int i = 0; i < NUM_DOOR; ++i) {
 			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
@@ -321,6 +323,10 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_UIEnding = new GameObject * [m_Ending];
 	m_UIEnding[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Ending.dds", 0.0f, 0.0f, 2.0f, 2.0f);
 	m_UIEnding[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.8f, -0.8f, 0.15f, 0.1f);
+	
+	m_nLoading = 1;
+	m_UILoading = new GameObject * [m_nLoading];
+	m_UILoading[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Loading.dds", 0.0f, 0.0f, 2.0f, 2.0f);
 
 	m_nPlay = 3;
 	m_UIPlay = new GameObject * [m_nPlay];
