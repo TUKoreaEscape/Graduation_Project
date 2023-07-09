@@ -292,6 +292,7 @@ void Framework::CreateDirect2DDevice()
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Purple, 1.0f), &m_pd2dpurpleText);
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::LightSalmon, 1.0f), &m_pd2dlightsalmonText);
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black, 1.0f), &m_pd2dblackText);
+	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::CadetBlue, 1.0f), &m_pd2dCadetBlueText);
 	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdLoginFont, 4096.0f, 4096.0f, &m_pdwTextLayout);
 	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdRoomTitleFont, 4096.0f, 4096.0f, &m_pdRoomTitleFLayout);
 	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdReadytoStartFont, 4096.0f, 4096.0f, &m_pdRoomTitleFLayout);
@@ -812,10 +813,33 @@ void Framework::TextRender()
 
 		D2D1_SIZE_F szRenderTarget = m_ppd2dRenderTargets[m_nSwapChainBufferIndex]->GetSize();
 
-		D2D1_RECT_F rcLowerText = D2D1::RectF(m_nWndClientWidth/2-250, m_nWndClientHeight/2-300, m_nWndClientWidth/2+500, m_nWndClientHeight+200);
-		m_pd2dDeviceContext->DrawTextW(L"곧 게임이 시작됩니다.", (UINT32)wcslen(L"곧 게임이 시작됩니다."), m_pdReadytoStartFont, &rcLowerText, m_pd2dblackText);
+		if (m_gamestate->IsLoading())
+		{
+			D2D1_RECT_F rcLowerText = D2D1::RectF(m_nWndClientWidth / 10, m_nWndClientHeight / 2 + 200, m_nWndClientWidth / 3, m_nWndClientHeight + 200);
+			switch(m_gamestate->LoadingCount()){
+			case 0:
+				m_pd2dDeviceContext->DrawTextW(L"Loading", (UINT32)wcslen(L"Loading"), m_pdReadytoStartFont, &rcLowerText, m_pd2dCadetBlueText);
+				break;
+			case 1:
+				m_pd2dDeviceContext->DrawTextW(L"Loading.", (UINT32)wcslen(L"Loading."), m_pdReadytoStartFont, &rcLowerText, m_pd2dCadetBlueText);
+				break;
+			case 2:
+				m_pd2dDeviceContext->DrawTextW(L"Loading..", (UINT32)wcslen(L"Loading.."), m_pdReadytoStartFont, &rcLowerText, m_pd2dCadetBlueText);
+				break;
+			case 3:
+				m_pd2dDeviceContext->DrawTextW(L"Loading...", (UINT32)wcslen(L"Loading..."), m_pdReadytoStartFont, &rcLowerText, m_pd2dCadetBlueText);
+				break;
+			}
+		}
+		else
+		{
+			D2D1_RECT_F rcLowerText = D2D1::RectF(m_nWndClientWidth/2-250, m_nWndClientHeight/2-300, m_nWndClientWidth/2+500, m_nWndClientHeight+200);
+			m_pd2dDeviceContext->DrawTextW(L"곧 게임이 시작됩니다.", (UINT32)wcslen(L"곧 게임이 시작됩니다."), m_pdReadytoStartFont, &rcLowerText, m_pd2dblackText);
+		}
 
 		m_pd2dDeviceContext->EndDraw();
+
+		m_gamestate->UpdateLoading(time.GetTimeElapsed());
 
 		m_pd3d11On12Device->ReleaseWrappedResources(ppd3dResources, _countof(ppd3dResources));
 

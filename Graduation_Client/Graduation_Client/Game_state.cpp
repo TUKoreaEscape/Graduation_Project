@@ -20,6 +20,7 @@ void GameState::ChangeNextState()
 		case WAITING_GAME:
 			player->ChangeCamera(WAITING_GAME, READY_TO_GAME);
 			m_GameState = READY_TO_GAME;
+			SetLoading(2.0f);
 			break;
 		case CUSTOMIZING:
 			break;
