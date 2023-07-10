@@ -18,27 +18,12 @@ D3D12_CPU_DESCRIPTOR_HANDLE	GameScene::m_d3dSrvCPUDescriptorNextHandle;
 D3D12_GPU_DESCRIPTOR_HANDLE	GameScene::m_d3dSrvGPUDescriptorNextHandle;
 GameScene::GameScene() : Scene()
 {
-	m_sPVS[static_cast<int>(PVSROOM::CLASS_ROOM)] = std::set<PVSROOM>{ PVSROOM::CLASS_ROOM, PVSROOM::PIANO_ROOM, PVSROOM::LOBBY_ROOM, PVSROOM::FOREST };
-	m_sPVS[static_cast<int>(PVSROOM::PIANO_ROOM)] = std::set<PVSROOM>{ PVSROOM::CLASS_ROOM, PVSROOM::PIANO_ROOM, PVSROOM::LOBBY_ROOM, PVSROOM::BROADCASTING_ROOM };
-	m_sPVS[static_cast<int>(PVSROOM::BROADCASTING_ROOM)] = std::set<PVSROOM>{ PVSROOM::LOBBY_ROOM, PVSROOM::PIANO_ROOM, PVSROOM::CUBE_ROOM, PVSROOM::BROADCASTING_ROOM };
-	m_sPVS[static_cast<int>(PVSROOM::LOBBY_ROOM)] = std::set<PVSROOM>{ PVSROOM::CLASS_ROOM, PVSROOM::PIANO_ROOM, PVSROOM::LOBBY_ROOM, PVSROOM::FOREST, PVSROOM::CUBE_ROOM, PVSROOM::BROADCASTING_ROOM };
-	m_sPVS[static_cast<int>(PVSROOM::FOREST)] = std::set<PVSROOM>{ PVSROOM::CLASS_ROOM, PVSROOM::BROADCASTING_ROOM, PVSROOM::LOBBY_ROOM, PVSROOM::FOREST };
-	m_sPVS[static_cast<int>(PVSROOM::CUBE_ROOM)] = std::set<PVSROOM>{ PVSROOM::LOBBY_ROOM, PVSROOM::CUBE_ROOM, PVSROOM::BROADCASTING_ROOM };
 
-	m_pvsCamera = PVSROOM::LOBBY_ROOM;
 }
 
 void GameScene::forrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	//if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
-	//if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
-	//m_pPlayer->m_pCamera->update(pd3dCommandList);
-	//m_pLight->GetComponent<Light>()->update(pd3dCommandList);
 
-	for (int i = 0; i < m_nBush; ++i)
-	{
-		if (m_ppBush[i]) m_ppBush[i]->render(pd3dCommandList);
-	}
 }
 
 void GameScene::prerender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -56,8 +41,6 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	m_pSkybox->render(pd3dCommandList);
 
-	m_pCeilling->render(pd3dCommandList);
-
 	m_pMainTerrain->render(pd3dCommandList);
 	m_pPianoTerrain->render(pd3dCommandList);
 	m_pBroadcastTerrain->render(pd3dCommandList);
@@ -71,45 +54,6 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 
 	Scene::render(pd3dCommandList);
-
-	for (auto p : m_sPVS[static_cast<int>(m_pvsCamera)]) {
-		m_pPVSObjects[static_cast<int>(p)]->render(pd3dCommandList);
-	}
-
-	for (int i = 0; i < NUM_VENT; ++i)
-	{
-		if (Vents[i]) {
-			Vents[i]->UpdateTransform(nullptr);
-			Vents[i]->render(pd3dCommandList);
-		}
-	}
-	for (int i = 0; i < NUM_DOOR; ++i)
-	{
-		if (m_pDoors[i]) {
-			m_pDoors[i]->UpdateTransform(nullptr);
-			m_pDoors[i]->render(pd3dCommandList);
-		}
-	}
-
-	for (int i = 0; i < NUM_POWER; ++i) {
-		if (m_pPowers[i]) {
-			m_pPowers[i]->UpdateTransform(nullptr);
-			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->render(pd3dCommandList);
-		}
-	}
-	for (int i = 0; i < NUM_ITEMBOX; ++i) {
-		if (m_pBoxes[i]) {
-			m_pBoxes[i]->UpdateTransform(nullptr);
-			reinterpret_cast<ItemBox*>(m_pBoxes[i])->render(pd3dCommandList);
-		}
-	}
-	if (m_sPVS[static_cast<int>(m_pvsCamera)].count(PVSROOM::FOREST) != 0) {
-		m_pOak->render(pd3dCommandList);
-		for (int i = 0; i < m_nBush; ++i)
-		{
-			if (m_ppBush[i]) m_ppBush[i]->render(pd3dCommandList);
-		}
-	}
 }
 
 void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -117,120 +61,6 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
-
-	switch (GameState::GetInstance()->GetGameState()) {
-	case LOGIN:
-		for (int i = 0; i < m_nLogin; ++i)
-		{
-			if (i > 2) break;
-			m_UILogin[i]->render(pd3dCommandList);
-		}
-		if (Input::GetInstance()->m_errorState != 0)
-		{
-			if (Input::GetInstance()->m_errorState == 1) m_UILogin[3]->render(pd3dCommandList);
-			else if (Input::GetInstance()->m_errorState == 2) m_UILogin[4]->render(pd3dCommandList);
-			
-		}
-		if (Input::GetInstance()->m_SuccessState) m_UILogin[5]->render(pd3dCommandList);
-		break;
-	case ROOM_SELECT:
-		for (int i = 0; i < m_nRoomSelect; ++i) m_UIRoomSelect[i]->render(pd3dCommandList);
-		break;
-	case WAITING_GAME:
-		for (int i = 0; i < 5; ++i) {
-			m_ppPlayers[i]->SetLookAt(XMFLOAT3(0, 0, 0));
-		}
-		m_ppPlayers[0]->SetPosition(XMFLOAT3(6.0f, 0.0f, -5.0f));
-		m_ppPlayers[1]->SetPosition(XMFLOAT3(3.0f, 0.0f, -5.0f));
-		m_ppPlayers[2]->SetPosition(XMFLOAT3(-3.0f, 0.0f, -5.0f));
-		m_ppPlayers[3]->SetPosition(XMFLOAT3(-6.0f, 0.0f, -5.0f));
-		m_ppPlayers[4]->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
-		m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -3.0f));
-		for (int i = 0; i < m_nWaitingRoom; ++i) m_UIWaitingRoom[i]->render(pd3dCommandList);
-		break;
-	case CUSTOMIZING:
-		for (int i = 0; i < m_nCustomizing; ++i) m_UICustomizing[i]->render(pd3dCommandList);
-		break;
-	case READY_TO_GAME:
-		if (GameState::GetInstance()->IsLoading()) for (int i = 0; i < m_nLoading; ++i) m_UILoading[i]->render(pd3dCommandList);
-		break;
-	case PLAYING_GAME:
-		for (int i = 0; i < NUM_DOOR; ++i) {
-			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
-		}
-		for (int i = 0; i < NUM_POWER; ++i) {
-			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->UIrender(pd3dCommandList);
-		}
-		for (int i = 0; i < NUM_VENT; ++i) {
-			reinterpret_cast<Vent*>(Vents[i])->UIrender(pd3dCommandList);
-		}
-		for (int i = 0; i < NUM_ITEMBOX; ++i) {
-			reinterpret_cast<ItemBox*>(m_pBoxes[i])->UIrender(pd3dCommandList);
-		}
-		for (int i = 0; i < m_nPlay - 1; ++i) m_UIPlay[i]->render(pd3dCommandList);
-
-		if (m_pPlayer->GetType() == TYPE_PLAYER)reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(1.0f);
-		else {
-			reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(-1.0f);
-#if USE_NETWORK
-			if(m_network->m_lifechip == true)
-				reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(1.0f);
-#endif		
-		}
-
-		m_UIPlay[2]->render(pd3dCommandList);
-		if (m_pPlayer->GetType() == TYPE_TAGGER) {
-			for (int i = 0; i < 3; ++i) {
-				if (m_pPlayer->GetTaggerSkill(i)) {
-					reinterpret_cast<IngameUI*>(m_UITagger[i + 3])->SetGuage(1.0f);
-					m_UITagger[i + 3]->render(pd3dCommandList);
-				}
-				else {
-					reinterpret_cast<IngameUI*>(m_UITagger[i + 3])->SetGuage(-1.0f);
-					m_UITagger[i + 3]->render(pd3dCommandList);
-				}
-			}
-			for (int i = 0; i < 3; ++i) m_UITagger[i]->render(pd3dCommandList);
-		}
-		else {
-			m_UIPlayer[0]->render(pd3dCommandList);
-			int index = m_pPlayer->GetItem();
-			if (index != -1) m_UIPlayer[1 + index]->render(pd3dCommandList);
-		}
-		break;
-	case ENDING_GAME:
-		if (0) { // TAGGER's Win
-			if (m_pPlayer->GetType() == TYPE_TAGGER) {
-				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-				m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-			}
-			else {
-				for (int i = 0; i < 5; ++i) {
-					if (m_ppPlayers[i]->GetType() == TYPE_TAGGER) {
-						m_ppPlayers[i]->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-						m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-						break;
-					}
-				}
-			}
-		}
-		else { // Player's Win
-			float my_win = 0.0f;
-			if (m_pPlayer->GetType() != TYPE_TAGGER) {
-				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-				m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-				my_win = true;
-			}
-			for (int i = 0; i < 5; ++i) {
-				if (m_ppPlayers[i]->GetType() != TYPE_TAGGER) {
-					m_ppPlayers[i]->SetPosition(XMFLOAT3(6.0f - 3.0f * i, 0.0f, -3.0f));
-					m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-				}
-			}
-		}
-		for (int i = 0; i < m_Ending; ++i) m_UIEnding[i]->render(pd3dCommandList);
-		break;
-	}
 }
 
 void GameScene::WaitingRoomrender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -265,13 +95,6 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
 	LoadedModelInfo* pPlayerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/C74.bin", nullptr); 
-	LoadedModelInfo* pClassModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InClassObject.bin", nullptr);
-	LoadedModelInfo* pPianoModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPianoRoom.bin", nullptr);
-	LoadedModelInfo* pBroadcastModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InBroadcast.bin", nullptr);
-	LoadedModelInfo* pHouseModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPorest.bin", nullptr);
-	LoadedModelInfo* pLobbyModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InDDD.bin", nullptr);
-	LoadedModelInfo* pCubeModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/CubeRoom.bin", nullptr);
-	LoadedModelInfo* pCeilModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Ceilling.bin", nullptr);
 
 	m_nPlayers = 5;
 	m_ppPlayers = new Player * [m_nPlayers];
@@ -318,126 +141,10 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pForestTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 60, -60, 81, 41, xmf3Scale, xmf4Color, L"Terrain/Road_grass.dds");
 	m_pClassroomTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), -20, -60, 81, 41, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
 
-	//UI생성 영역 dds파일 다음 x,y,width,height가 순서대로 들어간다. 아무것도 넣지않으면 화면중앙에 1x1사이즈로 나온다.
-	m_nLogin = 6;
-	m_UILogin = new GameObject * [m_nLogin];
-	m_UILogin[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Login.dds", 0.0f, 0.0f, 2.0f, 2.0f);
-	m_UILogin[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/LoginButton.dds", -0.67f, -0.55f, 0.2f, 0.14f);
-	m_UILogin[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/CreateID.dds", -0.38f, -0.55f, 0.2f, 0.14f);
-	m_UILogin[3] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Loginfail.dds", 0.0f, -0.2f, 0.8f, 0.35f);
-	m_UILogin[4] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SameID.dds", 0.0f, -0.2f, 0.8f, 0.35f);
-	m_UILogin[5] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SuccessfullycreatedID.dds", 0.0f, -0.2f, 0.8f, 0.35f);
-
-	m_nRoomSelect = 9;
-	m_UIRoomSelect = new GameObject * [m_nRoomSelect];
-	m_UIRoomSelect[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/RoomSelect.dds", 0.0f, 0.0f, 2.0f, 2.0f);
-	m_UIRoomSelect[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/LArrow.dds", -0.2f, -0.9f, 0.2f, 0.2f);
-	m_UIRoomSelect[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/RArrow.dds", 0.2f, -0.9f, 0.2f, 0.2f);
-
-	m_UIRoomSelect[3] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", 0.4f, 0.7f, 0.5f, 0.4f);
-	m_UIRoomSelect[4] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", 0.4f, 0.1f, 0.5f, 0.4f);
-	m_UIRoomSelect[5] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", 0.4f, -0.5f, 0.5f, 0.4f);
-	m_UIRoomSelect[6] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", -0.4f, 0.7f, 0.5f, 0.4f);
-	m_UIRoomSelect[7] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", -0.4f, 0.1f, 0.5f, 0.4f);
-	m_UIRoomSelect[8] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", -0.4f, -0.5f, 0.5f, 0.4f);
-
-	m_nWaitingRoom = 4;
-	m_UIWaitingRoom = new GameObject * [m_nWaitingRoom];
-	m_UIWaitingRoom[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/WaitingRoom.dds", 0.0f, 0.0f, 2.0f, 2.0f);
-	m_UIWaitingRoom[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Ready.dds", 0.4f, -0.8f, 0.15f, 0.1f);
-	m_UIWaitingRoom[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.6f, -0.8f, 0.15f, 0.1f);
-	m_UIWaitingRoom[3] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Customizing.dds", 0.8f, -0.8f, 0.15f, 0.1f);
-
-	m_nCustomizing = 11;
-	m_UICustomizing = new GameObject * [m_nCustomizing];
-	m_UICustomizing[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/CustomizingRoom.dds", 0.0f, 0.0f, 2.0f, 2.0f);
-	m_UICustomizing[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Ready.dds", 0.6f, -0.8f, 0.15f, 0.1f);
-	m_UICustomizing[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.8f, -0.8f, 0.15f, 0.1f);
-	m_UICustomizing[3] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/HEAD.dds", -0.8f, 0.6f, 0.1f, 0.15f);
-	m_UICustomizing[4] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Eyes.dds", -0.8f, 0.4f, 0.1f, 0.15f);
-	m_UICustomizing[5] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Mouthandnoses.dds", -0.8f, 0.2f, 0.1f, 0.15f);
-	m_UICustomizing[6] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Body.dds", -0.8f, 0.f, 0.1f, 0.15f);
-	m_UICustomizing[7] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/BodyParts.dds", -0.8f, -0.2f, 0.1f, 0.15f);
-	m_UICustomizing[8] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Gloves.dds", -0.8f, -0.4f, 0.1f, 0.15f);
-	m_UICustomizing[9] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/CustomizingRArrow.dds", 0.5f, 0.f, 0.1f, 0.15f);
-	m_UICustomizing[10] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/CustomizingLArrow.dds", -0.5f, 0.f, 0.1f, 0.15f);
-
-	m_Ending = 2;
-	m_UIEnding = new GameObject * [m_Ending];
-	m_UIEnding[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Ending.dds", 0.0f, 0.0f, 2.0f, 2.0f);
-	m_UIEnding[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.8f, -0.8f, 0.15f, 0.1f);
 	
-	m_nLoading = 1;
-	m_UILoading = new GameObject * [m_nLoading];
-	m_UILoading[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Loading.dds", 0.0f, 0.0f, 2.0f, 2.0f);
-
-	m_nPlay = 3;
-	m_UIPlay = new GameObject * [m_nPlay];
-	m_UIPlay[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.8f, -0.75f, 0.3f, 0.4f);
-	m_UIPlay[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.0f, 0.75f, 0.6f, 0.4f);
-	m_UIPlay[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/life2.dds", 0.8f, -0.75f, 0.3f, 0.4f);
-
-
-	m_nPlayPlayer = 1 + 5;
-	m_UIPlayer = new GameObject * [m_nPlayPlayer];
-	m_UIPlayer[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", -0.75f, -0.75f, 0.4f, 0.4f);
-	m_UIPlayer[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Hammer.dds", -0.75f, -0.75f, 0.4f, 0.4f);
-	m_UIPlayer[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Drill.dds", -0.75f, -0.75f, 0.4f, 0.4f);
-	m_UIPlayer[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Wrench.dds", -0.75f, -0.75f, 0.4f, 0.4f);
-	m_UIPlayer[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Pliers.dds", -0.75f, -0.75f, 0.4f, 0.4f);
-	m_UIPlayer[5] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Driver.dds", -0.75f, -0.75f, 0.4f, 0.4f);
-
-	m_nPlayTagger = 3 + 3;
-	m_UITagger = new GameObject * [m_nPlayTagger];
-	m_UITagger[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", -0.8f, -0.8f, 0.3f, 0.3f);
-	m_UITagger[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", -0.8f, -0.45f, 0.3f, 0.3f);
-	m_UITagger[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", -0.8f, -0.1f, 0.3f, 0.3f);
-	m_UITagger[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Gloves.dds", -0.8f, -0.8f, 0.3f, 0.3f);
-	m_UITagger[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Loginfail.dds", -0.8f, -0.45f, 0.3f, 0.3f);
-	m_UITagger[5] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/life.dds", -0.8f, -0.1f, 0.3f, 0.3f);
-
 	LPVOID m_pTerrain[ROOM_COUNT]{ m_pMainTerrain ,m_pPianoTerrain,m_pBroadcastTerrain, m_pCubeTerrain ,m_pForestTerrain,m_pClassroomTerrain };
 	
-	m_pCeilling = new GameObject();
-	m_pCeilling->SetChild(pCeilModel->m_pModelRootObject, true);
-	m_pCeilling->UpdateTransform(nullptr);
 	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene0621.bin");
-
-	m_pPVSObjects[0] = new GameObject();
-	m_pPVSObjects[0]->SetChild(pClassModel->m_pModelRootObject, true);
-	m_pPVSObjects[0]->UpdateTransform(nullptr);
-	m_pPVSObjects[1] = new GameObject();
-	m_pPVSObjects[1]->SetChild(pPianoModel->m_pModelRootObject, true);
-	m_pPVSObjects[1]->UpdateTransform(nullptr);
-	m_pPVSObjects[2] = new GameObject();
-	m_pPVSObjects[2]->SetChild(pBroadcastModel->m_pModelRootObject, true);
-	m_pPVSObjects[2]->UpdateTransform(nullptr);
-	m_pPVSObjects[3] = new GameObject();
-	m_pPVSObjects[3]->SetChild(pLobbyModel->m_pModelRootObject, true);
-	m_pPVSObjects[3]->UpdateTransform(nullptr);
-	m_pPVSObjects[4] = new GameObject();
-	m_pPVSObjects[4]->SetChild(pHouseModel->m_pModelRootObject, true);
-	m_pPVSObjects[4]->UpdateTransform(nullptr);
-	m_pPVSObjects[5] = new GameObject();
-	m_pPVSObjects[5]->SetChild(pCubeModel->m_pModelRootObject, true);
-	m_pPVSObjects[5]->UpdateTransform(nullptr);
-	/*	m_pClass = new GameObject();
-	m_pClass->SetChild(pClassModel->m_pModelRootObject, true);
-	m_pClass->UpdateTransform(nullptr);
-	m_pPiano = new GameObject();
-	m_pPiano->SetChild(pPianoModel->m_pModelRootObject, true);
-	m_pPiano->UpdateTransform(nullptr);
-	m_pBroadcast = new GameObject();
-	m_pBroadcast->SetChild(pBroadcastModel->m_pModelRootObject, true);
-	m_pBroadcast->UpdateTransform(nullptr);
-	m_pLobby = new GameObject();
-	m_pLobby->SetChild(pLobbyModel->m_pModelRootObject, true);
-	m_pLobby->UpdateTransform(nullptr);
-	m_pPorest = new GameObject();
-	m_pPorest->SetChild(pHouseModel->m_pModelRootObject, true);
-	m_pPorest->UpdateTransform(nullptr);*/
-
-	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 
 	m_pPlayer->SetPlayerUpdatedContext(m_pTerrain);
 	m_pPlayer->SetPlayerType(TYPE_PLAYER);
@@ -447,29 +154,6 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 		AddPlayer(m_ppPlayers[i]);
 	}
 	AddPlayer(m_pPlayer);
-
-	if (pPlayerModel) delete pPlayerModel;
-	if (pClassModel) delete pClassModel;
-	if (pPianoModel) delete pPianoModel;
-	if (pBroadcastModel) delete pBroadcastModel;
-	if (pHouseModel) delete pHouseModel;
-	if (pLobbyModel) delete pLobbyModel;
-	if (pCeilModel) delete pCeilModel;
-	if (pCubeModel) delete pCubeModel;
-
-	m_nObejctsUIs = 6;
-	m_ppObjectsUIs = new InteractionUI* [m_nObejctsUIs];
-	m_ppObjectsUIs[0] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fOpen.dds");
-	m_ppObjectsUIs[1] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fClose.dds");
-	m_ppObjectsUIs[2] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fPick.dds");
-	m_ppObjectsUIs[3] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fRepair.dds");
-	m_ppObjectsUIs[4] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/cCancel.dds");
-	m_ppObjectsUIs[5] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/block.dds");
-
-	MakeVents(pd3dDevice, pd3dCommandList);
-	MakeDoors(pd3dDevice, pd3dCommandList);
-	MakePowers(pd3dDevice, pd3dCommandList);
-	MakeBoxes(pd3dDevice, pd3dCommandList);
 
 #if USE_NETWORK
 	char id[20]{};
@@ -517,31 +201,7 @@ void GameScene::ReleaseObjects()
 	if (m_pClassroomTerrain) m_pClassroomTerrain->Release();
 	if (m_pForestTerrain) m_pForestTerrain->Release();
 	if (m_pCubeTerrain) m_pCubeTerrain->Release();
-	if (m_UILogin) {
-		for (int i = 0; i < m_nLogin; ++i) {
-			if (m_UILogin[i]) m_UILogin[i]->Release();
-		}
-		delete[] m_UILogin;
-	}
-	if (m_UIRoomSelect) {
-		for (int i = 0; i < m_nRoomSelect; ++i) {
-			if (m_UIRoomSelect[i]) m_UIRoomSelect[i]->Release();
-		}
-		delete[] m_UIRoomSelect;
-	}
-	if (m_pPVSObjects)
-		for (int i = 0; i < 6; ++i) {
-			if (m_pPVSObjects[i]) m_pPVSObjects[i]->Release();
-		}
-	if (m_ppBush) {
-		for (int i = 0; i < m_nBush; ++i) {
-			if (m_ppBush[i]) m_ppBush[i]->Release();
-		}
-		delete[] m_ppBush;
-	}
-
-	for (int i = 0; i < 8; ++i) if (Vents[i]) Vents[i]->Release();
-	if(m_pOak) m_pOak->Release();
+	
 }
 
 ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
@@ -788,12 +448,6 @@ void GameScene::ReleaseUploadBuffers()
 			if (m_ppWalls[i]) m_ppWalls[i]->ReleaseUploadBuffers();
 		}
 	}
-	if (m_pOak) m_pOak->ReleaseUploadBuffers();
-	if (m_ppBush) {
-		for (int i = 0; i < m_nBush; ++i) {
-			if (m_ppBush[i]) m_ppBush[i]->ReleaseUploadBuffers();
-		}
-	}
 	if (m_pLight) m_pLight->ReleaseUploadBuffers();
 	if (m_pSkybox) m_pSkybox->ReleaseUploadBuffers();
 
@@ -803,20 +457,6 @@ void GameScene::ReleaseUploadBuffers()
 	if (m_pClassroomTerrain) m_pClassroomTerrain->ReleaseUploadBuffers();
 	if (m_pForestTerrain) m_pForestTerrain->ReleaseUploadBuffers();
 	if (m_pCubeTerrain) m_pCubeTerrain->ReleaseUploadBuffers();
-	if (m_UILogin) {
-		for (int i = 0; i < m_nLogin; ++i) {
-			if (m_UILogin[i]) m_UILogin[i]->ReleaseUploadBuffers();
-		}
-	}
-	if (m_UIRoomSelect) {
-		for (int i = 0; i < m_nRoomSelect; ++i) {
-			if (m_UIRoomSelect[i]) m_UIRoomSelect[i]->ReleaseUploadBuffers();
-		}
-	}
-	for (int i = 0; i < 6; ++i) {
-		if (m_pPVSObjects[i]) m_pPVSObjects[i]->ReleaseUploadBuffers();
-	}
-	
 }
 
 void GameScene::CreateCbvSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nConstantBufferViews, int nShaderResourceViews)
@@ -951,201 +591,16 @@ void GameScene::LoadSceneObjectsFromFile(ID3D12Device* pd3dDevice, ID3D12Graphic
 
 void GameScene::LoadSceneBushFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName)
 {
-	FILE* pFile = NULL;
-	::fopen_s(&pFile, pstrFileName, "rb");
-	::rewind(pFile);
-
-	Material* pMaterial = new Material(7);
-	pMaterial->m_ppTextures[0] = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pMaterial->m_ppTextures[0]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Bush02_d.dds", RESOURCE_TEXTURE2D, 0);
-
-	CreateShaderResourceViews(pd3dDevice, pMaterial->m_ppTextures[0], 0, 3);
-
-	pMaterial->SetBushShader();
-	pMaterial->SetMaterialType(MATERIAL_ALBEDO_MAP);
 	
-	char pstrToken[64] = { '\0' };
-	char pstrGameObjectName[64] = { '\0' };
-
-	UINT nReads = 0, nObjectNameLength = 0;
-	BYTE nStrLength = 0;
-
-	nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pFile);
-	nReads = (UINT)::fread(pstrToken, sizeof(char), nStrLength, pFile); //"<GameObjects>:"
-	nReads = (UINT)::fread(&m_nBush, sizeof(int), 1, pFile);
-
-	m_ppBush = new GameObject * [m_nBush];
-
-	GameObject* pGameObject = NULL;
-	
-	FILE* pMeshFile = nullptr;
-	::fopen_s(&pMeshFile, "Model/bush02.bin", "rb");
-	::rewind(pMeshFile);
-	StandardMesh* bushMesh = new StandardMesh(pd3dDevice, pd3dCommandList);
-	bushMesh->LoadMeshFromFile(pd3dDevice, pd3dCommandList, pMeshFile);
-
-	for (int i = 0; i < m_nBush; i++)
-	{
-		pGameObject = new GameObject();
-
-		nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pFile);
-		nReads = (UINT)::fread(pstrToken, sizeof(char), 13, pFile); //"<GameObject>:"
-		nReads = (UINT)::fread(&nObjectNameLength, sizeof(BYTE), 1, pFile);
-		//nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pFile);
-		nReads = (UINT)::fread(pstrGameObjectName, sizeof(char), nObjectNameLength, pFile);
-		nReads = (UINT)::fread(&pGameObject->m_xmf4x4World, sizeof(float), 16, pFile);
-
-
-		pGameObject->SetMesh(bushMesh);
-
-		pGameObject->renderer->SetMaterial(pMaterial);
-
-		m_ppBush[i] = pGameObject;
-		//m_ppBush[i]->SetType(-1);
-	}
-
-	::fclose(pFile);
-
-	m_pOak = new GameObject();
-	LoadedModelInfo* pOakModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Oak.bin", nullptr);
-	m_pOak->SetChild(pOakModel->m_pModelRootObject, true);
-	m_pOak->SetType(-1);
-	//m_pOak->SetPosition(61.25, 0.7897112, -68.4);
-	m_pOak->UpdateTransform(nullptr);
-	if (pOakModel) delete pOakModel;
 }
 
 void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	LoadedModelInfo* pVentModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/airvent.bin", nullptr);
-
-	for (int i = 0; i < NUM_VENT; ++i) {
-		Vents[i] = new Vent();
-		Vents[i]->SetChild(pVentModel->m_pModelRootObject, true);
-		reinterpret_cast<Vent*>(Vents[i])->SetUI(0, m_ppObjectsUIs[0]);
-		reinterpret_cast<Vent*>(Vents[i])->SetUI(1, m_ppObjectsUIs[5]);
-	}
-	Vents[0]->SetPosition(XMFLOAT3(97.2155f, 1.0061f, 40.43311f));
-	reinterpret_cast<Vent*>(Vents[0])->SetOpenPos(XMFLOAT3(97.2155f, 2.0061f, 41.43311f));
-	reinterpret_cast<Vent*>(Vents[0])->SetRotation(DEGREE0);
-	Vents[1]->SetPosition(XMFLOAT3(97.27f, 1.0061f, -40.43311f));
-	reinterpret_cast<Vent*>(Vents[1])->SetOpenPos(XMFLOAT3(97.27f, 2.0061f, -41.43311f));
-	reinterpret_cast<Vent*>(Vents[1])->SetRotation(DEGREE180);
-	Vents[2]->SetPosition(XMFLOAT3(20.43311f, 1.0061f, -77.6103f));
-	reinterpret_cast<Vent*>(Vents[2])->SetOpenPos(XMFLOAT3(21.43311f, 2.0061f, -77.6103f));
-	reinterpret_cast<Vent*>(Vents[2])->SetRotation(DEGREE90);
-	Vents[3]->SetPosition(XMFLOAT3(18.56689f, 1.0061f, -77.6103f));
-	reinterpret_cast<Vent*>(Vents[3])->SetOpenPos(XMFLOAT3(17.56689f, 2.0061f, -77.6103f));
-	reinterpret_cast<Vent*>(Vents[3])->SetRotation(DEGREE270);
-	Vents[4]->SetPosition(XMFLOAT3(-56.00388f, 1.0061f, -40.54385f));
-	reinterpret_cast<Vent*>(Vents[4])->SetOpenPos(XMFLOAT3(-56.00388f, 2.0061f, -41.54385f));
-	reinterpret_cast<Vent*>(Vents[4])->SetRotation(DEGREE180);
-	Vents[5]->SetPosition(XMFLOAT3(-56.04684f, 1.0061f, 40.43311f));
-	reinterpret_cast<Vent*>(Vents[5])->SetOpenPos(XMFLOAT3(-56.04684f, 2.0061f, 41.43311f));
-	reinterpret_cast<Vent*>(Vents[5])->SetRotation(DEGREE0);
-	Vents[6]->SetPosition(XMFLOAT3(35.994f, 1.0061f, 40.56689f));
-	reinterpret_cast<Vent*>(Vents[6])->SetOpenPos(XMFLOAT3(35.994f, 2.0061f, 41.56689f));
-	reinterpret_cast<Vent*>(Vents[6])->SetRotation(DEGREE0);
-	Vents[7]->SetPosition(XMFLOAT3(35.96133f, 1.0061f, 23.56689f));
-	reinterpret_cast<Vent*>(Vents[7])->SetOpenPos(XMFLOAT3(35.96133f, 2.0061f, 22.56689f));
-	reinterpret_cast<Vent*>(Vents[7])->SetRotation(DEGREE180);
-	reinterpret_cast<Vent*>(Vents[7])->SetBlock();
-
-	/*Vents[0]->SetPosition(XMFLOAT3(97.2155f, 1.0061f, 40.43311f));
-	reinterpret_cast<Vent*>(Vents[0])->SetOpenPos(XMFLOAT3(98.94085f, 1.0061f, 42.29158f));
-	reinterpret_cast<Vent*>(Vents[0])->SetRotation(DEGREE0);
-	Vents[1]->SetPosition(XMFLOAT3(97.27f, 1.0061f, -40.43311f));
-	reinterpret_cast<Vent*>(Vents[1])->SetOpenPos(XMFLOAT3(95.5352f, 1.0061f, -42.2919f));
-	reinterpret_cast<Vent*>(Vents[1])->SetRotation(DEGREE0);
-	Vents[2]->SetPosition(XMFLOAT3(20.43311f, 1.0061f, -77.6103f));
-	reinterpret_cast<Vent*>(Vents[2])->SetOpenPos(XMFLOAT3(22.29154f, 1.0061f, -75.88629f));
-	reinterpret_cast<Vent*>(Vents[2])->SetRotation(DEGREE90);
-	Vents[3]->SetPosition(XMFLOAT3(18.56689f, 1.0061f, -77.6103f));
-	reinterpret_cast<Vent*>(Vents[3])->SetOpenPos(XMFLOAT3(16.70864f, 1.0061f, -79.3296f));
-	reinterpret_cast<Vent*>(Vents[3])->SetRotation(DEGREE90);
-	Vents[4]->SetPosition(XMFLOAT3(-56.00388f, 1.033527f, -40.54385f));
-	reinterpret_cast<Vent*>(Vents[4])->SetOpenPos(XMFLOAT3(-57.66415f, 1.0061f, -42.1952f));
-	reinterpret_cast<Vent*>(Vents[4])->SetRotation(DEGREE0);
-	Vents[5]->SetPosition(XMFLOAT3(-56.04684f, 1.0061f, 40.43311f));
-	reinterpret_cast<Vent*>(Vents[5])->SetOpenPos(XMFLOAT3(-54.31968f, 1.0061f, 42.29163f));
-	reinterpret_cast<Vent*>(Vents[5])->SetRotation(DEGREE0);
-	Vents[6]->SetPosition(XMFLOAT3(35.994f, 1.0061f, 40.56689f));
-	reinterpret_cast<Vent*>(Vents[6])->SetOpenPos(XMFLOAT3(37.63297f, 1.0061f, 42.2901f));
-	reinterpret_cast<Vent*>(Vents[6])->SetRotation(DEGREE0);
-	Vents[7]->SetPosition(XMFLOAT3(35.96133f, 1.0061f, 23.56689f));
-	reinterpret_cast<Vent*>(Vents[7])->SetOpenPos(XMFLOAT3(34.23397f, 1.0061f, 21.70837f));
-	reinterpret_cast<Vent*>(Vents[7])->SetRotation(DEGREE0);
-	*/
-	for (int i = 0; i < NUM_VENT; ++i) {
-		Vents[i]->UpdateTransform(nullptr);
-	}
-
-	if (pVentModel) delete pVentModel;
+	
 }
 
 void GameScene::MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	LoadedModelInfo* pDoorModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Future_Door_Final.bin", nullptr);
-	
-	for (int i = 0; i < NUM_DOOR; ++i) {
-		m_pDoors[i] = new Door();
-		m_pDoors[i]->SetChild(pDoorModel->m_pModelRootObject, true);
-		reinterpret_cast<Door*>(m_pDoors[i])->SetUI(0, m_ppObjectsUIs[0]);
-		reinterpret_cast<Door*>(m_pDoors[i])->SetUI(1, m_ppObjectsUIs[1]);
-		reinterpret_cast<Door*>(m_pDoors[i])->SetUI(2, m_ppObjectsUIs[5]);
-	}
-	
-	m_pDoors[0]->SetPosition(XMFLOAT3(-29.73866f, 0.0f, 39.6f)); 
-	reinterpret_cast<Door*>(m_pDoors[0])->SetRotation(DEGREE180);
-	m_pDoors[1]->SetPosition(XMFLOAT3(77.37788f, 0.0f, 39.72f));
-	reinterpret_cast<Door*>(m_pDoors[1])->SetRotation(DEGREE0);
-	m_pDoors[1]->UpdateTransform(nullptr);
-	m_pDoors[2]->SetPosition(XMFLOAT3(23.26f, 0.0f, -39.99f));
-	reinterpret_cast<Door*>(m_pDoors[2])->SetRotation(DEGREE0);
-	m_pDoors[2]->UpdateTransform(nullptr);
-
-	m_pDoors[3]->SetPosition(XMFLOAT3(-29.99397f, 0.0f, -39.71f));
-	reinterpret_cast<Door*>(m_pDoors[3])->SetRotation(DEGREE0);
-	m_pDoors[3]->UpdateTransform(nullptr);
-
-	m_pDoors[4]->SetPosition(XMFLOAT3(54.99f, 0.0f, -0.4182036f));
-	reinterpret_cast<Door*>(m_pDoors[4])->SetRotation(DEGREE270);
-
-	m_pDoors[5]->SetPosition(XMFLOAT3(0.18f, 0.0f, 60.25972f));
-	reinterpret_cast<Door*>(m_pDoors[5])->SetRotation(DEGREE270);
-
-	if (pDoorModel) delete pDoorModel;
-}
-
-void GameScene::MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	LoadedModelInfo* pElecModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Power.bin", nullptr);
-	
-	pElecModel->m_pModelRootObject->SetScale(0.5, 0.5, 0.5);
-	for (int i = 0; i < NUM_POWER; ++i) {
-		m_pPowers[i] = new PowerSwitch();
-		m_pPowers[i]->SetChild(pElecModel->m_pModelRootObject, true);
-		m_pPowers[i]->Init();
-		m_pPowers[i]->SetUI(0, m_ppObjectsUIs[0]);
-		m_pPowers[i]->SetUI(1, m_ppObjectsUIs[1]);
-		m_pPowers[i]->SetUI(2, m_ppObjectsUIs[3]);
-		m_pPowers[i]->SetUI(3, m_ppObjectsUIs[4]);
-		m_pPowers[i]->SetUI(4, m_ppObjectsUIs[5]);
-		//m_pPowers[i]->UpdateTransform(nullptr);
-	}
-
-	m_pPowers[0]->SetPosition(XMFLOAT3(-0.7033535f, 1.5f, 76.76f)); // piano
-	m_pPowers[0]->SetRotation(DEGREE270);
-	m_pPowers[1]->SetPosition(XMFLOAT3(-54.11389f, 1.5f, -66.95f)); // classroom
-	m_pPowers[1]->SetRotation(DEGREE270);
-	m_pPowers[2]->SetPosition(XMFLOAT3(60.87f, 1.5f, -70.0f)); // porest
-	m_pPowers[2]->SetRotation(DEGREE180);
-	m_pPowers[3]->SetPosition(XMFLOAT3(67.6f, 1.5f, 40.6322f)); // broadcastingroom
-	m_pPowers[3]->SetRotation(DEGREE0);
-	m_pPowers[4]->SetPosition(XMFLOAT3(65.231f, 1.5f, -27.5f)); // maze
-	m_pPowers[4]->SetRotation(DEGREE270);
-
-	if (pElecModel) delete pElecModel;
 }
 
 void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -1158,47 +613,6 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	bool IsNearInteractionObject = false;
 	bool IsNearVent = false;
 	bool IsNearItembox = false;
-	for (int i = 0; i < NUM_DOOR; ++i) {
-		m_pDoors[i]->update(elapsedTime);
-		if (reinterpret_cast<Door*>(m_pDoors[i])->IsPlayerNear(PlayerPos)) {
-			
-			m_pPlayer->m_pNearDoor = m_pDoors[i];
-			IsNearDoor = true;
-			//printf("%d 문에 접근\n", i);
-			m_pPlayer->m_door_number = i;
-		}
-	}
-	for (int i = 0; i < NUM_POWER; ++i) {
-		m_pPowers[i]->update(elapsedTime);
-		if (m_pPowers[i]->IsPlayerNear(PlayerPos)) {
-			m_pPlayer->m_pNearInteractionObejct = m_pPowers[i];
-			IsNearInteractionObject = true;
-
-			m_pPlayer->m_power_number = i;
-		}
-	}
-	for (int i = 0; i < NUM_ITEMBOX; ++i) {
-		m_pBoxes[i]->update(elapsedTime);
-		if (m_pBoxes[i]->IsPlayerNear(PlayerPos)) {
-			m_pPlayer->m_pNearItembox = reinterpret_cast<GameObject*>(m_pBoxes[i]);
-			IsNearItembox = true;
-
-			m_pPlayer->m_itembox_number = i;
-		}
-	}
-	for (int i = 0; i < NUM_VENT; ++i) {
-		Vents[i]->update(elapsedTime);
-		if (reinterpret_cast<Vent*>(Vents[i])->IsPlayerNear(PlayerPos)) {
-			m_pPlayer->m_pNearVent = Vents[i];
-			IsNearVent = true;
-
-			m_pPlayer->m_vent_number = i;
-		}
-	}
-	if (IsNearDoor == false) m_pPlayer->m_pNearDoor = nullptr;
-	if (IsNearInteractionObject == false) m_pPlayer->m_pNearInteractionObejct = nullptr;
-	if (IsNearVent == false) m_pPlayer->m_pNearVent = nullptr;
-	if (IsNearItembox == false) m_pPlayer->m_pNearItembox = nullptr;
 }
 
 bool InArea(int startX, int startZ, int width, int length, float x, float z)
@@ -1219,125 +633,9 @@ bool InArea(int startX, int startZ, int width, int length, float x, float z)
 void GameScene::CheckCameraPos(const XMFLOAT3 camera)
 {
 	float x = camera.x; float z = camera.z;
-
-	if (InArea(0, 0, 120, 80, x, z)) { 
-		m_pvsCamera = PVSROOM::LOBBY_ROOM;
-		return;
-	}
-	else if (InArea(-30, 60, 60, 40, x, z)) {
-		m_pvsCamera = PVSROOM::PIANO_ROOM;
-		return;
-	}
-	else if (InArea(50, 60, 100, 40, x, z)) {
-		m_pvsCamera = PVSROOM::BROADCASTING_ROOM;
-		return;
-	}
-	else if (InArea(80, 0, 40, 80, x, z)) {
-		m_pvsCamera = PVSROOM::CUBE_ROOM;
-		return;
-	}
-	else if (InArea(60, -60, 80, 40, x, z)) {
-		m_pvsCamera = PVSROOM::FOREST;
-		return;
-	}
-	else if (InArea(-20, -60, 80, 40, x, z)) {
-		m_pvsCamera = PVSROOM::CLASS_ROOM;
-		return;
-	}
 }
 
 void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	LoadedModelInfo* pBoxModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/AmmoBox.bin", nullptr);
-	LoadedModelInfo* pDrillModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Drill.bin", nullptr);
-	LoadedModelInfo* pHammerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Hammer_01.bin", nullptr);
-	LoadedModelInfo* pPliersModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Pliers.bin", nullptr);
-	LoadedModelInfo* pDriverModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Screwdriver_Cross.bin", nullptr);
-	LoadedModelInfo* pWrenchModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Wrench_Combination.bin", nullptr);
-	LoadedModelInfo* pChipModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Chip.bin", nullptr);
 
-	Items[0] = new GameObject();
-	Items[0]->SetChild(pHammerModel->m_pModelRootObject, true);
-	Items[1] = new GameObject();
-	Items[1]->SetChild(pDrillModel->m_pModelRootObject, true);
-	Items[2] = new GameObject();
-	Items[2]->SetChild(pWrenchModel->m_pModelRootObject, true);
-	Items[3] = new GameObject();
-	Items[3]->SetChild(pPliersModel->m_pModelRootObject, true);
-	Items[4] = new GameObject();
-	Items[4]->SetChild(pDriverModel->m_pModelRootObject, true);
-	Items[5] = new GameObject();
-	Items[5]->SetChild(pChipModel->m_pModelRootObject, true);
-
-	for (int i = 0; i < NUM_ITEMBOX; ++i) {
-		m_pBoxes[i] = new ItemBox();
-		m_pBoxes[i]->SetChild(pBoxModel->m_pModelRootObject, true);
-		m_pBoxes[i]->SetUI(0,m_ppObjectsUIs[0]);
-		m_pBoxes[i]->SetUI(1, m_ppObjectsUIs[1]);
-		m_pBoxes[i]->SetUI(2, m_ppObjectsUIs[2]); 
-		m_pBoxes[i]->SetUI(3, m_ppObjectsUIs[5]);
-		for (int j = 0; j < 6; ++j) {
-			if (Items[j]) {
-				m_pBoxes[i]->InitItems(j, Items[j]);
-			}
-		}
-	}
-	
-	m_pBoxes[0]->SetPosition(2.29f, 0.0f, 70.7f); // InBroadcastingRoom
-	m_pBoxes[0]->SetRotation(DEGREE90);
-	m_pBoxes[1]->SetPosition(36.91f, 0.0f, 64.079f);
-	m_pBoxes[1]->SetRotation(DEGREE180);
-	m_pBoxes[2]->SetPosition(87.3f, 0.0f, 77.7f);
-	m_pBoxes[2]->SetRotation(DEGREE180);
-
-	m_pBoxes[3]->SetPosition(66.924f, 0.0f, 11.678f); // InCubeRoom
-	m_pBoxes[3]->SetRotation(DEGREE270);
-	m_pBoxes[4]->SetPosition(63.465f, 0.0f, 26.12f);
-	m_pBoxes[4]->SetRotation(DEGREE90);
-	m_pBoxes[5]->SetPosition(85.75f, 0.0f, 26.9f);
-	m_pBoxes[5]->SetRotation(DEGREE270);
-
-	m_pBoxes[6]->SetPosition(49.261f, 0.1f, -65.91f); // InPorset
-	m_pBoxes[6]->SetRotation(DEGREE180);
-	m_pBoxes[7]->SetPosition(84.502f, 0.1f, -50.275f);
-	m_pBoxes[7]->SetRotation(DEGREE180);
-	m_pBoxes[8]->SetPosition(61.45f, 0.0f, -65.87f);
-	m_pBoxes[8]->SetRotation(DEGREE0);
-
-	m_pBoxes[9]->SetPosition(9.2f, 0.0f, -41.4f); // InClassRoom
-	m_pBoxes[9]->SetRotation(DEGREE180);
-	m_pBoxes[10]->SetPosition(9.4f, 0.0f, -78.42f);
-	m_pBoxes[10]->SetRotation(DEGREE0);
-	m_pBoxes[11]->SetPosition(-18.2f, 0.0f, -60.8f);
-	m_pBoxes[11]->SetRotation(DEGREE270);
-	m_pBoxes[12]->SetPosition(-56.89f, 0.0f, -59.96f);
-	m_pBoxes[12]->SetRotation(DEGREE90);
-
-	m_pBoxes[13]->SetPosition(-56.8f, 0.0f, 60.05f); // InPianoRoom
-	m_pBoxes[13]->SetRotation(DEGREE90);
-	m_pBoxes[14]->SetPosition(-16.757f, 0.0f, 59.201f);
-	m_pBoxes[14]->SetRotation(DEGREE0);
-	m_pBoxes[15]->SetPosition(-38.81f, 0.0f, 74.12f);
-	m_pBoxes[15]->SetRotation(DEGREE0);
-
-	m_pBoxes[16]->SetPosition(21.59f, 0.0f, 32.4f); // InLobby
-	m_pBoxes[16]->SetRotation(DEGREE180);
-	m_pBoxes[17]->SetPosition(37.7f, 0.0f, -0.4f);
-	m_pBoxes[17]->SetRotation(DEGREE270);
-	m_pBoxes[17]->SetItem(GAME_ITEM::ITEM_HAMMER);
-	m_pBoxes[18]->SetPosition(-34.2f, 0.0f, 0.5f);
-	m_pBoxes[18]->SetRotation(DEGREE270);
-	m_pBoxes[18]->SetItem(GAME_ITEM::ITEM_LIFECHIP);
-	m_pBoxes[19]->SetPosition(-3.7f, 0.0f, 16.734f);
-	m_pBoxes[19]->SetRotation(DEGREE0);
-	m_pBoxes[19]->SetItem(GAME_ITEM::ITEM_DRILL);
-	
-	if (pBoxModel) delete pBoxModel;
-
-	if (pDrillModel) delete pDrillModel;
-	if (pHammerModel) delete pHammerModel;
-	if (pPliersModel) delete pPliersModel;
-	if (pDriverModel) delete pDriverModel;
-	if (pWrenchModel) delete pWrenchModel;
-	if (pChipModel) delete pChipModel;
 }

@@ -79,8 +79,8 @@ void Player::ChangeCamera(GAME_STATE prev, GAME_STATE p)
 		break;
 	case READY_TO_GAME:
 		DeleteComponent<ThirdPersonCamera>();
-		AddComponent<FirstPersonCamera>();
-		m_pCamera = GetComponent<FirstPersonCamera>();
+		AddComponent<ThirdPersonCamera>();
+		m_pCamera = GetComponent<ThirdPersonCamera>();
 		m_pCamera->m_pPlayer = this;
 		break;
 	case PLAYING_GAME:
@@ -360,46 +360,11 @@ void Player::SetPlayerType(int type)
 
 void Player::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	if (PlayerNum != 0 && GameState::GetInstance()->GetGameState() == CUSTOMIZING) return;
-	if (USE_NETWORK)
-		if (GameState::GetInstance()->GetGameState() == WAITING_GAME)
-			if (m_id == -1)
-				return;
-
 	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->UpdateShaderVariables(pd3dCommandList, PlayerNum);
 
-	if (PlayerNum == 0) {
-		if (GameState::GetInstance()->GetGameState() == ENDING_GAME) {
-			if (0) { // Tagger's Win
-				if (GetType() == TYPE_TAGGER) {
-					renderer->render(pd3dCommandList);
-					if (m_pSibling) m_pSibling->render(pd3dCommandList);
-					if (m_pChild) m_pChild->render(pd3dCommandList);
-				}
-			}
-			else {
-				if (GetType() == TYPE_PLAYER) {
-					renderer->render(pd3dCommandList);
-					if (m_pSibling) m_pSibling->render(pd3dCommandList);
-					if (m_pChild) m_pChild->render(pd3dCommandList);
-				}
-			}
-		}
-		else if (GameState::GetInstance()->GetGameState() > CUSTOMIZING) {
-			GameObject* Hand = FindFrame("Gloves");
-			Hand->m_pChild->render(pd3dCommandList);
-		}
-		else {
-			renderer->render(pd3dCommandList);
-			if (m_pSibling) m_pSibling->render(pd3dCommandList);
-			if (m_pChild) m_pChild->render(pd3dCommandList);
-		}
-	}
-	else {
-		renderer->render(pd3dCommandList);
-		if (m_pSibling) m_pSibling->render(pd3dCommandList);
-		if (m_pChild) m_pChild->render(pd3dCommandList);
-	}
+	renderer->render(pd3dCommandList);
+	if (m_pSibling) m_pSibling->render(pd3dCommandList);
+	if (m_pChild) m_pChild->render(pd3dCommandList);
 }
 
 void Player::SetLookAt(XMFLOAT3& xmf3Target, XMFLOAT3& xmf3Up)

@@ -27,7 +27,7 @@ public:
 	static GameState* GetInstance() {
 		if (GameStateInstance == NULL) {
 			GameStateInstance = new GameState;
-			GameStateInstance->m_GameState = LOGIN;
+			GameStateInstance->m_GameState = PLAYING_GAME;
 		}
 		return GameStateInstance;
 	}

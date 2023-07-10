@@ -42,53 +42,10 @@ public:
 	GameObject* m_pForestTerrain = nullptr;
 	GameObject* m_pCubeTerrain = nullptr;
 
-	int m_nLogin;
-	int m_nRoomSelect;
-	int m_nWaitingRoom;
-	int m_nCustomizing;
-	int m_Ending;
-	int m_nPlay;
-	int m_nPlayPlayer;
-	int m_nPlayTagger;
-	int m_nLoading;
-
-	GameObject** m_UILogin = nullptr;
-	GameObject** m_UIRoomSelect = nullptr;
-	GameObject** m_UIWaitingRoom = nullptr;
-	GameObject** m_UICustomizing = nullptr;
-	GameObject** m_UIEnding = nullptr;
-	GameObject** m_UIPlay = nullptr;
-	GameObject** m_UIPlayer = nullptr;
-	GameObject** m_UITagger = nullptr;
-	GameObject** m_UILoading = nullptr;
-
-	GameObject* m_pCeilling = nullptr;
-
 	int m_nWalls;
 	GameObject** m_ppWalls;
-	
-	GameObject* m_pPVSObjects[6];
 
-	GameObject* Vents[NUM_VENT];
 
-	int m_nBush;
-	GameObject** m_ppBush;
-	GameObject* m_pOak;	
-
-	Door* m_pDoors[NUM_DOOR];
-
-	InteractionObject* m_pPowers[NUM_POWER];
-	ItemBox* m_pBoxes[NUM_ITEMBOX];
-	Network* m_network;
-	std::thread recv_thread;
-
-	std::set<PVSROOM> m_sPVS[6];
-	PVSROOM m_pvsCamera;
-
-	GameObject* Items[NUM_ITEMS];
-
-	InteractionUI** m_ppObjectsUIs = nullptr;
-	int m_nObejctsUIs{};
 protected:
 	static ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap;
 
