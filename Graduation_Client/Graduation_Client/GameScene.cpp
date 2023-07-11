@@ -204,12 +204,10 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			if (m_pPlayer->GetType() == TYPE_TAGGER) {
 				m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
 			}
-			else {
-				for (int i = 0; i < 5; ++i) {
-					m_ppPlayers[i]->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-					if (m_ppPlayers[i]->GetType() == TYPE_TAGGER) {
-						m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-					}
+			for (int i = 0; i < 5; ++i) {
+				m_ppPlayers[i]->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+				if (m_ppPlayers[i]->GetType() == TYPE_TAGGER) {
+					m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
 				}
 			}
 		}
