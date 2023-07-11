@@ -14,7 +14,7 @@ const int CHECK_MAX_PACKET_SIZE = 127;
 
 const int BUF_SIZE = 1024;
 // ----- 클라이언트가 서버에게 보낼때 ------
-
+#define MAX_INGAME_ITEM 20
 #define VOICE_ISSUER "작성해야됨"
 #define VOICE_DOMAIN "작성해야됨"
 #define VOICE_KEY "작성해야됨"
@@ -41,6 +41,19 @@ namespace LOGIN_FAIL_REASON
 	};
 }
 
+namespace GAME_ITEM
+{
+	enum ITEM {
+		ITEM_HAMMER,
+		ITEM_DRILL,
+		ITEM_WRENCH,
+		ITEM_PLIERS,
+		ITEM_DRIVER,
+		ITEM_LIFECHIP,
+		ITEM_NONE
+	};
+}
+
 namespace CS_PACKET
 {
 	enum TYPE
@@ -58,16 +71,23 @@ namespace CS_PACKET
 		CS_PACKET_REQUEST_ROOM_INFO,
 		CS_PACKET_REQUEST_VIVOX_DATA,
 		CS_PACKET_CUSTOMIZING,
+		CS_PACKET_ACTIVATE_ALTAR,
+		CS_PACKET_ALTAR_LIFECHIP_UPDATE,
 		CS_PACKET_USE_FIRST_TAGGER_SKILL,
 		CS_PACKET_USE_SECOND_TAGGER_SKILL,
 		CS_PACKET_USE_THIRD_TAGGER_SKILL,
 		CS_PACKET_REQUEST_OPEN_DOOR,
 		CS_PACKET_REQUEST_OPEN_HIDDEN_DOOR,
 		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_DOOR,
+		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_PLAYER,
+		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_TAGGER,
 		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_SWICH,
+		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_ATIVATE,
 		CS_PACKET_ATTACK,
+		CS_PACKET_ITEM_BOX_UPDATE,
 		CS_PACKET_PICK_ITEM,
-		CS_PACKET_STRESS_LOGIN
+		CS_PACKET_STRESS_LOGIN,
+		CS_ADMIN_SERVER_END
 	};
 }
 
@@ -92,7 +112,7 @@ struct Right {
 
 struct ElectronicSystem_Data {
 	unsigned short	idx;
-	unsigned char	value[15];
+	unsigned char	value[10];
 };
 
 struct UserData {
@@ -123,6 +143,19 @@ struct Roominfo_by10 {
 	unsigned short				join_member;
 	GAME_ROOM_STATE::TYPE		state;
 };
+
+struct GameItem_Setting {
+	unsigned short			item_box_index;
+	GAME_ITEM::ITEM			item_type;
+};
+
+// 서버종료용 패킷
+struct cs_packet_server_end {
+	unsigned char	size;
+	unsigned char	type;
+};
+
+//===============================================================
 
 struct cs_packet_create_id {
 	unsigned char	size;
@@ -204,6 +237,16 @@ struct cs_packet_use_tagger_skill {
 	unsigned char	type;
 };
 
+struct cs_packet_activate_altar {
+	unsigned char	size;
+	unsigned char	type;
+};
+
+struct cs_packet_altar_lifechip_update {
+	unsigned char	size;
+	unsigned char	type;
+};
+
 struct cs_packet_request_open_door {
 	unsigned char	size;
 	unsigned char	type;
@@ -214,6 +257,8 @@ struct cs_packet_request_open_door {
 struct cs_packet_request_open_hidden_door {
 	unsigned char	size;
 	unsigned char	type;
+
+	unsigned char	door_num;
 };
 
 struct cs_packet_request_electronic_system_open {
@@ -221,6 +266,13 @@ struct cs_packet_request_electronic_system_open {
 	unsigned char	type;
 	bool			is_door_open;
 	unsigned short	es_num;
+};
+
+struct cs_packet_request_electronic_system_reset {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			switch_index;
 };
 
 struct cs_packet_request_eletronic_system_switch_control {
@@ -232,6 +284,13 @@ struct cs_packet_request_eletronic_system_switch_control {
 	bool			switch_value;
 };
 
+struct cs_packet_request_electronic_system_activate {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			system_index;
+};
+
 struct cs_packet_request_electronic_system_fix {
 	unsigned char	size;
 	unsigned char	type;
@@ -239,11 +298,20 @@ struct cs_packet_request_electronic_system_fix {
 	unsigned char	fix_item_info;
 };
 
+struct cs_packet_item_box_update {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned short  index;
+	bool			is_open;
+};
+
 struct cs_packet_pick_fix_item {
 	unsigned char	size;
 	unsigned char	type;
 
-	unsigned short	item_type;
+	unsigned short	index;
+	GAME_ITEM::ITEM item_type;
 };
 
 struct cs_packet_request_exit_room {
@@ -298,6 +366,9 @@ namespace SC_PACKET
 		SC_PACKET_CHAT,
 		SC_PACKET_JOIN_ROOM_SUCCESS,
 		SC_PACKET_JOIN_ROOM_FAIL,
+		SC_PACKET_PLAYER_EXIT,
+		SC_PACKET_READY,
+		SC_PACKET_INIT_POSITION,
 		SC_PACKET_GAME_START,
 		SC_PACKET_PUT_PLAYER,
 		SC_PACKET_PUT_OTHER_PLAYER,
@@ -305,15 +376,28 @@ namespace SC_PACKET
 		SC_PACKET_ELECTRONIC_SWITCH_INIT,
 		SC_PACKET_CALCULATE_MOVE,
 		SC_PACKET_LIFE_CHIP_UPDATE,
+		SC_PACKET_TAGGER_CORRECT_LIFE_CHIP,
 		SC_PACKET_SELECT_TAGGER,
 		SC_PACKET_TAGGER_SKILL,
+		SC_PACKET_USE_FIRST_TAGGER_SKILL,
+		SC_PACKET_USE_SECOND_TAGGER_SKILL,
+		SC_PACKET_USE_THIRD_TAGGER_SKILL,
 		SC_PACKET_DOOR_UPDATE,
+		SC_PACKET_HIDDEN_DOOR_UPDATE,
+		SC_PACKET_ACTIVATE_ALTAR,
+		SC_PACKET_ALTAR_LIFECHIP_UPDATE,
 		SC_PACKET_ELECTRONIC_SYSTEM_DOOR_UPDATE,
+		SC_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_PLAYER,
+		SC_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_TAGGER,
 		SC_PACKET_ELECTRONIC_SYSTEM_SWITCH_UPDATE,
+		SC_PACKET_ELECTRONIC_SYSTEM_ACTIVATE_UPDATE,
 		SC_PACKET_ROOM_INFO,
 		SC_PACKET_VIVOX_DATA,
 		SC_PACKET_CUSTOMIZING,
 		SC_PACKET_ATTACK,
+		SC_PACKET_PICK_ITEM_INIT,
+		SC_PACKET_ITEM_BOX_UPDATE,
+		SC_PACKET_PICK_ITEM_UPDATE,
 		SC_PACKET_GAME_END
 	};
 }
@@ -362,7 +446,8 @@ struct sc_put_player_packet {
 	unsigned char	size;
 	unsigned char	type;
 
-	PutData		data;
+	PutData			data;
+	bool			is_ready;
 };
 
 struct sc_packet_request_room_info {
@@ -406,19 +491,40 @@ struct sc_packet_chat { // 유저간 채팅
 struct sc_packet_put_other_client {
 	unsigned char		size;
 	unsigned char		type;
-	unsigned int		user_id;
+	short				user_id;
 
 	char				id[MAX_NAME_SIZE];
 	DirectX::XMFLOAT3	position;
 	float				yaw;
 };
 
+struct sc_packet_player_exit {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			user_id;
+};
+
+struct sc_packet_ready {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			id;
+	bool			ready_type;
+};
+
+struct sc_packet_init_position {
+	unsigned char		size;
+	unsigned char		type;
+
+	unsigned short		user_id[6];
+	DirectX::XMFLOAT3	position[6];
+};
+
 struct sc_packet_game_start { // 게임 시작을 방에 있는 플레이어에게 알려줌
 	unsigned char	size;
 	unsigned char	type;
 };
-
-
 
 struct sc_packet_voice_data {
 	unsigned char	size;
@@ -454,6 +560,13 @@ struct sc_packet_life_chip_update {
 	bool			life_chip;
 };
 
+struct sc_packet_tagger_correct_life_chip {
+	unsigned char	size;
+	unsigned char	type;
+
+	bool			life_chip;
+};
+
 struct sc_packet_select_tagger {
 	unsigned char	size;
 	unsigned char	type;
@@ -474,6 +587,26 @@ struct sc_packet_tagger_skill {
 	bool			third_skill;
 };
 
+struct sc_packet_use_first_tagger_skill {
+	unsigned char	size;
+	unsigned char	type;
+
+	bool			electronic_system_close[5];
+};
+
+struct sc_packet_use_second_tagger_skill {
+	unsigned char	size;
+	unsigned char	type;
+
+	bool			is_start;
+};
+
+struct sc_packet_use_third_tagger_skill {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			unactivate_vent;
+};
 
 struct sc_other_player_move {
 	unsigned char	size;
@@ -494,6 +627,12 @@ struct sc_packet_electronic_system_init {
 	ElectronicSystem_Data data[5];
 };
 
+struct sc_packet_pick_item_init {
+	unsigned char		size;
+	unsigned char		type;
+	GameItem_Setting	data[MAX_INGAME_ITEM];
+};
+
 struct sc_packet_attack {
 	unsigned char	size;
 	unsigned char	type;
@@ -509,12 +648,27 @@ struct sc_packet_open_door {
 	unsigned char	door_state;
 };
 
+struct sc_packet_open_hidden_door {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned char	door_num;
+	unsigned char	door_state;
+};
+
 struct sc_packet_open_electronic_system_door {
 	unsigned char	size;
 	unsigned char	type;
 
 	unsigned short	es_num;
 	unsigned char	es_state;
+};
+
+struct sc_packet_request_electronic_system_reset {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			switch_index;
 };
 
 struct sc_packet_electronic_system_update_value {
@@ -524,6 +678,44 @@ struct sc_packet_electronic_system_update_value {
 	unsigned short	es_num;
 	unsigned short	es_switch_idx;
 	bool			es_value;
+};
+
+struct sc_packet_electronic_system_activate_update {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			system_index;
+	bool			activate;
+};
+
+struct sc_packet_item_box_update {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned short	box_index;
+	bool			is_open;
+};
+
+struct sc_packet_pick_fix_item_update {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned short	own_id;
+	unsigned short	box_index;
+	GAME_ITEM::ITEM item_type;
+	bool			item_show;
+};
+
+struct sc_packet_activate_altar {
+	unsigned char	size;
+	unsigned char	type;
+};
+
+struct sc_packet_altar_lifechip_update {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			lifechip_count;
 };
 
 struct sc_packet_customizing_update {

@@ -692,10 +692,10 @@ void Framework::TextRender()
 				array[j] = static_cast<wchar_t>(input->m_Roominfo[i].room_name[j]);
 			}
 			array[size] = '\0';
-			D2D1_RECT_F rcLowerText = D2D1::RectF(roominfoRect[i].left+20, roominfoRect[i].top + 145, roominfoRect[i].right+20, roominfoRect[i].bottom + 145);
+			D2D1_RECT_F rcLowerText = D2D1::RectF(roominfoRect[i].left+10, roominfoRect[i].top + 30, roominfoRect[i].right+10, roominfoRect[i].bottom + 30);
 			m_pd2dDeviceContext->DrawTextW(array, (UINT32)wcslen(array), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
 
-			rcLowerText = D2D1::RectF(roominfoRect[i].left+10, roominfoRect[i].top + 115, roominfoRect[i].right+10, roominfoRect[i].bottom + 115);
+			rcLowerText = D2D1::RectF(roominfoRect[i].left, roominfoRect[i].top + 0, roominfoRect[i].right, roominfoRect[i].bottom + 0);
 			m_pd2dDeviceContext->DrawTextW(L"规 力格", (UINT32)wcslen(L"规 力格"), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
 
 			std::wstring num = std::to_wstring(input->m_Roominfo[i].room_number);

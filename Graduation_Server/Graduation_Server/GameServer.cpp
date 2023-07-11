@@ -142,7 +142,6 @@ void cGameServer::WorkerThread()
 		case OP_TYPE::OP_UPDATE_PLAYER_MOVE:
 		{
 			Update_OtherPlayer(static_cast<int>(iocp_key), SET_SERVER_UPDATE_FRAME);
-			cout << "이거들어옴" << endl;
 			//m_room_manager->Get_Room_Info(iocp_key)->_room_state_lock.lock();
 			if (m_room_manager->Get_Room_Info(static_cast<int>(iocp_key))->_room_state == GAME_ROOM_STATE::PLAYING)
 			{
@@ -161,7 +160,6 @@ void cGameServer::WorkerThread()
 
 		case OP_TYPE::OP_GAME_START:
 		{
-			cout << "게임 시작" << endl;
 			Process_Game_Start(static_cast<int>(iocp_key));
 			delete exp_over;
 			break;
