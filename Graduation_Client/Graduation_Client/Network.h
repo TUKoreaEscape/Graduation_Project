@@ -46,6 +46,7 @@ private:
 	int					m_my_id = -1;
 	int					m_before_animation_index[5]{ 0 };
 
+
 public: // 좌표를 동기화 시켜주는 변수들
 	XMFLOAT3			m_pPlayer_Pos{ 0,0,0 };
 	XMFLOAT3			m_pPlayer_before_Pos{ 0,0,0 };
@@ -59,6 +60,7 @@ public: // 술래가 플레이시 사용하는 변수
 	bool				m_lifechip = false;
 	int					m_tagger_id = -1;
 	bool				m_tagger_win = false;
+	int					m_before_player_type = TYPE_PLAYER_YET;
 
 public: // 방 선택창에서 사용하는 변수
 	int					m_join_room_number = -1;

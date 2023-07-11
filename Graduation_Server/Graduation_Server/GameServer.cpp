@@ -190,15 +190,10 @@ void cGameServer::WorkerThread()
 				if (rl.in_player[i] == -1)
 					continue;
 				if (rl.in_player[i] == tagger_id)
-				{
-					life_packet.id = rl.in_player[i];
-					life_packet.life_chip = false;
-				}
-				else
-				{
-					life_packet.id = rl.in_player[i];
-					life_packet.life_chip = true;
-				}
+					continue;
+
+				life_packet.id = rl.in_player[i];
+				life_packet.life_chip = true;
 				m_clients[rl.in_player[i]].do_send(sizeof(life_packet), &life_packet);
 			}
 

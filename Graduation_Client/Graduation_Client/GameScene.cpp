@@ -201,10 +201,10 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	case ENDING_GAME:
 #if USE_NETWORK
 		Network& network = *Network::GetInstance();
-		if (network.m_tagger_win) {
+		if(network.m_tagger_win){
 #endif
 #if !USE_NETWORK
-			if (0) { // TAGGER's Win
+		if (0) { // TAGGER's Win
 #endif
 			m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 			if (m_pPlayer->GetType() == TYPE_TAGGER) {

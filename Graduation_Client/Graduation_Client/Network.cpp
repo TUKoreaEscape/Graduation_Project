@@ -378,7 +378,6 @@ void Network::ProcessPacket(char* ptr)
 		sc_put_player_packet* packet = reinterpret_cast<sc_put_player_packet*>(ptr);
 		m_pPlayer->SetID(packet->data.id);
 		m_pPlayer->SetVelocity(packet->data.velocity);
-		m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
 		break;
 	}
 
@@ -393,7 +392,6 @@ void Network::ProcessPacket(char* ptr)
 				m_ppOther[i]->SetID(packet->data.id);
 				Other_Player_Pos[i].id = packet->data.id;
 				m_ppOther[i]->SetVelocity(packet->data.velocity);
-				m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);
 				if (packet->is_ready) {
 					m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 					m_ppOther[i]->SetTrackAnimationSet(0, 9);
@@ -412,10 +410,14 @@ void Network::ProcessPacket(char* ptr)
 	{
 		sc_packet_select_tagger* packet = reinterpret_cast<sc_packet_select_tagger*>(ptr);
 		m_tagger_id = packet->id;
-		if (m_pPlayer->GetID() == packet->id)
+		if (m_pPlayer->GetID() == packet->id) {
 			m_pPlayer->SetPlayerType(TYPE_TAGGER);
-		else
+			m_before_player_type = TYPE_TAGGER;
+		}
+		else {
 			m_pPlayer->SetPlayerType(TYPE_PLAYER);
+			m_before_player_type = TYPE_PLAYER;
+		}
 
 		for (int i = 0; i < 5; ++i)
 		{

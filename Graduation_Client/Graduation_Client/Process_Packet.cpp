@@ -60,6 +60,9 @@ void Network::Process_Init_Position(char* ptr)
 			}
 		}
 	}
+	m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
+	for (int i = 0; i < 5; ++i)
+		m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);
 }
 
 void Network::Process_Game_Start(char* ptr)
