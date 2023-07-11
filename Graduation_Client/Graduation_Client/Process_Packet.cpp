@@ -87,8 +87,10 @@ void Network::Process_Game_End(char* ptr)
 		m_pDoors[i]->SetOpen(false);
 	for (int i = 0; i < 5; ++i)
 		m_pPowers[i]->SetOpen(false);
-	for (int i = 0; i < 8; ++i)
+	for (int i = 0; i < 8; ++i) {
 		m_Vents[i]->SetOpen(false);
+		reinterpret_cast<Vent*>(m_Vents[i])->SetUnBlock();
+	}
 	m_lifechip = false;
 	m_pPlayer->m_got_item = GAME_ITEM::ITEM_NONE;
 }
@@ -161,34 +163,34 @@ void Network::Process_Other_Move(char* ptr)
 		m_ppOther[i]->m_xmf3Right = conversion_right;
 		if (packet->data.input_key == DIR_FORWARD)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 1);
+			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_ppOther[i]->SetAnimation(1);
 		}
 		if (packet->data.input_key == DIR_BACKWARD)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 2);
+			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_ppOther[i]->SetAnimation(2);
 		}
 		if (packet->data.input_key == DIR_LEFT)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 3);
+			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_ppOther[i]->SetAnimation(3);
 		}
 		if (packet->data.input_key == DIR_RIGHT)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 4);
+			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_ppOther[i]->SetAnimation(4);
 		}
 		if (packet->data.input_key == DIR_UP)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 5);
+			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_ppOther[i]->SetAnimation(5);
 		}
 
 		if (packet->data.input_key == DIR_EMPTY)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 0);
+			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_ppOther[i]->SetAnimation(0);
 		}
 
 		if (packet->data.is_jump == true)
