@@ -122,11 +122,11 @@ void Network::Process_Tagger_Collect_LifeChip(char* ptr)
 {
 	sc_packet_tagger_correct_life_chip* packet = reinterpret_cast<sc_packet_tagger_correct_life_chip*>(ptr);
 	if (packet->life_chip == true) {
-		reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(1.0f);
+		reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(1.0f);
 		m_lifechip = true;
 	}
 	else {
-		reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(-1.0f);
+		reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(-1.0f);
 		m_lifechip = false;
 	}
 }
@@ -163,52 +163,75 @@ void Network::Process_Other_Move(char* ptr)
 		m_ppOther[i]->m_xmf3Right = conversion_right;
 		if (packet->data.input_key == DIR_FORWARD)
 		{
-			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetAnimation(1);
+			if (m_before_animation_index[i] != 1) {
+				m_ppOther[i]->SetAnimation(1);
+				m_before_animation_index[i] = 1;
+			}
 		}
 		if (packet->data.input_key == DIR_BACKWARD)
 		{
 			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetAnimation(2);
+			if (m_before_animation_index[i] != 2) {
+				m_ppOther[i]->SetAnimation(2);
+				m_before_animation_index[i] = 2;
+			}
 		}
 		if (packet->data.input_key == DIR_LEFT)
 		{
 			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetAnimation(3);
+			if (m_before_animation_index[i] != 3) {
+				m_ppOther[i]->SetAnimation(3);
+				m_before_animation_index[i] = 3;
+			}
 		}
 		if (packet->data.input_key == DIR_RIGHT)
 		{
 			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetAnimation(4);
+			if (m_before_animation_index[i] != 4) {
+				m_ppOther[i]->SetAnimation(4);
+				m_before_animation_index[i] = 4;
+			}
 		}
 		if (packet->data.input_key == DIR_UP)
 		{
 			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetAnimation(5);
+			if (m_before_animation_index[i] != 5) {
+				m_ppOther[i]->SetAnimation(5);
+				m_before_animation_index[i] = 5;
+			}
 		}
 
 		if (packet->data.input_key == DIR_EMPTY)
 		{
 			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetAnimation(0);
+			if (m_before_animation_index[i] != 0) {
+				m_ppOther[i]->SetAnimation(0);
+				m_before_animation_index[i] = 0;
+			}
 		}
 
 		if (packet->data.is_jump == true)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 6);
+			if (m_before_animation_index[i] != 6) {
+				m_ppOther[i]->SetAnimation(6);
+				m_before_animation_index[i] = 6;
+			}
 		}
 
 		if (packet->data.is_victim == true)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 8);
+			if (m_before_animation_index[i] != 8) {
+				m_ppOther[i]->SetAnimation(8);
+				m_before_animation_index[i] = 8;
+			}
 		}
 
 		if (packet->data.is_attack == true)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 7);
+			if (m_before_animation_index[i] != 7) {
+				m_ppOther[i]->SetAnimation(7);
+				m_before_animation_index[i] = 7;
+			}
 		}
 	}
 }

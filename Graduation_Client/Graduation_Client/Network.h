@@ -43,6 +43,7 @@ private:
 	SHELLEXECUTEINFO	info;
 	HWND				hwnd_ExtMixerWin;
 	bool				m_shutdown = false;
+	int					m_before_animation_index[5]{ 0 };
 
 public:
 	std::mutex			pos_lock;
