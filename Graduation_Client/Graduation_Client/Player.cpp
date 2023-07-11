@@ -65,7 +65,7 @@ void Player::ChangeCamera(GAME_STATE prev, GAME_STATE p)
 		}
 		else if (prev == ENDING_GAME)
 		{
-			DeleteComponent<FirstPersonCamera>();
+			DeleteComponent<ThirdPersonCamera>();
 		}
 		AddComponent<ThirdPersonCamera>();
 		m_pCamera = GetComponent<ThirdPersonCamera>();
@@ -86,6 +86,10 @@ void Player::ChangeCamera(GAME_STATE prev, GAME_STATE p)
 	case PLAYING_GAME:
 		break;
 	case ENDING_GAME:
+		DeleteComponent<FirstPersonCamera>();
+		AddComponent<ThirdPersonCamera>();
+		m_pCamera = GetComponent<ThirdPersonCamera>();
+		m_pCamera->m_pPlayer = this;
 		break;
 	}
 }
@@ -370,13 +374,39 @@ void Player::SetPlayerType(int type)
 void Player::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (PlayerNum != 0 && GameState::GetInstance()->GetGameState() == CUSTOMIZING) return;
-	if (USE_NETWORK  && m_id == -1 && GameState::GetInstance()->GetGameState() == WAITING_GAME) return;
+	if (USE_NETWORK)
+		if (GameState::GetInstance()->GetGameState() == WAITING_GAME)
+			if (m_id == -1)
+				return;
 
 	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->UpdateShaderVariables(pd3dCommandList, PlayerNum);
 
-	if (PlayerNum == 0 && GameState::GetInstance()->GetGameState() > CUSTOMIZING ) {
-		GameObject* Hand = FindFrame("Gloves");
-		Hand->m_pChild->render(pd3dCommandList);
+	if (PlayerNum == 0) {
+		if (GameState::GetInstance()->GetGameState() == ENDING_GAME) {
+			if (0) { // Tagger's Win
+				if (GetType() == TYPE_TAGGER) {
+					renderer->render(pd3dCommandList);
+					if (m_pSibling) m_pSibling->render(pd3dCommandList);
+					if (m_pChild) m_pChild->render(pd3dCommandList);
+				}
+			}
+			else {
+				if (GetType() == TYPE_PLAYER) {
+					renderer->render(pd3dCommandList);
+					if (m_pSibling) m_pSibling->render(pd3dCommandList);
+					if (m_pChild) m_pChild->render(pd3dCommandList);
+				}
+			}
+		}
+		else if (GameState::GetInstance()->GetGameState() > CUSTOMIZING) {
+			GameObject* Hand = FindFrame("Gloves");
+			Hand->m_pChild->render(pd3dCommandList);
+		}
+		else {
+			renderer->render(pd3dCommandList);
+			if (m_pSibling) m_pSibling->render(pd3dCommandList);
+			if (m_pChild) m_pChild->render(pd3dCommandList);
+		}
 	}
 	else {
 		renderer->render(pd3dCommandList);

@@ -545,9 +545,11 @@ void Framework::FrameAdvance()
 		scene->UIrender(m_pd3dCommandList); // Door UI
 		break;
 	case ENDING_GAME:
+		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
-		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
-		scene->UIrender(m_pd3dCommandList);
+		scene->UIrender(m_pd3dCommandList); 
+		scene->Endingrender(m_pd3dCommandList);
+		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
 		break;
 	}
 	//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);

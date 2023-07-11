@@ -199,6 +199,35 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		}
 		break;
 	case ENDING_GAME:
+		if (0) { // TAGGER's Win
+			if (m_pPlayer->GetType() == TYPE_TAGGER) {
+				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+				m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+			}
+			else {
+				for (int i = 0; i < 5; ++i) {
+					if (m_ppPlayers[i]->GetType() == TYPE_TAGGER) {
+						m_ppPlayers[i]->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+						m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+						break;
+					}
+				}
+			}
+		}
+		else { // Player's Win
+			float my_win = 0.0f;
+			if (m_pPlayer->GetType() != TYPE_TAGGER) {
+				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+				m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+				my_win = true;
+			}
+			for (int i = 0; i < 5; ++i) {
+				if (m_ppPlayers[i]->GetType() != TYPE_TAGGER) {
+					m_ppPlayers[i]->SetPosition(XMFLOAT3(6.0f - 3.0f * i, 0.0f, -3.0f));
+					m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+				}
+			}
+		}
 		for (int i = 0; i < m_Ending; ++i) m_UIEnding[i]->render(pd3dCommandList);
 		break;
 	}
@@ -210,6 +239,20 @@ void GameScene::WaitingRoomrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
 	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
+	Scene::render(pd3dCommandList);
+}
+
+void GameScene::Endingrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
+	m_pPlayer->m_pCamera->update(pd3dCommandList);
+	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
+	if (1) { // Player's Win
+		if (m_pPlayer->GetType() == TYPE_TAGGER) {
+			m_pPlayer->SetDraw(true);
+		}
+	}
 	Scene::render(pd3dCommandList);
 }
 

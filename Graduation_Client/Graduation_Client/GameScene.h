@@ -110,6 +110,7 @@ public:
 	virtual void forrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void WaitingRoomrender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void Endingrender(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
