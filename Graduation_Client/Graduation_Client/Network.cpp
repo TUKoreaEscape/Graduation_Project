@@ -433,7 +433,7 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_SELECT_TAGGER:
 	{
 		sc_packet_select_tagger* packet = reinterpret_cast<sc_packet_select_tagger*>(ptr);
-		
+		m_tagger_id = packet->id;
 		if (m_pPlayer->GetID() == packet->id)
 			m_pPlayer->SetPlayerType(TYPE_TAGGER);
 		else

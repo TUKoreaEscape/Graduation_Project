@@ -72,6 +72,7 @@ void Network::Process_Game_Start(char* ptr)
 void Network::Process_Game_End(char* ptr)
 {
 	sc_packet_game_end* packet = reinterpret_cast<sc_packet_game_end*>(ptr);
+	m_tagger_win = packet->is_tagger_win;
 	GameState& game_state = *GameState::GetInstance();
 	game_state.ChangeNextState();
 

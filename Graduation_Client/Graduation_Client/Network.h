@@ -52,10 +52,12 @@ public:
 	int					m_my_id = -1;
 	int					m_join_room_number = -1;
 	int					m_page_num = 0;
+	int					m_tagger_id = -1;
 	std::thread			send_thread;
 	//임시사용 변수입니다.
 	bool				m_login = false;
 	bool				m_join_room = false;
+	bool				m_tagger_win = false;
 
 public:
 	XMFLOAT3			m_pPlayer_Pos{ 0,0,0 };

@@ -16,6 +16,7 @@
 #define THIRD_TAGGER_SKILL_OPEN_SECOND 40
 #define GAME_END_SECOND 150
 
+
 //class CLIENT;
 class Room {
 private:
@@ -26,6 +27,13 @@ private:
 	int					m_tagger_id = -1;
 	long long			duration_time;
 
+	char room_name1[10]{ "Tagger?" };
+	char room_name2[10]{ "NowHere!" };
+	char room_name3[10]{ "TO DO!" };
+	char room_name4[10]{ "Plz" };
+	char room_name5[10]{ "KeepMovin" };
+	char room_name6[10]{ "Escape!" };
+	char room_name7[10]{ "Beat" };
 public:
 	array<BoundingOrientedBox, 6>	in_player_bounding_box;
 	vector<GameObject>				m_game_object;
@@ -81,6 +89,7 @@ public:
 
 public: // 서버 시작시 초기화하는 함수들
 	void	init_room_number(const int room_num){ room_number = room_num;}
+	void	init_room_name(const int rand_num);
 	void	init_fix_object_and_life_chip();
 
 	void	add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation);

@@ -1,6 +1,33 @@
 #include "Room.h"
 #include "GameServer.h"
 
+void Room::init_room_name(int rand_num)
+{
+	switch (rand_num) {
+	case 0:
+		strcpy_s(m_room_name, sizeof(room_name1), room_name1);
+		break;
+	case 1:
+		strcpy_s(m_room_name, sizeof(room_name2), room_name2);
+		break;
+	case 2:
+		strcpy_s(m_room_name, sizeof(room_name3), room_name3);
+		break;
+	case 3:
+		strcpy_s(m_room_name, sizeof(room_name4), room_name4);
+		break;
+	case 4:
+		strcpy_s(m_room_name, sizeof(room_name5), room_name5);
+		break;
+	case 5:
+		strcpy_s(m_room_name, sizeof(room_name6), room_name6);
+		break;
+	case 6:
+		strcpy_s(m_room_name, sizeof(room_name7), room_name7);
+		break;
+	}
+}
+
 void Room::Reset_Room()
 {
 	Number_of_users = 0;
