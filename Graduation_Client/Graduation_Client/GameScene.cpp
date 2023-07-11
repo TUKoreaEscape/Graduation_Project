@@ -199,7 +199,13 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		}
 		break;
 	case ENDING_GAME:
-		if (0) { // TAGGER's Win
+#if USE_NETWORK
+		Network& network = *Network::GetInstance();
+		if (network.m_tagger_win) {
+#endif
+#if !USE_NETWORK
+			if (0) { // TAGGER's Win
+#endif
 			m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 			if (m_pPlayer->GetType() == TYPE_TAGGER) {
 				m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);

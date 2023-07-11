@@ -799,6 +799,12 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		break;
 	}
 
+	case CS_PACKET::CS_PACKET_ALTAR_LIFECHIP_UPDATE:
+	{
+		Process_Altar_LifeChip_Update(user_id);
+		break;
+	}
+
 	case CS_PACKET::CS_PACKET_ITEM_BOX_UPDATE:
 	{
 		Process_Item_Box_Update(user_id, p);
