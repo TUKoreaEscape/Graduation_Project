@@ -169,16 +169,16 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		}
 		for (int i = 0; i < m_nPlay - 1; ++i) m_UIPlay[i]->render(pd3dCommandList);
 
-		if (m_pPlayer->GetType() == TYPE_PLAYER)reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(1.0f);
+		if (m_pPlayer->GetType() == TYPE_PLAYER)reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(1.0f);
 		else {
-			reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(-1.0f);
+			reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(-1.0f);
 #if USE_NETWORK
 			if(m_network->m_lifechip == true)
-				reinterpret_cast<IngameUI*>(m_UIPlay[2])->SetGuage(1.0f);
+				reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(1.0f);
 #endif		
 		}
 
-		m_UIPlay[2]->render(pd3dCommandList);
+		m_UIPlay[1]->render(pd3dCommandList);
 		if (m_pPlayer->GetType() == TYPE_TAGGER) {
 			for (int i = 0; i < 3; ++i) {
 				if (m_pPlayer->GetTaggerSkill(i)) {
@@ -235,10 +235,11 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	for (int i = 0; i < m_nPlayers; ++i) {
 		m_ppPlayers[i] = new Player();
 		m_ppPlayers[i]->SetChild(pPlayerModel->m_pModelRootObject, true);
-		m_ppPlayers[i]->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 1, pPlayerModel);
-		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+		m_ppPlayers[i]->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 2, pPlayerModel);
+		m_ppPlayers[i]->SetAnimation(0);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-		//m_ppPlayers[i]->SetPosition(XMFLOAT3(i , 0.0f, -5.0f));
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 0);
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackEnable(1, false);//m_ppPlayers[i]->SetPosition(XMFLOAT3(i , 0.0f, -5.0f));
 		for (int j = 0; j < 6; ++j)
 			GameObject::SetParts(i + 1, j, 0);
 		m_ppPlayers[i]->PlayerNum = i + 1;
@@ -252,9 +253,11 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	m_pPlayer = new Player();
 	m_pPlayer->SetChild(pPlayerModel->m_pModelRootObject, true);
-	m_pPlayer->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 1, pPlayerModel);
-	m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 9);
+	m_pPlayer->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 2, pPlayerModel);
+	m_pPlayer->SetAnimation(0);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.0f);
+	m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 0);
+	m_pPlayer->m_pSkinnedAnimationController->SetTrackEnable(1, false);
 	m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -3.0f));
 	for (int j = 0; j < 6; ++j)
 		GameObject::SetParts(0, j, 0);
@@ -328,11 +331,11 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_UILoading = new GameObject * [m_nLoading];
 	m_UILoading[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Loading.dds", 0.0f, 0.0f, 2.0f, 2.0f);
 
-	m_nPlay = 3;
+	m_nPlay = 2;
 	m_UIPlay = new GameObject * [m_nPlay];
 	m_UIPlay[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.8f, -0.75f, 0.3f, 0.4f);
-	m_UIPlay[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.0f, 0.75f, 0.6f, 0.4f);
-	m_UIPlay[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/life2.dds", 0.8f, -0.75f, 0.3f, 0.4f);
+	//m_UIPlay[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.0f, 0.75f, 0.6f, 0.4f); ½Ã°è
+	m_UIPlay[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/life2.dds", 0.8f, -0.75f, 0.3f, 0.4f);
 
 
 	m_nPlayPlayer = 1 + 5;
@@ -1006,7 +1009,6 @@ void GameScene::MakeVents(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	Vents[7]->SetPosition(XMFLOAT3(35.96133f, 1.0061f, 23.56689f));
 	reinterpret_cast<Vent*>(Vents[7])->SetOpenPos(XMFLOAT3(35.96133f, 2.0061f, 22.56689f));
 	reinterpret_cast<Vent*>(Vents[7])->SetRotation(DEGREE180);
-	reinterpret_cast<Vent*>(Vents[7])->SetBlock();
 
 	/*Vents[0]->SetPosition(XMFLOAT3(97.2155f, 1.0061f, 40.43311f));
 	reinterpret_cast<Vent*>(Vents[0])->SetOpenPos(XMFLOAT3(98.94085f, 1.0061f, 42.29158f));

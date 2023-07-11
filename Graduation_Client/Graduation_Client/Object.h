@@ -110,6 +110,7 @@ public:
 	virtual void SetRotation(DIR d) {};
 
 	virtual void SetBlock() { m_bIsBlocked = true; };
+	virtual void SetUnBlock() { m_bIsBlocked = false; };
 };
 
 class Door : public InteractionObject

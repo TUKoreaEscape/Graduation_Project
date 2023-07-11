@@ -228,6 +228,7 @@ void Player::update(float fTimeElapsed)
 	//OnPrepareRender();
 
 	GameObject::update(fTimeElapsed);
+	m_fBlendingTime += fTimeElapsed;
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
 	if (m_xmf3Position.y > 0.0f && !m_collision_up_face)
 	{
@@ -281,6 +282,18 @@ void Player::update(float fTimeElapsed)
 	float fDeceleration = (m_fFriction * fTimeElapsed);
 	if (fDeceleration > fLength) fDeceleration = fLength;
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
+
+	if (m_bIsBlending) {
+		m_pSkinnedAnimationController->SetTrackEnable(1, true);
+		if (m_fBlendingTime > 0.33f) {
+			m_nPrevAnimation = m_nNextAnimation;
+			m_bIsBlending = false;
+		}
+	}
+	else {
+		m_pSkinnedAnimationController->SetTrackEnable(1, false);
+		m_pSkinnedAnimationController->SetTrackWeight(0, 1.0f);
+	}
 }
 
 void Player::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -431,6 +444,21 @@ bool Player::UseTaggerSkill(int index)
 	m_bTaggerSkills[index] = false;
 	// Do Skill here maybe
 	return true;
+}
+
+void Player::SetAnimation(int index)
+{
+	m_nNextAnimation = index;
+	m_pSkinnedAnimationController->SetTrackAnimationSet(1, m_nPrevAnimation);
+	m_pSkinnedAnimationController->SetTrackWeight(1, 0.7f);
+	m_pSkinnedAnimationController->SetTrackSpeed(1, 1.0f);
+	m_pSkinnedAnimationController->SetTrackAnimationSet(0, index);
+	m_pSkinnedAnimationController->SetTrackWeight(0, 0.3f);
+	if (m_nPrevAnimation == index) return;
+	else {
+		if (!m_bIsBlending)	m_fBlendingTime = 0;
+		m_bIsBlending = true;
+	}
 }
 
 void Player::ReleaseShaderVariables()

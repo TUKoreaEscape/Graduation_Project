@@ -154,4 +154,8 @@ public:
 	bool GetTaggerSkill(int index);
 	void SetTaggerSkill(int index);
 	bool UseTaggerSkill(int index);
+
+	virtual void SetAnimation(int index) override;
+
+	float m_fBlendingTime{};
 };
