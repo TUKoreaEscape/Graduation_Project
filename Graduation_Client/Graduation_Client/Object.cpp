@@ -1511,3 +1511,49 @@ void IngameUI::UIrender(ID3D12GraphicsCommandList* pd3dCommandList, float gauge,
 	UpdateShaderVariable(pd3dCommandList, gauge, type);
 	GameObject::render(pd3dCommandList);
 }
+
+TaggersBox::TaggersBox()
+{
+}
+
+TaggersBox::~TaggersBox()
+{
+}
+
+bool TaggersBox::IsPlayerNear(const XMFLOAT3& PlayerPos)
+{
+	return false;
+}
+
+void TaggersBox::Rotate(float fPitch, float fYaw, float fRoll)
+{
+}
+
+void TaggersBox::render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void TaggersBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (Input::GetInstance()->m_pPlayer->GetType() != TYPE_TAGGER) return;
+}
+
+void TaggersBox::update(float fElapsedTime)
+{
+}
+
+void TaggersBox::Interaction(int playerType)
+{
+}
+
+void TaggersBox::SetOpen(bool open)
+{
+}
+
+void TaggersBox::SetRotation(DIR d)
+{
+}
+
+void TaggersBox::Reset()
+{
+}

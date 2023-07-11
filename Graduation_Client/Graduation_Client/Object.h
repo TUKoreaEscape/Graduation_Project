@@ -285,3 +285,27 @@ public:
 
 	void SetGuage(float f) { m_fGauge = f; };
 };
+
+class TaggersBox : public InteractionObject
+{
+public:
+	TaggersBox();
+	virtual ~TaggersBox();
+
+	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
+	void Rotate(float fPitch, float fYaw, float fRoll);
+	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
+	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
+	virtual void update(float fElapsedTime) override;
+
+	void Interaction(int playerType) override;
+	void SetOpen(bool open) override;
+
+	virtual void SetRotation(DIR d) override;
+
+public:
+	int m_nLifeChips{};
+
+	void CollectChip() { m_nLifeChips++; };
+	void Reset();
+};
