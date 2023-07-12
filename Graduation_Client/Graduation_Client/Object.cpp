@@ -1430,6 +1430,19 @@ void ItemBox::Interaction(int playerType)
 #if USE_NETWORK
 					Network& network = *Network::GetInstance();
 					network.Send_Picking_Fix_Object_Packet(m_item_box_index, m_item);
+					//std::cout << "m_item_box_index : " << m_item_box_index << " -> ";
+					//if (m_item == GAME_ITEM::ITEM_DRILL)
+					//	std::cout << "ITEM_DRILL pick" << std::endl;
+					//else if (m_item == GAME_ITEM::ITEM_DRIVER)
+					//	std::cout << "ITEM_DRIVER pick" << std::endl;
+					//else if (m_item == GAME_ITEM::ITEM_HAMMER)
+					//	std::cout << "ITEM_HAMMER pick" << std::endl;
+					//else if (m_item == GAME_ITEM::ITEM_LIFECHIP)
+					//	std::cout << "ITEM_LIFECHIP pick" << std::endl;
+					//else if (m_item == GAME_ITEM::ITEM_PLIERS)
+					//	std::cout << "ITEM_PLIERS pick" << std::endl;
+					//else if (m_item == GAME_ITEM::ITEM_WRENCH)
+					//	std::cout << "ITEM_WRENCH pick" << std::endl;
 #endif
 					m_item = GAME_ITEM::ITEM_NONE;
 					m_fPickupCooltime = 0;
@@ -1656,13 +1669,21 @@ void TaggersBox::Interaction(int playerType)
 	if (m_bActivate) { // 활성화 상태
 #if USE_NETWORK
 		// 생명칩 있을 때 넣는 동작
-		if (1)
+		Network& network = *Network::GetInstance();
+		if (network.m_lifechip) {
+			network.m_lifechip = false;
+			network.Send_Altar_Event();
 			CollectChip();
+		}
 #endif
 	}
 	else {
 		IsInteraction = true;
 		if (m_fCooltime >= TAGGER_ACTIVATION_COOLTIME) {
+#if	USE_NETWORK
+			Network& network = *Network::GetInstance();
+			network.Send_Ativate_Altar();
+#endif
 			m_fCooltime = 0;
 			m_bActivate = true;
 			IsInteraction = false;

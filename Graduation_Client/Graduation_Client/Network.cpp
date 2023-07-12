@@ -530,11 +530,13 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_ACTIVATE_ALTAR:
 	{
+		Process_Active_Altar(ptr);
 		break;
 	}
 
 	case SC_PACKET::SC_PACKET_ALTAR_LIFECHIP_UPDATE:
 	{
+		Process_Altar_LifeChip_Update(ptr);
 		break;
 	}
 

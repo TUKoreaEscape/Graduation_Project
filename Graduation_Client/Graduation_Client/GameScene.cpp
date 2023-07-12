@@ -487,6 +487,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_network->init_network();
 	m_network->m_pPlayer = m_pPlayer;
 	m_network->m_ppOther = m_ppPlayers;
+	m_network->m_Taggers_Box = Taggers;
 	m_network->m_UIPlay = m_UIPlay;
 	
 	for(int i = 0; i < 6; ++i)

@@ -562,7 +562,7 @@ void cGameServer::Process_Attack(const int user_id)
 
 				m_timer_queue.push(ev);
 
-				if (m_clients[other_player_id].get_life_chip() && room.Get_Tagger_ID() == user_id && room.Is_Tagger_Get_Life_Chip() == false)
+				if (m_clients[other_player_id].get_life_chip() && room.Get_Tagger_ID() == user_id && room.Is_Tagger_Get_Life_Chip() == false && room.m_altar->Get_Valid() == true)
 				{
 					room.Tagger_Get_Life_Chip(true);
 					m_clients[other_player_id].set_life_chip(false);
@@ -872,7 +872,7 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 	{
 		if (packet->index == room.m_fix_item[i].Get_Item_box_index())
 		{
-			item_index = room.m_fix_item[i].Get_Item_box_index();
+			item_index = i;
 			break;
 		}
 	}
@@ -892,7 +892,7 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, true);
 
 #if PRINT
-	std::cout << "Item_box_index [" << item_index << "] : ";
+	std::cout << "Item_box_index [" << room.m_fix_item[item_index].Get_Item_box_index() << "] : ";
 	if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_DRILL) // 1
 		cout << "ITEM_DRILL" << endl;
 	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_HAMMER) // 0

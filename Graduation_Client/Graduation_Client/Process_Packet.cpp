@@ -447,18 +447,31 @@ void Network::Process_Pick_Item_Update(char* ptr)
 		else
 			m_pPlayer->m_got_item = packet->item_type;
 	}
+
+	else {
+		if (packet->item_type != GAME_ITEM::ITEM_LIFECHIP)
+			return;
+
+		for (int i = 0; i < 5; ++i) {
+			if (packet->own_id == m_ppOther[i]->GetID())
+				m_ppOther[i]->SetType(TYPE_PLAYER);
+		}
+	}
 }
 
 void Network::Process_Active_Altar(char* ptr)
 {
 	sc_packet_activate_altar* packet = reinterpret_cast<sc_packet_activate_altar*>(ptr);
 	// 여기서 술래 재단을 활성화 해야함.
+	m_Taggers_Box;
+	std::cout << "술래가 재단을 활성화 하였습니다" << std::endl;
 }
 
 void Network::Process_Altar_LifeChip_Update(char* ptr)
 {
 	sc_packet_altar_lifechip_update* packet = reinterpret_cast<sc_packet_altar_lifechip_update*>(ptr);
 	packet->lifechip_count; // 이게 현재 수집된 생명칩 갯수임
+	std::cout << "현재 재단에 모인 생명칩 갯수 : " << packet->lifechip_count << std::endl;
 }
 
 void Network::Process_Activate_Tagger_Skill(char* ptr)
