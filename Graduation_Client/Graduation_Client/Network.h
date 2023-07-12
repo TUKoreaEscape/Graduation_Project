@@ -74,6 +74,8 @@ public: // 방 선택창에서 사용하는 변수
 public: // 스레드
 	std::thread			send_thread;
 
+public: // Ready 동기화를 위해 추가한 변수
+	bool				m_other_player_ready[5]{ false };
 
 public: // 클라이언트 오브젝트와 연결하는 용도
 	Player*				m_pPlayer = nullptr;;
