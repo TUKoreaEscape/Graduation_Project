@@ -494,7 +494,7 @@ void Network::Process_Use_First_Tagger_Skill(char* ptr)
 	sc_packet_use_first_tagger_skill* packet = reinterpret_cast<sc_packet_use_first_tagger_skill*>(ptr);
 	
 	for (int i = 0; i < 5; ++i) {
-		if (packet[i].electronic_system_close[i])
+		if (packet->electronic_system_close[i])
 			m_pPowers[i]->SetOpen(false);
 		else
 			m_pPowers[i]->SetOpen(true);

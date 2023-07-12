@@ -125,6 +125,7 @@ public:
 	void Set_Close_Electronic_System();
 
 	bool Activate_ElectronicSystem();
+	bool Get_Fixed_ElectronicSystem() { return m_fixed_system; }
 
 	void Update_bounding_box_pos(const XMFLOAT3& pos);
 	void Update_Object(bool value);
