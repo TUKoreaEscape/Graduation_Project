@@ -69,6 +69,9 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 		case VK_F8:
 			m_gamestate->ChangeSameLevelState();
 			break;
+		case VK_F12:
+			m_debuglight = !m_debuglight;
+			break;
 		case VK_F3:
 			if (m_pPlayer) {
 				if (m_pPlayer->m_Type == TYPE_TAGGER) m_pPlayer->SetPlayerType(TYPE_PLAYER);
@@ -400,7 +403,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			}
 			//InputRoomInfo();
 		}
-		std::cout << xPos << " " << yPos << std::endl;
+		//std::cout << xPos << " " << yPos << std::endl;
 		break;
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:

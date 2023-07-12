@@ -20,10 +20,14 @@ void GameState::ChangeNextState()
 		case WAITING_GAME:
 			player->ChangeCamera(WAITING_GAME, READY_TO_GAME);
 			m_GameState = READY_TO_GAME;
+			taggerTime = std::chrono::steady_clock::now();
+			taggercountdown = 60;
 			break;
 		case CUSTOMIZING:
 			break;
 		case READY_TO_GAME:
+			initLight = true;
+			startTime = std::chrono::steady_clock::now();
 			m_GameState = PLAYING_GAME;
 			break;
 		case PLAYING_GAME:
@@ -91,4 +95,29 @@ void GameState::ChangeSameLevelState()
 			break;
 	}
 	//std::cout << m_GameState << std::endl;
+}
+
+bool GameState::GetTick()
+{
+	auto currentTime = std::chrono::steady_clock::now();
+	auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
+	if (elapsedTime != prevTime)
+	{
+		prevTime = elapsedTime;
+		std::cout << elapsedTime << std::endl;
+		return true;
+	}
+	else return false;
+}
+
+int GameState::GetTaggerTime()
+{
+	auto currentTime = std::chrono::steady_clock::now();
+	auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - taggerTime).count();
+	if (elapsedTime != taggerprevTime)
+	{
+		taggerprevTime = elapsedTime;
+		--taggercountdown;
+	}
+	return taggercountdown;
 }

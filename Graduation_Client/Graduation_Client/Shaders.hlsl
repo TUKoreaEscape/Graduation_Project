@@ -477,7 +477,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSSkyBox(VS_SKYBOX_CUBEMAP_OUTPUT input, uint 
 
 	output.f4Albedo = cColor;
 
-	output.f4Scene = output.f4Color = output.f4Albedo * cIllumination;
+	output.f4Scene = output.f4Color = output.f4Albedo;
 
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	output.f4Specular = gMaterial.m_cSpecular;
