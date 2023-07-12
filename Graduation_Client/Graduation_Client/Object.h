@@ -267,6 +267,8 @@ public:
 
 	bool m_bShownItem = false;
 
+	float m_fPickupCooltime{};
+
 	XMFLOAT4X4 m_xmf4x4CapMatrix;
 	XMFLOAT4X4 m_xmf4x4CapOpenMatrix;
 };

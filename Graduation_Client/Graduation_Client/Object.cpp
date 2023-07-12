@@ -1307,7 +1307,7 @@ void ItemBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			else if (playerType == TYPE_TAGGER) {
 				if (m_ppInteractionUIs[1]) {
 					m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
-					m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, 0.0f, m_nUIType);
+					m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 				}
 			}
 		}
@@ -1325,7 +1325,26 @@ void ItemBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 void ItemBox::update(float fElapsedTime)
 {
 	if (IsOpen) {
-		m_fCooltime += fElapsedTime;
+		m_fPickupCooltime += fElapsedTime;
+		if (IsInteraction) {
+			if (IsNear) {
+				m_fCooltime += fElapsedTime;
+
+				UCHAR keyBuffer[256];
+				memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
+				if (((keyBuffer['f'] & 0xF0) == false) && ((keyBuffer['F'] & 0xF0) == false)) {
+					m_fCooltime = 0;
+					IsInteraction = false;
+				}
+			}
+			else {
+				IsInteraction = false;
+				m_fCooltime = 0;
+			}
+		}
+		else {
+			m_fCooltime = 0;
+		}
 	}
 	else {
 		if (IsInteraction) {
@@ -1358,27 +1377,34 @@ void ItemBox::Interaction(int playerType)
 		switch (playerType) {
 		case TYPE_TAGGER: 
 		{
+			if (m_fCooltime >= BOX_CLOSE_COOLTIME) {
 #if !USE_NETWORK
-			SetOpen(false);
+				SetOpen(false);
 #endif
 #if USE_NETWORK
-			Network& network = *Network::GetInstance();
-			network.Send_Fix_Object_Box_Update(m_item_box_index, false);
+				Network& network = *Network::GetInstance();
+				network.Send_Fix_Object_Box_Update(m_item_box_index, false);
 #endif
+				m_fCooltime = 0;
+				IsInteraction = false;
+			}
 		}
+		break;
 		case TYPE_PLAYER_YET:
+			IsInteraction = false;
 			break;
 		case TYPE_DEAD_PLAYER:
 		case TYPE_PLAYER:
+			IsInteraction = false;
 			if (m_item == GAME_ITEM::ITEM_NONE) break;
-			if (m_fCooltime >= GLOBAL_INTERACTION_COOLTIME) {
+			if (m_fPickupCooltime >= GLOBAL_INTERACTION_COOLTIME) {
 				if (Input::GetInstance()->m_pPlayer->PickUpItem(m_item)) {
 #if USE_NETWORK
 					Network& network = *Network::GetInstance();
 					network.Send_Picking_Fix_Object_Packet(m_item_box_index, m_item);
 #endif
 					m_item = GAME_ITEM::ITEM_NONE;
-					m_fCooltime = 0;
+					m_fPickupCooltime = 0;
 				}
 			}
 			break;
@@ -1389,6 +1415,7 @@ void ItemBox::Interaction(int playerType)
 		case TYPE_TAGGER:
 		case TYPE_PLAYER_YET:
 		case TYPE_DEAD_PLAYER:
+			IsInteraction = false;
 			break;
 		case TYPE_PLAYER:
 			if (m_fCooltime >= BOX_OPEN_COOLTIME) {
@@ -1401,6 +1428,7 @@ void ItemBox::Interaction(int playerType)
 #endif
 				m_fCooltime = 0;
 				IsInteraction = false;
+				m_fPickupCooltime = 0;
 			}
 			break;
 		}
