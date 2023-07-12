@@ -914,6 +914,7 @@ cbuffer cbGaugeInfo : register(b3)
 #define POWER_UI 4
 #define BLOCKED_UI 5
 #define INGAME_UI 6
+#define TAGGER_UI 7
 
 VS_UI_OUTPUT VSDoorUI(VS_UI_INPUT input)
 {

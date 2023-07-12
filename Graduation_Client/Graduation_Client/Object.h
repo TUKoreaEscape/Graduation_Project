@@ -15,6 +15,7 @@ constexpr int BOX_UI = 3;
 constexpr int POWER_UI = 4;
 constexpr int BLOCKED_UI = 5;
 constexpr int INGAME_UI = 6;
+constexpr int TAGGER_UI = 7;
 
 enum DIR {
 	DEGREE0 = 0,

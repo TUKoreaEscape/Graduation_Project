@@ -1514,6 +1514,12 @@ void IngameUI::UIrender(ID3D12GraphicsCommandList* pd3dCommandList, float gauge,
 
 TaggersBox::TaggersBox()
 {
+	m_nUIs = 1;
+	m_ppInteractionUIs = new InteractionUI * [m_nUIs];
+	for (int i = 0; i < m_nUIs; ++i) {
+		m_ppInteractionUIs[i] = nullptr;
+	}
+	m_nUIType = TAGGER_UI;
 }
 
 TaggersBox::~TaggersBox()
@@ -1522,7 +1528,12 @@ TaggersBox::~TaggersBox()
 
 bool TaggersBox::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
-	return false;
+	float dist = (m_xmf4x4ToParent._41 - PlayerPos.x) * (m_xmf4x4ToParent._41 - PlayerPos.x) + (m_xmf4x4ToParent._43 - PlayerPos.z) * (m_xmf4x4ToParent._43 - PlayerPos.z);
+	if (dist > 4.0f) { 
+		IsNear = false;
+		return false; }
+	IsNear = true;
+	return true;
 }
 
 void TaggersBox::Rotate(float fPitch, float fYaw, float fRoll)
@@ -1531,19 +1542,37 @@ void TaggersBox::Rotate(float fPitch, float fYaw, float fRoll)
 
 void TaggersBox::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	GameObject::render(pd3dCommandList);
 }
 
 void TaggersBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (Input::GetInstance()->m_pPlayer->GetType() != TYPE_TAGGER) return;
+	if (IsNear) {
+		if (m_ppInteractionUIs[0]) {
+			m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43);
+			m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
+		}
+	}
 }
 
 void TaggersBox::update(float fElapsedTime)
 {
+	if (m_nLifeChips > 11) {
+		// Tagger's win
+		printf("tagger's win");
+	}
+
 }
 
 void TaggersBox::Interaction(int playerType)
 {
+	if (playerType != TYPE_TAGGER) return;
+#if USE_NETWORK
+	// 생명칩 있을 때 넣는 동작
+	if (1)
+		CollectChip();
+#endif
 }
 
 void TaggersBox::SetOpen(bool open)
@@ -1556,4 +1585,5 @@ void TaggersBox::SetRotation(DIR d)
 
 void TaggersBox::Reset()
 {
+	m_nLifeChips = 0;
 }
