@@ -42,10 +42,14 @@ private:
 
 	SHELLEXECUTEINFO	info;
 	HWND				hwnd_ExtMixerWin;
-	bool				m_voice_talk_in_working = false;
 	bool				m_shutdown = false;
 	int					m_my_id = -1;
 	int					m_before_animation_index[5]{ 0 };
+
+private: // 보이스톡이 사용하는 변수
+	bool				m_is_use_voice_talk = false;
+	bool				m_is_join_room = false;
+	bool				m_voice_talk_in_working = false;
 
 
 public: // 좌표를 동기화 시켜주는 변수들
@@ -149,9 +153,15 @@ public:
 	void send_packet(void* packet);
 
 public: // 보이스톡 관련 함수
+	void on_voice_talk();
+	void off_voice_talk();
+
 	void set_voice_talk_working_state(bool value) { m_voice_talk_in_working = value; }
 	bool get_voice_talk_working_state() { return m_voice_talk_in_working; }
 
 	void join_voice_talk();
 	void exit_voice_talk();
+
+	void set_join_room_state(bool value) { m_is_join_room = value; }
+	bool get_join_room_state() { return m_is_join_room; }
 };
