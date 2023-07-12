@@ -103,6 +103,10 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			reinterpret_cast<ItemBox*>(m_pBoxes[i])->render(pd3dCommandList);
 		}
 	}
+	if (Taggers) {
+		Taggers->UpdateTransform(nullptr);
+		reinterpret_cast<TaggersBox*>(Taggers)->render(pd3dCommandList);
+	}
 	if (m_sPVS[static_cast<int>(m_pvsCamera)].count(PVSROOM::FOREST) != 0) {
 		m_pOak->render(pd3dCommandList);
 		for (int i = 0; i < m_nBush; ++i)
@@ -167,6 +171,7 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < NUM_ITEMBOX; ++i) {
 			reinterpret_cast<ItemBox*>(m_pBoxes[i])->UIrender(pd3dCommandList);
 		}
+		reinterpret_cast<TaggersBox*>(Taggers)->UIrender(pd3dCommandList);
 		for (int i = 0; i < m_nPlay - 1; ++i) m_UIPlay[i]->render(pd3dCommandList);
 
 		if (m_pPlayer->GetType() == TYPE_PLAYER)reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(1.0f);
@@ -291,8 +296,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_ppPlayers[2]->SetPosition(XMFLOAT3(-3.0f, 0.0f, -5.0f));
 	m_ppPlayers[3]->SetPosition(XMFLOAT3(-6.0f, 0.0f, -5.0f));
 	m_ppPlayers[4]->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
-	m_ppPlayers[3]->SetPlayerType(TYPE_TAGGER);
-
+	
 	m_pPlayer = new Player();
 	m_pPlayer->SetChild(pPlayerModel->m_pModelRootObject, true);
 	m_pPlayer->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 2, pPlayerModel);
@@ -442,7 +446,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 
 	m_pPlayer->SetPlayerUpdatedContext(m_pTerrain);
-	m_pPlayer->SetPlayerType(TYPE_PLAYER);
+	m_pPlayer->SetPlayerType(TYPE_DEAD_PLAYER);
 	m_pPlayer->AddComponent<CommonMovement>(); 
 	
 	for (int i = 0; i < m_nPlayers; ++i) {
@@ -472,6 +476,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	MakeDoors(pd3dDevice, pd3dCommandList);
 	MakePowers(pd3dDevice, pd3dCommandList);
 	MakeBoxes(pd3dDevice, pd3dCommandList);
+	MakeTaggers(pd3dDevice, pd3dCommandList);
 
 #if USE_NETWORK
 	char id[20]{};
@@ -1159,6 +1164,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	bool IsNearInteractionObject = false;
 	bool IsNearVent = false;
 	bool IsNearItembox = false;
+	bool IsNearTaggers = false;
 	for (int i = 0; i < NUM_DOOR; ++i) {
 		m_pDoors[i]->update(elapsedTime);
 		if (reinterpret_cast<Door*>(m_pDoors[i])->IsPlayerNear(PlayerPos)) {
@@ -1196,10 +1202,16 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 			m_pPlayer->m_vent_number = i;
 		}
 	}
+	Taggers->update(elapsedTime);
+	if (reinterpret_cast<TaggersBox*>(Taggers)->IsPlayerNear(PlayerPos)) {
+		m_pPlayer->m_pNearTaggers = Taggers;
+		IsNearTaggers = true;
+	}
 	if (IsNearDoor == false) m_pPlayer->m_pNearDoor = nullptr;
 	if (IsNearInteractionObject == false) m_pPlayer->m_pNearInteractionObejct = nullptr;
 	if (IsNearVent == false) m_pPlayer->m_pNearVent = nullptr;
 	if (IsNearItembox == false) m_pPlayer->m_pNearItembox = nullptr;
+	if (IsNearTaggers == false) m_pPlayer->m_pNearTaggers = nullptr;
 }
 
 bool InArea(int startX, int startZ, int width, int length, float x, float z)
@@ -1341,4 +1353,17 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	if (pDriverModel) delete pDriverModel;
 	if (pWrenchModel) delete pWrenchModel;
 	if (pChipModel) delete pChipModel;
+}
+
+void GameScene::MakeTaggers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	LoadedModelInfo* pBoxModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/AmmoBox.bin", nullptr);
+
+	Taggers = new TaggersBox();
+	Taggers->SetChild(pBoxModel->m_pModelRootObject, true);
+	Taggers->SetUI(0, m_ppObjectsUIs[0]);
+	Taggers->SetUI(1, m_ppObjectsUIs[5]);
+	Taggers->SetPosition(-4.0f, 0.8f, -0.5f);
+
+	if (pBoxModel) delete pBoxModel;
 }

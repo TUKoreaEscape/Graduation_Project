@@ -82,6 +82,8 @@ public:
 	Network* m_network;
 	std::thread recv_thread;
 
+	InteractionObject* Taggers = nullptr;
+
 	std::set<PVSROOM> m_sPVS[6];
 	PVSROOM m_pvsCamera;
 
@@ -143,6 +145,7 @@ public:
 	void MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void MakeTaggers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 

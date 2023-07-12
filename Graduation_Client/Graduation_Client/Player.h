@@ -139,6 +139,7 @@ public:
 	GameObject* m_pNearInteractionObejct = nullptr;
 	GameObject* m_pNearVent = nullptr;
 	GameObject* m_pNearItembox = nullptr;
+	GameObject* m_pNearTaggers = nullptr;
 
 	int							m_power_number = -1;
 	int							m_vent_number = -1;

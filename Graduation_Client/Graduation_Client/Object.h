@@ -15,6 +15,7 @@ constexpr int BOX_UI = 3;
 constexpr int POWER_UI = 4;
 constexpr int BLOCKED_UI = 5;
 constexpr int INGAME_UI = 6;
+constexpr int TAGGER_UI = 7;
 
 enum DIR {
 	DEGREE0 = 0,
@@ -266,6 +267,8 @@ public:
 
 	bool m_bShownItem = false;
 
+	float m_fPickupCooltime{};
+
 	XMFLOAT4X4 m_xmf4x4CapMatrix;
 	XMFLOAT4X4 m_xmf4x4CapOpenMatrix;
 };
@@ -284,4 +287,29 @@ public:
 	void UIrender(ID3D12GraphicsCommandList* pd3dCommandList, float gauge, int type);
 
 	void SetGuage(float f) { m_fGauge = f; };
+};
+
+class TaggersBox : public InteractionObject
+{
+public:
+	TaggersBox();
+	virtual ~TaggersBox();
+
+	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
+	void Rotate(float fPitch, float fYaw, float fRoll);
+	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
+	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
+	virtual void update(float fElapsedTime) override;
+
+	void Interaction(int playerType) override;
+	void SetOpen(bool open) override;
+
+	virtual void SetRotation(DIR d) override;
+
+public:
+	int m_nLifeChips{};
+	bool m_bActivate{};
+
+	void CollectChip() { m_nLifeChips++; };
+	void Reset();
 };

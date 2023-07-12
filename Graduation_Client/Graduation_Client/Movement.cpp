@@ -85,6 +85,9 @@ void CommonMovement::update(float elapsedTime)
 			if (Input::GetInstance()->m_pPlayer->m_pNearItembox) {
 				Input::GetInstance()->m_pPlayer->m_pNearItembox->Interaction(playerType);
 			}
+			if (Input::GetInstance()->m_pPlayer->m_pNearTaggers) {
+				Input::GetInstance()->m_pPlayer->m_pNearTaggers->Interaction(playerType);
+			}
 		}
 
 		if (keyBuffer['1'] & 0xF0)
