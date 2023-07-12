@@ -1669,13 +1669,21 @@ void TaggersBox::Interaction(int playerType)
 	if (m_bActivate) { // 활성화 상태
 #if USE_NETWORK
 		// 생명칩 있을 때 넣는 동작
-		if (1)
+		Network& network = *Network::GetInstance();
+		if (network.m_lifechip) {
+			network.m_lifechip = false;
+			network.Send_Altar_Event();
 			CollectChip();
+		}
 #endif
 	}
 	else {
 		IsInteraction = true;
 		if (m_fCooltime >= TAGGER_ACTIVATION_COOLTIME) {
+#if	USE_NETWORK
+			Network& network = *Network::GetInstance();
+			network.Send_Ativate_Altar();
+#endif
 			m_fCooltime = 0;
 			m_bActivate = true;
 			IsInteraction = false;

@@ -142,6 +142,7 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	{
 		for (int i = 0; i < MAX_INGAME_ITEM; ++i)
 			_room.m_fix_item.emplace_back();
+		_room.m_altar->init();
 	}
 
 //======================= Electronic System Object Read =======================
