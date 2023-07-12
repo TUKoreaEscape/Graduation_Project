@@ -296,8 +296,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_ppPlayers[2]->SetPosition(XMFLOAT3(-3.0f, 0.0f, -5.0f));
 	m_ppPlayers[3]->SetPosition(XMFLOAT3(-6.0f, 0.0f, -5.0f));
 	m_ppPlayers[4]->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
-	m_ppPlayers[3]->SetPlayerType(TYPE_TAGGER);
-
+	
 	m_pPlayer = new Player();
 	m_pPlayer->SetChild(pPlayerModel->m_pModelRootObject, true);
 	m_pPlayer->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 2, pPlayerModel);
@@ -447,7 +446,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 
 	m_pPlayer->SetPlayerUpdatedContext(m_pTerrain);
-	m_pPlayer->SetPlayerType(TYPE_PLAYER);
+	m_pPlayer->SetPlayerType(TYPE_DEAD_PLAYER);
 	m_pPlayer->AddComponent<CommonMovement>(); 
 	
 	for (int i = 0; i < m_nPlayers; ++i) {
