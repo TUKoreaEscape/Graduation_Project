@@ -52,6 +52,7 @@ void Network::Send_Request_Room_Info(int page)
 
 void Network::Send_Exit_Room()
 {
+	set_join_room_state(false);
 	exit_voice_talk();
 	cs_packet_request_exit_room packet;
 	packet.size = sizeof(packet);

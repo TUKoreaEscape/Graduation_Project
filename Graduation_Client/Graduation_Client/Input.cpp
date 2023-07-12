@@ -391,10 +391,15 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 				network.m_pPlayer->SetTrackAnimationSet(0, 0);
 
 				for (int i = 0; i < 5; ++i) {
-					network.m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-					network.m_ppOther[i]->SetTrackAnimationSet(0, 0);
+					if (network.m_other_player_ready[i] == false) {
+						network.m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+						network.m_ppOther[i]->SetTrackAnimationSet(0, 0);
+					}
+					else {
+						network.m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+						network.m_ppOther[i]->SetTrackAnimationSet(0, 9);
+					}
 				}
-
 				m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
 				for (int i = 0; i < 5; ++i)
 					network.m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);

@@ -25,10 +25,12 @@ void Network::Process_Ready(char* ptr)
 			continue;
 		if (m_ppOther[i]->GetID() == packet->id) {
 			if (packet->ready_type) {
+				m_other_player_ready[i] = true;
 				m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 				m_ppOther[i]->SetTrackAnimationSet(0, 9);
 			}
 			else {
+				m_other_player_ready[i] = false;
 				m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 				m_ppOther[i]->SetTrackAnimationSet(0, 0);
 			}
@@ -76,6 +78,10 @@ void Network::Process_Game_End(char* ptr)
 {
 	sc_packet_game_end* packet = reinterpret_cast<sc_packet_game_end*>(ptr);
 	m_tagger_win = packet->is_tagger_win;
+
+	for (int i = 0; i < 5; ++i)
+		m_other_player_ready[i] = false;
+
 	GameState& game_state = *GameState::GetInstance();
 	game_state.ChangeNextState();
 

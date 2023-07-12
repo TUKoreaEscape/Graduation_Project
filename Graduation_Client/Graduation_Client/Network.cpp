@@ -272,6 +272,7 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_CREATE_ROOM_OK:
 	{
+		set_join_room_state(true);
 		join_voice_talk();
 		GameState& game_state = *GameState::GetInstance();
 		game_state.ChangeNextState();
@@ -587,10 +588,24 @@ void Network::ProcessPacket(char* ptr)
 	}
 }
 
+void Network::on_voice_talk()
+{
+	m_is_use_voice_talk = true;
+	join_voice_talk();
+}
+
+void Network::off_voice_talk()
+{
+	exit_voice_talk();
+	m_is_use_voice_talk = false;
+}
+
 void Network::join_voice_talk()
 {
-#if USE_VOICE
-	if (false == get_voice_talk_working_state()) {
+	if (m_is_use_voice_talk == false)
+		return;
+
+	if (false == get_voice_talk_working_state() && true == m_is_join_room) {
 		std::wstring parameter = L"addsession -l ";
 		std::wstring room_parameter = std::to_wstring(m_join_room_number);
 		std::wstring room_parameter2 = L"lobby";
@@ -615,15 +630,15 @@ void Network::join_voice_talk()
 
 		set_voice_talk_working_state(true);
 	}
-#endif
 }
 
 void Network::exit_voice_talk()
 {
-#if USE_VOICE
+	if (m_is_use_voice_talk == false)
+		return;
+
 	if (true == get_voice_talk_working_state()) {
 		TerminateProcess(info.hProcess, 1);
 		set_voice_talk_working_state(false);
 	}
-#endif
 }
