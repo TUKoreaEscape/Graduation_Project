@@ -93,7 +93,7 @@ void CommonMovement::update(float elapsedTime)
 		if (keyBuffer['1'] & 0xF0)
 		{
 #if USE_NETWORK
-			if (Input::GetInstance()->m_pPlayer->GetType() == TYPE_TAGGER)
+			if (Input::GetInstance()->m_pPlayer->GetType() == TYPE_TAGGER && Input::GetInstance()->m_pPlayer->GetTaggerSkill(0) == true)
 			{
 				Network& network = *Network::GetInstance();
 				network.Send_Use_Tagger_Skill(1);
@@ -106,7 +106,7 @@ void CommonMovement::update(float elapsedTime)
 		if (keyBuffer['2'] & 0xF0)
 		{
 #if USE_NETWORK
-			if (Input::GetInstance()->m_pPlayer->GetType() == TYPE_TAGGER)
+			if (Input::GetInstance()->m_pPlayer->GetType() == TYPE_TAGGER && Input::GetInstance()->m_pPlayer->GetTaggerSkill(1) == true)
 			{
 				Network& network = *Network::GetInstance();
 				network.Send_Use_Tagger_Skill(2);
@@ -118,7 +118,7 @@ void CommonMovement::update(float elapsedTime)
 		if (keyBuffer['3'] & 0xF0)
 		{
 #if USE_NETWORK
-			if (Input::GetInstance()->m_pPlayer->GetType() == TYPE_TAGGER)
+			if (Input::GetInstance()->m_pPlayer->GetType() == TYPE_TAGGER && Input::GetInstance()->m_pPlayer->GetTaggerSkill(2) == true)
 			{
 				Network& network = *Network::GetInstance();
 				network.Send_Use_Tagger_Skill(3);
