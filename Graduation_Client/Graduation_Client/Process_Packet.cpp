@@ -507,11 +507,11 @@ void Network::Process_Use_Second_Tagger_Skill(char* ptr)
 
 	if (packet->is_start) {
 		for (int i = 0; i < 6; ++i)
-			m_pDoors[i];
+			m_pDoors[i]->SetBlock();
 	}
 	else {
 		for (int i = 0; i < 6; ++i)
-			m_pDoors[i];
+			m_pDoors[i]->SetUnBlock();
 	}
 }
 
