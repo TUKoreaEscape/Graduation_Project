@@ -85,12 +85,18 @@ void Network::Process_Game_End(char* ptr)
 	GameState& game_state = *GameState::GetInstance();
 	game_state.ChangeNextState();
 
-	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
+	for (int i = 0; i < MAX_INGAME_ITEM; ++i) {
 		m_pBoxes[i]->SetOpen(false);
-	for (int i = 0; i < 6; ++i)
+		m_pBoxes[i]->SetUnBlock();
+	}
+	for (int i = 0; i < 6; ++i) {
 		m_pDoors[i]->SetOpen(false);
-	for (int i = 0; i < 5; ++i)
+		m_pDoors[i]->SetUnBlock();
+	}
+	for (int i = 0; i < 5; ++i) {
 		m_pPowers[i]->SetOpen(false);
+		m_pPowers[i]->SetUnBlock();
+	}
 	for (int i = 0; i < 8; ++i) {
 		m_Vents[i]->SetOpen(false);
 		reinterpret_cast<Vent*>(m_Vents[i])->SetUnBlock();
