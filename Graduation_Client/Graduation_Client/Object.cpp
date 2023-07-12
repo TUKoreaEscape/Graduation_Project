@@ -1570,7 +1570,7 @@ void IngameUI::UIrender(ID3D12GraphicsCommandList* pd3dCommandList, float gauge,
 
 TaggersBox::TaggersBox()
 {
-	m_nUIs = 1;
+	m_nUIs = 2;
 	m_ppInteractionUIs = new InteractionUI * [m_nUIs];
 	for (int i = 0; i < m_nUIs; ++i) {
 		m_ppInteractionUIs[i] = nullptr;
@@ -1605,9 +1605,17 @@ void TaggersBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (Input::GetInstance()->m_pPlayer->GetType() != TYPE_TAGGER) return;
 	if (IsNear) {
-		if (m_ppInteractionUIs[0]) {
-			m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43);
-			m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
+		if (m_bActivate) {
+			if (m_ppInteractionUIs[1]) {
+				m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43);
+				m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, 0.0f, m_nUIType);
+			}
+		}
+		else {
+			if (m_ppInteractionUIs[0]) {
+				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43);
+				m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
+			}
 		}
 	}
 }
@@ -1618,17 +1626,48 @@ void TaggersBox::update(float fElapsedTime)
 		// Tagger's win
 		printf("tagger's win");
 	}
+	if (false == m_bActivate) {
+		if (IsInteraction) {
+			if (IsNear) {
+				m_fCooltime += fElapsedTime;
 
+				UCHAR keyBuffer[256];
+				memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
+				if (((keyBuffer['f'] & 0xF0) == false) && ((keyBuffer['F'] & 0xF0) == false)) {
+					m_fCooltime = 0;
+					IsInteraction = false;
+				}
+			}
+			else {
+				IsInteraction = false;
+				m_fCooltime = 0;
+			}
+		}
+		else {
+			m_fCooltime = 0;
+		}
+	}
+	m_fGauge = m_fCooltime / TAGGER_ACTIVATION_COOLTIME;
 }
 
 void TaggersBox::Interaction(int playerType)
 {
 	if (playerType != TYPE_TAGGER) return;
+	if (m_bActivate) { // 활성화 상태
 #if USE_NETWORK
-	// 생명칩 있을 때 넣는 동작
-	if (1)
-		CollectChip();
+		// 생명칩 있을 때 넣는 동작
+		if (1)
+			CollectChip();
 #endif
+	}
+	else {
+		IsInteraction = true;
+		if (m_fCooltime >= TAGGER_ACTIVATION_COOLTIME) {
+			m_fCooltime = 0;
+			m_bActivate = true;
+			IsInteraction = false;
+		}
+	}
 }
 
 void TaggersBox::SetOpen(bool open)
@@ -1642,4 +1681,5 @@ void TaggersBox::SetRotation(DIR d)
 void TaggersBox::Reset()
 {
 	m_nLifeChips = 0;
+	m_bActivate = false;
 }

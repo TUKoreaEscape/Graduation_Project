@@ -104,6 +104,7 @@ constexpr float VENT_OPEN_COOLTIME = 10.0f;
 constexpr float VENT_CLOSE_COOLTIME = 3.0;
 constexpr float BOX_OPEN_COOLTIME = 3.0f;
 constexpr float BOX_CLOSE_COOLTIME = 3.0f;
+constexpr float TAGGER_ACTIVATION_COOLTIME = 15.0f;
 
 extern UINT	gnCbvSrvDescriptorIncrementSize;
 extern UINT	gnRtvDescriptorIncrementSize;

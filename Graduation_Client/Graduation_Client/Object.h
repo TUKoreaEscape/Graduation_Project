@@ -308,6 +308,7 @@ public:
 
 public:
 	int m_nLifeChips{};
+	bool m_bActivate{};
 
 	void CollectChip() { m_nLifeChips++; };
 	void Reset();

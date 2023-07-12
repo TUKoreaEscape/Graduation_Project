@@ -959,6 +959,10 @@ float4 PSDoorUI(VS_UI_OUTPUT input) : SV_TARGET
 				//Color = float4(0.3f, 0.3f, 0.3f, 1.0f);
 		}
 	}
+	else if (gnUIType == TAGGER_UI) {
+		if (input.uv.y - 1.0f > -gfGauge && Color.w < 0.1f)
+			Color = float4(1.0f, 0.0f, 0.0f, 1.0f);
+	}
 	clip(Color.w - 0.1f);
 	return Color;
 }

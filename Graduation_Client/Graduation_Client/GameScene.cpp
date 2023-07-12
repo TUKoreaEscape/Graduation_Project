@@ -1362,6 +1362,7 @@ void GameScene::MakeTaggers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	Taggers = new TaggersBox();
 	Taggers->SetChild(pBoxModel->m_pModelRootObject, true);
 	Taggers->SetUI(0, m_ppObjectsUIs[0]);
+	Taggers->SetUI(1, m_ppObjectsUIs[5]);
 	Taggers->SetPosition(-4.0f, 0.8f, -0.5f);
 
 	if (pBoxModel) delete pBoxModel;
