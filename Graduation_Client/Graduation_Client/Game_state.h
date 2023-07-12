@@ -23,7 +23,6 @@ private:
 
 	long long prevTime = 0;
 	bool initLight = false;
-	GAME_STATE m_GameState; 
 	float				m_totalLoading = 2.0f;
 	float				m_Loading = 0.0f;
 	int					m_LoadingCount = 0;
