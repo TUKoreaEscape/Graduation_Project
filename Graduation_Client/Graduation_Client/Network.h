@@ -7,7 +7,7 @@
 #include "Server_Timer.h"
 
 #define  DIR_NO 100
-#define  USE_NETWORK 0
+#define  USE_NETWORK 1
 #define	 USE_VOICE 0
 
 class Door;
@@ -42,30 +42,36 @@ private:
 
 	SHELLEXECUTEINFO	info;
 	HWND				hwnd_ExtMixerWin;
+	bool				m_voice_talk_in_working = false;
 	bool				m_shutdown = false;
+	int					m_my_id = -1;
 	int					m_before_animation_index[5]{ 0 };
 
-public:
-	std::mutex			pos_lock;
-	std::mutex			other_pos_lock;
-	bool				m_recv_move = false;
-	bool				m_lifechip = false;
-	int					m_my_id = -1;
-	int					m_join_room_number = -1;
-	int					m_page_num = 0;
-	int					m_tagger_id = -1;
-	std::thread			send_thread;
-	//임시사용 변수입니다.
-	bool				m_login = false;
-	bool				m_join_room = false;
-	bool				m_tagger_win = false;
 
-public:
+public: // 좌표를 동기화 시켜주는 변수들
 	XMFLOAT3			m_pPlayer_Pos{ 0,0,0 };
 	XMFLOAT3			m_pPlayer_before_Pos{ 0,0,0 };
 	OtherPlayerPos		Other_Player_Pos[5]{};
+	std::mutex			pos_lock;
+	std::mutex			other_pos_lock;
+	std::mutex			state_lock;
+	bool				m_recv_move = false;
 
-public:
+public: // 술래가 플레이시 사용하는 변수
+	bool				m_lifechip = false;
+	int					m_tagger_id = -1;
+	bool				m_tagger_win = false;
+	int					m_before_player_type = TYPE_PLAYER_YET;
+
+public: // 방 선택창에서 사용하는 변수
+	int					m_join_room_number = -1;
+	int					m_page_num = 0;
+
+public: // 스레드
+	std::thread			send_thread;
+
+
+public: // 클라이언트 오브젝트와 연결하는 용도
 	Player*				m_pPlayer = nullptr;;
 	Player**			m_ppOther = nullptr;
 	GameObject**		m_UIPlay = nullptr;
@@ -141,4 +147,11 @@ public:
 	void Send_Attack_Packet();
 
 	void send_packet(void* packet);
+
+public: // 보이스톡 관련 함수
+	void set_voice_talk_working_state(bool value) { m_voice_talk_in_working = value; }
+	bool get_voice_talk_working_state() { return m_voice_talk_in_working; }
+
+	void join_voice_talk();
+	void exit_voice_talk();
 };

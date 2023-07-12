@@ -52,9 +52,7 @@ void Network::Send_Request_Room_Info(int page)
 
 void Network::Send_Exit_Room()
 {
-#if USE_VOICE
-	TerminateProcess(info.hProcess, 1);
-#endif
+	exit_voice_talk();
 	cs_packet_request_exit_room packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET::CS_PACKET_EXIT_ROOM;

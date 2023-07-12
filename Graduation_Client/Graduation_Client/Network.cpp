@@ -264,75 +264,17 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_JOIN_ROOM_SUCCESS:
 	{
-		//std::cout << "방 접속 성공" << std::endl;
-		m_join_room = true;
-		//send_thread = std::thread{ &Network::Debug_send_thread, this };
-		//for (int i = 0; i < 5; ++i)
-		//	m_ppOther[i]->SetPosition(XMFLOAT3(-100, -100, -100));
-#if USE_VOICE
-		std::wstring parameter = L"addsession -l ";
-		std::wstring room_parameter = std::to_wstring(m_join_room_number);
-		std::wstring room_parameter2 = L"lobby";
-		std::wstring option_parameter = L" -audio yes";
-
-		std::wstring result_parameter = parameter + room_parameter + room_parameter2 + option_parameter;
-
-		std::wcout << result_parameter << std::endl;
-		info.cbSize = sizeof(SHELLEXECUTEINFO);
-		info.fMask = SEE_MASK_NOCLOSEPROCESS;
-		info.hwnd = NULL;
-		info.lpVerb = L"open";
-		info.lpFile = L"voice\\Voice.exe";
-		info.lpParameters = (LPCWSTR&)result_parameter;
-		info.lpDirectory = NULL;
-		info.nShow = SW_HIDE;
-		info.hInstApp = NULL;
-
-		ShellExecuteEx(&info); // start process
-
-		GetProcessId(info.hProcess); // retrieve PID
-#endif
+		join_voice_talk();
 		GameState& game_state = *GameState::GetInstance();
 		game_state.ChangeNextState();
-
-		//Send_Ready_Packet(true);
 		break;
 	}
 
 	case SC_PACKET::SC_PACKET_CREATE_ROOM_OK:
 	{
-		//ShellExecute(NULL, L"open", L"voice\Voice.exe", NULL, NULL, SW_SHOWMINIMIZED);
-		//std::cout << "방 생성에 성공하였습니다." << std::endl;
-		m_join_room = true;
-		//send_thread = std::thread{ &Network::Debug_send_thread, this };
-		//for (int i = 0; i < 5; ++i)
-		//	m_ppOther[i]->SetPosition(XMFLOAT3(-100, -100, -100));
-#if USE_VOICE
-		std::wstring parameter = L"addsession -l ";
-		std::wstring room_parameter = std::to_wstring(m_join_room_number);
-		std::wstring room_parameter2 = L"lobby";
-		std::wstring option_parameter = L" -audio yes";
-
-		std::wstring result_parameter = parameter + room_parameter + room_parameter2 + option_parameter;
-
-		std::wcout << result_parameter << std::endl;
-		info.cbSize = sizeof(SHELLEXECUTEINFO);
-		info.fMask = SEE_MASK_NOCLOSEPROCESS;
-		info.hwnd = NULL;
-		info.lpVerb = L"open";
-		info.lpFile = L"voice\\Voice.exe";
-		info.lpParameters = (LPCWSTR&)result_parameter;
-		info.lpDirectory = NULL;
-		info.nShow = SW_HIDE;
-		info.hInstApp = NULL;
-
-		ShellExecuteEx(&info); // start process
-
-		GetProcessId(info.hProcess); // retrieve PID
-#endif
+		join_voice_talk();
 		GameState& game_state = *GameState::GetInstance();
 		game_state.ChangeNextState();
-		//Send_Ready_Packet(true);
 		break;
 	}
 
@@ -342,13 +284,7 @@ void Network::ProcessPacket(char* ptr)
 		packet.size = sizeof(packet);
 		packet.type = CS_PACKET::CS_PACKET_REQUEST_ROOM_INFO;
 		packet.request_page = m_page_num;
-
-		//system("cls");
-		//send_packet(&packet);
-		//cs_packet_create_room packet;
-		//packet.size = sizeof(packet);
-		//packet.type = CS_PACKET::CS_PACKET_CREATE_ROOM;
-		//send_packet(&packet);
+		send_packet(&packet);
 		break;
 	}
 
@@ -393,11 +329,7 @@ void Network::ProcessPacket(char* ptr)
 	{
 		sc_put_player_packet* packet = reinterpret_cast<sc_put_player_packet*>(ptr);
 		m_pPlayer->SetID(packet->data.id);
-		//m_pPlayer->SetPosition(packet->data.position, true);
-		//std::cout << "Set Init Pos : (" << packet->data.position.x << ", " << packet->data.position.y << ", " << packet->data.position.z << ") " << std::endl;
 		m_pPlayer->SetVelocity(packet->data.velocity);
-		m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
-		//std::cout << "put player packet recv!" << std::endl;
 		break;
 	}
 
@@ -409,12 +341,9 @@ void Network::ProcessPacket(char* ptr)
 		{
 			if (m_ppOther[i]->GetID() == -1)
 			{
-				//std::cout << i << "번째에 플레이어 할당" << std::endl;
 				m_ppOther[i]->SetID(packet->data.id);
 				Other_Player_Pos[i].id = packet->data.id;
-				//m_ppOther[i]->SetPosition(packet->data.position, true);
 				m_ppOther[i]->SetVelocity(packet->data.velocity);
-				m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);
 				if (packet->is_ready) {
 					m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 					m_ppOther[i]->SetTrackAnimationSet(0, 9);
@@ -426,7 +355,6 @@ void Network::ProcessPacket(char* ptr)
 				break;
 			}
 		}
-		//std::cout << "put player_other packet recv!" << std::endl;	
 		break;
 	}
 
@@ -434,10 +362,14 @@ void Network::ProcessPacket(char* ptr)
 	{
 		sc_packet_select_tagger* packet = reinterpret_cast<sc_packet_select_tagger*>(ptr);
 		m_tagger_id = packet->id;
-		if (m_pPlayer->GetID() == packet->id)
+		if (m_pPlayer->GetID() == packet->id) {
 			m_pPlayer->SetPlayerType(TYPE_TAGGER);
-		else
+			m_before_player_type = TYPE_TAGGER;
+		}
+		else {
 			m_pPlayer->SetPlayerType(TYPE_PLAYER);
+			m_before_player_type = TYPE_PLAYER;
+		}
 
 		for (int i = 0; i < 5; ++i)
 		{
@@ -446,9 +378,6 @@ void Network::ProcessPacket(char* ptr)
 			else
 				m_ppOther[i]->SetPlayerType(TYPE_PLAYER);
 		}
-
-		//std::cout << std::endl;
-		//std::cout << "Player (Server ID) [" << packet->id << "] 가 술래로 결정되었습니다. 외곽선이 빨간선으로 바뀝니다." << std::endl;
 		GameState& game_state = *GameState::GetInstance();
 		game_state.ChangeNextState();
 		break;
@@ -486,7 +415,6 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_LIFE_CHIP_UPDATE:
 	{
-		// 게임 시작시 생명칩을 활성화 시켜줘야하므로 존재함.
 		Process_LifeChip_Update(ptr);
 		break;
 	}
@@ -500,16 +428,6 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_CUSTOMIZING:
 	{
 		sc_packet_customizing_update* packet = reinterpret_cast<sc_packet_customizing_update*>(ptr);
-		//packet->body;
-		//std::cout << "=======================================================================" << std::endl;
-		//std::cout << "packet->id : " << packet->id << std::endl;
-		//std::cout << "body : " << static_cast<BODIES>(packet->body) << std::endl;
-		//std::cout << "body_parts : " << static_cast<BODYPARTS>(packet->body_parts) << std::endl;
-		//std::cout << "eyes : " << static_cast<EYES>(packet->eyes) << std::endl;
-		//std::cout << "gloves : " << static_cast<GLOVES>(packet->gloves) << std::endl;
-		//std::cout << "mouthandnoses : " << static_cast<MOUTHANDNOSES>(packet->mouthandnoses) << std::endl;
-		//std::cout << "head : " << static_cast<HEADS>(packet->head) << std::endl;
-		//std::cout << "=======================================================================" << std::endl;
 
  		if (packet->id == m_pPlayer->GetID())
 		{
@@ -570,7 +488,6 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_SWITCH_UPDATE:
 	{
 		Process_ElectronicSystem_Switch_Update(ptr);
-		// 아직 처리할 전력장치 코드가 없음
 		break;
 	}
 
@@ -623,7 +540,6 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_ROOM_INFO:
 	{
 		sc_packet_request_room_info* packet = reinterpret_cast<sc_packet_request_room_info*>(ptr);
-		//system("cls");
 		for (int i = 0; i < MAX_ROOM_INFO_SEND; ++i)
 		{
 			memcpy(Input::GetInstance()->m_Roominfo[i].room_name, packet->room_info[i].room_name, sizeof(packet->room_info[i].room_name));
@@ -671,3 +587,43 @@ void Network::ProcessPacket(char* ptr)
 	}
 }
 
+void Network::join_voice_talk()
+{
+#if USE_VOICE
+	if (false == get_voice_talk_working_state()) {
+		std::wstring parameter = L"addsession -l ";
+		std::wstring room_parameter = std::to_wstring(m_join_room_number);
+		std::wstring room_parameter2 = L"lobby";
+		std::wstring option_parameter = L" -audio yes";
+
+		std::wstring result_parameter = parameter + room_parameter + room_parameter2 + option_parameter;
+
+		std::wcout << result_parameter << std::endl;
+		info.cbSize = sizeof(SHELLEXECUTEINFO);
+		info.fMask = SEE_MASK_NOCLOSEPROCESS;
+		info.hwnd = NULL;
+		info.lpVerb = L"open";
+		info.lpFile = L"voice\\Voice.exe";
+		info.lpParameters = (LPCWSTR&)result_parameter;
+		info.lpDirectory = NULL;
+		info.nShow = SW_HIDE;
+		info.hInstApp = NULL;
+
+		ShellExecuteEx(&info); // start process
+
+		GetProcessId(info.hProcess); // retrieve PID
+
+		set_voice_talk_working_state(true);
+	}
+#endif
+}
+
+void Network::exit_voice_talk()
+{
+#if USE_VOICE
+	if (true == get_voice_talk_working_state()) {
+		TerminateProcess(info.hProcess, 1);
+		set_voice_talk_working_state(false);
+	}
+#endif
+}

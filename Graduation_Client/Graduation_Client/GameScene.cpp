@@ -199,31 +199,34 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		}
 		break;
 	case ENDING_GAME:
+#if USE_NETWORK
+		Network& network = *Network::GetInstance();
+		if(network.m_tagger_win){
+#endif
+#if !USE_NETWORK
 		if (0) { // TAGGER's Win
+#endif
+			m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 			if (m_pPlayer->GetType() == TYPE_TAGGER) {
-				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 				m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
 			}
-			else {
-				for (int i = 0; i < 5; ++i) {
-					if (m_ppPlayers[i]->GetType() == TYPE_TAGGER) {
-						m_ppPlayers[i]->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-						m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-						break;
-					}
+			for (int i = 0; i < 5; ++i) {
+				m_ppPlayers[i]->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+				if (m_ppPlayers[i]->GetType() == TYPE_TAGGER) {
+					m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
 				}
 			}
 		}
 		else { // Player's Win
 			float my_win = 0.0f;
+			m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 			if (m_pPlayer->GetType() != TYPE_TAGGER) {
-				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 				m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
 				my_win = true;
 			}
 			for (int i = 0; i < 5; ++i) {
+				m_ppPlayers[i]->SetPosition(XMFLOAT3(6.0f - 3.0f * i, 0.0f, -1.0f));
 				if (m_ppPlayers[i]->GetType() != TYPE_TAGGER) {
-					m_ppPlayers[i]->SetPosition(XMFLOAT3(6.0f - 3.0f * i, 0.0f, -3.0f));
 					m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
 				}
 			}
@@ -248,11 +251,6 @@ void GameScene::Endingrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
 	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
-	if (1) { // Player's Win
-		if (m_pPlayer->GetType() == TYPE_TAGGER) {
-			m_pPlayer->SetDraw(true);
-		}
-	}
 	Scene::render(pd3dCommandList);
 }
 
@@ -293,6 +291,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_ppPlayers[2]->SetPosition(XMFLOAT3(-3.0f, 0.0f, -5.0f));
 	m_ppPlayers[3]->SetPosition(XMFLOAT3(-6.0f, 0.0f, -5.0f));
 	m_ppPlayers[4]->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
+	m_ppPlayers[3]->SetPlayerType(TYPE_TAGGER);
 
 	m_pPlayer = new Player();
 	m_pPlayer->SetChild(pPlayerModel->m_pModelRootObject, true);

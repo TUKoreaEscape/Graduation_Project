@@ -78,8 +78,9 @@ void Framework::OnDestroy()
 	Network& network = *Network::GetInstance();
 	network.send_thread.join();
 	network.~Network();
-#endif
 	scene->recv_thread.join();
+#endif
+
 
 	ReleaseObjects(); //°ÔÀÓ °´Ã¼(°ÔÀÓ ¿ùµå °´Ã¼)¸¦ ¼Ò¸êÇÑ´Ù.
 	::CloseHandle(m_hFenceEvent);
@@ -458,17 +459,17 @@ void Framework::UpdateObjects()
 		network->send_packet(&packet);
 
 		//while (!network.m_recv_move);
-		network->pos_lock.lock();
+		//network->pos_lock.lock();
 		input->m_pPlayer->SetPosition(network->m_pPlayer_Pos);
-		network->pos_lock.unlock();
+		//network->pos_lock.unlock();
 
 		for (int i = 0; i < 5; ++i)
 		{
 			if (network->m_ppOther[i]->GetID() != -1)
 			{
-				network->Other_Player_Pos[i].pos_lock.lock();
+				//network->Other_Player_Pos[i].pos_lock.lock();
 				network->m_ppOther[i]->SetPosition(network->Other_Player_Pos[i].Other_Pos);
-				network->Other_Player_Pos[i].pos_lock.unlock();
+				//network->Other_Player_Pos[i].pos_lock.unlock();
 			}
 		}
 	}

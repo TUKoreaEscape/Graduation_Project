@@ -394,6 +394,10 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 					network.m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 					network.m_ppOther[i]->SetTrackAnimationSet(0, 0);
 				}
+
+				m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
+				for (int i = 0; i < 5; ++i)
+					network.m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);
 #endif
 				m_cs_packet_ready.ready_type = false;
 				m_gamestate->ChangeNextState();//QUITÅ¬¸¯
