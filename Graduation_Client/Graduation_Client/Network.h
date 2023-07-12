@@ -42,6 +42,7 @@ private:
 
 	SHELLEXECUTEINFO	info;
 	HWND				hwnd_ExtMixerWin;
+	bool				m_voice_talk_in_working = false;
 	bool				m_shutdown = false;
 	int					m_my_id = -1;
 	int					m_before_animation_index[5]{ 0 };
@@ -146,4 +147,11 @@ public:
 	void Send_Attack_Packet();
 
 	void send_packet(void* packet);
+
+public: // 보이스톡 관련 함수
+	void set_voice_talk_working_state(bool value) { m_voice_talk_in_working = value; }
+	bool get_voice_talk_working_state() { return m_voice_talk_in_working; }
+
+	void join_voice_talk();
+	void exit_voice_talk();
 };

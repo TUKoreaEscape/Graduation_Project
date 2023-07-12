@@ -264,33 +264,7 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_JOIN_ROOM_SUCCESS:
 	{
-		//std::cout << "规 立加 己傍" << std::endl;
-		//send_thread = std::thread{ &Network::Debug_send_thread, this };
-		//for (int i = 0; i < 5; ++i)
-		//	m_ppOther[i]->SetPosition(XMFLOAT3(-100, -100, -100));
-#if USE_VOICE
-		std::wstring parameter = L"addsession -l ";
-		std::wstring room_parameter = std::to_wstring(m_join_room_number);
-		std::wstring room_parameter2 = L"lobby";
-		std::wstring option_parameter = L" -audio yes";
-
-		std::wstring result_parameter = parameter + room_parameter + room_parameter2 + option_parameter;
-
-		std::wcout << result_parameter << std::endl;
-		info.cbSize = sizeof(SHELLEXECUTEINFO);
-		info.fMask = SEE_MASK_NOCLOSEPROCESS;
-		info.hwnd = NULL;
-		info.lpVerb = L"open";
-		info.lpFile = L"voice\\Voice.exe";
-		info.lpParameters = (LPCWSTR&)result_parameter;
-		info.lpDirectory = NULL;
-		info.nShow = SW_HIDE;
-		info.hInstApp = NULL;
-
-		ShellExecuteEx(&info); // start process
-
-		GetProcessId(info.hProcess); // retrieve PID
-#endif
+		join_voice_talk();
 		GameState& game_state = *GameState::GetInstance();
 		game_state.ChangeNextState();
 		break;
@@ -298,29 +272,7 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_CREATE_ROOM_OK:
 	{
-#if USE_VOICE
-		std::wstring parameter = L"addsession -l ";
-		std::wstring room_parameter = std::to_wstring(m_join_room_number);
-		std::wstring room_parameter2 = L"lobby";
-		std::wstring option_parameter = L" -audio yes";
-
-		std::wstring result_parameter = parameter + room_parameter + room_parameter2 + option_parameter;
-
-		std::wcout << result_parameter << std::endl;
-		info.cbSize = sizeof(SHELLEXECUTEINFO);
-		info.fMask = SEE_MASK_NOCLOSEPROCESS;
-		info.hwnd = NULL;
-		info.lpVerb = L"open";
-		info.lpFile = L"voice\\Voice.exe";
-		info.lpParameters = (LPCWSTR&)result_parameter;
-		info.lpDirectory = NULL;
-		info.nShow = SW_HIDE;
-		info.hInstApp = NULL;
-
-		ShellExecuteEx(&info); // start process
-
-		GetProcessId(info.hProcess); // retrieve PID
-#endif
+		join_voice_talk();
 		GameState& game_state = *GameState::GetInstance();
 		game_state.ChangeNextState();
 		break;
@@ -635,3 +587,43 @@ void Network::ProcessPacket(char* ptr)
 	}
 }
 
+void Network::join_voice_talk()
+{
+#if USE_VOICE
+	if (false == get_voice_talk_working_state()) {
+		std::wstring parameter = L"addsession -l ";
+		std::wstring room_parameter = std::to_wstring(m_join_room_number);
+		std::wstring room_parameter2 = L"lobby";
+		std::wstring option_parameter = L" -audio yes";
+
+		std::wstring result_parameter = parameter + room_parameter + room_parameter2 + option_parameter;
+
+		std::wcout << result_parameter << std::endl;
+		info.cbSize = sizeof(SHELLEXECUTEINFO);
+		info.fMask = SEE_MASK_NOCLOSEPROCESS;
+		info.hwnd = NULL;
+		info.lpVerb = L"open";
+		info.lpFile = L"voice\\Voice.exe";
+		info.lpParameters = (LPCWSTR&)result_parameter;
+		info.lpDirectory = NULL;
+		info.nShow = SW_HIDE;
+		info.hInstApp = NULL;
+
+		ShellExecuteEx(&info); // start process
+
+		GetProcessId(info.hProcess); // retrieve PID
+
+		set_voice_talk_working_state(true);
+	}
+#endif
+}
+
+void Network::exit_voice_talk()
+{
+#if USE_VOICE
+	if (true == get_voice_talk_working_state()) {
+		TerminateProcess(info.hProcess, 1);
+		set_voice_talk_working_state(false);
+	}
+#endif
+}
