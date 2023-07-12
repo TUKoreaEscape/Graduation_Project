@@ -334,72 +334,85 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 	m_clients[user_id].m_is_ready = packet->ready_type;
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
-	sc_packet_ready ready_packet;
-	ready_packet.size = sizeof(ready_packet);
-	ready_packet.type = SC_PACKET::SC_PACKET_READY;
-	ready_packet.id = user_id;
-	ready_packet.ready_type = packet->ready_type;
-	for (auto player_id : room.in_player)
-	{
-		if (player_id == -1 || player_id == user_id)
-			continue;
-		m_clients[player_id].do_send(sizeof(ready_packet), &ready_packet);
-	}
-
 	room.SetReady(packet->ready_type, user_id);
-	int i = 0;
+	int index = 0;
 	if (room.All_Player_Ready())
 	{
+		for (int i = 0; i < room.in_player.size(); ++i) {
+			if (room.in_player[i] == -1)
+				continue;
+			m_clients[room.in_player[i]].set_user_position(XMFLOAT3(static_cast<float>(6.f - ((float)i * 2.5)), 5.f, -10.f));
+			m_clients[room.in_player[i]].set_life_chip(true);
+		}
+
+		sc_packet_init_position init_packet;
+		init_packet.size = sizeof(init_packet);
+		init_packet.type = SC_PACKET::SC_PACKET_INIT_POSITION;
 		for (auto put_id : room.in_player)
 		{
 			if (put_id == -1) {
-				i++;
+				init_packet.position[index] = XMFLOAT3(-100, -100, -100);
+				init_packet.user_id[index] = -1;
+				index++;
 				continue;
 			}
-			m_clients[put_id].set_user_position(XMFLOAT3(static_cast<float>(4.f - ((float)i * 2.5)), 5.f, -4.f));
-			sc_packet_init_position init_packet;
-			init_packet.size = sizeof(init_packet);
-			init_packet.type = SC_PACKET::SC_PACKET_INIT_POSITION;
-			init_packet.user_id = put_id;
-			init_packet.position = m_clients[put_id].get_user_position();
-			init_packet.yaw = m_clients[put_id].get_user_yaw();
-
-			for (auto recv_id : room.in_player)
-			{
-				if (recv_id == -1)
-					continue;
-				m_clients[recv_id].do_send(sizeof(init_packet), &init_packet);
-			}
-			i++;
+			m_clients[put_id].set_user_position(XMFLOAT3(static_cast<float>(4.f - ((float)index * 2.5)), 5.f, -10.f));
+			init_packet.user_id[index] = put_id;
+			init_packet.position[index] = m_clients[put_id].get_user_position();
+			index++;
 		}
 
-		for (auto player_index : room.in_player) {
-			send_game_start_packet(player_index);
-			m_clients[player_index]._state_lock.lock();
-			m_clients[player_index].set_state(CLIENT_STATE::ST_INGAME);
-			m_clients[player_index]._state_lock.unlock();
-		}
-		// 모든 플레이어가 레디가 된 경우 이제 게임을 시작하게 바꿔줘야하는 부분!
-
-		sc_packet_game_start start_packet;
-		start_packet.size = sizeof(start_packet);
-		start_packet.type = SC_PACKET::SC_PACKET_GAME_START;
-		for (auto player_id : room.in_player)
+		for (auto recv_id : room.in_player)
 		{
-			if (player_id == -1)
+			if (recv_id == -1)
 				continue;
-			m_clients[player_id].do_send(sizeof(start_packet), &start_packet);
+			m_clients[recv_id].do_send(sizeof(init_packet), &init_packet);
 		}
-		room.Start_Game();
+
+		TIMER_EVENT ev;
+		ev.event_type = EventType::GAME_START;
+		ev.event_time = chrono::system_clock::now() + 2s;
+		ev.room_number = m_clients[user_id].get_join_room_number();
+
+		m_timer_queue.push(ev);
+	}
+	else {
+		sc_packet_ready ready_packet;
+		ready_packet.size = sizeof(ready_packet);
+		ready_packet.type = SC_PACKET::SC_PACKET_READY;
+		ready_packet.id = user_id;
+		ready_packet.ready_type = packet->ready_type;
+		for (int& player_id : room.in_player)
+		{
+			if (player_id == -1 || player_id == user_id)
+				continue;
+			m_clients[player_id].do_send(sizeof(ready_packet), &ready_packet);
+		}
 	}
 }
 
-void cGameServer::Process_Game_Start(const int user_id)
+void cGameServer::Process_Game_Start(const int room_number)
 {
-	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
-	room.SetLoading(true, user_id);
-	if (room.All_Player_Loading())
-		room.Start_Game();
+	Room& room = *m_room_manager->Get_Room_Info(room_number);
+
+	for (auto player_index : room.in_player) {
+		send_game_start_packet(player_index);
+		m_clients[player_index]._state_lock.lock();
+		m_clients[player_index].set_state(CLIENT_STATE::ST_INGAME);
+		m_clients[player_index]._state_lock.unlock();
+	}
+	// 모든 플레이어가 레디가 된 경우 이제 게임을 시작하게 바꿔줘야하는 부분!
+
+	sc_packet_game_start start_packet;
+	start_packet.size = sizeof(start_packet);
+	start_packet.type = SC_PACKET::SC_PACKET_GAME_START;
+	for (int& player_id : room.in_player)
+	{
+		if (player_id == -1)
+			continue;
+		m_clients[player_id].do_send(sizeof(start_packet), &start_packet);
+	}
+	room.Start_Game();
 }
 
 void cGameServer::Process_Request_Room_Info(const int user_id, void* buff)
@@ -549,10 +562,23 @@ void cGameServer::Process_Attack(const int user_id)
 
 				m_timer_queue.push(ev);
 
-				if (m_clients[other_player_id].get_life_chip())
+				if (m_clients[other_player_id].get_life_chip() && room.Get_Tagger_ID() == user_id && room.Is_Tagger_Get_Life_Chip() == false && room.m_altar->Get_Valid() == true)
 				{
+					room.Tagger_Get_Life_Chip(true);
 					m_clients[other_player_id].set_life_chip(false);
-					send_life_chip_update(other_player_id);
+
+					sc_packet_life_chip_update update_packet;
+					update_packet.size = sizeof(update_packet);
+					update_packet.type = SC_PACKET::SC_PACKET_LIFE_CHIP_UPDATE;
+					update_packet.id = other_player_id;
+					update_packet.life_chip = m_clients[other_player_id].get_life_chip();
+
+					for (auto player_id : room.in_player) {
+						if (player_id == -1)
+							continue;
+						m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
+					}
+					send_correct_life_chip(user_id);
 				}
 			}
 		}
@@ -573,7 +599,7 @@ void cGameServer::Process_Door(const int user_id, void* buff)
 	door_packet.door_number = static_cast<int>(packet->door_num);
 	door_packet.door_state = room.Get_Door_State(static_cast<int>(packet->door_num));
 
-	for (auto player_id : room.in_player) {
+	for (int& player_id : room.in_player) {
 		if (player_id == -1)
 			continue;
 		m_clients[player_id].do_send(sizeof(door_packet), &door_packet);
@@ -619,12 +645,43 @@ void cGameServer::Process_Vent(const int user_id, void* buff)
 	update_packet.door_num = packet->door_num;
 	update_packet.door_state = room.m_vent_object[static_cast<int>(packet->door_num)].get_state();
 
-	for (auto player_id : room.in_player) {
+	for (int& player_id : room.in_player) {
 		if (player_id == -1)
 			continue;
 		if (player_id == user_id)
 			continue;
 		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
+	}
+}
+
+void cGameServer::Process_Use_Tagger_Skill(const int user_id, int skill_number)
+{
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+	if (room.Get_Tagger_ID() != user_id)
+		return;
+
+	switch (skill_number) {
+	case 0: // firt skill use
+		if (m_clients[user_id].get_first_skill_enable()) {
+			room.Tagger_Use_First_Skill();
+			m_clients[user_id].use_first_skill();
+		}
+		break;
+
+	case 1: // second skill use
+		if (m_clients[user_id].get_second_skill_enable()) {
+			room.Tagger_Use_Second_Skill(m_clients[user_id].get_join_room_number());
+			m_clients[user_id].use_second_skill();
+		}
+		break;
+
+	case 2: // third skill use
+		if (m_clients[user_id].get_third_skill_enable()) {
+			room.Tagger_Use_Third_Skill();
+			m_clients[user_id].use_third_skill();
+		}
+		break;
 	}
 }
 
@@ -643,7 +700,7 @@ void cGameServer::Process_ElectronicSystem_Open(const int user_id, void* buff)
 	es_packet.es_num = packet->es_num;
 	es_packet.es_state = room.Get_EletronicSystem_State(static_cast<int>(packet->es_num));
 
-	for (auto player_id : room.in_player) {
+	for (int& player_id : room.in_player) {
 		if (player_id == -1)
 			continue;
 		m_clients[player_id].do_send(sizeof(es_packet), &es_packet);
@@ -685,9 +742,11 @@ void cGameServer::Process_ElectronicSystem_Reset_By_Player(const int user_id, vo
 	update_packet.type = SC_PACKET::SC_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_PLAYER;
 	update_packet.switch_index = packet->switch_index;
 
-	for (auto player_id : room.in_player)
+	for (int& player_id : room.in_player)
 	{
 		if (player_id == -1)
+			continue;
+		if (player_id == user_id)
 			continue;
 		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
 	}
@@ -707,7 +766,7 @@ void cGameServer::Process_ElectronicSystem_Reset_By_Tagger(const int user_id, vo
 	update_packet.type = SC_PACKET::SC_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_TAGGER;
 	update_packet.switch_index = packet->switch_index;
 
-	for (auto player_id : room.in_player)
+	for (int& player_id : room.in_player)
 	{
 		if (player_id == -1)
 			continue;
@@ -736,7 +795,7 @@ void cGameServer::Process_ElectronicSystem_Control(const int user_id, void* buff
 	
 	for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
 	{
-		int player_id = room.in_player[i];
+		int& player_id = room.in_player[i];
 		if (player_id == -1)
 			continue;
 		m_clients[player_id].do_send(sizeof(es_packet), &es_packet);
@@ -760,7 +819,7 @@ void cGameServer::Process_ElectronicSystem_Activate(const int user_id, void* buf
 	else
 		update_packet.activate = false;
 
-	for (auto player_id : room.in_player)
+	for (int& player_id : room.in_player)
 	{
 		if (player_id == -1)
 			continue;
@@ -786,13 +845,15 @@ void cGameServer::Process_Item_Box_Update(const int user_id, void* buff)
 
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
+	room.m_fix_item[packet->index].Set_Box_Open(packet->is_open);
+
 	sc_packet_item_box_update update_packet;
 	update_packet.size = sizeof(update_packet);
 	update_packet.type = SC_PACKET::SC_PACKET_ITEM_BOX_UPDATE;
 	update_packet.box_index = packet->index;
-	update_packet.is_open = packet->is_open;
+	update_packet.is_open = room.m_fix_item[packet->index].Is_Box_Open();
 
-	for (auto player_id : room.in_player)
+	for (int& player_id : room.in_player)
 	{
 		if (player_id == -1)
 			continue;
@@ -811,7 +872,7 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 	{
 		if (packet->index == room.m_fix_item[i].Get_Item_box_index())
 		{
-			item_index = room.m_fix_item[i].Get_Item_box_index();
+			item_index = i;
 			break;
 		}
 	}
@@ -819,21 +880,30 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 	if (item_index == -1)
 		return;
 
-	bool ret = room.Pick_Item(item_index);
-
-	if (ret == false)
-		return;
-
-	if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_DRILL)
+	if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_DRILL) // 1
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_DRILL, true);
-	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_HAMMER)
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_HAMMER) // 0
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_HAMMER, true);
-	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_PLIERS)
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_PLIERS) // 3
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_PLIERS, true);
-	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_WRENCH)
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_WRENCH) // 2
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_WRENCH, true);
-	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_LIFECHIP)
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_LIFECHIP) // 5
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, true);
+
+#if PRINT
+	std::cout << "Item_box_index [" << room.m_fix_item[item_index].Get_Item_box_index() << "] : ";
+	if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_DRILL) // 1
+		cout << "ITEM_DRILL" << endl;
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_HAMMER) // 0
+		cout << "ITEM_HAMMER" << endl;
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_PLIERS) // 3
+		cout << "ITEM_PLIERS" << endl;
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_WRENCH) // 2
+		cout << "ITEM_WRENCH" << endl;
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_LIFECHIP) // 5
+		cout << "ITEM_LIFECHIP" << endl;
+#endif
 
 	sc_packet_pick_fix_item_update item_packet;
 	item_packet.size = sizeof(item_packet);
@@ -843,7 +913,7 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 	item_packet.box_index = packet->index;
 	item_packet.item_show = false;
 
-	for (auto player_id : room.in_player)
+	for (int& player_id : room.in_player)
 	{
 		if (player_id == -1)
 			continue;
@@ -862,7 +932,7 @@ void cGameServer::Process_Active_Altar(const int user_id)
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_ACTIVATE_ALTAR;
 
-	for (auto player_id : room.in_player)
+	for (int& player_id : room.in_player)
 	{
 		if (player_id == -1)
 			continue;
@@ -874,17 +944,22 @@ void cGameServer::Process_Altar_LifeChip_Update(const int user_id)
 {
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 	room.m_altar->Add_Life_Chip();
-
+	room.Tagger_Get_Life_Chip(false);
 
 	sc_packet_altar_lifechip_update packet;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_ALTAR_LIFECHIP_UPDATE;
 	packet.lifechip_count = room.m_altar->Get_Life_Chip();
-	for (auto player_id : room.in_player)
+	for (int& player_id : room.in_player)
 	{
 		if (player_id == -1)
 			continue;
 		m_clients[player_id].do_send(sizeof(packet), &packet);
+	}
+
+	if (room.Is_Tagger_Winner())
+	{
+		// 여기는 Tagger가 승리한 조건을 달성한 경우 활성화
 	}
 }
 

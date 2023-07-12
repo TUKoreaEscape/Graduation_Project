@@ -142,7 +142,6 @@ void cGameServer::WorkerThread()
 		case OP_TYPE::OP_UPDATE_PLAYER_MOVE:
 		{
 			Update_OtherPlayer(static_cast<int>(iocp_key), SET_SERVER_UPDATE_FRAME);
-			cout << "ÀÌ°Åµé¾î¿È" << endl;
 			//m_room_manager->Get_Room_Info(iocp_key)->_room_state_lock.lock();
 			if (m_room_manager->Get_Room_Info(static_cast<int>(iocp_key))->_room_state == GAME_ROOM_STATE::PLAYING)
 			{
@@ -155,6 +154,13 @@ void cGameServer::WorkerThread()
 				m_timer_queue.push(ev);
 			}
 			//m_room_manager->Get_Room_Info(iocp_key)->_room_state_lock.unlock();
+			delete exp_over;
+			break;
+		}
+
+		case OP_TYPE::OP_GAME_START:
+		{
+			Process_Game_Start(static_cast<int>(iocp_key));
 			delete exp_over;
 			break;
 		}
@@ -184,21 +190,16 @@ void cGameServer::WorkerThread()
 				if (rl.in_player[i] == -1)
 					continue;
 				if (rl.in_player[i] == tagger_id)
-				{
-					life_packet.id = rl.in_player[i];
-					life_packet.life_chip = false;
-				}
-				else
-				{
-					life_packet.id = rl.in_player[i];
-					life_packet.life_chip = true;
-				}
+					continue;
+
+				life_packet.id = rl.in_player[i];
+				life_packet.life_chip = true;
 				m_clients[rl.in_player[i]].do_send(sizeof(life_packet), &life_packet);
 			}
 
 			TIMER_EVENT next_ev;
 			next_ev.room_number = static_cast<int>(iocp_key);
-			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(FIRST_SKILL_ENABLE_TIME);
+			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(FIRST_TAGGER_SKILL_OPEN_SECOND);
 			next_ev.event_type = EventType::OPEN_TAGGER_SKILL_FIRST;
 			m_timer_queue.push(next_ev);
 			break;
@@ -207,6 +208,9 @@ void cGameServer::WorkerThread()
 		case OP_TYPE::OP_FIRST_TAGGER_SKILL_OPEN:
 		{
 			Room& rl = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
+
+			if (rl.Get_Tagger_ID() == -1)
+				return;
 			m_clients[rl.Get_Tagger_ID()].set_first_skill_enable();
 
 			sc_packet_tagger_skill packet;
@@ -221,7 +225,7 @@ void cGameServer::WorkerThread()
 
 			TIMER_EVENT next_ev;
 			next_ev.room_number = static_cast<int>(iocp_key);
-			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(SECOND_SKILL_ENABLE_TIME);
+			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(SECOND_TAGGER_SKILL_OPEN_SECOND);
 			next_ev.event_type = EventType::OPEN_TAGGER_SKILL_SECOND;
 			m_timer_queue.push(next_ev);
 			break;
@@ -230,6 +234,9 @@ void cGameServer::WorkerThread()
 		case OP_TYPE::OP_SECOND_TAGGER_SKILL_OPEN:
 		{
 			Room& rl = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
+			if (rl.Get_Tagger_ID() == -1)
+				return;
+
 			m_clients[rl.Get_Tagger_ID()].set_second_skill_enable();
 
 			sc_packet_tagger_skill packet;
@@ -245,7 +252,7 @@ void cGameServer::WorkerThread()
 
 			TIMER_EVENT next_ev;
 			next_ev.room_number = static_cast<int>(iocp_key);
-			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(THIRD_SKILL_ENABLE_TIME);
+			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(THIRD_TAGGER_SKILL_OPEN_SECOND);
 			next_ev.event_type = EventType::OPEN_TAGGER_SKILL_THIRD;
 			m_timer_queue.push(next_ev);
 			break;
@@ -254,6 +261,9 @@ void cGameServer::WorkerThread()
 		case OP_TYPE::OP_THIRD_TAGGER_SKILL_OPEN:
 		{
 			Room& rl = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
+			if (rl.Get_Tagger_ID() == -1)
+				return;
+
 			m_clients[rl.Get_Tagger_ID()].set_third_skill_enable();
 
 			sc_packet_tagger_skill packet;
@@ -268,6 +278,33 @@ void cGameServer::WorkerThread()
 			break;
 		}
 
+		case OP_TYPE::OP_USE_FIRST_TAGGER_SKILL:
+		{
+			break;
+		}
+
+		case OP_TYPE::OP_USE_SECOND_TAGGER_SKILL:
+		{
+			sc_packet_use_second_tagger_skill packet;
+			packet.size = sizeof(packet);
+			packet.type = SC_PACKET::SC_PACKET_USE_SECOND_TAGGER_SKILL;
+			packet.is_start = false;
+
+			Room& room = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
+			
+			for (int& player_id : room.in_player) {
+				if (player_id == -1)
+					continue;
+				m_clients[player_id].do_send(sizeof(packet), &packet);
+			}
+			break;
+		}
+
+		case OP_TYPE::OP_USE_THIRD_TAGGER_SKILL:
+		{
+			break;
+		}
+
 		case OP_TYPE::OP_VENT_CLOSE:
 		{
 			TIMER_EVENT ev = reinterpret_cast<TIMER_EVENT&>(exp_over->m_wsa_buf);
@@ -279,7 +316,7 @@ void cGameServer::WorkerThread()
 			packet.type = SC_PACKET::SC_PACKET_HIDDEN_DOOR_UPDATE;
 			packet.door_num = ev.obj_id;
 			packet.door_state = room.m_vent_object[ev.obj_id].get_state();
-			for (auto player_id : room.in_player) {
+			for (int& player_id : room.in_player) {
 				if (player_id == -1)
 					continue;
 				m_clients[player_id].do_send(sizeof(packet), &packet);
@@ -445,7 +482,7 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 		request.request_custom_data = custom_data;
 		request.request_id = _user_id;
 		request.request_custom_data;
-		request.request_name = convertID;
+		request.request_name = convertID; 
 		m_database->insert_request(request);
 	}
 	// ¿©±â¼­ ÃÊ±âÈ­
@@ -454,17 +491,6 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 			int disconnect_room_number = cl.get_join_room_number();
 			Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
 			rl.in_player_lock.lock();
-			for (int i = 0; i < 6; ++i)
-			{
-				if (rl.Get_Join_Member(i) != _user_id && rl.Get_Join_Member(i) != -1)
-				{
-					int rl_id = rl.Get_Join_Member(i);
-					m_clients[rl_id]._room_list_lock.lock();
-					if (m_clients[rl_id].room_list.size() != 0)
-						m_clients[rl_id].room_list.erase(m_clients[rl_id].room_list.find(_user_id));
-					m_clients[rl_id]._room_list_lock.unlock();
-				}
-			}
 			rl.Exit_Player(_user_id);
 			rl.in_player_lock.unlock();
 
@@ -738,21 +764,39 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		break;
 	}
 
-	case CS_PACKET::CS_PACKET_GAME_LOADING_SUCCESS:
-	{
-		Process_Game_Start(user_id);
-		break;
-	}
-
 	case CS_PACKET::CS_PACKET_ATTACK:
 	{
 		Process_Attack(user_id);
 		break;
 	}
 
+	case CS_PACKET::CS_PACKET_USE_FIRST_TAGGER_SKILL:
+	{
+		Process_Use_Tagger_Skill(user_id, 0);
+		break;
+	}
+
+	case CS_PACKET::CS_PACKET_USE_SECOND_TAGGER_SKILL:
+	{
+		Process_Use_Tagger_Skill(user_id, 1);
+		break;
+	}
+
+	case CS_PACKET::CS_PACKET_USE_THIRD_TAGGER_SKILL:
+	{
+		Process_Use_Tagger_Skill(user_id, 2);
+		break;
+	}
+
 	case CS_PACKET::CS_PACKET_ACTIVATE_ALTAR:
 	{
 		Process_Active_Altar(user_id);
+		break;
+	}
+
+	case CS_PACKET::CS_PACKET_ALTAR_LIFECHIP_UPDATE:
+	{
+		Process_Altar_LifeChip_Update(user_id);
 		break;
 	}
 

@@ -311,6 +311,7 @@ struct cs_packet_pick_fix_item {
 	unsigned char	type;
 
 	unsigned short	index;
+	GAME_ITEM::ITEM item_type;
 };
 
 struct cs_packet_request_exit_room {
@@ -375,8 +376,12 @@ namespace SC_PACKET
 		SC_PACKET_ELECTRONIC_SWITCH_INIT,
 		SC_PACKET_CALCULATE_MOVE,
 		SC_PACKET_LIFE_CHIP_UPDATE,
+		SC_PACKET_TAGGER_CORRECT_LIFE_CHIP,
 		SC_PACKET_SELECT_TAGGER,
 		SC_PACKET_TAGGER_SKILL,
+		SC_PACKET_USE_FIRST_TAGGER_SKILL,
+		SC_PACKET_USE_SECOND_TAGGER_SKILL,
+		SC_PACKET_USE_THIRD_TAGGER_SKILL,
 		SC_PACKET_DOOR_UPDATE,
 		SC_PACKET_HIDDEN_DOOR_UPDATE,
 		SC_PACKET_ACTIVATE_ALTAR,
@@ -512,9 +517,8 @@ struct sc_packet_init_position {
 	unsigned char		size;
 	unsigned char		type;
 
-	unsigned int		user_id;
-	DirectX::XMFLOAT3	position;
-	float				yaw;
+	unsigned short		user_id[6];
+	DirectX::XMFLOAT3	position[6];
 };
 
 struct sc_packet_game_start { // 게임 시작을 방에 있는 플레이어에게 알려줌
@@ -556,6 +560,13 @@ struct sc_packet_life_chip_update {
 	bool			life_chip;
 };
 
+struct sc_packet_tagger_correct_life_chip {
+	unsigned char	size;
+	unsigned char	type;
+
+	bool			life_chip;
+};
+
 struct sc_packet_select_tagger {
 	unsigned char	size;
 	unsigned char	type;
@@ -576,6 +587,26 @@ struct sc_packet_tagger_skill {
 	bool			third_skill;
 };
 
+struct sc_packet_use_first_tagger_skill {
+	unsigned char	size;
+	unsigned char	type;
+
+	bool			electronic_system_close[5];
+};
+
+struct sc_packet_use_second_tagger_skill {
+	unsigned char	size;
+	unsigned char	type;
+
+	bool			is_start;
+};
+
+struct sc_packet_use_third_tagger_skill {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			unactivate_vent;
+};
 
 struct sc_other_player_move {
 	unsigned char	size;

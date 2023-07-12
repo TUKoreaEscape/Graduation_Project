@@ -36,6 +36,10 @@ Player::Player() : GameObject()
 	AddComponent<ThirdPersonCamera>();
 	m_pCamera = GetComponent<ThirdPersonCamera>();
 	m_pCamera->m_pPlayer = this;
+
+	for (int i = 0; i < 3; ++i) {
+		m_bTaggerSkills[i] = false;
+	}
 }
 
 void Player::ChangeCamera(GAME_STATE prev, GAME_STATE p)
@@ -68,7 +72,7 @@ void Player::ChangeCamera(GAME_STATE prev, GAME_STATE p)
 		}
 		else if (prev == ENDING_GAME)
 		{
-			DeleteComponent<FirstPersonCamera>();
+			DeleteComponent<ThirdPersonCamera>();
 		}
 		AddComponent<ThirdPersonCamera>();
 		m_pCamera = GetComponent<ThirdPersonCamera>();
@@ -99,6 +103,10 @@ void Player::ChangeCamera(GAME_STATE prev, GAME_STATE p)
 		m_fYaw = m_fPrevYaw;
 		break;
 	case ENDING_GAME:
+		DeleteComponent<FirstPersonCamera>();
+		AddComponent<ThirdPersonCamera>();
+		m_pCamera = GetComponent<ThirdPersonCamera>();
+		m_pCamera->m_pPlayer = this;
 		break;
 	case INTERACTION_POWER:
 		DeleteComponent<FirstPersonCamera>();
@@ -247,6 +255,7 @@ void Player::update(float fTimeElapsed)
 	//OnPrepareRender();
 
 	GameObject::update(fTimeElapsed);
+	m_fBlendingTime += fTimeElapsed;
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
 	if (m_xmf3Position.y > 0.0f && !m_collision_up_face)
 	{
@@ -301,6 +310,18 @@ void Player::update(float fTimeElapsed)
 	float fDeceleration = (m_fFriction * fTimeElapsed);
 	if (fDeceleration > fLength) fDeceleration = fLength;
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
+
+	if (m_bIsBlending) {
+		m_pSkinnedAnimationController->SetTrackEnable(1, true);
+		if (m_fBlendingTime > 0.33f) {
+			m_nPrevAnimation = m_nNextAnimation;
+			m_bIsBlending = false;
+		}
+	}
+	else {
+		m_pSkinnedAnimationController->SetTrackEnable(1, false);
+		m_pSkinnedAnimationController->SetTrackWeight(0, 1.0f);
+	}
 }
 
 void Player::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -377,13 +398,47 @@ void Player::SetPlayerType(int type)
 void Player::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (PlayerNum != 0 && GameState::GetInstance()->GetGameState() == CUSTOMIZING) return;
-	if (USE_NETWORK  && m_id == -1 && GameState::GetInstance()->GetGameState() == WAITING_GAME) return;
+	if (USE_NETWORK)
+		if (GameState::GetInstance()->GetGameState() == WAITING_GAME)
+			if (m_id == -1)
+				return;
 
 	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->UpdateShaderVariables(pd3dCommandList, PlayerNum);
 
-	if (PlayerNum == 0 && GameState::GetInstance()->GetGameState() > CUSTOMIZING ) {
-		GameObject* Hand = FindFrame("Gloves");
-		Hand->m_pChild->render(pd3dCommandList);
+	if (GameState::GetInstance()->GetGameState() == ENDING_GAME) {
+#if USE_NETWORK
+		Network& network = *Network::GetInstance();
+		if(network.m_tagger_win){
+#endif
+#if !USE_NETWORK
+		if (0) { // Tagger's Win
+#endif
+			if (this->GetType() == TYPE_TAGGER) {
+				renderer->render(pd3dCommandList);
+				if (m_pSibling) m_pSibling->render(pd3dCommandList);
+				if (m_pChild) m_pChild->render(pd3dCommandList);
+			}
+		}
+		else {
+			if (this->GetType() == TYPE_PLAYER || this->GetType() == TYPE_DEAD_PLAYER) {
+				renderer->render(pd3dCommandList);
+				if (m_pSibling) m_pSibling->render(pd3dCommandList);
+				if (m_pChild) m_pChild->render(pd3dCommandList);
+			}
+		}
+		return;
+	}
+
+	if (PlayerNum == 0) {
+		if (GameState::GetInstance()->GetGameState() > CUSTOMIZING) {
+			GameObject* Hand = FindFrame("Gloves");
+			Hand->m_pChild->render(pd3dCommandList);
+		}
+		else {
+			renderer->render(pd3dCommandList);
+			if (m_pSibling) m_pSibling->render(pd3dCommandList);
+			if (m_pChild) m_pChild->render(pd3dCommandList);
+		}
 	}
 	else {
 		renderer->render(pd3dCommandList);
@@ -397,6 +452,75 @@ void Player::SetLookAt(XMFLOAT3& xmf3Target, XMFLOAT3& xmf3Up)
 	m_xmf3Look = XMFLOAT3(0, 0, 1);
 	m_xmf3Right = XMFLOAT3(1, 0, 0);
 	m_xmf3Up = XMFLOAT3(0, 1, 0);
+}
+
+bool Player::PickUpItem(GAME_ITEM::ITEM item)
+{
+	if (item == GAME_ITEM::ITEM_NONE) return false;
+	if (item == GAME_ITEM::ITEM_LIFECHIP) {
+		if (GetType() == TYPE_DEAD_PLAYER) {
+			SetPlayerType(TYPE_PLAYER);
+			return true;
+		}
+		return false;
+	}
+	if (m_got_item != GAME_ITEM::ITEM_NONE) return false;
+	m_got_item = item;
+	return true;
+}
+
+int Player::GetItem()
+{
+	switch (m_got_item) {
+	case GAME_ITEM::ITEM_HAMMER:
+		return 0;
+	case GAME_ITEM::ITEM_DRILL:
+		return 1;
+	case GAME_ITEM::ITEM_WRENCH:
+		return 2;
+	case GAME_ITEM::ITEM_PLIERS:
+		return 3;
+	case GAME_ITEM::ITEM_DRIVER:
+		return 4;
+	default:
+		return -1;
+	}
+}
+
+bool Player::GetTaggerSkill(int index)
+{
+	if (GetType() != TYPE_TAGGER) return false;
+	return m_bTaggerSkills[index];
+}
+
+void Player::SetTaggerSkill(int index)
+{
+	if (GetType() != TYPE_TAGGER) return;
+	m_bTaggerSkills[index] = true;
+}
+
+bool Player::UseTaggerSkill(int index)
+{
+	if (GetType() != TYPE_TAGGER) return false;
+	if (false == m_bTaggerSkills[index]) return false;
+	m_bTaggerSkills[index] = false;
+	// Do Skill here maybe
+	return true;
+}
+
+void Player::SetAnimation(int index)
+{
+	m_nNextAnimation = index;
+	m_pSkinnedAnimationController->SetTrackAnimationSet(1, m_nPrevAnimation);
+	m_pSkinnedAnimationController->SetTrackWeight(1, 0.7f);
+	m_pSkinnedAnimationController->SetTrackSpeed(1, 1.0f);
+	m_pSkinnedAnimationController->SetTrackAnimationSet(0, index);
+	m_pSkinnedAnimationController->SetTrackWeight(0, 0.3f);
+	if (m_nPrevAnimation == index) return;
+	else {
+		if (!m_bIsBlending)	m_fBlendingTime = 0;
+		m_bIsBlending = true;
+	}
 }
 
 void Player::ReleaseShaderVariables()

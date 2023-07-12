@@ -134,7 +134,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:
-		if (!m_pPlayer->IsAttack() && (m_gamestate->GetGameState() == PLAYING_GAME || m_gamestate->GetGameState() == READY_TO_GAME))
+		if (!m_pPlayer->IsAttack() && m_gamestate->GetGameState() == PLAYING_GAME)
 		{
 #if USE_NETWORK
 			Network& network = *Network::GetInstance();
@@ -156,18 +156,55 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			{
 				// 입력란을 활성화하고 입력을 받을 수 있는 상태로 전환합니다.
 				m_inputState = 1;
-				//std::cout << "아이디 칸 클릭!" << std::endl;
 			}
 			//비밀번호
 			else if (xPos >= passwordRect.left && xPos <= passwordRect.right && yPos >= passwordRect.top && yPos <= passwordRect.bottom)
 			{
 				m_inputState = 2;
-				//std::cout << "비밀번호 칸 클릭!" << std::endl;
+			}
+			else if (xPos >= logininfoRect[0].left && xPos <= logininfoRect[0].right && yPos >= logininfoRect[0].top && yPos <= logininfoRect[0].bottom) //Login
+			{
+#if USE_NETWORK
+				Network& network = *Network::GetInstance();
+				m_cs_packet_login.size = sizeof(m_cs_packet_login);
+				m_cs_packet_login.type = CS_PACKET::CS_PACKET_LOGIN;
+
+				network.send_packet(&m_cs_packet_login);
+#endif
+			}
+			else if (xPos >= logininfoRect[1].left && xPos <= logininfoRect[1].right && yPos >= logininfoRect[1].top && yPos <= logininfoRect[1].bottom) //Create ID
+			{
+#if USE_NETWORK
+				Network& network = *Network::GetInstance();
+				cs_packet_create_id packet;
+				packet.size = sizeof(packet);
+				packet.type = CS_PACKET::CS_PACKET_CREATE_ID;
+				memcpy(packet.id, m_cs_packet_login.id, sizeof(m_cs_packet_login.id));
+				memcpy(packet.pass_word, m_cs_packet_login.pass_word, sizeof(m_cs_packet_login.pass_word));
+				
+				network.send_packet(&packet);
+#endif
+			}
+			else if (xPos >= logininfoRect[2].left && xPos <= logininfoRect[2].right && yPos >= logininfoRect[2].top && yPos <= logininfoRect[2].bottom)//Login fail
+			{
+				m_errorState = 0;
+				m_SuccessState = 0;
+			}
+			else if (xPos >= logininfoRect[3].left && xPos <= logininfoRect[3].right && yPos >= logininfoRect[3].top && yPos <= logininfoRect[3].bottom)//Same ID
+			{
+				m_errorState = 0;
+				m_SuccessState = 0;
+			}
+			else if (xPos >= logininfoRect[4].left && xPos <= logininfoRect[4].right && yPos >= logininfoRect[4].top && yPos <= logininfoRect[4].bottom)//SuccessfullycreatedID
+			{
+				m_SuccessState = 0;
+				m_errorState = 0;
 			}
 			else
 			{
 				m_inputState = 0;
-				//std::cout << "빈칸 클릭!" << std::endl;
+				m_SuccessState = 0;
+				m_errorState = 0;
 			}
 		}
 		else if (m_gamestate->GetGameState() == ROOM_SELECT)
@@ -354,16 +391,25 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 				network.m_pPlayer->SetTrackAnimationSet(0, 0);
 
 				for (int i = 0; i < 5; ++i) {
-					network.m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-					network.m_ppOther[i]->SetTrackAnimationSet(0, 0);
+					if (network.m_other_player_ready[i] == false) {
+						network.m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+						network.m_ppOther[i]->SetTrackAnimationSet(0, 0);
+					}
+					else {
+						network.m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+						network.m_ppOther[i]->SetTrackAnimationSet(0, 9);
+					}
 				}
+				m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
+				for (int i = 0; i < 5; ++i)
+					network.m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);
 #endif
 				m_cs_packet_ready.ready_type = false;
 				m_gamestate->ChangeNextState();//QUIT클릭
 			}
 			//InputRoomInfo();
 		}
-		std::cout << xPos << " " << yPos << std::endl;
+		//std::cout << xPos << " " << yPos << std::endl;
 		break;
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:

@@ -162,6 +162,11 @@ public:
 
 	virtual	void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f) {};
 	virtual void Interaction(int playerType) {};
+
+	virtual void SetAnimation(int index) {};
+	bool m_bIsBlending = false;
+	int m_nPrevAnimation{};
+	int m_nNextAnimation{};
 };
 
 template<typename T>

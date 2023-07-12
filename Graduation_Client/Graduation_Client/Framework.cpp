@@ -78,8 +78,9 @@ void Framework::OnDestroy()
 	Network& network = *Network::GetInstance();
 	network.send_thread.join();
 	network.~Network();
-#endif
 	scene->recv_thread.join();
+#endif
+
 
 	ReleaseObjects(); //게임 객체(게임 월드 객체)를 소멸한다.
 	::CloseHandle(m_hFenceEvent);
@@ -292,6 +293,7 @@ void Framework::CreateDirect2DDevice()
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Purple, 1.0f), &m_pd2dpurpleText);
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::LightSalmon, 1.0f), &m_pd2dlightsalmonText);
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black, 1.0f), &m_pd2dblackText);
+	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::CadetBlue, 1.0f), &m_pd2dCadetBlueText);
 	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdLoginFont, 4096.0f, 4096.0f, &m_pdwTextLayout);
 	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdRoomTitleFont, 4096.0f, 4096.0f, &m_pdRoomTitleFLayout);
 	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdReadytoStartFont, 4096.0f, 4096.0f, &m_pdRoomTitleFLayout);
@@ -457,17 +459,17 @@ void Framework::UpdateObjects()
 		network->send_packet(&packet);
 
 		//while (!network.m_recv_move);
-		network->pos_lock.lock();
+		//network->pos_lock.lock();
 		input->m_pPlayer->SetPosition(network->m_pPlayer_Pos);
-		network->pos_lock.unlock();
+		//network->pos_lock.unlock();
 
 		for (int i = 0; i < 5; ++i)
 		{
 			if (network->m_ppOther[i]->GetID() != -1)
 			{
-				network->Other_Player_Pos[i].pos_lock.lock();
+				//network->Other_Player_Pos[i].pos_lock.lock();
 				network->m_ppOther[i]->SetPosition(network->Other_Player_Pos[i].Other_Pos);
-				network->Other_Player_Pos[i].pos_lock.unlock();
+				//network->Other_Player_Pos[i].pos_lock.unlock();
 			}
 		}
 	}
@@ -544,9 +546,11 @@ void Framework::FrameAdvance()
 		scene->UIrender(m_pd3dCommandList); // Door UI
 		break;
 	case ENDING_GAME:
+		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
-		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
-		scene->UIrender(m_pd3dCommandList);
+		scene->UIrender(m_pd3dCommandList); 
+		scene->Endingrender(m_pd3dCommandList);
+		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
 		break;
 	case INTERACTION_POWER:
 		if (scene) scene->prerender(m_pd3dCommandList); 
@@ -701,10 +705,10 @@ void Framework::TextRender()
 				array[j] = static_cast<wchar_t>(input->m_Roominfo[i].room_name[j]);
 			}
 			array[size] = '\0';
-			D2D1_RECT_F rcLowerText = D2D1::RectF(roominfoRect[i].left+20, roominfoRect[i].top + 145, roominfoRect[i].right+20, roominfoRect[i].bottom + 145);
+			D2D1_RECT_F rcLowerText = D2D1::RectF(roominfoRect[i].left+10, roominfoRect[i].top + 30, roominfoRect[i].right+10, roominfoRect[i].bottom + 30);
 			m_pd2dDeviceContext->DrawTextW(array, (UINT32)wcslen(array), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
 
-			rcLowerText = D2D1::RectF(roominfoRect[i].left+10, roominfoRect[i].top + 115, roominfoRect[i].right+10, roominfoRect[i].bottom + 115);
+			rcLowerText = D2D1::RectF(roominfoRect[i].left, roominfoRect[i].top + 0, roominfoRect[i].right, roominfoRect[i].bottom + 0);
 			m_pd2dDeviceContext->DrawTextW(L"방 제목", (UINT32)wcslen(L"방 제목"), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
 
 			std::wstring num = std::to_wstring(input->m_Roominfo[i].room_number);
@@ -822,10 +826,33 @@ void Framework::TextRender()
 
 		D2D1_SIZE_F szRenderTarget = m_ppd2dRenderTargets[m_nSwapChainBufferIndex]->GetSize();
 
-		D2D1_RECT_F rcLowerText = D2D1::RectF(m_nWndClientWidth/2-250, m_nWndClientHeight/2-300, m_nWndClientWidth/2+500, m_nWndClientHeight+200);
-		m_pd2dDeviceContext->DrawTextW(L"곧 게임이 시작됩니다.", (UINT32)wcslen(L"곧 게임이 시작됩니다."), m_pdReadytoStartFont, &rcLowerText, m_pd2dblackText);
+		if (m_gamestate->IsLoading())
+		{
+			D2D1_RECT_F rcLowerText = D2D1::RectF(m_nWndClientWidth / 10, m_nWndClientHeight / 2 + 200, m_nWndClientWidth / 3, m_nWndClientHeight + 200);
+			switch(m_gamestate->LoadingCount()){
+			case 0:
+				m_pd2dDeviceContext->DrawTextW(L"Loading", (UINT32)wcslen(L"Loading"), m_pdReadytoStartFont, &rcLowerText, m_pd2dCadetBlueText);
+				break;
+			case 1:
+				m_pd2dDeviceContext->DrawTextW(L"Loading.", (UINT32)wcslen(L"Loading."), m_pdReadytoStartFont, &rcLowerText, m_pd2dCadetBlueText);
+				break;
+			case 2:
+				m_pd2dDeviceContext->DrawTextW(L"Loading..", (UINT32)wcslen(L"Loading.."), m_pdReadytoStartFont, &rcLowerText, m_pd2dCadetBlueText);
+				break;
+			case 3:
+				m_pd2dDeviceContext->DrawTextW(L"Loading...", (UINT32)wcslen(L"Loading..."), m_pdReadytoStartFont, &rcLowerText, m_pd2dCadetBlueText);
+				break;
+			}
+		}
+		else
+		{
+			D2D1_RECT_F rcLowerText = D2D1::RectF(m_nWndClientWidth/2-250, m_nWndClientHeight/2-300, m_nWndClientWidth/2+500, m_nWndClientHeight+200);
+			m_pd2dDeviceContext->DrawTextW(L"곧 게임이 시작됩니다.", (UINT32)wcslen(L"곧 게임이 시작됩니다."), m_pdReadytoStartFont, &rcLowerText, m_pd2dblackText);
+		}
 
 		m_pd2dDeviceContext->EndDraw();
+
+		m_gamestate->UpdateLoading(time.GetTimeElapsed());
 
 		m_pd3d11On12Device->ReleaseWrappedResources(ppd3dResources, _countof(ppd3dResources));
 

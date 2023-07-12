@@ -142,6 +142,7 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	{
 		for (int i = 0; i < MAX_INGAME_ITEM; ++i)
 			_room.m_fix_item.emplace_back();
+		_room.m_altar->init();
 	}
 
 //======================= Electronic System Object Read =======================
@@ -169,6 +170,11 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	cout << "Electronic System Load Success!                            " << endl;
 
 	cout << "All Objects File Load Success!" << endl;
+
+	srand(time(NULL));
+	for (auto& room : a_in_game_room)
+		room.init_room_name(rand() % 7);
+	cout << "All Room Name init Success!" << endl;
 }
 
 int RoomManager::Create_room(int user_id, int room_number) // 방생성을 요청받을경우 사용합니다. 

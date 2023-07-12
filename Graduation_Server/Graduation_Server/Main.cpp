@@ -10,6 +10,7 @@ cGameServer* cGameServer::server_instance = NULL;
 int main()
 {
 	_wsetlocale(LC_ALL, L"korean");
+	srand(100);
 	cGameServer& game_server = *cGameServer::GetInstance();
 	game_server.init();
 	game_server.StartServer();

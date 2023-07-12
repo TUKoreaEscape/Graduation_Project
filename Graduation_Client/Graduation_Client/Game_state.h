@@ -16,7 +16,10 @@ class GameState {
 
 private:
 	static GameState* GameStateInstance;
-	GAME_STATE m_GameState;
+	GAME_STATE m_GameState; 
+	float				m_totalLoading = 2.0f;
+	float				m_Loading = 0.0f;
+	int					m_LoadingCount = 0;
 	GameState() {}
 	GameState(const GameState& other);
 	~GameState() {}
@@ -32,5 +35,9 @@ public:
 	void ChangeNextState();
 	void ChangePrevState();
 	void ChangeSameLevelState();
+	bool IsLoading() { return m_totalLoading > m_Loading; }; //로딩중이면 true
+	void UpdateLoading(float time) { m_Loading += time, m_LoadingCount = (m_LoadingCount + 1) % 4; };
+	void SetLoading(float time) { m_totalLoading = time, m_Loading = 0.0f, m_LoadingCount = 0; };
+	int LoadingCount() { return m_LoadingCount; };
 	GAME_STATE GetGameState() { return m_GameState; };
 };

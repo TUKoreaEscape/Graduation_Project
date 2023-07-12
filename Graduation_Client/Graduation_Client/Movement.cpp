@@ -20,28 +20,28 @@ void CommonMovement::update(float elapsedTime)
 			//m_pPlayer를 사용하여 움직이는 코드를 작성하면 된다.
 			//std::cout << "w키" << std::endl;
 			dwDirection |= DIR_FORWARD;
-			gameObject->SetTrackAnimationSet(0, 1);
+			gameObject->SetAnimation(1);
 			Input::GetInstance()->m_pPlayer->SetDirection(DIR_FORWARD);
 		}
 		if (keyBuffer['s'] & 0xF0 || keyBuffer['S'] & 0xF0)
 		{
 			//std::cout << "s키" << std::endl;
 			dwDirection |= DIR_BACKWARD;
-			gameObject->SetTrackAnimationSet(0, 2);
+			gameObject->SetAnimation(2);
 			Input::GetInstance()->m_pPlayer->SetDirection(DIR_BACKWARD);
 		}
 		if (keyBuffer['a'] & 0xF0 || keyBuffer['A'] & 0xF0)
 		{
 			//std::cout << "a키" << std::endl;
 			dwDirection |= DIR_LEFT;
-			gameObject->SetTrackAnimationSet(0, 3);
+			gameObject->SetAnimation(3);
 			Input::GetInstance()->m_pPlayer->SetDirection(DIR_LEFT);
 		}
 		if (keyBuffer['d'] & 0xF0 || keyBuffer['D'] & 0xF0)
 		{
 			//std::cout << "d키" << std::endl;
 			dwDirection |= DIR_RIGHT;
-			gameObject->SetTrackAnimationSet(0, 4);
+			gameObject->SetAnimation(4);
 			Input::GetInstance()->m_pPlayer->SetDirection(DIR_RIGHT);
 		}
 		if ((keyBuffer[VK_SPACE] & 0xF0&&!Input::GetInstance()->m_pPlayer->GetIsFalling()))
@@ -54,7 +54,7 @@ void CommonMovement::update(float elapsedTime)
 		{
 			//std::cout << "점프 on" << std::endl;
 			dwDirection |= DIR_UP;
-			gameObject->SetTrackAnimationSet(0, 5);
+			gameObject->SetAnimation(5);
 			Input::GetInstance()->m_pPlayer->SetDirection(DIR_UP);
 			Input::GetInstance()->m_pPlayer->SetJumpTime(elapsedTime);
 		}
@@ -62,7 +62,8 @@ void CommonMovement::update(float elapsedTime)
 		if (Input::GetInstance()->m_pPlayer->GetIsFalling())
 		{
 			gameObject->m_pSkinnedAnimationController->SetTrackSpeed(0, 0.33f);
-			gameObject->SetTrackAnimationSet(0, 6);
+
+			gameObject->SetAnimation(6);
 		}
 
 		if (keyBuffer['f'] & 0xF0 || keyBuffer['F'] & 0xF0)
@@ -84,6 +85,46 @@ void CommonMovement::update(float elapsedTime)
 			if (Input::GetInstance()->m_pPlayer->m_pNearItembox) {
 				Input::GetInstance()->m_pPlayer->m_pNearItembox->Interaction(playerType);
 			}
+			if (Input::GetInstance()->m_pPlayer->m_pNearTaggers) {
+				Input::GetInstance()->m_pPlayer->m_pNearTaggers->Interaction(playerType);
+			}
+		}
+
+		if (keyBuffer['1'] & 0xF0)
+		{
+#if USE_NETWORK
+			if (Input::GetInstance()->m_pPlayer->GetType() == TYPE_TAGGER)
+			{
+				Network& network = *Network::GetInstance();
+				network.Send_Use_Tagger_Skill(1);
+				Input::GetInstance()->m_pPlayer->UseTaggerSkill(0);
+			}
+#endif
+
+		}
+
+		if (keyBuffer['2'] & 0xF0)
+		{
+#if USE_NETWORK
+			if (Input::GetInstance()->m_pPlayer->GetType() == TYPE_TAGGER)
+			{
+				Network& network = *Network::GetInstance();
+				network.Send_Use_Tagger_Skill(2);
+				Input::GetInstance()->m_pPlayer->UseTaggerSkill(1);
+			}
+#endif
+		}
+
+		if (keyBuffer['3'] & 0xF0)
+		{
+#if USE_NETWORK
+			if (Input::GetInstance()->m_pPlayer->GetType() == TYPE_TAGGER)
+			{
+				Network& network = *Network::GetInstance();
+				network.Send_Use_Tagger_Skill(3);
+				Input::GetInstance()->m_pPlayer->UseTaggerSkill(2);
+			}
+#endif
 		}
 
 		if (dwDirection)
@@ -100,12 +141,12 @@ void CommonMovement::update(float elapsedTime)
 		if (Input::GetInstance()->m_pPlayer->IsAttack())
 		{
 			Input::GetInstance()->m_pPlayer->PlayAttack(elapsedTime);
-			gameObject->SetTrackAnimationSet(0, 7);
+			gameObject->SetAnimation(7);
 			
 		}
 		else if (m_emptyKey && !Input::GetInstance()->m_pPlayer->GetIsFalling())
 		{
-			gameObject->SetTrackAnimationSet(0, 0);
+			gameObject->SetAnimation(0);
 			Input::GetInstance()->m_pPlayer->SetDirection(DIR_EMPTY);
 		}
 }

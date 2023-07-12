@@ -34,6 +34,8 @@ public:
 	int								m_passwordNum = 0;
 
 	int								m_inputState = 0; //0->x , 1->Id입력, 2->password입력
+	int								m_errorState = 0;
+	int								m_SuccessState = 0;
 
 	float speed = 60.0f;
 
@@ -52,6 +54,7 @@ public:
 	void PageUp() { m_PageNum++; };
 	void PageDown() { if (m_PageNum > 1)m_PageNum--; };
 	int ChangeInputState() { return m_inputState = (m_inputState + 1) % 3; };
+	int ChangeErrorState() { return m_inputState = (m_inputState + 1) % 3; };
 	void InputRoomInfo(); //이 함수에서 roominfo를 넣어줌 패킷주고받는곳에 넣으면 될듯? 안에 정의해주고, 일단 지금은 input.cpp 159번줄에 넣어놨음
 };
 

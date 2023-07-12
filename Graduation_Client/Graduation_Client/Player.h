@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "Camera.h"
 #include "Game_state.h"
+#include "protocol.h"
 
 #define DIR_FORWARD					0x01
 #define DIR_BACKWARD				0x02
@@ -138,10 +139,26 @@ public:
 	GameObject* m_pNearInteractionObejct = nullptr;
 	GameObject* m_pNearVent = nullptr;
 	GameObject* m_pNearItembox = nullptr;
+	GameObject* m_pNearTaggers = nullptr;
 
 	int							m_power_number = -1;
 	int							m_vent_number = -1;
 	int							m_itembox_number = -1;
+
+	GAME_ITEM::ITEM				m_got_item = GAME_ITEM::ITEM_NONE;
+
+	bool						m_bTaggerSkills[3];
+
+	bool PickUpItem(GAME_ITEM::ITEM item);
+	int GetItem();
+
+	bool GetTaggerSkill(int index);
+	void SetTaggerSkill(int index);
+	bool UseTaggerSkill(int index);
+
+	virtual void SetAnimation(int index) override;
+
+	float m_fBlendingTime{};
 
 	XMFLOAT3						m_xmf3PrevRight = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3						m_xmf3PrevUp = XMFLOAT3(0.0f, 0.0f, 0.0f);

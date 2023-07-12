@@ -47,12 +47,20 @@ public:
 	int m_nWaitingRoom;
 	int m_nCustomizing;
 	int m_Ending;
+	int m_nPlay;
+	int m_nPlayPlayer;
+	int m_nPlayTagger;
+	int m_nLoading;
 
 	GameObject** m_UILogin = nullptr;
 	GameObject** m_UIRoomSelect = nullptr;
 	GameObject** m_UIWaitingRoom = nullptr;
 	GameObject** m_UICustomizing = nullptr;
 	GameObject** m_UIEnding = nullptr;
+	GameObject** m_UIPlay = nullptr;
+	GameObject** m_UIPlayer = nullptr;
+	GameObject** m_UITagger = nullptr;
+	GameObject** m_UILoading = nullptr;
 
 	GameObject* m_pCeilling = nullptr;
 
@@ -73,6 +81,8 @@ public:
 	ItemBox* m_pBoxes[NUM_ITEMBOX];
 	Network* m_network;
 	std::thread recv_thread;
+
+	InteractionObject* Taggers = nullptr;
 
 	std::set<PVSROOM> m_sPVS[6];
 	PVSROOM m_pvsCamera;
@@ -102,6 +112,7 @@ public:
 	virtual void forrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void WaitingRoomrender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void Endingrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Powerrender(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
@@ -135,6 +146,7 @@ public:
 	void MakeDoors(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void MakeTaggers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 

@@ -20,6 +20,7 @@ void cGameServer::Timer()
 			else {
 				ev = timer_queue.top();
 				if (ev.event_type == EventType::CHECK_NUM_OF_SERVER_ACCEPT_USER);
+				else if (ev.event_type == EventType::GAME_START);
 				else if (m_room_manager->Get_Room_Info(ev.room_number)->_room_state != GAME_ROOM_STATE::PLAYING)
 					timer_queue.pop();
 			}
@@ -85,6 +86,15 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 		//cout << "event update µé¾î¿È" << endl;
 		EXP_OVER* over = new EXP_OVER;
 		over->m_comp_op = OP_TYPE::OP_UPDATE_PLAYER_MOVE;
+		memcpy(&over->m_wsa_buf, &ev, sizeof(ev));
+		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
+		return;
+	}
+
+	case EventType::GAME_START:
+	{
+		EXP_OVER* over = new EXP_OVER;
+		over->m_comp_op = OP_TYPE::OP_GAME_START;
 		memcpy(&over->m_wsa_buf, &ev, sizeof(ev));
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
 		return;
@@ -170,6 +180,14 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 	case EventType::CLOSE_ELECTRONIC:
 	{
 
+		return;
+	}
+
+	case EventType::USE_SECOND_TAGGER_SKILL:
+	{
+		EXP_OVER* over = new EXP_OVER;
+		over->m_comp_op = OP_TYPE::OP_USE_SECOND_TAGGER_SKILL;
+		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
 		return;
 	}
 

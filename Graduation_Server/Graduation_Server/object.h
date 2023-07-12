@@ -122,6 +122,7 @@ public:
 	bool Get_On_Off_Switch_Correct_Value(int idx) { return m_correct_on_off_switch[idx]; }
 
 	void Set_On_Off_Switch_Value(int idx, bool value) { m_check_on_off_switch[idx] = value; }
+	void Set_Close_Electronic_System();
 
 	bool Activate_ElectronicSystem();
 
@@ -160,6 +161,7 @@ class GameItem : public GameObject {
 private:
 	GAME_ITEM::ITEM m_item_type;
 	bool			m_own = false;
+	bool			m_is_open = false;
 	bool			m_show = false;
 	
 	short			m_item_box_index;
@@ -174,12 +176,14 @@ public:
 
 	void				Set_Item_box_index(const unsigned short index) { m_item_box_index = index; }
 	void				Set_Item_Type(GAME_ITEM::ITEM item_type) { m_item_type = item_type; }
+	void				Set_Box_Open(bool value);
 
 	short				Get_Item_box_index() const{ return m_item_box_index; }
 	GAME_ITEM::ITEM		Get_Item_Type() { return m_item_type; }
 
 	void				Update_bounding_box_pos(const XMFLOAT3& pos);
 	bool				Pict_Item();
+	bool				Is_Box_Open() { return m_is_open; }
 	void				Update_Object();
 	void				Release();
 };

@@ -5,6 +5,8 @@
 extern RECT_FLOAT idRect;
 extern RECT_FLOAT passwordRect;
 
+extern RECT_FLOAT logininfoRect[5];
+
 extern RECT_FLOAT roominfoRect[6];
 
 extern RECT_FLOAT roomPageRect[2];

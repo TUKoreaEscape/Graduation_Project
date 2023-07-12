@@ -10,9 +10,14 @@
 #include "Server_Timer.h"
 #include <queue>
 
-#define FIRST_SKILL_ENABLE_TIME 180
-#define SECOND_SKILL_ENABLE_TIME 240
-#define THIRD_SKILL_ENABLE_TIME 240
+#define FIRST_SKILL_ENABLE_TIME 20
+#define SECOND_SKILL_ENABLE_TIME 30
+#define THIRD_SKILL_ENABLE_TIME 40
+
+//#define FIRST_SKILL_ENABLE_TIME 180
+//#define SECOND_SKILL_ENABLE_TIME 240
+//#define THIRD_SKILL_ENABLE_TIME 240
+
 #define SET_SERVER_UPDATE_FRAME 30
 
 class EXP_OVER;
@@ -23,6 +28,7 @@ class RoomManager;
 enum class EventType : char
 {
 	CHECK_NUM_OF_SERVER_ACCEPT_USER,
+	GAME_START,
 	OPEN_DOOR,
 	CLOSE_DOOR,
 	OPEN_ELECTRONIC,
@@ -35,6 +41,9 @@ enum class EventType : char
 	OPEN_TAGGER_SKILL_FIRST,
 	OPEN_TAGGER_SKILL_SECOND,
 	OPEN_TAGGER_SKILL_THIRD,
+	USE_FIRST_TAGGER_SKILL,
+	USE_SECOND_TAGGER_SKILL,
+	USE_THIRD_TAGGER_SKILL,
 	GAME_END,
 	SERVER_END
 };
@@ -90,6 +99,7 @@ public: // 이쪽은 패킷을 전송하는 함수의 모임입니다.
 	void	send_move_packet(const unsigned int id, const unsigned int moved_id); // 이동을 처리합니다.
 	void	send_calculate_move_packet(const unsigned int id); // 이동을 요청한 클라이언트에게 좌표를 계산하여 넘겨줍니다.
 	void	send_life_chip_update(const unsigned int id);
+	void	send_correct_life_chip(const unsigned int id);
 	void	send_game_start_packet(const unsigned int id); // 게임이 시작된것을 패킷으로 전송함
 	void	send_put_player_data(const unsigned int recv_id);
 	void	send_put_other_player(const unsigned int put_id, const unsigned int recv_id);  
@@ -108,7 +118,7 @@ public:
 	void	Process_Join_Room(const int user_id, void* buff); // 방 접속 요청을 처리하는 함수
 	void	Process_Exit_Room(const int user_id, void* buff); // 방에서 나가는 요청을 처리하는 함수
 	void	Process_Ready(const int user_id, void* buff); // 게임방에서 준비완료됨을 처리하는 함수
-	void	Process_Game_Start(const int user_id); // 게임방에서 게임이 시작함을 처리하는 함수
+	void	Process_Game_Start(const int room_number); // 게임방에서 게임이 시작함을 처리하는 함수
 	void	Process_Attack(const int user_id); // 공격을 처리하는 함수
 	void	Process_Customizing(const int user_id, void* buff); // 커스터마이징 정보를 처리하는 함수
 	void	Process_Door(const int user_id, void* buff); // 게임방 내 Door 열기,닫기를 처리하는 함수
@@ -120,6 +130,7 @@ public:
 	void	Process_ElectronicSystem_Reset_By_Player(const int user_id, void* buff);
 	void	Process_ElectronicSystem_Control(const int user_id, void* buff); // 게임방 내 전력장치 스위치 on,off를 처리, 수리를 체크하는 함수
 	void	Process_ElectronicSystem_Activate(const int user_id, void* buff);
+	void	Process_Use_Tagger_Skill(const int user_id, int skill_number);
 	void	Process_Item_Box_Update(const int user_id, void* buff);
 	void	Process_Pick_Fix_Item(const int user_id, void* buff);
 	void	Process_Event(const TIMER_EVENT& ev); // 이벤트를 처리, worker thread로 넘기는 역할을 함 *매우중요*

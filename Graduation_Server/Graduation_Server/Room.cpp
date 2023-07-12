@@ -1,6 +1,33 @@
 #include "Room.h"
 #include "GameServer.h"
 
+void Room::init_room_name(int rand_num)
+{
+	switch (rand_num) {
+	case 0:
+		strcpy_s(m_room_name, sizeof(room_name1), room_name1);
+		break;
+	case 1:
+		strcpy_s(m_room_name, sizeof(room_name2), room_name2);
+		break;
+	case 2:
+		strcpy_s(m_room_name, sizeof(room_name3), room_name3);
+		break;
+	case 3:
+		strcpy_s(m_room_name, sizeof(room_name4), room_name4);
+		break;
+	case 4:
+		strcpy_s(m_room_name, sizeof(room_name5), room_name5);
+		break;
+	case 5:
+		strcpy_s(m_room_name, sizeof(room_name6), room_name6);
+		break;
+	case 6:
+		strcpy_s(m_room_name, sizeof(room_name7), room_name7);
+		break;
+	}
+}
+
 void Room::Reset_Room()
 {
 	Number_of_users = 0;
@@ -58,11 +85,11 @@ void Room::init_room_by_game_end()
 
 	cGameServer& server = *cGameServer::GetInstance();
 	int i = 0;
-	for (auto player_id : in_player)
+	for (int& player_id : in_player)
 	{
 		if (player_id == -1)
 			continue;
-		server.m_clients[player_id].set_user_position(XMFLOAT3(static_cast<float>(6.f - ((float)i * 2.5)), 5.f, -4.f));
+		server.m_clients[player_id].set_user_position(XMFLOAT3(static_cast<float>(6.f - ((float)i * 2.5)), 5.f, -10.f));
 		server.m_clients[player_id].set_life_chip(false);
 		i++;
 	}
@@ -120,7 +147,7 @@ void Room::Exit_Player(int user_id)
 
 
 		cGameServer& server = *cGameServer::GetInstance();
-		for (auto player_id : in_player)
+		for (int& player_id : in_player)
 		{
 			if (player_id == -1)
 				continue;
@@ -193,8 +220,30 @@ void Room::init_fix_object_and_life_chip()
 		item_init_packet.data[i].item_type = m_fix_item[i].Get_Item_Type();
 	}
 
-	for (auto player_id : in_player)
+#if PRINT
+	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
+	{
+		cout << "Item [" << item_init_packet.data[i].item_box_index << "] Type : ";
+		if (item_init_packet.data[i].item_type == GAME_ITEM::ITEM_LIFECHIP)
+			std::cout << "ITEM_LIFECHIP" << std::endl;
+		if (item_init_packet.data[i].item_type == GAME_ITEM::ITEM_DRILL)
+			std::cout << "ITEM_DRILL" << std::endl;
+		if (item_init_packet.data[i].item_type == GAME_ITEM::ITEM_HAMMER)
+			std::cout << "ITEM_HAMMER" << std::endl;
+		if (item_init_packet.data[i].item_type == GAME_ITEM::ITEM_NONE)
+			std::cout << "ITEM_NONE" << std::endl;
+		if (item_init_packet.data[i].item_type == GAME_ITEM::ITEM_PLIERS)
+			std::cout << "ITEM_PLIERS" << std::endl;
+		if (item_init_packet.data[i].item_type == GAME_ITEM::ITEM_WRENCH)
+			std::cout << "ITEM_WRENCH" << std::endl;
+	}
+#endif
+
+	for (int& player_id : in_player) {
+		if (player_id == -1)
+			continue;
 		cGameServer::GetInstance()->m_clients[player_id].do_send(sizeof(item_init_packet), &item_init_packet);
+	}
 }
 
 void Room::add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation)
@@ -266,8 +315,14 @@ void Room::Activate_Altar()
 	m_altar->Set_Valid(true);
 }
 
-void Room::Set_Electronic_System_ONOFF
-()
+bool Room::Is_Tagger_Winner()
+{
+	if (m_altar->Get_Life_Chip() == GAME_END_COLLECT_CHIP)
+		return true;
+	return false;
+}
+
+void Room::Set_Electronic_System_ONOFF()
 {
 	mt19937 engine((unsigned int)time(NULL));
 	for (int i = 0; i < NUMBER_OF_ELECTRONIC; ++i)
@@ -295,6 +350,73 @@ bool Room::All_Player_Loading()
 			return false;
 	}
 	return true;
+}
+
+void Room::Tagger_Use_First_Skill()
+{
+	cGameServer& server = *cGameServer::GetInstance();
+
+	for (int i = 0; i < m_electrinic_system.size(); ++i)
+		m_electrinic_system[i].Set_Close_Electronic_System();
+
+	sc_packet_use_first_tagger_skill packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_USE_FIRST_TAGGER_SKILL;
+	for (int i = 0; i < m_electrinic_system.size(); ++i) {
+		if (m_electrinic_system[i].get_state() == ES_OPEN)
+			packet.electronic_system_close[i] = false;
+		else
+			packet.electronic_system_close[i] = true;
+	}
+
+	for (int& player_id : in_player) {
+		if (player_id == -1)
+			continue;
+		server.m_clients[player_id].do_send(sizeof(packet), &packet);
+	}
+}
+
+void Room::Tagger_Use_Second_Skill(int room_number)
+{
+	cGameServer& server = *cGameServer::GetInstance();
+
+	TIMER_EVENT ev;
+	ev.room_number = room_number;
+	ev.event_type = EventType::USE_SECOND_TAGGER_SKILL;
+	ev.event_time = chrono::system_clock::now() + 30s;
+
+	server.m_timer_queue.push(ev);
+
+	sc_packet_use_second_tagger_skill packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_USE_SECOND_TAGGER_SKILL;
+	packet.is_start = true;
+
+	for (int& player_id : in_player) {
+		if (player_id == -1)
+			continue;
+		server.m_clients[player_id].do_send(sizeof(packet), &packet);
+	}
+}
+
+void Room::Tagger_Use_Third_Skill()
+{
+	srand(time(NULL));
+	
+	cGameServer& server = *cGameServer::GetInstance();
+
+	int unactive_vent_number = rand() % m_vent_object.size();
+
+	sc_packet_use_third_tagger_skill packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET::SC_PACKET_USE_THIRD_TAGGER_SKILL;
+	packet.unactivate_vent = unactive_vent_number;
+
+	for (int& player_id : in_player) {
+		if (player_id == -1)
+			continue;
+		server.m_clients[player_id].do_send(sizeof(packet), &packet);
+	}
 }
 
 void Room::Update_Player_Position() // 사용하지 않습니다.

@@ -11,10 +11,11 @@
 #define THIRD_TAGGER_SKILL_OPEN_SECOND 540
 #define GAME_END_SECOND 900
 
-//#define FIRST_TAGGER_SKILL_OPEN_SECOND 5
-//#define SECOND_TAGGER_SKILL_OPEN_SECOND 10
-//#define THIRD_TAGGER_SKILL_OPEN_SECOND 15
-//#define GAME_END_SECOND 90
+//#define FIRST_TAGGER_SKILL_OPEN_SECOND 10
+//#define SECOND_TAGGER_SKILL_OPEN_SECOND 15
+//#define THIRD_TAGGER_SKILL_OPEN_SECOND 20
+//#define GAME_END_SECOND 25
+
 
 //class CLIENT;
 class Room {
@@ -26,6 +27,13 @@ private:
 	int					m_tagger_id = -1;
 	long long			duration_time;
 
+	char room_name1[10]{ "Tagger?" };
+	char room_name2[10]{ "NowHere!" };
+	char room_name3[10]{ "TO DO!" };
+	char room_name4[10]{ "Plz" };
+	char room_name5[10]{ "KeepMovin" };
+	char room_name6[10]{ "Escape!" };
+	char room_name7[10]{ "Beat" };
 public:
 	array<BoundingOrientedBox, 6>	in_player_bounding_box;
 	vector<GameObject>				m_game_object;
@@ -46,7 +54,7 @@ private: // 여긴 인게임 플레이시 사용하는 변수
 	bool				m_first_skill_enable = false;
 	bool				m_second_skill_enable = false;
 	bool				m_third_skill_enable = false;
-
+	bool				m_tagger_now_collect_life_chip = false;
 	int					m_tagger_collect_chip = 0;
 
 public:
@@ -81,6 +89,7 @@ public:
 
 public: // 서버 시작시 초기화하는 함수들
 	void	init_room_number(const int room_num){ room_number = room_num;}
+	void	init_room_name(const int rand_num);
 	void	init_fix_object_and_life_chip();
 
 	void	add_game_object(Object_Type ob_type, XMFLOAT3 center, XMFLOAT3 extents, XMFLOAT4 orientation);
@@ -107,6 +116,16 @@ public:
 	void	Update_Player_Position();
 	void	Update_Door(const int door_num);
 	void	Update_ElectronicSystem_Door(const int es_num, bool value);
+
+public: // 술래 스킬 사용 관련 함수들
+	void	Tagger_Use_First_Skill();
+	void	Tagger_Use_Second_Skill(int room_number);
+	void	Tagger_Use_Third_Skill();
+
+public:
+	void	Tagger_Get_Life_Chip(bool value) { m_tagger_collect_chip = value; }
+	bool	Is_Tagger_Get_Life_Chip() { return m_tagger_collect_chip; }
+	bool	Is_Tagger_Winner();
 
 public: // 인게임 오브젝트 state 받아야하는 공간
 	Door_State Get_Door_State(const int door_num) { return m_door_object[door_num].get_state(); }

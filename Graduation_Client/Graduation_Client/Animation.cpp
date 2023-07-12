@@ -28,7 +28,7 @@ AnimationSet::~AnimationSet()
 
 void AnimationSet::SetPosition(float fTrackPosition)
 {
-	m_fPosition = fTrackPosition;
+	m_fPosition += fTrackPosition;
 	switch (m_nType)
 	{
 	case ANIMATION_TYPE_LOOP:

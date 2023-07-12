@@ -25,10 +25,12 @@ void Network::Process_Ready(char* ptr)
 			continue;
 		if (m_ppOther[i]->GetID() == packet->id) {
 			if (packet->ready_type) {
+				m_other_player_ready[i] = true;
 				m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 				m_ppOther[i]->SetTrackAnimationSet(0, 9);
 			}
 			else {
+				m_other_player_ready[i] = false;
 				m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 				m_ppOther[i]->SetTrackAnimationSet(0, 0);
 			}
@@ -40,57 +42,97 @@ void Network::Process_Init_Position(char* ptr)
 {
 	sc_packet_init_position* packet = reinterpret_cast<sc_packet_init_position*>(ptr);
 
-	if (m_pPlayer->GetID() == packet->user_id) {
-		m_pPlayer->SetPosition(packet->position, true);
-		m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-		m_pPlayer->SetTrackAnimationSet(0, 0);
+	for (int i = 0; i < 6; ++i) {
+		if (m_pPlayer->GetID() == packet->user_id[i]) {
+			m_pPlayer->SetPosition(packet->position[i], true);
+			m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			m_pPlayer->SetTrackAnimationSet(0, 0);
+			GameState& game_state = *GameState::GetInstance();
+			game_state.ChangeNextState();
+			break;
+		}
 	}
-	else {
-		for (int i = 0; i < 5; ++i) {
-			if (m_ppOther[i]->GetID() == packet->user_id) {
-				m_ppOther[i]->SetPosition(packet->position, true);
+
+	for (int i = 0; i < 5; ++i) {
+		for (int j = 0; j < 6; ++j) {
+			if (m_ppOther[i]->GetID() == packet->user_id[j]) {
+				m_ppOther[i]->SetPosition(packet->position[j], true);
 				m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 				m_ppOther[i]->SetTrackAnimationSet(0, 0);
 			}
 		}
 	}
+	m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
+	for (int i = 0; i < 5; ++i)
+		m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);
 }
 
 void Network::Process_Game_Start(char* ptr)
 {
 	sc_packet_game_start* packet = reinterpret_cast<sc_packet_game_start*>(ptr);
-
 	GameState& game_state = *GameState::GetInstance();
-	game_state.ChangeNextState();
+	game_state.SetLoading(0.0f);
 }
 
 void Network::Process_Game_End(char* ptr)
 {
 	sc_packet_game_end* packet = reinterpret_cast<sc_packet_game_end*>(ptr);
-	
+	m_tagger_win = packet->is_tagger_win;
+
+	for (int i = 0; i < 5; ++i)
+		m_other_player_ready[i] = false;
+
 	GameState& game_state = *GameState::GetInstance();
 	game_state.ChangeNextState();
 
-	m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
-	for (int i = 0; i < 5; ++i) {
-		m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);
-		m_ppOther[i]->SetID(-1);
-	}
 	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
 		m_pBoxes[i]->SetOpen(false);
 	for (int i = 0; i < 6; ++i)
 		m_pDoors[i]->SetOpen(false);
 	for (int i = 0; i < 5; ++i)
 		m_pPowers[i]->SetOpen(false);
-	for (int i = 0; i < 8; ++i)
+	for (int i = 0; i < 8; ++i) {
 		m_Vents[i]->SetOpen(false);
+		reinterpret_cast<Vent*>(m_Vents[i])->SetUnBlock();
+	}
+	m_lifechip = false;
+	m_pPlayer->m_got_item = GAME_ITEM::ITEM_NONE;
 }
 
 void Network::Process_LifeChip_Update(char* ptr)
 {
 	sc_packet_life_chip_update* packet = reinterpret_cast<sc_packet_life_chip_update*>(ptr);
-	packet->id;
-	packet->life_chip;
+
+	if (m_pPlayer->GetID() == packet->id) {
+		if (false == packet->life_chip)
+			m_pPlayer->SetPlayerType(TYPE_DEAD_PLAYER);
+		else
+			m_pPlayer->SetPlayerType(TYPE_PLAYER);
+		return;
+	}
+
+	for (int i = 0; i < 5; ++i){
+		if (m_ppOther[i]->GetID() == packet->id) {
+			if (false == packet->life_chip)
+				m_ppOther[i]->SetPlayerType(TYPE_DEAD_PLAYER);
+			else
+				m_ppOther[i]->SetPlayerType(TYPE_PLAYER);
+			return;
+		}
+	}
+}
+
+void Network::Process_Tagger_Collect_LifeChip(char* ptr)
+{
+	sc_packet_tagger_correct_life_chip* packet = reinterpret_cast<sc_packet_tagger_correct_life_chip*>(ptr);
+	if (packet->life_chip == true) {
+		reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(1.0f);
+		m_lifechip = true;
+	}
+	else {
+		reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(-1.0f);
+		m_lifechip = false;
+	}
 }
 
 void Network::Process_Player_Move(char* ptr)
@@ -99,10 +141,10 @@ void Network::Process_Player_Move(char* ptr)
 	sc_packet_calculate_move* packet = reinterpret_cast<sc_packet_calculate_move*>(ptr);
 	//m_pPlayer->SetPosition(packet->pos);	
 	XMFLOAT3 conversion_position = XMFLOAT3(static_cast<float>(packet->pos.x) / 10000.f, static_cast<float>(packet->pos.y) / 10000.f, static_cast<float>(packet->pos.z) / 10000.f);
-	pos_lock.lock();
+	//pos_lock.lock();
 	m_pPlayer_Pos = conversion_position;
 	m_pPlayer->SetIsColledUpFace(packet->is_collision_up_face);
-	pos_lock.unlock();
+	//pos_lock.unlock();
 }
 
 void Network::Process_Other_Move(char* ptr)
@@ -117,60 +159,83 @@ void Network::Process_Other_Move(char* ptr)
 		XMFLOAT3 conversion_look = XMFLOAT3(static_cast<float>(packet->data.look.x) / 100.f, static_cast<float>(packet->data.look.y) / 100.f, static_cast<float>(packet->data.look.z) / 100.f);
 		XMFLOAT3 conversion_right = XMFLOAT3(static_cast<float>(packet->data.right.x) / 100.f, static_cast<float>(packet->data.right.y) / 100.f, static_cast<float>(packet->data.right.z) / 100.f);
 
-		Other_Player_Pos[i].pos_lock.lock();
+		//Other_Player_Pos[i].pos_lock.lock();
 		Other_Player_Pos[i].Other_Pos = conversion_position;
 		m_ppOther[i]->SetIsColledUpFace(packet->data.is_collision_up_face);
-		Other_Player_Pos[i].pos_lock.unlock();
+		//Other_Player_Pos[i].pos_lock.unlock();
 		m_ppOther[i]->m_xmf3Look = conversion_look;
 		m_ppOther[i]->m_xmf3Right = conversion_right;
 		if (packet->data.input_key == DIR_FORWARD)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 1);
+			if (m_before_animation_index[i] != 1) {
+				m_ppOther[i]->SetAnimation(1);
+				m_before_animation_index[i] = 1;
+			}
 		}
 		if (packet->data.input_key == DIR_BACKWARD)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 2);
+			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			if (m_before_animation_index[i] != 2) {
+				m_ppOther[i]->SetAnimation(2);
+				m_before_animation_index[i] = 2;
+			}
 		}
 		if (packet->data.input_key == DIR_LEFT)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 3);
+			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			if (m_before_animation_index[i] != 3) {
+				m_ppOther[i]->SetAnimation(3);
+				m_before_animation_index[i] = 3;
+			}
 		}
 		if (packet->data.input_key == DIR_RIGHT)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 4);
+			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			if (m_before_animation_index[i] != 4) {
+				m_ppOther[i]->SetAnimation(4);
+				m_before_animation_index[i] = 4;
+			}
 		}
 		if (packet->data.input_key == DIR_UP)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 5);
+			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			if (m_before_animation_index[i] != 5) {
+				m_ppOther[i]->SetAnimation(5);
+				m_before_animation_index[i] = 5;
+			}
 		}
 
 		if (packet->data.input_key == DIR_EMPTY)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 0);
+			//m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
+			if (m_before_animation_index[i] != 0) {
+				m_ppOther[i]->SetAnimation(0);
+				m_before_animation_index[i] = 0;
+			}
 		}
 
 		if (packet->data.is_jump == true)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 6);
+			if (m_before_animation_index[i] != 6) {
+				m_ppOther[i]->SetAnimation(6);
+				m_before_animation_index[i] = 6;
+			}
 		}
 
 		if (packet->data.is_victim == true)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 8);
+			if (m_before_animation_index[i] != 8) {
+				m_ppOther[i]->SetAnimation(8);
+				m_before_animation_index[i] = 8;
+			}
 		}
 
 		if (packet->data.is_attack == true)
 		{
-			m_ppOther[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-			m_ppOther[i]->SetTrackAnimationSet(0, 7);
+			if (m_before_animation_index[i] != 7) {
+				m_ppOther[i]->SetAnimation(7);
+				m_before_animation_index[i] = 7;
+			}
 		}
 	}
 }
@@ -316,12 +381,10 @@ void Network::Process_ElectrinicSystem_Init(char* ptr)
 
 	for (int i = 0; i < 5; ++i)
 	{
-		std::cout << "EletronicSystem Correct : ";
 		m_pPowers[i]->SetIndex(i);
 		m_pPowers[i]->SetActivate(false);
 		for (int idx = 0; idx < 10; ++idx)
 		{
-			std::cout << static_cast<int>(packet->data[i].value[idx]) << " ";
 			m_pPowers[i]->SetAnswer(idx, packet->data[i].value[idx]);
 			m_pPowers[i]->SetSwitchValue(idx, false);
 		}
@@ -353,25 +416,12 @@ void Network::Process_Pick_Item_Init(char* ptr)
 
 	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
 	{
-		//std::cout << "Item [" << packet->data[i].item_box_index << "] Type : ";
-		//if (packet->data[i].item_type == GAME_ITEM::ITEM_LIFECHIP)
-		//	std::cout << "ITEM_LIFECHIP" << std::endl;
-		//if (packet->data[i].item_type == GAME_ITEM::ITEM_DRILL)
-		//	std::cout << "ITEM_DRILL" << std::endl;
-		//if (packet->data[i].item_type == GAME_ITEM::ITEM_HAMMER)
-		//	std::cout << "ITEM_HAMMER" << std::endl;
-		//if (packet->data[i].item_type == GAME_ITEM::ITEM_NONE)
-		//	std::cout << "ITEM_NONE" << std::endl;
-		//if (packet->data[i].item_type == GAME_ITEM::ITEM_PLIERS)
-		//	std::cout << "ITEM_PLIERS" << std::endl;
-		//if (packet->data[i].item_type == GAME_ITEM::ITEM_WRENCH)
-		//	std::cout << "ITEM_WRENCH" << std::endl;
-
 		for (int idx = 0; idx < MAX_INGAME_ITEM; ++idx)
 		{
-			if (m_pBoxes[i]->m_item_box_index != packet->data[idx].item_box_index)
-				continue;
-			m_pBoxes[i]->SetItem(packet->data[idx].item_type);
+			if (m_pBoxes[i]->m_item_box_index == packet->data[idx].item_box_index) {
+				m_pBoxes[i]->SetItem(packet->data[idx].item_type);
+				break;
+			}
 		}
 	}
 }
@@ -384,17 +434,89 @@ void Network::Process_Pick_Item_Box_Update(char* ptr)
 
 void Network::Process_Pick_Item_Update(char* ptr)
 {
+	sc_packet_pick_fix_item_update* packet = reinterpret_cast<sc_packet_pick_fix_item_update*>(ptr);
+	
+	if (packet->item_type == GAME_ITEM::ITEM_NONE)
+		return;
 
+	m_pBoxes[packet->box_index]->m_item = GAME_ITEM::ITEM_NONE;
+	
+	if (packet->own_id == m_pPlayer->GetID()) {
+		if (packet->item_type == GAME_ITEM::ITEM_LIFECHIP)
+			m_pPlayer->SetType(TYPE_PLAYER);
+		else
+			m_pPlayer->m_got_item = packet->item_type;
+	}
+
+	else {
+		if (packet->item_type != GAME_ITEM::ITEM_LIFECHIP)
+			return;
+
+		for (int i = 0; i < 5; ++i) {
+			if (packet->own_id == m_ppOther[i]->GetID())
+				m_ppOther[i]->SetType(TYPE_PLAYER);
+		}
+	}
 }
 
 void Network::Process_Active_Altar(char* ptr)
 {
 	sc_packet_activate_altar* packet = reinterpret_cast<sc_packet_activate_altar*>(ptr);
 	// 여기서 술래 재단을 활성화 해야함.
+	m_Taggers_Box;
+	std::cout << "술래가 재단을 활성화 하였습니다" << std::endl;
 }
 
 void Network::Process_Altar_LifeChip_Update(char* ptr)
 {
 	sc_packet_altar_lifechip_update* packet = reinterpret_cast<sc_packet_altar_lifechip_update*>(ptr);
 	packet->lifechip_count; // 이게 현재 수집된 생명칩 갯수임
+	std::cout << "현재 재단에 모인 생명칩 갯수 : " << packet->lifechip_count << std::endl;
+}
+
+void Network::Process_Activate_Tagger_Skill(char* ptr)
+{
+	sc_packet_tagger_skill* packet = reinterpret_cast<sc_packet_tagger_skill*>(ptr);
+
+	std::cout << "first skill : " << packet->first_skill << std::endl;
+	std::cout << "second_skill : " << packet->second_skill << std::endl;
+	std::cout << "third_skill : " << packet->third_skill << std::endl;
+	if (packet->first_skill)
+		m_pPlayer->SetTaggerSkill(0);
+	if (packet->second_skill)
+		m_pPlayer->SetTaggerSkill(1);
+	if (packet->third_skill)
+		m_pPlayer->SetTaggerSkill(2);
+}
+
+void Network::Process_Use_First_Tagger_Skill(char* ptr)
+{
+	sc_packet_use_first_tagger_skill* packet = reinterpret_cast<sc_packet_use_first_tagger_skill*>(ptr);
+	
+	for (int i = 0; i < 5; ++i) {
+		if (packet[i].electronic_system_close[i])
+			m_pPowers[i]->SetOpen(false);
+		else
+			m_pPowers[i]->SetOpen(true);
+	}
+}
+
+void Network::Process_Use_Second_Tagger_Skill(char* ptr)
+{
+	sc_packet_use_second_tagger_skill* packet = reinterpret_cast<sc_packet_use_second_tagger_skill*>(ptr);
+
+	if (packet->is_start) {
+		for (int i = 0; i < 6; ++i)
+			m_pDoors[i];
+	}
+	else {
+		for (int i = 0; i < 6; ++i)
+			m_pDoors[i];
+	}
+}
+
+void Network::Process_Use_Third_Tagger_Skill(char* ptr)
+{
+	sc_packet_use_third_tagger_skill* packet = reinterpret_cast<sc_packet_use_third_tagger_skill*>(ptr);
+	reinterpret_cast<Vent*>(m_Vents[packet->unactivate_vent])->SetBlock();
 }
