@@ -872,7 +872,7 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 	{
 		if (packet->index == room.m_fix_item[i].Get_Item_box_index())
 		{
-			item_index = room.m_fix_item[i].Get_Item_box_index();
+			item_index = i;
 			break;
 		}
 	}
@@ -891,8 +891,7 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_LIFECHIP) // 5
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, true);
 
-#if PRINT
-	std::cout << "Item_box_index [" << item_index << "] : ";
+	std::cout << "Item_box_index [" << room.m_fix_item[item_index].Get_Item_box_index() << "] : ";
 	if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_DRILL) // 1
 		cout << "ITEM_DRILL" << endl;
 	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_HAMMER) // 0
@@ -903,7 +902,6 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 		cout << "ITEM_WRENCH" << endl;
 	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_LIFECHIP) // 5
 		cout << "ITEM_LIFECHIP" << endl;
-#endif
 
 	sc_packet_pick_fix_item_update item_packet;
 	item_packet.size = sizeof(item_packet);

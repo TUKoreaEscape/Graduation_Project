@@ -447,6 +447,16 @@ void Network::Process_Pick_Item_Update(char* ptr)
 		else
 			m_pPlayer->m_got_item = packet->item_type;
 	}
+
+	else {
+		if (packet->item_type != GAME_ITEM::ITEM_LIFECHIP)
+			return;
+
+		for (int i = 0; i < 5; ++i) {
+			if (packet->own_id == m_ppOther[i]->GetID())
+				m_ppOther[i]->SetType(TYPE_PLAYER);
+		}
+	}
 }
 
 void Network::Process_Active_Altar(char* ptr)
