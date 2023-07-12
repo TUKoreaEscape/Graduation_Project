@@ -836,15 +836,13 @@ void Framework::TextRender()
 		}
 		else
 		{
-			D2D1_RECT_F rcLowerText = D2D1::RectF(m_nWndClientWidth/2-250, m_nWndClientHeight/2-300, m_nWndClientWidth/2+500, m_nWndClientHeight+200);
-			m_pd2dDeviceContext->DrawTextW(L"곧 게임이 시작됩니다.", (UINT32)wcslen(L"곧 게임이 시작됩니다."), m_pdReadytoStartFont, &rcLowerText, m_pd2dblackText);
-		}
-		D2D1_RECT_F rcLowerText = D2D1::RectF(m_nWndClientWidth/2-250, m_nWndClientHeight/2-300, m_nWndClientWidth/2+500, m_nWndClientHeight+200);
-		m_pd2dDeviceContext->DrawTextW(L"곧 술래가 정해집니다.", (UINT32)wcslen(L"곧 술래가 정해집니다."), m_pdReadytoStartFont, &rcLowerText, m_pd2dblackText);
+			D2D1_RECT_F rcLowerText = D2D1::RectF(m_nWndClientWidth / 2 - 250, m_nWndClientHeight / 2 - 300, m_nWndClientWidth / 2 + 500, m_nWndClientHeight + 200);
+			m_pd2dDeviceContext->DrawTextW(L"곧 술래가 정해집니다.", (UINT32)wcslen(L"곧 술래가 정해집니다."), m_pdReadytoStartFont, &rcLowerText, m_pd2dblackText);
 
-		std::wstring num = std::to_wstring(m_gamestate->GetTaggerTime());
-		rcLowerText = D2D1::RectF(m_nWndClientWidth/2-25, m_nWndClientHeight/2-250, m_nWndClientWidth/2+500, m_nWndClientHeight+250);
-		m_pd2dDeviceContext->DrawTextW(num.c_str(), (UINT32)wcslen(num.c_str()), m_pdReadytoStartFont, &rcLowerText, m_pd2dlightsalmonText);
+			std::wstring num = std::to_wstring(m_gamestate->GetTaggerTime());
+			rcLowerText = D2D1::RectF(m_nWndClientWidth / 2 - 25, m_nWndClientHeight / 2 - 250, m_nWndClientWidth / 2 + 500, m_nWndClientHeight + 250);
+			m_pd2dDeviceContext->DrawTextW(num.c_str(), (UINT32)wcslen(num.c_str()), m_pdReadytoStartFont, &rcLowerText, m_pd2dlightsalmonText);
+		}
 
 		m_pd2dDeviceContext->EndDraw();
 
