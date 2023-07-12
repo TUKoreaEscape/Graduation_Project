@@ -164,7 +164,7 @@ void Framework::CreateRtvAndDsvDescriptorHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC d3dDescriptorHeapDesc;
 	::ZeroMemory(&d3dDescriptorHeapDesc, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
-	d3dDescriptorHeapDesc.NumDescriptors = m_nSwapChainBuffers + 6;
+	d3dDescriptorHeapDesc.NumDescriptors = m_nSwapChainBuffers + 5;
 	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	d3dDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	d3dDescriptorHeapDesc.NodeMask = 0;
@@ -408,8 +408,8 @@ void Framework::BuildObjects()
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	d3dRtvCPUDescriptorHandle.ptr += (::gnRtvDescriptorIncrementSize * m_nSwapChainBuffers);
 
-	DXGI_FORMAT pdxgiResourceFormats[6] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
-	m_pEdgeShader->CreateResourcesAndViews(m_pd3dDevice, 6, pdxgiResourceFormats, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, d3dRtvCPUDescriptorHandle, 6 + 1); //SRV to (Render Targets) + (Depth Buffer)
+	DXGI_FORMAT pdxgiResourceFormats[5] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32_FLOAT };
+	m_pEdgeShader->CreateResourcesAndViews(m_pd3dDevice, 5, pdxgiResourceFormats, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, d3dRtvCPUDescriptorHandle, 5 + 1); //SRV to (Render Targets) + (Depth Buffer)
 
 	DXGI_FORMAT pdxgiDepthSrvFormats[1] = { DXGI_FORMAT_R32_FLOAT };
 	m_pEdgeShader->CreateShaderResourceViews(m_pd3dDevice, 1, &m_pd3dDepthStencilBuffer, pdxgiDepthSrvFormats);
@@ -839,6 +839,12 @@ void Framework::TextRender()
 			D2D1_RECT_F rcLowerText = D2D1::RectF(m_nWndClientWidth/2-250, m_nWndClientHeight/2-300, m_nWndClientWidth/2+500, m_nWndClientHeight+200);
 			m_pd2dDeviceContext->DrawTextW(L"곧 게임이 시작됩니다.", (UINT32)wcslen(L"곧 게임이 시작됩니다."), m_pdReadytoStartFont, &rcLowerText, m_pd2dblackText);
 		}
+		D2D1_RECT_F rcLowerText = D2D1::RectF(m_nWndClientWidth/2-250, m_nWndClientHeight/2-300, m_nWndClientWidth/2+500, m_nWndClientHeight+200);
+		m_pd2dDeviceContext->DrawTextW(L"곧 술래가 정해집니다.", (UINT32)wcslen(L"곧 술래가 정해집니다."), m_pdReadytoStartFont, &rcLowerText, m_pd2dblackText);
+
+		std::wstring num = std::to_wstring(m_gamestate->GetTaggerTime());
+		rcLowerText = D2D1::RectF(m_nWndClientWidth/2-25, m_nWndClientHeight/2-250, m_nWndClientWidth/2+500, m_nWndClientHeight+250);
+		m_pd2dDeviceContext->DrawTextW(num.c_str(), (UINT32)wcslen(num.c_str()), m_pdReadytoStartFont, &rcLowerText, m_pd2dlightsalmonText);
 
 		m_pd2dDeviceContext->EndDraw();
 
