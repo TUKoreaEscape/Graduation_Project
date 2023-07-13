@@ -43,6 +43,10 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 		switch (wParam)
 		{
+		case 'm':
+		case 'M':
+			m_gamestate ->ChangeMicState();
+			break;
 		case VK_F1:
 			GetCursorPos(&ptMouse);
 			if (ptMouse.x != ptCenter.x || ptMouse.y != ptCenter.y) {

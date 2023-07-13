@@ -3,6 +3,7 @@
 #include "Input.h"
 #include "Network.h"
 #include "Object.h"
+#include "Game_state.h"
 
 void CommonMovement::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {

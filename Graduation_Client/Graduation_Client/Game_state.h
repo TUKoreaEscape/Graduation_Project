@@ -20,6 +20,7 @@ private:
 	std::chrono::steady_clock::time_point taggerTime;
 	long long taggerprevTime = 0;
 	short taggercountdown = 60;
+	bool mic_state = false; // 마이크 온
 
 	long long prevTime = 0;
 	bool initLight = false;
@@ -50,4 +51,6 @@ public:
 	bool GetInitLight() { return initLight; };
 	void SetInitLight() { initLight = !initLight; };
 	int GetTaggerTime();
+	void ChangeMicState() { mic_state = !mic_state; };
+	bool GetMicState() { return mic_state; };
 };
