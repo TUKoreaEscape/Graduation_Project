@@ -85,12 +85,18 @@ void Network::Process_Game_End(char* ptr)
 	GameState& game_state = *GameState::GetInstance();
 	game_state.ChangeNextState();
 
-	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
+	for (int i = 0; i < MAX_INGAME_ITEM; ++i) {
 		m_pBoxes[i]->SetOpen(false);
-	for (int i = 0; i < 6; ++i)
+		m_pBoxes[i]->SetUnBlock();
+	}
+	for (int i = 0; i < 6; ++i) {
 		m_pDoors[i]->SetOpen(false);
-	for (int i = 0; i < 5; ++i)
+		m_pDoors[i]->SetUnBlock();
+	}
+	for (int i = 0; i < 5; ++i) {
 		m_pPowers[i]->SetOpen(false);
+		m_pPowers[i]->SetUnBlock();
+	}
 	for (int i = 0; i < 8; ++i) {
 		m_Vents[i]->SetOpen(false);
 		reinterpret_cast<Vent*>(m_Vents[i])->SetUnBlock();
@@ -494,7 +500,7 @@ void Network::Process_Use_First_Tagger_Skill(char* ptr)
 	sc_packet_use_first_tagger_skill* packet = reinterpret_cast<sc_packet_use_first_tagger_skill*>(ptr);
 	
 	for (int i = 0; i < 5; ++i) {
-		if (packet[i].electronic_system_close[i])
+		if (packet->electronic_system_close[i])
 			m_pPowers[i]->SetOpen(false);
 		else
 			m_pPowers[i]->SetOpen(true);
@@ -507,11 +513,11 @@ void Network::Process_Use_Second_Tagger_Skill(char* ptr)
 
 	if (packet->is_start) {
 		for (int i = 0; i < 6; ++i)
-			m_pDoors[i];
+			m_pDoors[i]->SetBlock();
 	}
 	else {
 		for (int i = 0; i < 6; ++i)
-			m_pDoors[i];
+			m_pDoors[i]->SetUnBlock();
 	}
 }
 

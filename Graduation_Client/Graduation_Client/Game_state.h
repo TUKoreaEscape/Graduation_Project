@@ -16,7 +16,14 @@ class GameState {
 
 private:
 	static GameState* GameStateInstance;
-	GAME_STATE m_GameState; 
+	GAME_STATE m_GameState;
+	std::chrono::steady_clock::time_point startTime;
+	std::chrono::steady_clock::time_point taggerTime;
+	long long taggerprevTime = 0;
+	short taggercountdown = 60;
+
+	long long prevTime = 0;
+	bool initLight = false;
 	float				m_totalLoading = 2.0f;
 	float				m_Loading = 0.0f;
 	int					m_LoadingCount = 0;
@@ -40,4 +47,8 @@ public:
 	void SetLoading(float time) { m_totalLoading = time, m_Loading = 0.0f, m_LoadingCount = 0; };
 	int LoadingCount() { return m_LoadingCount; };
 	GAME_STATE GetGameState() { return m_GameState; };
+	bool GetTick();
+	bool GetInitLight() { return initLight; };
+	void SetInitLight() { initLight = !initLight; };
+	int GetTaggerTime();
 };

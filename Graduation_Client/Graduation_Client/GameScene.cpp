@@ -47,7 +47,7 @@ void GameScene::prerender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
 	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
-
+	if(GameState::GetInstance()->GetTick())m_pLight->GetComponent<Light>()->Updaterotate();
 	XMFLOAT3 cameraPos = m_pPlayer->m_pCamera->GetPosition();
 	CheckCameraPos(cameraPos);
 }

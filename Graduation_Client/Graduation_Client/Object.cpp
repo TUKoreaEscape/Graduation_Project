@@ -383,6 +383,10 @@ void Door::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Door::update(float fElapsedTime)
 {
+	if (m_bIsBlocked) {
+		m_fCooltime = 0;
+		return;
+	}
 	if (IsInteraction) {
 		if (IsNear) {
 			if (!IsWorking)
@@ -460,16 +464,24 @@ void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	//int playerType = Input::GetInstance()->m_pPlayer->GetType();
 	if (IsWorking) return;
 	if (IsNear) {
-		if (true == IsOpen) {
-			if (m_ppInteractionUIs[1]) {
-				m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
-				m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
+		if (true == m_bIsBlocked) {
+			if (m_ppInteractionUIs[2]) {
+				m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
+				m_ppInteractionUIs[2]->BillboardRender(pd3dCommandList, m_dir, 1.0f, m_nUIType);
 			}
 		}
 		else {
-			if (m_ppInteractionUIs[0]) {
-				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
-				m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
+			if (true == IsOpen) {
+				if (m_ppInteractionUIs[1]) {
+					m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
+					m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
+				}
+			}
+			else {
+				if (m_ppInteractionUIs[0]) {
+					m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43 + 0.5f);
+					m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
+				}
 			}
 		}
 	}

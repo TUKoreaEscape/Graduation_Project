@@ -61,7 +61,7 @@ void Room::Start_Game()
 	server.m_timer_queue.push(ev);
 
 	ev.event_type = EventType::SELECT_TAGGER;
-	ev.event_time = start_time + 10s;
+	ev.event_time = start_time + 59s;
 	server.m_timer_queue.push(ev);
 
 	Set_Electronic_System_ONOFF();

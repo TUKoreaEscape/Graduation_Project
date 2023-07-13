@@ -363,7 +363,7 @@ void Room::Tagger_Use_First_Skill()
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_USE_FIRST_TAGGER_SKILL;
 	for (int i = 0; i < m_electrinic_system.size(); ++i) {
-		if (m_electrinic_system[i].get_state() == ES_OPEN)
+		if (m_electrinic_system[i].Get_Fixed_ElectronicSystem() == true)
 			packet.electronic_system_close[i] = false;
 		else
 			packet.electronic_system_close[i] = true;
