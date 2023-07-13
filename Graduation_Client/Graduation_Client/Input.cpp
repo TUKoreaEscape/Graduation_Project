@@ -46,6 +46,11 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 		case 'm':
 		case 'M':
 			m_gamestate ->ChangeMicState();
+			std::cout << "mÅ° ´©¸§" << std::endl;
+			if (m_gamestate->GetMicState())
+				Network::GetInstance()->on_voice_talk();
+			else
+				Network::GetInstance()->off_voice_talk();
 			break;
 		case VK_F1:
 			GetCursorPos(&ptMouse);

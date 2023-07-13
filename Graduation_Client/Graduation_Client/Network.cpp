@@ -264,6 +264,7 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_JOIN_ROOM_SUCCESS:
 	{
+		set_join_room_state(true);
 		join_voice_talk();
 		GameState& game_state = *GameState::GetInstance();
 		game_state.ChangeNextState();
@@ -594,12 +595,14 @@ void Network::on_voice_talk()
 {
 	m_is_use_voice_talk = true;
 	join_voice_talk();
+	std::cout << "voice on" << std::endl;
 }
 
 void Network::off_voice_talk()
 {
 	exit_voice_talk();
 	m_is_use_voice_talk = false;
+	std::cout << "voice off" << std::endl;
 }
 
 void Network::join_voice_talk()
