@@ -172,9 +172,11 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			reinterpret_cast<ItemBox*>(m_pBoxes[i])->UIrender(pd3dCommandList);
 		}
 		reinterpret_cast<TaggersBox*>(Taggers)->UIrender(pd3dCommandList);
-		for (int i = 0; i < m_nPlay-2; ++i)
+		for (int i = 0; i < m_nPlay; ++i)
 		{
-			if (i == 1) continue;
+			if (i >= 1 && i <= 3) continue;
+			if (i==4 && !GameState::GetInstance()->GetChatState()) continue;
+			m_UIPlay[i]->render(pd3dCommandList);
 		}
 		if (GameState::GetInstance()->GetMicState())
 		{
@@ -388,13 +390,14 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_UILoading = new GameObject * [m_nLoading];
 	m_UILoading[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Loading.dds", 0.0f, 0.0f, 2.0f, 2.0f);
 
-	m_nPlay = 4;
+	m_nPlay = 5;
 	m_UIPlay = new GameObject * [m_nPlay];
 	m_UIPlay[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.8f, -0.75f, 0.3f, 0.4f);
 	//m_UIPlay[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.0f, 0.75f, 0.6f, 0.4f); ½Ã°è
 	m_UIPlay[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/life2.dds", 0.8f, -0.75f, 0.3f, 0.4f);
 	m_UIPlay[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Mic-on.dds", 0.5f, -0.85f, 0.07f, 0.15f);//mic-on
 	m_UIPlay[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Mic-off.dds", 0.5f, -0.85f, 0.07f, 0.15f);//mic-off
+	m_UIPlay[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/ChatBox.dds", -0.1f, -0.7f, 0.6f, 0.6f);//chatBox
 
 
 	m_nPlayPlayer = 1 + 5;

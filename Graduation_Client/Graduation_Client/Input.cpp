@@ -43,6 +43,10 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 		switch (wParam)
 		{
+		case 'a':
+		case 'A':
+			Receive("HI", "nick");
+			break;
 		case 'm':
 		case 'M':
 			m_gamestate ->ChangeMicState();
@@ -104,6 +108,10 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 				network.send_packet(&m_cs_packet_login);
 			}
 #endif
+			if (m_gamestate->GetGameState() == PLAYING_GAME)
+			{
+				m_gamestate->ChangeChatState();
+			}
 			break;
 		}
 
@@ -130,6 +138,18 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			{
 				if (m_inputState == 1) InputIdAndPassword(wParam, m_cs_packet_login.id, m_idNum);//id입력
 				else if (m_inputState == 2) InputIdAndPassword(wParam, m_cs_packet_login.pass_word, m_passwordNum); //password입력
+			}
+		}
+		else if (m_gamestate->GetGameState() == PLAYING_GAME && m_gamestate->GetChatState())
+		{
+			if (wParam == VK_BACK) Deletechat(m_cs_packet_chat.message, m_chatNum);
+			else if (wParam == VK_ESCAPE) m_gamestate->ChangeChatState();
+			else  Inputchat(wParam, m_cs_packet_chat.message, m_chatNum);
+			if (wParam == VK_RETURN)
+			{
+				//메시지 보내기
+				memset(m_cs_packet_chat.message, 0, 20);
+				m_chatNum = 0;
 			}
 		}
 		break;
@@ -421,7 +441,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			}
 			//InputRoomInfo();
 		}
-		//std::cout << xPos << " " << yPos << std::endl;
+		std::cout << xPos << " " << yPos << std::endl;
 		break;
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:
@@ -498,6 +518,64 @@ void Input::InputIdAndPassword(char input_char, char* str, int& num)
 }
 
 void Input::DeleteIdAndPassword(char* str, int& num)
+{
+	if (num > 0)
+	{
+		str[num] = '\0';
+		num--;
+	}
+	else if (num == 0)
+	{
+		str[num] = '\0';
+	}
+	//std::cout << str << std::endl;
+}
+
+void Input::Receive(char* chat, char* name)
+{
+	for (int i = 4; i > 0; --i)
+	{
+		strcpy(m_chatlist[i], m_chatlist[i - 1]);
+	}
+	strcpy(m_chatlist[0], chat);
+
+	char n[24];
+	strcpy(n, name);
+	strcat(n, " : ");
+	strcat(n, m_chatlist[0]);
+	strcpy(m_chatlist[0], n);
+}
+
+void Input::Inputchat(char input_char, char* str, int& num)
+{
+	if (isalpha(char(input_char)))
+	{
+		if (GetKeyState(VK_SHIFT) < 0) // Shift 키가 눌린 상태인지 확인
+		{
+			if (num < MAX_NAME_SIZE - 1)
+			{
+				str[num] = char(input_char);
+				num++;
+			}
+		}
+		else
+		{
+			if (num < MAX_NAME_SIZE - 1)
+			{
+				str[num] = char(tolower(input_char));
+				num++;
+			}
+		}
+	}
+	else
+	{
+		str[num] = char(input_char);
+		num++;
+	}
+	//std::cout << str << std::endl;
+}
+
+void Input::Deletechat(char* str, int& num)
 {
 	if (num > 0)
 	{

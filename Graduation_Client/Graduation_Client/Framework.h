@@ -67,6 +67,7 @@ private:
 	IDWriteTextFormat* m_pdRoomTitleFont = NULL;
 	IDWriteTextFormat* m_pdRoomOtherFont = NULL;
 	IDWriteTextFormat* m_pdReadytoStartFont = NULL;
+	IDWriteTextFormat* m_pdChatFont = NULL;
 	IDWriteTextLayout* m_pdwTextLayout = NULL;
 	IDWriteTextLayout* m_pdRoomTitleFLayout = NULL;
 	IDWriteTextLayout* m_pdRoomOtherLayout = NULL;

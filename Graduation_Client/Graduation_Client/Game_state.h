@@ -21,6 +21,7 @@ private:
 	long long taggerprevTime = 0;
 	short taggercountdown = 60;
 	bool mic_state = false; // 마이크 온
+	bool chat_state = false; // 채팅
 
 	long long prevTime = 0;
 	bool initLight = false;
@@ -53,4 +54,6 @@ public:
 	int GetTaggerTime();
 	void ChangeMicState() { mic_state = !mic_state; };
 	bool GetMicState() { return mic_state; };
+	void ChangeChatState() { chat_state = !chat_state; };
+	bool GetChatState() { return chat_state; };
 };

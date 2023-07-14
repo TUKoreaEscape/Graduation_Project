@@ -58,7 +58,8 @@ using Microsoft::WRL::ComPtr;
 #include <WinSock2.h>
 #include <typeinfo>
 #include <chrono>
-
+#include <cstdlib>
+#include <cstring>
 #include <unordered_map>
 #include <set>
 

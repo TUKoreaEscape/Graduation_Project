@@ -284,6 +284,7 @@ void Framework::CreateDirect2DDevice()
 	hResult = m_pdWriteFactory->CreateTextFormat(L"굴림체", NULL, DWRITE_FONT_WEIGHT_EXTRA_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 20.0f, L"en-US", &m_pdRoomTitleFont);
 	hResult = m_pdWriteFactory->CreateTextFormat(L"굴림체", NULL, DWRITE_FONT_WEIGHT_EXTRA_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 50.0f, L"en-US", &m_pdReadytoStartFont);
 	hResult = m_pdWriteFactory->CreateTextFormat(L"굴림체", NULL, DWRITE_FONT_WEIGHT_LIGHT, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 15.0f, L"en-US", &m_pdRoomOtherFont);
+	hResult = m_pdWriteFactory->CreateTextFormat(L"굴림체", NULL, DWRITE_FONT_WEIGHT_LIGHT, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 20.0f, L"ko-KR", &m_pdChatFont);
 	hResult = m_pdLoginFont->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 	hResult = m_pdLoginFont->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
@@ -847,6 +848,62 @@ void Framework::TextRender()
 		m_pd2dDeviceContext->EndDraw();
 
 		m_gamestate->UpdateLoading(time.GetTimeElapsed());
+
+		m_pd3d11On12Device->ReleaseWrappedResources(ppd3dResources, _countof(ppd3dResources));
+
+		m_pd3d11DeviceContext->Flush();
+	}
+	else if (m_gamestate->GetGameState() == PLAYING_GAME)
+	{
+		m_pd2dDeviceContext->SetTarget(m_ppd2dRenderTargets[m_nSwapChainBufferIndex]);
+		ID3D11Resource* ppd3dResources[] = { m_ppd3d11WrappedBackBuffers[m_nSwapChainBufferIndex] };
+		m_pd3d11On12Device->AcquireWrappedResources(ppd3dResources, _countof(ppd3dResources));
+
+		m_pd2dDeviceContext->BeginDraw();
+
+		m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
+
+		D2D1_SIZE_F szRenderTarget = m_ppd2dRenderTargets[m_nSwapChainBufferIndex]->GetSize();
+
+		if(m_gamestate->GetChatState())
+		{
+			//내가 지금 입력하고있는 문자열 출력해야함
+			int size = strlen(input->m_cs_packet_chat.message);
+			if (size > 0)
+			{
+				wchar_t* array = new wchar_t[size + 1];
+				//for (int j = 0; j < size; j++) {
+				//	array[j] = static_cast<wchar_t>(input->m_cs_packet_chat.message[j]);
+				//}
+				setlocale(LC_CTYPE, "ko-KR");
+				mbstowcs(array, input->m_cs_packet_chat.message, size);
+				array[size] = '\0';
+				D2D1_RECT_F rcLowerText = D2D1::RectF(chatBoxRect.left, chatBoxRect.top, chatBoxRect.right, chatBoxRect.bottom);
+				m_pd2dDeviceContext->DrawTextW(array, (UINT32)wcslen(array), m_pdChatFont, &rcLowerText, m_pd2dpurpleText);
+				delete[] array;
+				//setlocale(LC_CTYPE, "en-US");
+			}
+			for (int i = 0; i < 5; ++i)
+			{
+				int size = strlen(input->m_chatlist[i]);
+				if (size > 0)
+				{
+					wchar_t* array = new wchar_t[size + 1];
+					//for (int j = 0; j < size; j++) {
+					//	array[j] = static_cast<wchar_t>(input->m_chatlist[i][j]);
+					//}
+					setlocale(LC_CTYPE, "ko-KR");
+					mbstowcs(array, input->m_chatlist[i], size);
+					array[size] = '\0';
+					D2D1_RECT_F rcLowerText = D2D1::RectF(chatBoxRect.left, chatBoxRect.top - i * 40 - 55, chatBoxRect.right, chatBoxRect.bottom - i * 40 - 55);
+					m_pd2dDeviceContext->DrawTextW(array, (UINT32)wcslen(array), m_pdChatFont, &rcLowerText, m_pd2dpurpleText);
+					delete[] array;
+					//setlocale(LC_CTYPE, "en-US");
+				}
+			}
+		}
+
+		m_pd2dDeviceContext->EndDraw();
 
 		m_pd3d11On12Device->ReleaseWrappedResources(ppd3dResources, _countof(ppd3dResources));
 
