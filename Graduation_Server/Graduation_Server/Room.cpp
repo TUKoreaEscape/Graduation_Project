@@ -317,7 +317,8 @@ void Room::Activate_Altar()
 
 bool Room::Is_Tagger_Winner()
 {
-	if (m_altar->Get_Life_Chip() == GAME_END_COLLECT_CHIP)
+	//if (m_altar->Get_Life_Chip() == GAME_END_COLLECT_CHIP)
+	if (m_altar->Get_Life_Chip() == 2)
 		return true;
 	return false;
 }

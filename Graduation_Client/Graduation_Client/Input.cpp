@@ -45,7 +45,6 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 		{
 		case 'a':
 		case 'A':
-			Receive("HI", "nick");
 			break;
 		case 'm':
 		case 'M':
@@ -148,6 +147,14 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			if (wParam == VK_RETURN)
 			{
 				//메시지 보내기
+#if USE_NETWORK
+				Network& network = *Network::GetInstance();
+				m_cs_packet_chat.size = sizeof(m_cs_packet_chat);
+				m_cs_packet_chat.type = CS_PACKET::CS_PACKET_CHAT;
+				m_cs_packet_chat.room_number = network.m_join_room_number;
+				network.send_packet(&m_cs_packet_chat);
+				std::cout << "send : " << m_cs_packet_chat.message << std::endl;
+#endif
 				memset(m_cs_packet_chat.message, 0, 20);
 				m_chatNum = 0;
 			}

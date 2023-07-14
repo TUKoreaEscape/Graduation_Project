@@ -144,11 +144,10 @@ void cGameServer::Process_Chat(const int user_id, void* buff)
 
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
-
-	for (int i = 0; i < 6; ++i)
-	{
-		if (room.Get_Join_Member(i) != -1 && room.Get_Join_Member(i) != user_id)
-			send_chat_packet(room.Get_Join_Member(i), user_id, mess);
+	for (auto& player_id : room.in_player) {
+		if (player_id == -1)
+			continue;
+		send_chat_packet(player_id, user_id, mess);
 	}
 }
 
@@ -960,6 +959,7 @@ void cGameServer::Process_Altar_LifeChip_Update(const int user_id)
 	if (room.Is_Tagger_Winner())
 	{
 		// 여기는 Tagger가 승리한 조건을 달성한 경우 활성화
+		room.End_Game(true);
 	}
 }
 

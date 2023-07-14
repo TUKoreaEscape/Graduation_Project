@@ -61,7 +61,7 @@ void Room::Start_Game()
 	server.m_timer_queue.push(ev);
 
 	ev.event_type = EventType::SELECT_TAGGER;
-	ev.event_time = start_time + 59s;
+	ev.event_time = start_time + 5s;
 	server.m_timer_queue.push(ev);
 
 	Set_Electronic_System_ONOFF();
@@ -86,6 +86,8 @@ void Room::Start_Game()
 
 void Room::End_Game(bool is_tagger_win)
 {
+	cGameServer& server = *cGameServer::GetInstance();
+
 	_room_state_lock.lock();
 	_room_state = GAME_ROOM_STATE::READY;
 	_room_state_lock.unlock();
@@ -95,6 +97,51 @@ void Room::End_Game(bool is_tagger_win)
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_GAME_END;
 	packet.is_tagger_win = is_tagger_win;
+
+	int tmp_id = -1;
+	for (auto& player_id : in_player) {
+		if (player_id == -1)
+			continue;
+		server.m_clients[player_id].do_send(sizeof(packet), &packet);
+		if (tmp_id == -1)
+			tmp_id = player_id;
+	}
+
+	int room_number = server.m_clients[tmp_id].get_join_room_number();
+
+	sc_packet_update_room update_room_packet;
+	update_room_packet.size = sizeof(update_room_packet);
+	update_room_packet.type = SC_PACKET::SC_PACKET_ROOM_INFO_UPDATE;
+	update_room_packet.join_member = Get_Number_of_users();
+	update_room_packet.room_number = room_number;
+	update_room_packet.state = _room_state;
+
+	for (auto& cl : server.m_clients)
+	{
+		if (cl.get_state() != CLIENT_STATE::ST_LOBBY)
+			continue;
+
+		if (cl.get_look_lobby_page() != static_cast<int>(room_number) / 6)
+			continue;
+
+		cl.do_send(sizeof(update_room_packet), &update_room_packet);
+	}
+
+	init_room_by_game_end();
+
+	for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
+	{
+		if (in_player[i] != -1)
+			server.send_put_player_data(in_player[i]);
+		for (int idx = 0; idx < JOIN_ROOM_MAX_USER; ++idx)
+		{
+			if (in_player[idx] == -1)
+				continue;
+			if (in_player[i] == in_player[idx])
+				continue;
+			server.send_put_other_player(in_player[i], in_player[idx]);
+		}
+	}
 
 }
 

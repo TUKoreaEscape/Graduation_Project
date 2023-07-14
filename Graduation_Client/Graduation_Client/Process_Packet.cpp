@@ -1,6 +1,7 @@
 #include "Network.h"
 #include "Object.h"
 #include "GameObject.h"
+#include "Input.h"
 
 void Network::Process_Player_Exit(char* ptr)
 {
@@ -73,6 +74,7 @@ void Network::Process_Chat(char* ptr)
 	
 	// 여기서 동규가 넘겨주는 채팅 관련 함수에 넣어주면 됨
 	std::cout << "[" << packet->name << "] : " << packet->message << std::endl;
+	Input::GetInstance()->Receive(packet->message, packet->name);
 }
 
 void Network::Process_Game_Start(char* ptr)

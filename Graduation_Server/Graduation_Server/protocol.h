@@ -3,7 +3,7 @@
 // 클라이언트와 서버간 통신에 사용할 구조체를 정의합니다.
 const short SERVER_PORT = 5000;
 const int	BUFSIZE = 1024;
-const int	MAX_CHAT_SIZE = 100;
+const int	MAX_CHAT_SIZE = 40;
 
 const int  MAX_NAME_SIZE = 20;
 const int  MAX_ROOM = 5000;
