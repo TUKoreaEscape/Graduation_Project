@@ -36,7 +36,7 @@ private:
 
 private:
 	SOCKET				m_socket;
-	const char*			SERVER_ADDR = "220.120.240.202";
+	const char*			SERVER_ADDR = "127.0.0.1";
 	Server_Timer		m_server_counter;
 	Custom				data;
 
@@ -110,6 +110,7 @@ public:
 	void Process_Player_Exit(char* ptr);
 	void Process_Ready(char* ptr);
 	void Process_Init_Position(char* ptr);
+	void Process_Chat(char* ptr);
 	void Process_Game_Start(char* ptr);
 	void Process_Game_End(char* ptr);
 	void Process_Door_Update(char* ptr);

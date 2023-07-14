@@ -517,6 +517,9 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	recv_thread = std::thread{ &Network::listen_thread, m_network };
 #endif
+#if USE_CHAT_TEST
+	send_thread = std::thread{ &Network::Debug_send_thread, m_network };
+#endif
 }
 
 void GameScene::ReleaseObjects()

@@ -394,7 +394,7 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 void cGameServer::Process_Game_Start(const int room_number)
 {
 	Room& room = *m_room_manager->Get_Room_Info(room_number);
-
+	 
 	for (auto player_index : room.in_player) {
 		send_game_start_packet(player_index);
 		m_clients[player_index]._state_lock.lock();

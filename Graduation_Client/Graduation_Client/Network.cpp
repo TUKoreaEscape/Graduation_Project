@@ -20,121 +20,14 @@ void Network::Debug_send_thread()
 {
 	while (m_shutdown == false)
 	{
-		int code;
-		std::cout << "1. Head 변경 \n";
-		std::cout << "2. Head Part 변경 (쓰지마셈)\n";
-		std::cout << "3. Body 변경 \n";
-		std::cout << "4. Body Part 변경 \n";
-		std::cout << "5. Eye 변경 \n";
-		std::cout << "6. Glove 변경 \n";
-		std::cout << "7. Mouse and Nose 변경 \n";
-		std::cout << "8. 무조건 한번 눌러요\n";
-		std::cout << "9. 프로그램 전체 종료 \n";
-		std::cout << "10. 서버 종료 요청 \n";
-		std::cout << "명령어 입력 : ";
-		std::cin >> code;
+		cs_packet_chat packet;
+		packet.size = sizeof(packet);
+		packet.type = CS_PACKET::CS_PACKET_CHAT;
+		std::cout << "입력 : ";
+		std::cin >> packet.message;
+		packet.room_number = m_join_room_number;
 
-		int select;
-		switch (code)
-		{
-		case 1:
-		{
-			system("cls");
-			std::cout << "Head Select (0 ~ 20) : ";
-			std::cin >> select;
-
-			GameObject::SetParts(0, 5, select);
-			data.head = static_cast<HEADS>(select);
-			Send_Customizing_Data();
-			system("cls");
-			break;
-		}
-
-		case 3:
-			system("cls");
-			std::cout << "Body Select (0 ~ 5) : ";
-			std::cin >> select;
-			GameObject::SetParts(0, 0, select);
-			data.body = static_cast<BODIES>(select);
-			Send_Customizing_Data();
-			system("cls");
-			break;
-
-		case 4:
-			system("cls");
-			std::cout << "Body Parts Select (0 ~ 5) : ";
-			std::cin >> select;
-			GameObject::SetParts(0, 1, select);
-			data.body_parts = static_cast<BODYPARTS>(select);
-			Send_Customizing_Data();
-			system("cls");
-			break;
-
-		case 5:
-			system("cls");
-			std::cout << "Eyes Select (0 ~ 6) : ";
-			std::cin >> select;
-
-			GameObject::SetParts(0, 2, select);
-			data.eyes = static_cast<EYES>(select);
-			Send_Customizing_Data();
-			system("cls");
-			break;
-
-		case 6:
-			system("cls");
-			std::cout << "Gloves Select (0 ~ 5) : ";
-			std::cin >> select;
-			
-			data.gloves = static_cast<GLOVES>(select);
-			GameObject::SetParts(0, 3, select);
-			Send_Customizing_Data();
-			system("cls");
-			break;
-
-		case 7:
-			system("cls");
-			std::cout << "Mouse And Nose Select (0 ~ 6) : ";
-			std::cin >> select;
-			GameObject::SetParts(0, 4, select);
-			data.mouthandnoses = static_cast<MOUTHANDNOSES>(select);
-			Send_Customizing_Data();
-			system("cls");
-			break;
-
-		case 8:
-			system("cls");
-			GameObject::SetParts(0, 0, 0);
-			data.head = static_cast<HEADS>(0);
-			data.body_parts = static_cast<BODYPARTS>(0);
-			data.eyes = static_cast<EYES>(0);
-			data.gloves = static_cast<GLOVES>(0);
-			data.body = static_cast<BODIES>(0);
-			data.mouthandnoses = static_cast<MOUTHANDNOSES>(0);
-			GameObject::SetParts(0, 1, 0);
-			GameObject::SetParts(0, 2, 0);
-			GameObject::SetParts(0, 3, 0);
-			GameObject::SetParts(0, 4, 0);
-			GameObject::SetParts(0, 5, 0);
-
-			Send_Customizing_Data();
-			break;
-
-		case 9:
-		{
-			system("cls");
-			TerminateProcess(info.hProcess, 1);
-			break;
-		}
-
-		case 10:
-			system("cls");
-			cs_packet_server_end packet;
-			packet.size = sizeof(packet);
-			packet.type = CS_PACKET::CS_ADMIN_SERVER_END;
-			send_packet(&packet);
-			break;
-		}
+		send_packet(&packet);
 	}
 }
 
@@ -388,6 +281,12 @@ void Network::ProcessPacket(char* ptr)
 	case SC_PACKET::SC_PACKET_PLAYER_EXIT:
 	{
 		Process_Player_Exit(ptr);
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_CHAT:
+	{
+		Process_Chat(ptr);
 		break;
 	}
 

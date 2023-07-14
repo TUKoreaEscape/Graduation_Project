@@ -67,6 +67,14 @@ void Network::Process_Init_Position(char* ptr)
 		m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);
 }
 
+void Network::Process_Chat(char* ptr)
+{
+	sc_packet_chat* packet = reinterpret_cast<sc_packet_chat*>(ptr);
+	
+	// 여기서 동규가 넘겨주는 채팅 관련 함수에 넣어주면 됨
+	std::cout << "[" << packet->name << "] : " << packet->message << std::endl;
+}
+
 void Network::Process_Game_Start(char* ptr)
 {
 	sc_packet_game_start* packet = reinterpret_cast<sc_packet_game_start*>(ptr);
