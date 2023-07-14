@@ -81,6 +81,7 @@ public:
 	ItemBox* m_pBoxes[NUM_ITEMBOX];
 	Network* m_network;
 	std::thread recv_thread;
+	std::thread send_thread;
 
 	InteractionObject* Taggers = nullptr;
 

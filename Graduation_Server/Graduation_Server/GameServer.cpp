@@ -680,6 +680,12 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		break;
 	}
 
+	case CS_PACKET::CS_PACKET_LOGOUT:
+	{
+		Disconnect(user_id);
+		break;
+	}
+
 	case CS_PACKET::CS_PACKET_CREATE_ID:
 	{
 		Process_Create_ID(user_id, p);
