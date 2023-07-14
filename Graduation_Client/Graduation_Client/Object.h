@@ -173,6 +173,8 @@ public:
 
 	float m_fCheckCooltime{};
 	XMFLOAT4X4 m_xmf4x4MainKnobParent;
+
+	bool m_bDoesOtherPlayerActive = false;
 public:
 	PowerSwitch();
 	virtual ~PowerSwitch();
@@ -198,6 +200,9 @@ public:
 	void OperateKnob(int index);
 	bool CheckAnswer();
 	void Reset();
+
+	void CheckStart() { m_bDoesOtherPlayerActive = true; };
+	void CheckStop() { m_bDoesOtherPlayerActive = false; };
 
 private:
 	bool m_bAnswers[10];

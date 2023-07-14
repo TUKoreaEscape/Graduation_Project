@@ -894,7 +894,13 @@ void PowerSwitch::update(float fElapsedTime)
 {
 	if (m_bClear) return;
 	m_fCooltime += fElapsedTime;
-	if (m_bIsOperating == false) return;
+	if (m_bIsOperating == false) {
+		if (m_bDoesOtherPlayerActive) m_fCheckCooltime += fElapsedTime;
+		else {
+			m_fCheckCooltime = 0;
+		}
+		return;
+	}
 	if (IsNear == false) {
 		m_bIsOperating = false;
 		m_fCooltime = 0;
@@ -923,6 +929,9 @@ void PowerSwitch::update(float fElapsedTime)
 	}
 	if (keyBuffer['f'] & 0xF0 || keyBuffer['F'] & 0xF0) {
 		if (m_fCooltime < GLOBAL_INTERACTION_COOLTIME) return;
+		if (IsEqual(m_fCheckCooltime, 0)) {
+			// 다른 플레이어들에게 CheckStart();
+		}
 		m_fCheckCooltime += fElapsedTime;
 		if (m_fCheckCooltime < 2.0f) return;
 
@@ -931,6 +940,7 @@ void PowerSwitch::update(float fElapsedTime)
 			m_bIsOperating = false;
 			m_fCheckCooltime = 0;
 			Input::GetInstance()->m_gamestate->ChangeSameLevelState();
+			// 다른 플레이어들에게 CheckStop();
 			return;
 		}
 
@@ -947,9 +957,10 @@ void PowerSwitch::update(float fElapsedTime)
 #endif
 	}
 	else {
-		m_fCheckCooltime -= fElapsedTime;
-		if (m_fCheckCooltime <= 0)
-			m_fCheckCooltime = 0;
+		if (false == IsEqual(m_fCheckCooltime, 0)) {
+			// 다른 플레이어들에게 CheckStop();
+		}
+		m_fCheckCooltime = 0;
 	}
 }
 
@@ -1013,10 +1024,15 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		if (false == IsOpen) {
 			if (playerType == TYPE_PLAYER) {
 				if (m_ppInteractionUIs[0]) {
-					if (IsRot)
-						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
-					else
+					if (m_dir == DEGREE0) {
+						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 - 0.5f);
+					}
+					else if (m_dir == DEGREE180) {
 						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					}
+					else {
+						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
+					}
 					m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 				}
 			}
@@ -1024,30 +1040,57 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		else {
 			if (playerType == TYPE_TAGGER) {
 				if (m_ppInteractionUIs[1]) {
-					if (IsRot)
-						m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
-					else
+					if (m_dir == DEGREE0) {
+						m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 - 0.5f);
+					}
+					else if (m_dir == DEGREE180) {
 						m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					}
+					else {
+						m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
+					}
 					m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 				}
 				return;
 			}
 			if (m_bIsOperating) {
 				if (m_ppInteractionUIs[3]) {
-					if (IsRot)
-						m_ppInteractionUIs[3]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
-					else
-						m_ppInteractionUIs[3]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					if (m_dir == DEGREE0) {
+						m_ppInteractionUIs[3]->SetPosition(m_xmf4x4ToParent._41 - 0.5f, 1.5f, m_xmf4x4ToParent._43 - 0.5f);
+					}
+					else if (m_dir == DEGREE180) {
+						m_ppInteractionUIs[3]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					}
+					else {
+						m_ppInteractionUIs[3]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					}
 					m_ppInteractionUIs[3]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
+				}
+				if (m_ppInteractionUIs[2]) {
+					if (m_dir == DEGREE0) {
+						m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41 - 0.2f, 1.5f, m_xmf4x4ToParent._43 - 0.5f);
+					}
+					else if (m_dir == DEGREE180) {
+						m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41 + 0.2f, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					}
+					else {
+						m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43 + 0.2f);
+					}
+					m_ppInteractionUIs[2]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 				}
 			}
 			else {
-				if (m_ppInteractionUIs[0]) {
-					if (IsRot)
-						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
-					else
-						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
-					m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
+				if (m_ppInteractionUIs[2]) {
+					if (m_dir == DEGREE0) {
+						m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 - 0.5f);
+					}
+					else if (m_dir == DEGREE180) {
+						m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					}
+					else {
+						m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
+					}
+					m_ppInteractionUIs[2]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 				}
 			}
 		}
@@ -1144,6 +1187,7 @@ void PowerSwitch::SetRotation(DIR d)
 	{
 	case DEGREE0:
 		m_dir = DEGREE0;
+		UpdateTransform(NULL);
 		m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
 		m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
 		m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
