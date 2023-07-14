@@ -157,6 +157,9 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		break;
 	case READY_TO_GAME:
 		if (GameState::GetInstance()->IsLoading()) for (int i = 0; i < m_nLoading; ++i) m_UILoading[i]->render(pd3dCommandList);
+		for (int i = 0; i < NUM_DOOR; ++i) {
+			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
+		}
 		break;
 	case PLAYING_GAME:
 		for (int i = 0; i < NUM_DOOR; ++i) {
@@ -252,6 +255,9 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	case INTERACTION_POWER:
 		if ((m_pPlayer->m_pNearInteractionObejct))
 			reinterpret_cast<PowerSwitch*>(m_pPlayer->m_pNearInteractionObejct)->UIrender(pd3dCommandList);
+		m_UIPlayer[0]->render(pd3dCommandList);
+		int index = m_pPlayer->GetItem();
+		if (index != -1) m_UIPlayer[1 + index]->render(pd3dCommandList);
 	}
 }
 

@@ -96,13 +96,12 @@ void GameState::ChangeSameLevelState()
 		case READY_TO_GAME:
 			break;
 		case PLAYING_GAME:
-			player->ChangeCamera(PLAYING_GAME, INTERACTION_POWER);
+			//::ReleaseCapture();
 			m_GameState = INTERACTION_POWER;
 			break;
 		case ENDING_GAME:
 			break;
 		case INTERACTION_POWER:
-			player->ChangeCamera(INTERACTION_POWER, PLAYING_GAME);
 			m_GameState = PLAYING_GAME;
 			break;
 	}

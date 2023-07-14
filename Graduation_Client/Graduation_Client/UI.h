@@ -19,4 +19,6 @@ extern RECT_FLOAT customizingRect[10];
 
 extern RECT_FLOAT endingRect;
 
+extern RECT_FLOAT powerRect;
+
 void UpdateRectSize(HWND hWnd);
