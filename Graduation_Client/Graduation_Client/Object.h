@@ -170,6 +170,9 @@ public:
 
 	bool m_bClear = false;
 	bool m_bIsOperating = false;
+
+	float m_fCheckCooltime{};
+	XMFLOAT4X4 m_xmf4x4MainKnobParent;
 public:
 	PowerSwitch();
 	virtual ~PowerSwitch();

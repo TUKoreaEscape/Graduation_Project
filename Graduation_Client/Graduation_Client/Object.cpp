@@ -815,6 +815,7 @@ void PowerSwitch::Init()
 
 	m_pCup = FindFrame("Cup");
 	m_pMainKnob = FindFrame("Main_Knob");
+	m_xmf4x4MainKnobParent = m_pMainKnob->m_xmf4x4ToParent;
 }
 
 bool PowerSwitch::IsPlayerNear(const XMFLOAT3& PlayerPos)
@@ -922,12 +923,17 @@ void PowerSwitch::update(float fElapsedTime)
 	}
 	if (keyBuffer['f'] & 0xF0 || keyBuffer['F'] & 0xF0) {
 		if (m_fCooltime < GLOBAL_INTERACTION_COOLTIME) return;
+		m_fCheckCooltime += fElapsedTime;
+		if (m_fCheckCooltime < 2.0f) return;
+
 		if (false == CheckAnswer()) {
 			Reset();
 			m_bIsOperating = false;
+			m_fCheckCooltime = 0;
 			Input::GetInstance()->m_gamestate->ChangeSameLevelState();
 			return;
 		}
+
 		m_bClear = true;
 		m_bIsOperating = false;
 		Input::GetInstance()->m_gamestate->ChangeSameLevelState();
@@ -939,6 +945,11 @@ void PowerSwitch::update(float fElapsedTime)
 		Network& network = *Network::GetInstance();
 		network.send_packet(&packet);
 #endif
+	}
+	else {
+		m_fCheckCooltime -= fElapsedTime;
+		if (m_fCheckCooltime <= 0)
+			m_fCheckCooltime = 0;
 	}
 }
 
@@ -968,16 +979,30 @@ void PowerSwitch::render(ID3D12GraphicsCommandList* pd3dCommandList)
 			}
 		}
 	}
+	XMFLOAT4X4 prevMat = m_pMainKnob->m_xmf4x4ToParent;
 	UpdateTransform(nullptr);
+	if (m_bIsOperating) {
+		XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_fCheckCooltime * -35), XMConvertToRadians(0), XMConvertToRadians(0));
+		m_pMainKnob->m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_pMainKnob->m_xmf4x4ToParent);
+		
+		UpdateTransform(NULL);
+	}
+	else {
+		m_pMainKnob->m_xmf4x4ToParent = m_xmf4x4MainKnobParent;
+	}
 	if (m_bClear) {
 		FindFrame("Lamp_1")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 		FindFrame("Lamp_2")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
+		XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(-110.0f), XMConvertToRadians(0), XMConvertToRadians(0));
+		m_pMainKnob->m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4MainKnobParent);
+		UpdateTransform(NULL);
 	}
 	else {
 		FindFrame("Lamp_1")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(0.0f, 0.5f, 0.04827571f, 1.0f);
 		FindFrame("Lamp_2")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	}
 	GameObject::render(pd3dCommandList);
+	m_pMainKnob->m_xmf4x4ToParent = prevMat;
 }
 
 void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
