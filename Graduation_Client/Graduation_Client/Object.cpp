@@ -1136,6 +1136,7 @@ void PowerSwitch::Interaction(int playerType)
 			if (m_fCooltime >= GLOBAL_INTERACTION_COOLTIME) {
 				m_fCooltime = 0;
 				m_bIsOperating = true;
+				Input::GetInstance()->m_pPlayer->SetLookAt(XMFLOAT3(m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43));
 				Input::GetInstance()->m_gamestate->ChangeSameLevelState();
 			}
 			break;

@@ -433,9 +433,19 @@ void Player::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Player::SetLookAt(XMFLOAT3& xmf3Target, XMFLOAT3& xmf3Up)
 {
-	m_xmf3Look = XMFLOAT3(0, 0, 1);
-	m_xmf3Right = XMFLOAT3(1, 0, 0);
-	m_xmf3Up = XMFLOAT3(0, 1, 0);
+	XMFLOAT3 position = m_xmf3Position;
+	if (!IsEqual(position.y, 0)) {
+		position.y = 0;
+	}
+	XMFLOAT3 target = xmf3Target;
+	target.y = 0;
+	XMFLOAT3 look = Vector3::Subtract(target, position);
+	m_xmf3Look = Vector3::Normalize(look);
+	m_xmf3Up = xmf3Up;
+	m_xmf3Right = Vector3::CrossProduct(m_xmf3Up, m_xmf3Look, true);
+	//m_xmf3Up = Vector3::CrossProduct(m_xmf3Look, m_xmf3Right, true);
+
+	if (m_pCamera) m_pCamera->SetLookAt(xmf3Target);
 }
 
 bool Player::PickUpItem(GAME_ITEM::ITEM item)

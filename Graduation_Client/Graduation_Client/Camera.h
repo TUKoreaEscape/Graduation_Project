@@ -127,6 +127,7 @@ public:
 	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void update(float elapsedTime) {};
 	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
+	virtual void SetLookAt(XMFLOAT3& vLookAt);
 };
 
 class ThirdPersonCamera : public Camera

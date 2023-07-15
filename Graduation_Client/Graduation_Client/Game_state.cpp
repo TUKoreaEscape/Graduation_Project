@@ -96,7 +96,7 @@ void GameState::ChangeSameLevelState()
 		case READY_TO_GAME:
 			break;
 		case PLAYING_GAME:
-			//::ReleaseCapture();
+			::ReleaseCapture();
 			m_GameState = INTERACTION_POWER;
 			break;
 		case ENDING_GAME:
