@@ -44,6 +44,13 @@ Player::Player() : GameObject()
 
 void Player::ChangeCamera(GAME_STATE prev, GAME_STATE p)
 {
+	m_xmf3PrevRight = m_xmf3Right;
+	m_xmf3PrevUp = m_xmf3Up;
+	m_xmf3PrevLook = m_xmf3Look;
+	m_fPrevPitch = m_fPitch;
+	m_fPrevRoll = m_fRoll;
+	m_fPrevYaw = m_fYaw;
+
 	m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
 	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
@@ -90,6 +97,8 @@ void Player::ChangeCamera(GAME_STATE prev, GAME_STATE p)
 		AddComponent<ThirdPersonCamera>();
 		m_pCamera = GetComponent<ThirdPersonCamera>();
 		m_pCamera->m_pPlayer = this;
+		break;
+	case INTERACTION_POWER:
 		break;
 	}
 }
@@ -281,7 +290,6 @@ void Player::update(float fTimeElapsed)
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->update(fTimeElapsed);
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);*/
 	m_pCamera->RegenerateViewMatrix();
-
 	fLength = Vector3::Length(m_xmf3Velocity);
 	float fDeceleration = (m_fFriction * fTimeElapsed);
 	if (fDeceleration > fLength) fDeceleration = fLength;

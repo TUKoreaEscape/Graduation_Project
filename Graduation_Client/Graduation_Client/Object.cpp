@@ -683,6 +683,20 @@ void InteractionObject::SetUI(int index, InteractionUI* ui)
 	if (m_ppInteractionUIs[index]) m_ppInteractionUIs[index]->AddRef();
 }
 
+int InteractionObject::GetDIR() const
+{
+	switch(m_dir) {
+		case DEGREE0:
+			return 0;
+		case DEGREE90:
+			return 1;
+		case DEGREE180:
+			return 2;
+		default:
+			return 3;
+	}
+}
+
 InteractionUI::InteractionUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName)
 {
 	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
@@ -801,6 +815,7 @@ void PowerSwitch::Init()
 
 	m_pCup = FindFrame("Cup");
 	m_pMainKnob = FindFrame("Main_Knob");
+	m_xmf4x4MainKnobParent = m_pMainKnob->m_xmf4x4ToParent;
 }
 
 bool PowerSwitch::IsPlayerNear(const XMFLOAT3& PlayerPos)
@@ -808,28 +823,28 @@ bool PowerSwitch::IsPlayerNear(const XMFLOAT3& PlayerPos)
 	float minx, maxx, minz, maxz;
 	switch (m_dir) {
 	case DEGREE0:
-		minx = m_xmf4x4ToParent._41 - 0.6f;
-		maxx = m_xmf4x4ToParent._41 + 0.6f;
-		minz = m_xmf4x4ToParent._43 + 0.5f;
-		maxz = m_xmf4x4ToParent._43 + 1.5f;
+		minx = m_xmf4x4ToParent._41 - 0.3f;
+		maxx = m_xmf4x4ToParent._41 + 0.3f;
+		minz = m_xmf4x4ToParent._43 + 0.7f;
+		maxz = m_xmf4x4ToParent._43 + 1.0f;
 		break;
 	case DEGREE90:
-		minx = m_xmf4x4ToParent._41 - 1.5f;
-		maxx = m_xmf4x4ToParent._41 - 0.5f;
-		minz = m_xmf4x4ToParent._43 - 0.6f;
-		maxz = m_xmf4x4ToParent._43 + 0.6f;
+		minx = m_xmf4x4ToParent._41 - 1.0f;
+		maxx = m_xmf4x4ToParent._41 - 0.7f;
+		minz = m_xmf4x4ToParent._43 - 0.4f;
+		maxz = m_xmf4x4ToParent._43 + 0.4f;
 		break;
 	case DEGREE180:
-		minx = m_xmf4x4ToParent._41 - 0.6f;
-		maxx = m_xmf4x4ToParent._41 + 0.6f;
-		minz = m_xmf4x4ToParent._43 - 1.5f;
-		maxz = m_xmf4x4ToParent._43 - 0.5f;
+		minx = m_xmf4x4ToParent._41 - 0.3f;
+		maxx = m_xmf4x4ToParent._41 + 0.3f;
+		minz = m_xmf4x4ToParent._43 - 1.0f;
+		maxz = m_xmf4x4ToParent._43 - 0.7f;
 		break;
 	default:
-		minx = m_xmf4x4ToParent._41 - 1.5f;
-		maxx = m_xmf4x4ToParent._41 - 0.5f;
-		minz = m_xmf4x4ToParent._43 - 0.6f;
-		maxz = m_xmf4x4ToParent._43 + 0.6f;
+		minx = m_xmf4x4ToParent._41 - 1.0f;
+		maxx = m_xmf4x4ToParent._41 - 0.7f;
+		minz = m_xmf4x4ToParent._43 - 0.3f;
+		maxz = m_xmf4x4ToParent._43 + 0.3f;
 		break;
 	}
 	if (PlayerPos.x > maxx) {
@@ -879,10 +894,17 @@ void PowerSwitch::update(float fElapsedTime)
 {
 	if (m_bClear) return;
 	m_fCooltime += fElapsedTime;
-	if (m_bIsOperating == false) return;
+	if (m_bIsOperating == false) {
+		if (m_bDoesOtherPlayerActive) m_fCheckCooltime += fElapsedTime;
+		else {
+			m_fCheckCooltime = 0;
+		}
+		return;
+	}
 	if (IsNear == false) {
 		m_bIsOperating = false;
 		m_fCooltime = 0;
+		Input::GetInstance()->m_gamestate->ChangeSameLevelState();
 		return;
 	}
 	if (false == IsOpen) return;
@@ -903,16 +925,28 @@ void PowerSwitch::update(float fElapsedTime)
 		Reset();
 		m_bIsOperating = false;
 		m_fCooltime = 0;
+		Input::GetInstance()->m_gamestate->ChangeSameLevelState();
 	}
 	if (keyBuffer['f'] & 0xF0 || keyBuffer['F'] & 0xF0) {
 		if (m_fCooltime < GLOBAL_INTERACTION_COOLTIME) return;
+		if (IsEqual(m_fCheckCooltime, 0)) {
+			// 다른 플레이어들에게 CheckStart();
+		}
+		m_fCheckCooltime += fElapsedTime;
+		if (m_fCheckCooltime < 2.0f) return;
+
 		if (false == CheckAnswer()) {
 			Reset();
 			m_bIsOperating = false;
+			m_fCheckCooltime = 0;
+			Input::GetInstance()->m_gamestate->ChangeSameLevelState();
+			// 다른 플레이어들에게 CheckStop();
 			return;
 		}
+
 		m_bClear = true;
 		m_bIsOperating = false;
+		Input::GetInstance()->m_gamestate->ChangeSameLevelState();
 #if USE_NETWORK
 		cs_packet_request_electronic_system_activate packet;
 		packet.size = sizeof(packet);
@@ -921,6 +955,12 @@ void PowerSwitch::update(float fElapsedTime)
 		Network& network = *Network::GetInstance();
 		network.send_packet(&packet);
 #endif
+	}
+	else {
+		if (false == IsEqual(m_fCheckCooltime, 0)) {
+			// 다른 플레이어들에게 CheckStop();
+		}
+		m_fCheckCooltime = 0;
 	}
 }
 
@@ -950,16 +990,30 @@ void PowerSwitch::render(ID3D12GraphicsCommandList* pd3dCommandList)
 			}
 		}
 	}
+	XMFLOAT4X4 prevMat = m_pMainKnob->m_xmf4x4ToParent;
 	UpdateTransform(nullptr);
+	if (m_bIsOperating) {
+		XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_fCheckCooltime * -35), XMConvertToRadians(0), XMConvertToRadians(0));
+		m_pMainKnob->m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_pMainKnob->m_xmf4x4ToParent);
+		
+		UpdateTransform(NULL);
+	}
+	else {
+		m_pMainKnob->m_xmf4x4ToParent = m_xmf4x4MainKnobParent;
+	}
 	if (m_bClear) {
 		FindFrame("Lamp_1")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 		FindFrame("Lamp_2")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
+		XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(-110.0f), XMConvertToRadians(0), XMConvertToRadians(0));
+		m_pMainKnob->m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4MainKnobParent);
+		UpdateTransform(NULL);
 	}
 	else {
 		FindFrame("Lamp_1")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(0.0f, 0.5f, 0.04827571f, 1.0f);
 		FindFrame("Lamp_2")->renderer->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	}
 	GameObject::render(pd3dCommandList);
+	m_pMainKnob->m_xmf4x4ToParent = prevMat;
 }
 
 void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -970,10 +1024,15 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		if (false == IsOpen) {
 			if (playerType == TYPE_PLAYER) {
 				if (m_ppInteractionUIs[0]) {
-					if (IsRot)
-						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
-					else
+					if (m_dir == DEGREE0) {
+						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 - 0.5f);
+					}
+					else if (m_dir == DEGREE180) {
 						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					}
+					else {
+						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
+					}
 					m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 				}
 			}
@@ -981,30 +1040,57 @@ void PowerSwitch::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		else {
 			if (playerType == TYPE_TAGGER) {
 				if (m_ppInteractionUIs[1]) {
-					if (IsRot)
-						m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
-					else
+					if (m_dir == DEGREE0) {
+						m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 - 0.5f);
+					}
+					else if (m_dir == DEGREE180) {
 						m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					}
+					else {
+						m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
+					}
 					m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 				}
 				return;
 			}
 			if (m_bIsOperating) {
 				if (m_ppInteractionUIs[3]) {
-					if (IsRot)
-						m_ppInteractionUIs[3]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
-					else
-						m_ppInteractionUIs[3]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					if (m_dir == DEGREE0) {
+						m_ppInteractionUIs[3]->SetPosition(m_xmf4x4ToParent._41 - 0.5f, 1.5f, m_xmf4x4ToParent._43 - 0.5f);
+					}
+					else if (m_dir == DEGREE180) {
+						m_ppInteractionUIs[3]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					}
+					else {
+						m_ppInteractionUIs[3]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					}
 					m_ppInteractionUIs[3]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
+				}
+				if (m_ppInteractionUIs[2]) {
+					if (m_dir == DEGREE0) {
+						m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41 - 0.2f, 1.5f, m_xmf4x4ToParent._43 - 0.5f);
+					}
+					else if (m_dir == DEGREE180) {
+						m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41 + 0.2f, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					}
+					else {
+						m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43 + 0.2f);
+					}
+					m_ppInteractionUIs[2]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 				}
 			}
 			else {
-				if (m_ppInteractionUIs[0]) {
-					if (IsRot)
-						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
-					else
-						m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
-					m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
+				if (m_ppInteractionUIs[2]) {
+					if (m_dir == DEGREE0) {
+						m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 - 0.5f);
+					}
+					else if (m_dir == DEGREE180) {
+						m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43 + 0.5f);
+					}
+					else {
+						m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41 + 0.5f, 1.5f, m_xmf4x4ToParent._43);
+					}
+					m_ppInteractionUIs[2]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 				}
 			}
 		}
@@ -1050,6 +1136,7 @@ void PowerSwitch::Interaction(int playerType)
 			if (m_fCooltime >= GLOBAL_INTERACTION_COOLTIME) {
 				m_fCooltime = 0;
 				m_bIsOperating = true;
+				Input::GetInstance()->m_gamestate->ChangeSameLevelState();
 			}
 			break;
 		}
@@ -1100,18 +1187,31 @@ void PowerSwitch::SetRotation(DIR d)
 	{
 	case DEGREE0:
 		m_dir = DEGREE0;
+		UpdateTransform(NULL);
+		m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
+		m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
 		break;
 	case DEGREE90:
 		m_dir = DEGREE90;
-		Rotate(0, 90, 0);
+		Rotate(0, 90, 0); 
+		m_xmf3Right = XMFLOAT3(0.0f, 0.0f, -1.0f);
+		m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		m_xmf3Look = XMFLOAT3(1.0f, 0.0f, 0.0f);
 		break;
 	case DEGREE180:
 		m_dir = DEGREE180;
 		Rotate(0, 180, 0);
+		m_xmf3Right = XMFLOAT3(-1.0f, 0.0f, 0.0f);
+		m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		m_xmf3Look = XMFLOAT3(0.0f, 0.0f, -1.0f);
 		break;
 	default:
 		m_dir = DEGREE270;
 		Rotate(0, 270, 0);
+		m_xmf3Right = XMFLOAT3(0.0f, 0.0f, 1.0f);
+		m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		m_xmf3Look = XMFLOAT3(1.0f, 0.0f, 0.0f);
 		break;
 	}
 }

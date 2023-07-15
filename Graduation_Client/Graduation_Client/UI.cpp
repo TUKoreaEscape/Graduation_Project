@@ -10,6 +10,7 @@ RECT_FLOAT pageNumRect{ 0,0,0,0 };
 RECT_FLOAT waitingRoomRect[3]{ 0, };
 RECT_FLOAT customizingRect[10]{ 0, };
 RECT_FLOAT endingRect{ 0,0,0,0 };
+RECT_FLOAT powerRect{ 0,0,0,0 };
 RECT_FLOAT chatBoxRect{ 0,0,0,0 };
 
 void UpdateRectSize(HWND hWnd)
@@ -60,4 +61,6 @@ void UpdateRectSize(HWND hWnd)
 	endingRect = RECT_FLOAT{ clientWidth / float(1600.0 / 1380.0), clientHeight / float(900.0 / 785.0), clientWidth / float(1600.0 / 1500.0), clientHeight / float(900.0 / 830.0) };
 	
 	chatBoxRect = RECT_FLOAT{ clientWidth / float(1600.0 / 480.0), clientHeight / float(900.0 / 845.0), clientWidth / float(1600.0 / 960.0), clientHeight / float(900.0 / 900) };
+
+	powerRect = RECT_FLOAT{ clientWidth / float(1600.0 / 60.0), clientHeight / float(900.0 / 710.0), clientWidth / float(1600.0 / 340.0), clientHeight / float(900.0 / 860.0) };
 }

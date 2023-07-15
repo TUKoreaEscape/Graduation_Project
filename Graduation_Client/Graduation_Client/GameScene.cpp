@@ -157,6 +157,9 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		break;
 	case READY_TO_GAME:
 		if (GameState::GetInstance()->IsLoading()) for (int i = 0; i < m_nLoading; ++i) m_UILoading[i]->render(pd3dCommandList);
+		for (int i = 0; i < NUM_DOOR; ++i) {
+			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
+		}
 		break;
 	case PLAYING_GAME:
 		for (int i = 0; i < NUM_DOOR; ++i) {
@@ -251,6 +254,12 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		}
 		for (int i = 0; i < m_Ending; ++i) m_UIEnding[i]->render(pd3dCommandList);
 		break;
+	case INTERACTION_POWER:
+		if ((m_pPlayer->m_pNearInteractionObejct))
+			reinterpret_cast<PowerSwitch*>(m_pPlayer->m_pNearInteractionObejct)->UIrender(pd3dCommandList);
+		m_UIPlayer[0]->render(pd3dCommandList);
+		int index = m_pPlayer->GetItem();
+		if (index != -1) m_UIPlayer[1 + index]->render(pd3dCommandList);
 	}
 }
 
@@ -899,6 +908,16 @@ void GameScene::CreateShaderResourceViews(ID3D12Device* pd3dDevice, Texture* pTe
 	int nRootParameters = pTexture->GetRootParameters();
 	for (int j = 0; j < nRootParameters; j++) pTexture->SetRootParameterIndex(j, nRootParameterStartIndex + j);
 
+}
+
+void GameScene::Powerrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	for (int i = 0; i < m_nWalls; ++i)
+	{
+		if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
+	}
+	if ((m_pPlayer->m_pNearInteractionObejct))
+		m_pPlayer->m_pNearInteractionObejct->render(pd3dCommandList);
 }
 
 void GameScene::LoadSceneObjectsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName)

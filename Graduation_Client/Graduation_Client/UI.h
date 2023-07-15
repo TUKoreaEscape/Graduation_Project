@@ -19,6 +19,8 @@ extern RECT_FLOAT customizingRect[10];
 
 extern RECT_FLOAT endingRect;
 
+extern RECT_FLOAT powerRect;
+
 extern RECT_FLOAT chatBoxRect;
 
 void UpdateRectSize(HWND hWnd);

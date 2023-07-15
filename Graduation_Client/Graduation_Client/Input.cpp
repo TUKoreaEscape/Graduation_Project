@@ -26,8 +26,12 @@ void Input::Update(HWND hWnd)
 	if (cxDelta || cyDelta)
 	{
 		if (m_pPlayer) {
-			if (keyBuffer[VK_RBUTTON] & 0xF0) m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
-			else m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+			//if (keyBuffer[VK_RBUTTON] & 0xF0) m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
+			if (Input::GetInstance()->m_gamestate->GetGameState() == INTERACTION_POWER)
+				m_pPlayer->Rotate(cyDelta, 0.0f, 0.0f);
+			else {
+				m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+			}
 		}
 	}
 }
@@ -448,7 +452,36 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			}
 			//InputRoomInfo();
 		}
-		std::cout << xPos << " " << yPos << std::endl;
+		else if (m_gamestate->GetGameState() == INTERACTION_POWER) {
+			if (xPos >= powerRect.left && xPos <= powerRect.right && yPos >= powerRect.top && yPos <= powerRect.bottom) {
+				if (m_pPlayer) {
+					if (m_pPlayer->GetType() == TYPE_TAGGER) break;
+					int item = m_pPlayer->GetItem();
+					switch (item) {
+					case 0:
+						std::cout << "hammer\n";
+						break;
+					case 1:
+						std::cout << "drill\n";
+						break;
+					case 2:
+						std::cout << "wrench\n";
+						break;
+					case 3:
+						std::cout << "pliers\n";
+						break;
+					case 4:
+						std::cout << "driver\n";
+						break;
+					default:
+						std::cout << "no item\n";
+						break;
+					}
+				}
+				std::cout << "정답 출력 해줘야함" << std::endl;
+			}
+		}
+		//std::cout << xPos << " " << yPos << std::endl;
 		break;
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:

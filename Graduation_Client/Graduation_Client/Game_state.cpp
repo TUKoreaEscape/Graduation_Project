@@ -38,6 +38,9 @@ void GameState::ChangeNextState()
 		case ENDING_GAME:
 			m_GameState = WAITING_GAME;
 			break;
+		case INTERACTION_POWER:
+			m_GameState = ENDING_GAME;
+			break;
 	}
 	//std::cout << m_GameState << std::endl;
 }
@@ -67,6 +70,8 @@ void GameState::ChangePrevState()
 		case ENDING_GAME:
 			m_GameState = PLAYING_GAME;
 			break;
+		case INTERACTION_POWER:
+			break;
 	}
 	//std::cout << m_GameState << std::endl;
 }
@@ -91,8 +96,13 @@ void GameState::ChangeSameLevelState()
 		case READY_TO_GAME:
 			break;
 		case PLAYING_GAME:
+			//::ReleaseCapture();
+			m_GameState = INTERACTION_POWER;
 			break;
 		case ENDING_GAME:
+			break;
+		case INTERACTION_POWER:
+			m_GameState = PLAYING_GAME;
 			break;
 	}
 	//std::cout << m_GameState << std::endl;

@@ -9,6 +9,7 @@ enum GAME_STATE {
 	READY_TO_GAME, //술래가 정해지기 전 게임 시작 전
 	PLAYING_GAME, //게임중
 	ENDING_GAME, //게임이 끝난 후
+	INTERACTION_POWER, // 전력장치 수리
 };
 
 class GameState {

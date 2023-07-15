@@ -77,17 +77,19 @@ void CommonMovement::update(float elapsedTime)
 				if (Input::GetInstance()->m_pPlayer->m_pNearDoor->GetIsWorking() == false)
 					Input::GetInstance()->m_pPlayer->m_pNearDoor->Interaction(playerType);
 			}
-			if (Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct) {
-				Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct->Interaction(playerType);
-			}
-			if (Input::GetInstance()->m_pPlayer->m_pNearVent) {
-				Input::GetInstance()->m_pPlayer->m_pNearVent->Interaction(playerType);
-			}
-			if (Input::GetInstance()->m_pPlayer->m_pNearItembox) {
-				Input::GetInstance()->m_pPlayer->m_pNearItembox->Interaction(playerType);
-			}
-			if (Input::GetInstance()->m_pPlayer->m_pNearTaggers) {
-				Input::GetInstance()->m_pPlayer->m_pNearTaggers->Interaction(playerType);
+			if (Input::GetInstance()->m_gamestate->GetGameState() == PLAYING_GAME) {
+				if (Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct) {
+					Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct->Interaction(playerType);
+				}
+				if (Input::GetInstance()->m_pPlayer->m_pNearVent) {
+					Input::GetInstance()->m_pPlayer->m_pNearVent->Interaction(playerType);
+				}
+				if (Input::GetInstance()->m_pPlayer->m_pNearItembox) {
+					Input::GetInstance()->m_pPlayer->m_pNearItembox->Interaction(playerType);
+				}
+				if (Input::GetInstance()->m_pPlayer->m_pNearTaggers) {
+					Input::GetInstance()->m_pPlayer->m_pNearTaggers->Interaction(playerType);
+				}
 			}
 		}
 
