@@ -1817,3 +1817,56 @@ void TaggersBox::Reset()
 	m_nLifeChips = 0;
 	m_bActivate = false;
 }
+
+EscapeObject::EscapeObject()
+{
+	m_nUIs = 1;
+	m_ppInteractionUIs = new InteractionUI * [m_nUIs];
+	for (int i = 0; i < m_nUIs; ++i) {
+		m_ppInteractionUIs[i] = nullptr;
+	}
+}
+
+EscapeObject::~EscapeObject()
+{
+}
+
+bool EscapeObject::IsPlayerNear(const XMFLOAT3& PlayerPos)
+{
+	return false;
+}
+
+void EscapeObject::Rotate(float fPitch, float fYaw, float fRoll)
+{
+}
+
+void EscapeObject::render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void EscapeObject::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void EscapeObject::update(float fElapsedTime)
+{
+}
+
+void EscapeObject::Interaction(int playerType)
+{
+}
+
+void EscapeObject::SetOpen(bool open)
+{
+}
+
+void EscapeObject::SetRotation(DIR d)
+{
+}
+
+void EscapeObject::SetWorking()
+{
+	// 전력장치가 모두 수리 완료되었을 때 호출
+	if (false == m_bIsReal) return;
+	IsWorking = true; 
+}
