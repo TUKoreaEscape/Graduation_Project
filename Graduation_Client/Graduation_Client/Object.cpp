@@ -826,10 +826,10 @@ bool PowerSwitch::IsPlayerNear(const XMFLOAT3& PlayerPos)
 		minx = m_xmf4x4ToParent._41 - 0.3f;
 		maxx = m_xmf4x4ToParent._41 + 0.3f;
 		minz = m_xmf4x4ToParent._43 + 0.7f;
-		maxz = m_xmf4x4ToParent._43 + 1.0f;
+		maxz = m_xmf4x4ToParent._43 + 1.5f;
 		break;
 	case DEGREE90:
-		minx = m_xmf4x4ToParent._41 - 1.0f;
+		minx = m_xmf4x4ToParent._41 - 1.5f;
 		maxx = m_xmf4x4ToParent._41 - 0.7f;
 		minz = m_xmf4x4ToParent._43 - 0.4f;
 		maxz = m_xmf4x4ToParent._43 + 0.4f;
@@ -837,11 +837,11 @@ bool PowerSwitch::IsPlayerNear(const XMFLOAT3& PlayerPos)
 	case DEGREE180:
 		minx = m_xmf4x4ToParent._41 - 0.3f;
 		maxx = m_xmf4x4ToParent._41 + 0.3f;
-		minz = m_xmf4x4ToParent._43 - 1.0f;
+		minz = m_xmf4x4ToParent._43 - 1.5f;
 		maxz = m_xmf4x4ToParent._43 - 0.7f;
 		break;
 	default:
-		minx = m_xmf4x4ToParent._41 - 1.0f;
+		minx = m_xmf4x4ToParent._41 - 1.5f;
 		maxx = m_xmf4x4ToParent._41 - 0.7f;
 		minz = m_xmf4x4ToParent._43 - 0.3f;
 		maxz = m_xmf4x4ToParent._43 + 0.3f;

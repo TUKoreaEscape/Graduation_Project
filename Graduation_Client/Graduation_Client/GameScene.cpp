@@ -220,40 +220,42 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		}
 		break;
 	case ENDING_GAME:
+	{
 #if USE_NETWORK
 		Network& network = *Network::GetInstance();
-		if(network.m_tagger_win){
+		if (network.m_tagger_win) {
 #endif
 #if !USE_NETWORK
-		if (0) { // TAGGER's Win
+			if (0) { // TAGGER's Win
 #endif
-			m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-			if (m_pPlayer->GetType() == TYPE_TAGGER) {
-				m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-			}
-			for (int i = 0; i < 5; ++i) {
-				m_ppPlayers[i]->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-				if (m_ppPlayers[i]->GetType() == TYPE_TAGGER) {
-					m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+				if (m_pPlayer->GetType() == TYPE_TAGGER) {
+					m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+				}
+				for (int i = 0; i < 5; ++i) {
+					m_ppPlayers[i]->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+					if (m_ppPlayers[i]->GetType() == TYPE_TAGGER) {
+						m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+					}
+				}
+		}
+			else { // Player's Win
+				float my_win = 0.0f;
+				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+				if (m_pPlayer->GetType() != TYPE_TAGGER) {
+					m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+					my_win = true;
+				}
+				for (int i = 0; i < 5; ++i) {
+					m_ppPlayers[i]->SetPosition(XMFLOAT3(6.0f - 3.0f * i, 0.0f, -1.0f));
+					if (m_ppPlayers[i]->GetType() != TYPE_TAGGER) {
+						m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+					}
 				}
 			}
-		}
-		else { // Player's Win
-			float my_win = 0.0f;
-			m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-			if (m_pPlayer->GetType() != TYPE_TAGGER) {
-				m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-				my_win = true;
-			}
-			for (int i = 0; i < 5; ++i) {
-				m_ppPlayers[i]->SetPosition(XMFLOAT3(6.0f - 3.0f * i, 0.0f, -1.0f));
-				if (m_ppPlayers[i]->GetType() != TYPE_TAGGER) {
-					m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-				}
-			}
-		}
-		for (int i = 0; i < m_Ending; ++i) m_UIEnding[i]->render(pd3dCommandList);
-		break;
+			for (int i = 0; i < m_Ending; ++i) m_UIEnding[i]->render(pd3dCommandList);
+			break;
+	}
 	case INTERACTION_POWER:
 		if ((m_pPlayer->m_pNearInteractionObejct))
 			reinterpret_cast<PowerSwitch*>(m_pPlayer->m_pNearInteractionObejct)->UIrender(pd3dCommandList);
