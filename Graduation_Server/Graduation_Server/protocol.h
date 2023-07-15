@@ -85,6 +85,7 @@ namespace CS_PACKET
 		CS_PACKET_ELETRONIC_SYSTEM_LEVER_WORKING,
 		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_SWICH,
 		CS_PACKET_REQUEST_ELETRONIC_SYSTEM_ATIVATE,
+		CS_PACKET_REQUEST_ESCAPESYSTEM_WORKING,
 		CS_PACKET_ATTACK,
 		CS_PACKET_ITEM_BOX_UPDATE,
 		CS_PACKET_PICK_ITEM,
@@ -308,6 +309,13 @@ struct cs_packet_electronic_system_lever_working {
 	bool			is_start;
 };
 
+struct cs_packet_request_escapesystem_working {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			index;
+};
+
 struct cs_packet_item_box_update {
 	unsigned char	size;
 	unsigned char	type;
@@ -403,6 +411,7 @@ namespace SC_PACKET
 		SC_PACKET_ELECTRONIC_SYSTEM_ACTIVATE_UPDATE,
 		SC_PACKET_ELECTRONIC_SYSTEM_LEVER_WORKING,
 		SC_PACKET_ESCAPESYSTEM_ACTIVATE_UPDATE,
+		SC_PACKET_REQUEST_ESCAPESYSTEM_WORKING,
 		SC_PACKET_ROOM_INFO,
 		SC_PACKET_VIVOX_DATA,
 		SC_PACKET_CUSTOMIZING,
@@ -731,6 +740,13 @@ struct sc_packet_escapesystem_activate {
 	unsigned char	type;
 
 	unsigned short	index;
+};
+
+struct sc_packet_request_escapesystem_working {
+	unsigned char	size;
+	unsigned char	type;
+
+	short			index;
 };
 
 struct sc_packet_activate_altar {
