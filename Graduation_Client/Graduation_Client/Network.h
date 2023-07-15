@@ -67,6 +67,9 @@ public: // 술래가 플레이시 사용하는 변수
 	bool				m_tagger_win = false;
 	int					m_before_player_type = TYPE_PLAYER_YET;
 
+public: // 엔딩창에 사용할 목적인 변수 (술래가 패배한 경우)
+	int					m_escape_player_id[6];
+
 public: // 방 선택창에서 사용하는 변수
 	int					m_join_room_number = -1;
 	int					m_page_num = 0;
@@ -122,6 +125,7 @@ public:
 	void Process_ElectrinicSystem_Init(char* ptr);
 	void Process_ElectronicSystem_Switch_Update(char* ptr);
 	void Process_ElectronicSystem_Activate(char* ptr);
+	void Process_EscapeSystem_Update(char* ptr);
 	void Process_Attack_Packet(char* ptr);
 	void Process_LifeChip_Update(char* ptr);
 	void Process_Tagger_Collect_LifeChip(char* ptr);

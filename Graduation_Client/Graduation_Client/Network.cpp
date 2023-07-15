@@ -410,6 +410,12 @@ void Network::ProcessPacket(char* ptr)
 		break;
 	}
 
+	case SC_PACKET::SC_PACKET_REQUEST_ESCAPESYSTEM_WORKING:
+	{
+		Process_EscapeSystem_Update(ptr); // 탈출장치를 조작 한 경우
+		break;
+	}
+
 	case SC_PACKET::SC_PACKET_DOOR_UPDATE:
 	{
 		Process_Door_Update(ptr);

@@ -44,6 +44,7 @@ enum class EventType : char
 	USE_FIRST_TAGGER_SKILL,
 	USE_SECOND_TAGGER_SKILL,
 	USE_THIRD_TAGGER_SKILL,
+	WORKING_ESCAPE_SYSTEM,
 	GAME_END,
 	SERVER_END
 };
@@ -131,6 +132,7 @@ public:
 	void	Process_ElectronicSystem_Control(const int user_id, void* buff); // 게임방 내 전력장치 스위치 on,off를 처리, 수리를 체크하는 함수
 	void	Process_ElectronicSystem_Activate(const int user_id, void* buff);
 	void	Process_ElectronicSystem_lever_working(const int user_id, void* buff);
+	void	Process_EscapeSystem(const int user_id, void* buff);
 	void	Process_Use_Tagger_Skill(const int user_id, int skill_number);
 	void	Process_Item_Box_Update(const int user_id, void* buff);
 	void	Process_Pick_Fix_Item(const int user_id, void* buff);

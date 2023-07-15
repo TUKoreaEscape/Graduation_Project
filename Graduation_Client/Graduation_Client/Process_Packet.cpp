@@ -6,7 +6,6 @@
 void Network::Process_Player_Exit(char* ptr)
 {
 	sc_packet_player_exit* packet = reinterpret_cast<sc_packet_player_exit*>(ptr);
-	std::cout << "나간패킷 받음" << std::endl;
 	for (int i = 0; i < 5; ++i)
 	{
 		if (m_ppOther[i]->GetID() == -1)
@@ -88,6 +87,12 @@ void Network::Process_Game_End(char* ptr)
 {
 	sc_packet_game_end* packet = reinterpret_cast<sc_packet_game_end*>(ptr);
 	m_tagger_win = packet->is_tagger_win;
+
+	for (int i = 0; i < 6; ++i)
+		m_escape_player_id[i] = -1;
+
+	for (int i = 0; i < 6; ++i)
+		m_escape_player_id[i] = packet->escape_id[i]; // 탈출한 사람 id를 저장함
 
 	for (int i = 0; i < 5; ++i)
 		m_other_player_ready[i] = false;
@@ -499,6 +504,12 @@ void Network::Process_Active_EscapeSystem(char* ptr)
 {
 	sc_packet_escapesystem_activate* packet = reinterpret_cast<sc_packet_escapesystem_activate*>(ptr);
 	std::cout << "탈출장치 [" << packet->index << "]번 활성화" << std::endl;
+}
+
+void Network::Process_EscapeSystem_Update(char* ptr)
+{
+	sc_packet_request_escapesystem_working* packet = reinterpret_cast<sc_packet_request_escapesystem_working*>(ptr);
+	packet->index; // 해당 번호의 탈출장치 working시 뭔가 조작을 할 예정인데 이건 추후 예정
 }
 
 void Network::Process_Altar_LifeChip_Update(char* ptr)

@@ -747,6 +747,7 @@ struct sc_packet_request_escapesystem_working {
 	unsigned char	type;
 
 	short			index;
+	short			escape_id;
 };
 
 struct sc_packet_activate_altar {
@@ -788,6 +789,7 @@ struct sc_packet_game_end {
 	unsigned char	type;
 
 	bool			is_tagger_win;
+	short			escape_id[6];
 };
 
 // 여긴 StressTest용 패킷입니다

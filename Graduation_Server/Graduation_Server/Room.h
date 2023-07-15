@@ -62,6 +62,7 @@ public:
 	GAME_ROOM_STATE::TYPE	_room_state;
 
 	array<int, 6>			in_player; // 방에 들어온 플레이어 id XMFLOAT3 
+	array<int, 6>			in_escape_player;
 	array<bool, 6>			in_player_ready;
 	array<bool, 6>			in_player_loading_success;
 	mutex					in_player_lock;
@@ -71,6 +72,7 @@ public:
 	{
 		_room_state = GAME_ROOM_STATE::FREE;
 		in_player.fill(-1);
+		in_escape_player.fill(-1);
 		in_player_ready.fill(false);
 		m_altar = new Altar;
 		for (int i = 0; i < 3; ++i) {
