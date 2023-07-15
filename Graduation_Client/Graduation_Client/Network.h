@@ -162,6 +162,17 @@ public:
 
 	void send_packet(void* packet);
 
+public:
+	std::wstring StringToWString(const std::string& str)
+	{
+		int length = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, NULL, 0);
+		wchar_t* buffer = new wchar_t[length];
+		MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, buffer, length);
+		std::wstring result(buffer);
+		delete[] buffer;
+		return result;
+	}
+
 public: // 보이스톡 관련 함수
 	void on_voice_talk();
 	void off_voice_talk();
