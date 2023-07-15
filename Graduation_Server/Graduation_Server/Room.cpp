@@ -32,7 +32,9 @@ void Room::Reset_Room()
 {
 	Number_of_users = 0;
 	remain_user = 6;
+	_room_state_lock.lock();
 	_room_state = GAME_ROOM_STATE::FREE;
+	_room_state_lock.unlock();
 	in_player.fill(-1);
 	in_player_ready.fill(false);
 	in_player_loading_success.fill(false);

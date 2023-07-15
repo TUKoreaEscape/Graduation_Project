@@ -344,6 +344,9 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 			m_clients[room.in_player[i]].set_life_chip(true);
 		}
 
+		for (int i = 0; i < room.m_door_object.size(); ++i)
+			room.m_door_object[i].m_check_bounding_box = true;
+
 		sc_packet_init_position init_packet;
 		init_packet.size = sizeof(init_packet);
 		init_packet.type = SC_PACKET::SC_PACKET_INIT_POSITION;
