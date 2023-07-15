@@ -54,4 +54,6 @@ public:
 
 	ID3D12Resource* m_pd3dcbLights = nullptr;
 	LIGHTS* m_pcbMappedLights = nullptr;
+
+	void SetWaitingLight(bool set);
 };

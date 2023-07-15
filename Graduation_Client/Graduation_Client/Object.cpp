@@ -1720,6 +1720,10 @@ bool TaggersBox::IsPlayerNear(const XMFLOAT3& PlayerPos)
 
 void TaggersBox::Rotate(float fPitch, float fYaw, float fRoll)
 {
+	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
+	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
+
+	UpdateTransform(NULL);
 }
 
 void TaggersBox::render(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -1820,7 +1824,7 @@ void TaggersBox::Reset()
 
 EscapeObject::EscapeObject()
 {
-	m_nUIs = 1;
+	m_nUIs = 2;
 	m_ppInteractionUIs = new InteractionUI * [m_nUIs];
 	for (int i = 0; i < m_nUIs; ++i) {
 		m_ppInteractionUIs[i] = nullptr;
@@ -1833,27 +1837,90 @@ EscapeObject::~EscapeObject()
 
 bool EscapeObject::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
-	return false;
+	float minx, maxx, minz, maxz;
+	switch (m_dir) {
+	case DEGREE0:
+		minx = m_xmf4x4ToParent._41 - 2.0f;
+		maxx = m_xmf4x4ToParent._41 + 2.0f;
+		minz = m_xmf4x4ToParent._43 - 2.5f;
+		maxz = m_xmf4x4ToParent._43 + 2.5f;
+		break;
+	case DEGREE90:
+		minx = m_xmf4x4ToParent._41 - 2.5f;
+		maxx = m_xmf4x4ToParent._41 + 2.5f;
+		minz = m_xmf4x4ToParent._43 - 2.0f;
+		maxz = m_xmf4x4ToParent._43 + 2.0f;
+		break;
+	case DEGREE180:
+		minx = m_xmf4x4ToParent._41 - 2.0f;
+		maxx = m_xmf4x4ToParent._41 + 2.0f;
+		minz = m_xmf4x4ToParent._43 - 2.5f;
+		maxz = m_xmf4x4ToParent._43 + 2.5f;
+		break;
+	default:
+		minx = m_xmf4x4ToParent._41 - 2.5f;
+		maxx = m_xmf4x4ToParent._41 + 2.5f;
+		minz = m_xmf4x4ToParent._43 - 2.0f;
+		maxz = m_xmf4x4ToParent._43 + 2.0f;
+		break;
+	}
+	if (PlayerPos.x > maxx) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.x < minx) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.z < minz) {
+		IsNear = false;
+		return false;
+	}
+	if (PlayerPos.z > maxz) {
+		IsNear = false;
+		return false;
+	}
+	IsNear = true;
+	return true;
 }
 
 void EscapeObject::Rotate(float fPitch, float fYaw, float fRoll)
 {
+	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
+	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_xmf4x4ToParent);
+
+	UpdateTransform(NULL);
 }
 
 void EscapeObject::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	GameObject::render(pd3dCommandList);
 }
 
 void EscapeObject::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (IsWorking) {
+		if (m_ppInteractionUIs[0]) {
+			m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43);
+			m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, 0.0f, m_nUIType);
+		}
+	}
+	else {
+		if (m_ppInteractionUIs[1]) {
+			m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43);
+			m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, 0.0f, m_nUIType);
+		}
+	}
 }
 
 void EscapeObject::update(float fElapsedTime)
 {
+	if (false == IsWorking) return;
 }
 
 void EscapeObject::Interaction(int playerType)
 {
+	if (false == IsWorking) return;
 }
 
 void EscapeObject::SetOpen(bool open)
@@ -1862,11 +1929,28 @@ void EscapeObject::SetOpen(bool open)
 
 void EscapeObject::SetRotation(DIR d)
 {
+	switch (d)
+	{
+	case DEGREE0:
+		m_dir = DEGREE0;
+		break;
+	case DEGREE90:
+		m_dir = DEGREE90;
+		Rotate(0, 90, 0);
+		break;
+	case DEGREE180:
+		m_dir = DEGREE180;
+		Rotate(0, 180, 0);
+		break;
+	default:
+		m_dir = DEGREE270;
+		Rotate(0, -90, 0);
+		break;
+	}
 }
 
 void EscapeObject::SetWorking()
 {
 	// 전력장치가 모두 수리 완료되었을 때 호출
-	if (false == m_bIsReal) return;
 	IsWorking = true; 
 }
