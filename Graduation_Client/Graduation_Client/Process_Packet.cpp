@@ -510,6 +510,18 @@ void Network::Process_EscapeSystem_Update(char* ptr)
 {
 	sc_packet_request_escapesystem_working* packet = reinterpret_cast<sc_packet_request_escapesystem_working*>(ptr);
 	packet->index; // 해당 번호의 탈출장치 working시 뭔가 조작을 할 예정인데 이건 추후 예정
+
+	if (m_pPlayer->GetID() == packet->escape_id) {
+		m_pPlayer->SetType(TYPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
+	}
+	else {
+		for (int i = 0; i < 5; ++i) {
+			if (m_ppOther[i]->GetID() == packet->escape_id) {
+				m_ppOther[i]->SetType(TYPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
+				break;
+			}
+		}
+	}
 }
 
 void Network::Process_Altar_LifeChip_Update(char* ptr)
