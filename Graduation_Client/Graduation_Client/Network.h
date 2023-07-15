@@ -118,6 +118,7 @@ public:
 	void Process_ElectronicSystem_Reset_By_Tagger(char* ptr);
 	void Process_ElectronicSystem_Reset_By_Player(char* ptr);
 	void Process_ElectronicSystemDoor_Update(char* ptr);
+	void Process_ElectonicSystem_Lever_Update(char* ptr);
 	void Process_ElectrinicSystem_Init(char* ptr);
 	void Process_ElectronicSystem_Switch_Update(char* ptr);
 	void Process_ElectronicSystem_Activate(char* ptr);
@@ -128,6 +129,7 @@ public:
 	void Process_Pick_Item_Box_Update(char* ptr);
 	void Process_Pick_Item_Update(char* ptr);
 	void Process_Active_Altar(char* ptr);
+	void Process_Active_EscapeSystem(char* ptr);
 	void Process_Altar_LifeChip_Update(char* ptr);
 
 	// 술래 스킬 적용하는 부분!

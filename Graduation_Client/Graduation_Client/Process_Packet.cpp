@@ -366,6 +366,16 @@ void Network::Process_Hidden_Door_Update(char* ptr)
 		m_Vents[static_cast<int>(packet->door_num)]->SetOpen(false);
 }
 
+void Network::Process_ElectonicSystem_Lever_Update(char* ptr)
+{
+	sc_packet_electronic_system_lever_working* packet = reinterpret_cast<sc_packet_electronic_system_lever_working*>(ptr);
+
+	if (packet->is_start)
+		reinterpret_cast<PowerSwitch*>(m_pPowers[packet->index])->CheckStart();
+	else
+		reinterpret_cast<PowerSwitch*>(m_pPowers[packet->index])->CheckStop();
+}
+
 void Network::Process_ElectronicSystem_Reset_By_Tagger(char* ptr)
 {
 	sc_packet_request_electronic_system_reset* packet = reinterpret_cast<sc_packet_request_electronic_system_reset*>(ptr);
@@ -397,10 +407,12 @@ void Network::Process_ElectrinicSystem_Init(char* ptr)
 
 	for (int i = 0; i < 5; ++i)
 	{
+		std::cout << i << " : ";
 		m_pPowers[i]->SetIndex(i);
 		m_pPowers[i]->SetActivate(false);
 		for (int idx = 0; idx < 10; ++idx)
 		{
+			std::cout << static_cast<int>(packet->data[i].value[idx]) << " ";
 			m_pPowers[i]->SetAnswer(idx, packet->data[i].value[idx]);
 			m_pPowers[i]->SetSwitchValue(idx, false);
 		}
@@ -481,6 +493,12 @@ void Network::Process_Active_Altar(char* ptr)
 	// 여기서 술래 재단을 활성화 해야함.
 	m_Taggers_Box;
 	std::cout << "술래가 재단을 활성화 하였습니다" << std::endl;
+}
+
+void Network::Process_Active_EscapeSystem(char* ptr)
+{
+	sc_packet_escapesystem_activate* packet = reinterpret_cast<sc_packet_escapesystem_activate*>(ptr);
+	std::cout << "탈출장치 [" << packet->index << "]번 활성화" << std::endl;
 }
 
 void Network::Process_Altar_LifeChip_Update(char* ptr)

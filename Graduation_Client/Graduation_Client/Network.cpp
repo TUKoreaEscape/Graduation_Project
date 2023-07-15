@@ -392,9 +392,21 @@ void Network::ProcessPacket(char* ptr)
 		break;
 	}
 
+	case SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_LEVER_WORKING:
+	{
+		Process_ElectonicSystem_Lever_Update(ptr);
+		break;
+	}
+
 	case SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_ACTIVATE_UPDATE:
 	{
 		Process_ElectronicSystem_Activate(ptr);
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_ESCAPESYSTEM_ACTIVATE_UPDATE:
+	{
+		Process_Active_EscapeSystem(ptr);
 		break;
 	}
 

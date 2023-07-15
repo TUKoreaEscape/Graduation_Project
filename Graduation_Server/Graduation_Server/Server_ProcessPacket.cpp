@@ -836,9 +836,40 @@ void cGameServer::Process_ElectronicSystem_Activate(const int user_id, void* buf
 		int ativate_escape_system_index = rand() % 3;
 		room.m_escape_system[ativate_escape_system_index].Activate();
 		// 모든 전력장치 수리가 완료되었을 경우 탈출장치 활성화 시켜야함
+		sc_packet_escapesystem_activate activate_packet;
+		activate_packet.size = sizeof(activate_packet);
+		activate_packet.type = SC_PACKET::SC_PACKET_ESCAPESYSTEM_ACTIVATE_UPDATE;
+		activate_packet.index = ativate_escape_system_index;
+
+		for (auto& player_id : room.in_player) {
+			if (player_id == -1)
+				continue;
+			m_clients[player_id].do_send(sizeof(activate_packet), &activate_packet);
+		}
 	}
 
 
+}
+
+void cGameServer::Process_ElectronicSystem_lever_working(const int user_id, void* buff)
+{
+	cs_packet_electronic_system_lever_working* packet = reinterpret_cast<cs_packet_electronic_system_lever_working*>(buff);
+
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+	sc_packet_electronic_system_lever_working update_packet;
+	update_packet.size = sizeof(update_packet);
+	update_packet.type = SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_LEVER_WORKING;
+	update_packet.index = packet->index;
+	update_packet.is_start = packet->is_start;
+
+	for (auto& player_id : room.in_player) {
+		if (player_id == -1)
+			continue;
+		if (player_id == user_id)
+			continue;
+		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
+	}
 }
 
 void cGameServer::Process_Item_Box_Update(const int user_id, void* buff)

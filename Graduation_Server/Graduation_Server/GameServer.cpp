@@ -836,6 +836,12 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		break;
 	}
 
+	case CS_PACKET::CS_PACKET_ELETRONIC_SYSTEM_LEVER_WORKING:
+	{
+		Process_ElectronicSystem_lever_working(user_id, p);
+		break;
+	}
+
 	case CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_RESET_BY_TAGGER:
 	{
 		Process_ElectronicSystem_Reset_By_Tagger(user_id, p);

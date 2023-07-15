@@ -930,6 +930,17 @@ void PowerSwitch::update(float fElapsedTime)
 	if (keyBuffer['f'] & 0xF0 || keyBuffer['F'] & 0xF0) {
 		if (m_fCooltime < GLOBAL_INTERACTION_COOLTIME) return;
 		if (IsEqual(m_fCheckCooltime, 0)) {
+#if USE_NETWORK
+			Network& network = *Network::GetInstance();
+
+			cs_packet_electronic_system_lever_working packet;
+			packet.size = sizeof(packet);
+			packet.type = CS_PACKET::CS_PACKET_ELETRONIC_SYSTEM_LEVER_WORKING;
+			packet.index = m_switch_index;
+			packet.is_start = true;
+
+			network.send_packet(&packet);
+#endif
 			// 다른 플레이어들에게 CheckStart();
 		}
 		m_fCheckCooltime += fElapsedTime;
@@ -941,6 +952,17 @@ void PowerSwitch::update(float fElapsedTime)
 			m_fCheckCooltime = 0;
 			Input::GetInstance()->m_gamestate->ChangeSameLevelState();
 			// 다른 플레이어들에게 CheckStop();
+#if USE_NETWORK
+			Network& network = *Network::GetInstance();
+
+			cs_packet_electronic_system_lever_working packet;
+			packet.size = sizeof(packet);
+			packet.type = CS_PACKET::CS_PACKET_ELETRONIC_SYSTEM_LEVER_WORKING;
+			packet.index = m_switch_index;
+			packet.is_start = false;
+
+			network.send_packet(&packet);
+#endif
 			return;
 		}
 
@@ -959,6 +981,17 @@ void PowerSwitch::update(float fElapsedTime)
 	else {
 		if (false == IsEqual(m_fCheckCooltime, 0)) {
 			// 다른 플레이어들에게 CheckStop();
+#if USE_NETWORK
+			Network& network = *Network::GetInstance();
+
+			cs_packet_electronic_system_lever_working packet;
+			packet.size = sizeof(packet);
+			packet.type = CS_PACKET::CS_PACKET_ELETRONIC_SYSTEM_LEVER_WORKING;
+			packet.index = m_switch_index;
+			packet.is_start = false;
+
+			network.send_packet(&packet);
+#endif
 		}
 		m_fCheckCooltime = 0;
 	}
@@ -992,7 +1025,7 @@ void PowerSwitch::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 	XMFLOAT4X4 prevMat = m_pMainKnob->m_xmf4x4ToParent;
 	UpdateTransform(nullptr);
-	if (m_bIsOperating) {
+	if (m_bIsOperating || m_bDoesOtherPlayerActive) {
 		XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_fCheckCooltime * -35), XMConvertToRadians(0), XMConvertToRadians(0));
 		m_pMainKnob->m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_pMainKnob->m_xmf4x4ToParent);
 		
