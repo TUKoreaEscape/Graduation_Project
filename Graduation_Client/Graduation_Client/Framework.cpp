@@ -443,6 +443,8 @@ void Framework::UpdateObjects()
 {
 	float fTimeElapsed = time.GetTimeElapsed();
 	timeToSend += fTimeElapsed;
+
+#if USE_NETWORK
 	if (input ->m_pPlayer->GetID() != -1 && (m_gamestate->GetGameState() == READY_TO_GAME || m_gamestate->GetGameState() == PLAYING_GAME)) {
 		cs_packet_move packet;
 		packet.size = sizeof(packet);
@@ -464,11 +466,13 @@ void Framework::UpdateObjects()
 		//std::cout << packet.xmf3Shift.x << ", " << packet.xmf3Shift.y << ", " << packet.xmf3Shift.z << std::endl;
 		//std::cout << packet.look.x << ", " << packet.look.y << ", " << packet.look.z << std::endl;
 		//std::cout << packet.right.x << ", " << packet.right.y << ", " << packet.right.z << std::endl;
-		network->send_packet(&packet);
+		if (Input::GetInstance()->m_pPlayer->GetType() != TYPE_ESCAPE_PLAYER) {
+			network->send_packet(&packet);
 
-		//while (!network.m_recv_move);
-		//network->pos_lock.lock();
-		input->m_pPlayer->SetPosition(network->m_pPlayer_Pos);
+			//while (!network.m_recv_move);
+			//network->pos_lock.lock();
+			input->m_pPlayer->SetPosition(network->m_pPlayer_Pos);
+		}
 		//network->pos_lock.unlock();
 
 		for (int i = 0; i < 5; ++i)
@@ -481,6 +485,8 @@ void Framework::UpdateObjects()
 			}
 		}
 	}
+#endif
+
 	scene->update(fTimeElapsed, m_pd3dDevice, m_pd3dCommandList);
 	if (scene->m_pPlayer->m_pCamera->m_pcbMappedCamera == nullptr)
 	{
