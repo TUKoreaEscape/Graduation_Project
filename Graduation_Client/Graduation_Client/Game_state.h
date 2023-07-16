@@ -10,6 +10,7 @@ enum GAME_STATE {
 	PLAYING_GAME, //게임중
 	ENDING_GAME, //게임이 끝난 후
 	INTERACTION_POWER, // 전력장치 수리
+	GAME_LOADING,
 };
 
 class GameState {
@@ -37,7 +38,8 @@ public:
 	static GameState* GetInstance() {
 		if (GameStateInstance == NULL) {
 			GameStateInstance = new GameState;
-			GameStateInstance->m_GameState = LOGIN;
+			//GameStateInstance->m_GameState = LOGIN;
+			GameStateInstance->m_GameState = GAME_LOADING;
 		}
 		return GameStateInstance;
 	}

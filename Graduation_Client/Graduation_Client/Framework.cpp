@@ -328,6 +328,11 @@ void Framework::CreateCommandQueueAndList()
 	hResult = m_pd3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_ppd3dCommandAllocators[0], NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_pd3dCommandList); //직접(Direct) 명령 리스트를 생성한다.
 
 	hResult = m_pd3dCommandList->Close(); //명령 리스트는 생성되면 열린(Open) 상태이므로 닫힌(Closed) 상태로 만든다.
+
+	// buildThread용 커맨드리스트
+	hResult = m_pd3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)&m_ppd3dBuildCommandAllocators); //직접(Direct) 명령 할당자를 생성한다.
+	hResult = m_pd3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_ppd3dBuildCommandAllocators, NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_pd3dBuildCommandList); //직접(Direct) 명령 리스트를 생성한다.
+	hResult = m_pd3dBuildCommandList->Close();
 }
 
 void Framework::CreateRenderTargetViews()
@@ -421,7 +426,9 @@ void Framework::BuildObjects()
 
 	WaitForGpuComplete();
 
-	scene->ReleaseUploadBuffers();
+	buildThread = std::thread{ &Framework::BuildObjectsThread, this };
+
+	//scene->ReleaseUploadBuffers();
 
 	time.Reset();
 }
@@ -484,16 +491,44 @@ void Framework::UpdateObjects()
 void Framework::FrameAdvance()
 {
 	time.Tick(60.0);
+	
+	HRESULT hResult = m_ppd3dCommandAllocators[m_nSwapChainBufferIndex]->Reset();
+	hResult = m_pd3dCommandList->Reset(m_ppd3dCommandAllocators[m_nSwapChainBufferIndex], NULL); //명령 할당자와 명령 리스트를 리셋한다.
+
+	::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	
+	if (m_gamestate->GetGameState() == GAME_LOADING) {
+		hResult = WaitForSingleObject(buildThread.native_handle(), 30);
+		if (hResult == WAIT_TIMEOUT) {
+			m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+			m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
+			scene->Loadingrender(m_pd3dCommandList);
+
+			::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+
+			hResult = m_pd3dCommandList->Close();
+			ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
+			m_pd3dCommandQueue->ExecuteCommandLists(_countof(ppd3dCommandLists), ppd3dCommandLists);
+
+			m_pdxgiSwapChain->Present(0, 0);
+			MoveToNextFrame();
+
+			time.GetFrameRate(m_pszFrameRate + 10, 37);
+			::SetWindowText(m_hWnd, m_pszFrameRate);
+			return;
+		}
+		else if (hResult == WAIT_OBJECT_0) {
+			m_gamestate->ChangeNextState();
+			buildThread.join();
+		}
+	}
+
 	input->Update(m_hWnd);
 
 	UpdateObjects();
 	if (input->keyBuffer['1'] & 0xF0) m_nDebugOptions = 85;
 	else m_nDebugOptions = 10;
-	HRESULT hResult = m_ppd3dCommandAllocators[m_nSwapChainBufferIndex]->Reset();
-	hResult = m_pd3dCommandList->Reset(m_ppd3dCommandAllocators[m_nSwapChainBufferIndex], NULL); //명령 할당자와 명령 리스트를 리셋한다.
-
-	::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-
+	
 	switch (m_gamestate->GetGameState()) {
 	case LOGIN:
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
@@ -939,4 +974,16 @@ void Framework::TextRender()
 
 		m_pd3d11DeviceContext->Flush();
 	}
+}
+
+void Framework::BuildObjectsThread()
+{
+	m_pd3dBuildCommandList->Reset(m_ppd3dBuildCommandAllocators, NULL);
+	scene->BuildObjectsThread(m_pd3dDevice, m_pd3dBuildCommandList);
+	m_pd3dBuildCommandList->Close();
+	ID3D12CommandList* ppd3dBuildCommandLists[] = { m_pd3dBuildCommandList };
+	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dBuildCommandLists);
+
+	WaitForGpuComplete();
+
 }

@@ -10,6 +10,9 @@ void GameState::ChangeNextState()
 	Player* player = Input::GetInstance()->m_pPlayer;
 	std::cout << m_GameState << " -> ";
 	switch (m_GameState) {
+		case GAME_LOADING:
+			m_GameState = LOGIN;
+			break;
 		case LOGIN:
 			m_GameState = ROOM_SELECT;
 			break;
@@ -50,6 +53,7 @@ void GameState::ChangePrevState()
 	Player* player = Input::GetInstance()->m_pPlayer;
 	std::cout << m_GameState << " -> ";
 	switch (m_GameState) {
+		case GAME_LOADING:
 		case LOGIN:
 			break;
 		case ROOM_SELECT:
@@ -81,6 +85,7 @@ void GameState::ChangeSameLevelState()
 	Player* player = Input::GetInstance()->m_pPlayer;
 	std::cout << m_GameState << " -> ";
 	switch (m_GameState) {
+		case GAME_LOADING:
 		case LOGIN:
 			break;
 		case ROOM_SELECT:
