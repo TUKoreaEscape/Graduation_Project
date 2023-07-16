@@ -77,6 +77,7 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			speed = 60.0f;
 			break;
 		case VK_F6:
+			if (m_gamestate->GetGameState() == GAME_LOADING) break;
 			m_gamestate->ChangeNextState();
 			break;
 		case VK_F7:

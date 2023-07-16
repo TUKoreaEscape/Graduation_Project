@@ -297,6 +297,12 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_UILoading = new GameObject * [m_nLoading];
 	m_UILoading[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Loading.dds", 0.0f, 0.0f, 2.0f, 2.0f);
 
+	m_nPlayers = 5;
+	m_ppPlayers = new Player * [m_nPlayers];
+	for (int i = 0; i < m_nPlayers; ++i) {
+		m_ppPlayers[i] = new Player();
+	}
+
 	m_pPlayer = new Player();
 	m_pPlayer->m_pCamera->start(pd3dDevice, pd3dCommandList);
 }
@@ -1193,10 +1199,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	LoadedModelInfo* pCubeModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/CubeRoom.bin", nullptr);
 	LoadedModelInfo* pCeilModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Ceilling.bin", nullptr);
 
-	m_nPlayers = 5;
-	m_ppPlayers = new Player * [m_nPlayers];
 	for (int i = 0; i < m_nPlayers; ++i) {
-		m_ppPlayers[i] = new Player();
 		m_ppPlayers[i]->SetChild(pPlayerModel->m_pModelRootObject, true);
 		m_ppPlayers[i]->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 2, pPlayerModel);
 		m_ppPlayers[i]->SetAnimation(0);
