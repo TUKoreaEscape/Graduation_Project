@@ -44,20 +44,21 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 	POINT ptMouse;
 	switch (nMessageID)
 	{
+		break;
 	case WM_KEYUP:
 		switch (wParam)
 		{
-		case 'a':
-		case 'A':
-			break;
 		case 'm':
 		case 'M':
-			m_gamestate ->ChangeMicState();
-			std::cout << "m키 누름" << std::endl;
-			if (m_gamestate->GetMicState())
-				Network::GetInstance()->on_voice_talk();
-			else
-				Network::GetInstance()->off_voice_talk();
+			if (m_gamestate->GetGameState() == PLAYING_GAME && !m_gamestate->GetChatState())
+			{
+				m_gamestate->ChangeMicState();
+				std::cout << "m키 누름" << std::endl;
+				if (m_gamestate->GetMicState())
+					Network::GetInstance()->on_voice_talk();
+				else
+					Network::GetInstance()->off_voice_talk();
+			}
 			break;
 		case VK_F1:
 			GetCursorPos(&ptMouse);
@@ -141,26 +142,6 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			{
 				if (m_inputState == 1) InputIdAndPassword(wParam, m_cs_packet_login.id, m_idNum);//id입력
 				else if (m_inputState == 2) InputIdAndPassword(wParam, m_cs_packet_login.pass_word, m_passwordNum); //password입력
-			}
-		}
-		else if (m_gamestate->GetGameState() == PLAYING_GAME && m_gamestate->GetChatState())
-		{
-			if (wParam == VK_BACK) Deletechat(m_cs_packet_chat.message, m_chatNum);
-			else if (wParam == VK_ESCAPE) m_gamestate->ChangeChatState();
-			else  Inputchat(wParam, m_cs_packet_chat.message, m_chatNum);
-			if (wParam == VK_RETURN)
-			{
-				//메시지 보내기
-#if USE_NETWORK
-				Network& network = *Network::GetInstance();
-				m_cs_packet_chat.size = sizeof(m_cs_packet_chat);
-				m_cs_packet_chat.type = CS_PACKET::CS_PACKET_CHAT;
-				m_cs_packet_chat.room_number = network.m_join_room_number;
-				network.send_packet(&m_cs_packet_chat);
-				std::cout << "send : " << m_cs_packet_chat.message << std::endl;
-#endif
-				memset(m_cs_packet_chat.message, 0, 20);
-				m_chatNum = 0;
 			}
 		}
 		break;
@@ -586,47 +567,122 @@ void Input::Receive(char* chat, char* name)
 	strcpy(m_chatlist[0], n);
 }
 
-void Input::Inputchat(char input_char, char* str, int& num)
+LRESULT Input::OnImeComposition(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (isalpha(char(input_char)))
+	TCHAR inChar[2];
+	inChar[0] = wParam;
+	inChar[1] = 0;
+	HIMC hImc;
+	int pos = lstrlen(tmp);
+	int messagelen = strlen(m_cs_packet_chat.message);
+	std::string str;
+	int bufferSize = 0;
+	if (m_gamestate->GetGameState() == PLAYING_GAME && m_gamestate->GetChatState())
 	{
-		if (GetKeyState(VK_SHIFT) < 0) // Shift 키가 눌린 상태인지 확인
-		{
-			if (num < MAX_NAME_SIZE - 1)
+		switch (msg) {
+		case WM_IME_COMPOSITION:   //글씨조합중
+			if (messagelen < m_Limitchatlength)
 			{
-				str[num] = char(input_char);
-				num++;
+				//std::cout << "컴포짓" << std::endl;
+				if (lParam & GCS_COMPSTR) //조립중이라면
+				{
+					if (bComposite) pos--;
+
+					hImc = ImmGetContext(hWnd);	//IME 사용
+					int lenIMM = ImmGetCompositionString(hImc, GCS_COMPSTR, NULL, 0); //조합 중인 문자에 길이를 받습니다.
+					ImmReleaseContext(hWnd, hImc); //IME 자원 해제
+					//조합중에 backspace를 누르는 경우 길이가 0일 수 있습니다. 
+					//이런 경우가 없다면 ImmGetContext를 사용 안해도 될 것 같습니다.
+					if (0 == lenIMM)
+					{
+						pos--;
+						bComposite = false;
+					}
+					else
+					{
+						bComposite = true;
+					}
+					memcpy(tmp + pos, inChar, (lstrlen(inChar) + 1) * sizeof(TCHAR));
+				}
+				bufferSize = WideCharToMultiByte(NULL, 0, tmp, -1, NULL, 0, NULL, NULL);
+				WideCharToMultiByte(NULL, 0, tmp, -1, m_cs_packet_chat.message, bufferSize, NULL, NULL);
+				//std::cout << "컴포지션-";
+				//std::cout << str;
+				//std::cout << "--" << pos << std::endl;
 			}
-		}
-		else
-		{
-			if (num < MAX_NAME_SIZE - 1)
+			//std::cout << "--" << strlen(m_cs_packet_chat.message) << std::endl;
+			//std::cout << "--" << pos << std::endl;
+			break;
+		case WM_CHAR:            // 문자 넘어오기
+			if (wParam == VK_RETURN)
 			{
-				str[num] = char(tolower(input_char));
-				num++;
+				//메시지 보내기
+#if USE_NETWORK
+				Network& network = *Network::GetInstance();
+				m_cs_packet_chat.size = sizeof(m_cs_packet_chat);
+				m_cs_packet_chat.type = CS_PACKET::CS_PACKET_CHAT;
+				m_cs_packet_chat.room_number = network.m_join_room_number;
+				network.send_packet(&m_cs_packet_chat);
+				std::cout << "send : " << m_cs_packet_chat.message << std::endl;
+#endif
+				memset(m_cs_packet_chat.message, 0, 50);
+				memset(tmp, 0, 100);
+				m_chatNum = 0;
 			}
+			else if (wParam == VK_ESCAPE) m_gamestate->ChangeChatState();
+			else if (wParam == VK_BACK) {      // 만약 백스페이스라면
+
+				if (lstrlen(tmp) > 0) {
+
+					if (lstrlen(tmp) < 0) {
+						tmp[lstrlen(tmp) - 1] = 0;
+					}
+					tmp[lstrlen(tmp) - 1] = 0;
+					//총 두바이트를 지운다.
+				}
+			}
+			else {  // 빽스페이스가 아니면
+				if (messagelen < m_Limitchatlength)
+				{
+					//std::cout << "캐릭터" << std::endl;
+					pos = lstrlen(tmp);
+					tmp[pos] = wParam & 0xff;   //  넘어온 문자를 문자열에 
+					pos++;
+					tmp[pos] = 0;
+				}
+			}
+			bufferSize = WideCharToMultiByte(NULL, 0, tmp, -1, NULL, 0, NULL, NULL);
+			WideCharToMultiByte(NULL, 0, tmp, -1, m_cs_packet_chat.message, bufferSize, NULL, NULL);
+			//std::cout << "캐릭터-";
+			//std::wcout << tmp;
+			//std::cout << "--" << pos << std::endl;
+			//std::cout << "--" << strlen(m_cs_packet_chat.message) << std::endl;
+			//std::cout << "--" << pos << std::endl;
+			break;
 		}
 	}
-	else
-	{
-		str[num] = char(input_char);
-		num++;
-	}
-	//std::cout << str << std::endl;
+	return 1;
 }
 
-void Input::Deletechat(char* str, int& num)
+LRESULT Input::OnImeChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	if (num > 0)
+	int messagelen = strlen(m_cs_packet_chat.message);
+	if (messagelen < m_Limitchatlength)
 	{
-		str[num] = '\0';
-		num--;
+		//std::cout << "완성캐릭터" << std::endl;
+		int pos = lstrlen(tmp);
+		if (bComposite) pos--;
+
+		TCHAR szChar[2];
+		szChar[0] = wParam;
+		szChar[1] = 0;
+
+		memcpy(tmp + pos, szChar, (lstrlen(szChar) + 1) * sizeof(TCHAR));
+		bComposite = false;
+		//std::cout << "캐릭터";
+		//std::wcout << tmp << std::endl;
 	}
-	else if (num == 0)
-	{
-		str[num] = '\0';
-	}
-	//std::cout << str << std::endl;
+	return 0;
 }
 
 void Input::InputRoomInfo()

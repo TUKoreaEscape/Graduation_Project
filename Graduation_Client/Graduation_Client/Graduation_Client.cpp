@@ -146,7 +146,15 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    input->OnImeComposition(hWnd, message, wParam, lParam);
     switch (message) {
+    case WM_IME_COMPOSITION:
+        return DefWindowProc(hWnd, WM_IME_COMPOSITION, wParam, lParam);
+        break;
+    case WM_IME_CHAR:
+        input->OnImeChar(hWnd, wParam, lParam);
+        return DefWindowProc(hWnd, WM_IME_COMPOSITION, wParam, lParam);
+        break;
     case WM_SIZE:
     case WM_LBUTTONDOWN:
     case WM_LBUTTONUP:

@@ -43,6 +43,7 @@ using Microsoft::WRL::ComPtr;
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")
 #pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "imm32.lib")
 
 #define FRAME_BUFFER_WIDTH 1600
 #define FRAME_BUFFER_HEIGHT 900
@@ -60,6 +61,9 @@ using Microsoft::WRL::ComPtr;
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
+#include <string>
+#include <tchar.h>
+#include <Windows.h>
 #include <unordered_map>
 #include <set>
 

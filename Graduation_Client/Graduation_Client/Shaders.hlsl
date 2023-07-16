@@ -95,7 +95,7 @@ struct PS_MULTIPLE_RENDER_TARGETS_OUTPUT
 	float4 f4Color : SV_TARGET1;
 	float4 f4Normal : SV_TARGET2;
 	float4 f4Albedo : SV_TARGET3;
-	float2 f4Specular : SV_TARGET4;
+	float4 f4Specular : SV_TARGET4;
 	float4 f4CameraNormal : SV_TARGET5;
 };
 
