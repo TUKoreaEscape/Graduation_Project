@@ -342,6 +342,7 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 				continue;
 			m_clients[room.in_player[i]].set_user_position(XMFLOAT3(static_cast<float>(6.f - ((float)i * 2.5)), 5.f, -10.f));
 			m_clients[room.in_player[i]].set_life_chip(true);
+			m_clients[room.in_player[i]].set_escape_state(false);
 		}
 
 		for (int i = 0; i < room.m_door_object.size(); ++i)
@@ -1004,6 +1005,9 @@ void cGameServer::Process_EscapeSystem(const int user_id, void* buff)
 	if (m_clients[user_id].get_life_chip() == false)
 		return;
 
+	if (false == m_clients[user_id].get_escape_state())
+		m_clients[user_id].set_escape_state(true);
+
 	cs_packet_request_escapesystem_working* packet = reinterpret_cast<cs_packet_request_escapesystem_working*>(buff);
 
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
@@ -1029,7 +1033,7 @@ void cGameServer::Process_EscapeSystem(const int user_id, void* buff)
 	sc_packet_request_escapesystem_working update_packet;
 
 	update_packet.size = sizeof(update_packet);
-	update_packet.type = SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_LEVER_WORKING;
+	update_packet.type = SC_PACKET::SC_PACKET_REQUEST_ESCAPESYSTEM_WORKING;
 	update_packet.index = packet->index;
 	update_packet.escape_id = user_id;
 
@@ -1038,6 +1042,21 @@ void cGameServer::Process_EscapeSystem(const int user_id, void* buff)
 			continue;
 		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
 	}
+
+	// 밑의 코드는 탈출장치를 한번 가동시 랜덤으로 또 지정해주기 위해 작성해둔 코드입니다. 아직은 미사용
+
+	/*sc_packet_escapesystem_activate re_packet;
+	re_packet.size = sizeof(re_packet);
+	re_packet.type = SC_PACKET::SC_PACKET_ESCAPESYSTEM_ACTIVATE_UPDATE;
+	re_packet.index = rand() % 3;
+
+	for (auto& player_id : room.in_player) {
+		if (player_id == -1)
+			continue;
+		if (player_id == user_id)
+			continue;
+		m_clients[player_id].do_send(sizeof(re_packet), &re_packet);
+	}*/
 }
 
 void cGameServer::Server_End()

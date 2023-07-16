@@ -634,6 +634,8 @@ CollisionInfo Room::is_collision_player_to_player(const int& player_id, const XM
 			continue;
 		if (in_player[i] == -1)
 			continue;
+		if (true == server.m_clients[in_player[i]].get_escape_state())
+			continue;
 
 		CLIENT& other_player = *server.get_client_info(in_player[i]);
 		BoundingOrientedBox other_player_bounding_box = other_player.get_bounding_box();
