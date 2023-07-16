@@ -1001,18 +1001,22 @@ void cGameServer::Process_EscapeSystem(const int user_id, void* buff)
 {
 	// 해당위치에 탈출장치 조작패킷 도착할 예정
 	// working 여부에 따라 gameend 처리 해야함.
+	if (m_clients[user_id].get_life_chip() == false)
+		return;
+
 	cs_packet_request_escapesystem_working* packet = reinterpret_cast<cs_packet_request_escapesystem_working*>(buff);
 
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
+
+	if (room.m_escape_system[packet->index].Is_Activate() == false) {
+		TIMER_EVENT ev;
+		ev.event_type = EventType::WORKING_ESCAPE_SYSTEM;
+		ev.event_time = chrono::system_clock::now() + 120s; // 탈출장치 작동 후 2분간 시간 부여 만약 end시간이 더 가까운 경우 end시간을 우선시함
+		ev.room_number = m_clients[user_id].get_join_room_number();
+		m_timer_queue.push(ev);
+	}
 	room.m_escape_system[packet->index].Activate();
-
-	TIMER_EVENT ev;
-	ev.event_type = EventType::WORKING_ESCAPE_SYSTEM;
-	ev.event_time = chrono::system_clock::now() + 120s; // 탈출장치 작동 후 2분간 시간 부여 만약 end시간이 더 가까운 경우 end시간을 우선시함
-	ev.room_number = m_clients[user_id].get_join_room_number();
-
-	m_timer_queue.push(ev);
 
 	
 	for (int i = 0; i < room.in_escape_player.size(); ++i) {
