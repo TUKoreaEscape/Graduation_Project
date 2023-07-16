@@ -6,7 +6,6 @@
 void Network::Process_Player_Exit(char* ptr)
 {
 	sc_packet_player_exit* packet = reinterpret_cast<sc_packet_player_exit*>(ptr);
-	std::cout << "나간패킷 받음" << std::endl;
 	for (int i = 0; i < 5; ++i)
 	{
 		if (m_ppOther[i]->GetID() == -1)
@@ -88,6 +87,12 @@ void Network::Process_Game_End(char* ptr)
 {
 	sc_packet_game_end* packet = reinterpret_cast<sc_packet_game_end*>(ptr);
 	m_tagger_win = packet->is_tagger_win;
+
+	for (int i = 0; i < 6; ++i)
+		m_escape_player_id[i] = -1;
+
+	for (int i = 0; i < 6; ++i)
+		m_escape_player_id[i] = packet->escape_id[i]; // 탈출한 사람 id를 저장함
 
 	for (int i = 0; i < 5; ++i)
 		m_other_player_ready[i] = false;
@@ -366,6 +371,16 @@ void Network::Process_Hidden_Door_Update(char* ptr)
 		m_Vents[static_cast<int>(packet->door_num)]->SetOpen(false);
 }
 
+void Network::Process_ElectonicSystem_Lever_Update(char* ptr)
+{
+	sc_packet_electronic_system_lever_working* packet = reinterpret_cast<sc_packet_electronic_system_lever_working*>(ptr);
+
+	if (packet->is_start)
+		reinterpret_cast<PowerSwitch*>(m_pPowers[packet->index])->CheckStart();
+	else
+		reinterpret_cast<PowerSwitch*>(m_pPowers[packet->index])->CheckStop();
+}
+
 void Network::Process_ElectronicSystem_Reset_By_Tagger(char* ptr)
 {
 	sc_packet_request_electronic_system_reset* packet = reinterpret_cast<sc_packet_request_electronic_system_reset*>(ptr);
@@ -397,10 +412,12 @@ void Network::Process_ElectrinicSystem_Init(char* ptr)
 
 	for (int i = 0; i < 5; ++i)
 	{
+		std::cout << i << " : ";
 		m_pPowers[i]->SetIndex(i);
 		m_pPowers[i]->SetActivate(false);
 		for (int idx = 0; idx < 10; ++idx)
 		{
+			std::cout << static_cast<int>(packet->data[i].value[idx]) << " ";
 			m_pPowers[i]->SetAnswer(idx, packet->data[i].value[idx]);
 			m_pPowers[i]->SetSwitchValue(idx, false);
 		}
@@ -481,6 +498,30 @@ void Network::Process_Active_Altar(char* ptr)
 	// 여기서 술래 재단을 활성화 해야함.
 	m_Taggers_Box;
 	std::cout << "술래가 재단을 활성화 하였습니다" << std::endl;
+}
+
+void Network::Process_Active_EscapeSystem(char* ptr)
+{
+	sc_packet_escapesystem_activate* packet = reinterpret_cast<sc_packet_escapesystem_activate*>(ptr);
+	std::cout << "탈출장치 [" << packet->index << "]번 활성화" << std::endl;
+}
+
+void Network::Process_EscapeSystem_Update(char* ptr)
+{
+	sc_packet_request_escapesystem_working* packet = reinterpret_cast<sc_packet_request_escapesystem_working*>(ptr);
+	packet->index; // 해당 번호의 탈출장치 working시 뭔가 조작을 할 예정인데 이건 추후 예정
+
+	if (m_pPlayer->GetID() == packet->escape_id) {
+		m_pPlayer->SetType(TYPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
+	}
+	else {
+		for (int i = 0; i < 5; ++i) {
+			if (m_ppOther[i]->GetID() == packet->escape_id) {
+				m_ppOther[i]->SetType(TYPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
+				break;
+			}
+		}
+	}
 }
 
 void Network::Process_Altar_LifeChip_Update(char* ptr)

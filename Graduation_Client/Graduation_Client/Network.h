@@ -7,7 +7,7 @@
 #include "Server_Timer.h"
 
 #define  DIR_NO 100
-#define  USE_NETWORK 0
+#define  USE_NETWORK 1
 #define	 USE_VOICE 0
 
 class Door;
@@ -36,7 +36,7 @@ private:
 
 private:
 	SOCKET				m_socket;
-	const char*			SERVER_ADDR = "127.0.0.1";
+	const char*			SERVER_ADDR = "172.30.1.52";
 	Server_Timer		m_server_counter;
 	Custom				data;
 
@@ -66,6 +66,9 @@ public: // 술래가 플레이시 사용하는 변수
 	int					m_tagger_id = -1;
 	bool				m_tagger_win = false;
 	int					m_before_player_type = TYPE_PLAYER_YET;
+
+public: // 엔딩창에 사용할 목적인 변수 (술래가 패배한 경우)
+	int					m_escape_player_id[6];
 
 public: // 방 선택창에서 사용하는 변수
 	int					m_join_room_number = -1;
@@ -118,9 +121,11 @@ public:
 	void Process_ElectronicSystem_Reset_By_Tagger(char* ptr);
 	void Process_ElectronicSystem_Reset_By_Player(char* ptr);
 	void Process_ElectronicSystemDoor_Update(char* ptr);
+	void Process_ElectonicSystem_Lever_Update(char* ptr);
 	void Process_ElectrinicSystem_Init(char* ptr);
 	void Process_ElectronicSystem_Switch_Update(char* ptr);
 	void Process_ElectronicSystem_Activate(char* ptr);
+	void Process_EscapeSystem_Update(char* ptr);
 	void Process_Attack_Packet(char* ptr);
 	void Process_LifeChip_Update(char* ptr);
 	void Process_Tagger_Collect_LifeChip(char* ptr);
@@ -128,6 +133,7 @@ public:
 	void Process_Pick_Item_Box_Update(char* ptr);
 	void Process_Pick_Item_Update(char* ptr);
 	void Process_Active_Altar(char* ptr);
+	void Process_Active_EscapeSystem(char* ptr);
 	void Process_Altar_LifeChip_Update(char* ptr);
 
 	// 술래 스킬 적용하는 부분!
@@ -155,6 +161,17 @@ public:
 	void Send_Attack_Packet();
 
 	void send_packet(void* packet);
+
+public:
+	std::wstring StringToWString(const std::string& str)
+	{
+		int length = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, NULL, 0);
+		wchar_t* buffer = new wchar_t[length];
+		MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, buffer, length);
+		std::wstring result(buffer);
+		delete[] buffer;
+		return result;
+	}
 
 public: // 보이스톡 관련 함수
 	void on_voice_talk();

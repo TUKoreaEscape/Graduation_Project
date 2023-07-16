@@ -344,6 +344,9 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 			m_clients[room.in_player[i]].set_life_chip(true);
 		}
 
+		for (int i = 0; i < room.m_door_object.size(); ++i)
+			room.m_door_object[i].m_check_bounding_box = true;
+
 		sc_packet_init_position init_packet;
 		init_packet.size = sizeof(init_packet);
 		init_packet.type = SC_PACKET::SC_PACKET_INIT_POSITION;
@@ -833,9 +836,40 @@ void cGameServer::Process_ElectronicSystem_Activate(const int user_id, void* buf
 		int ativate_escape_system_index = rand() % 3;
 		room.m_escape_system[ativate_escape_system_index].Activate();
 		// 모든 전력장치 수리가 완료되었을 경우 탈출장치 활성화 시켜야함
+		sc_packet_escapesystem_activate activate_packet;
+		activate_packet.size = sizeof(activate_packet);
+		activate_packet.type = SC_PACKET::SC_PACKET_ESCAPESYSTEM_ACTIVATE_UPDATE;
+		activate_packet.index = ativate_escape_system_index;
+
+		for (auto& player_id : room.in_player) {
+			if (player_id == -1)
+				continue;
+			m_clients[player_id].do_send(sizeof(activate_packet), &activate_packet);
+		}
 	}
 
 
+}
+
+void cGameServer::Process_ElectronicSystem_lever_working(const int user_id, void* buff)
+{
+	cs_packet_electronic_system_lever_working* packet = reinterpret_cast<cs_packet_electronic_system_lever_working*>(buff);
+
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+	sc_packet_electronic_system_lever_working update_packet;
+	update_packet.size = sizeof(update_packet);
+	update_packet.type = SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_LEVER_WORKING;
+	update_packet.index = packet->index;
+	update_packet.is_start = packet->is_start;
+
+	for (auto& player_id : room.in_player) {
+		if (player_id == -1)
+			continue;
+		if (player_id == user_id)
+			continue;
+		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
+	}
 }
 
 void cGameServer::Process_Item_Box_Update(const int user_id, void* buff)
@@ -960,6 +994,45 @@ void cGameServer::Process_Altar_LifeChip_Update(const int user_id)
 	{
 		// 여기는 Tagger가 승리한 조건을 달성한 경우 활성화
 		room.End_Game(true);
+	}
+}
+
+void cGameServer::Process_EscapeSystem(const int user_id, void* buff)
+{
+	// 해당위치에 탈출장치 조작패킷 도착할 예정
+	// working 여부에 따라 gameend 처리 해야함.
+	cs_packet_request_escapesystem_working* packet = reinterpret_cast<cs_packet_request_escapesystem_working*>(buff);
+
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+	room.m_escape_system[packet->index].Activate();
+
+	TIMER_EVENT ev;
+	ev.event_type = EventType::WORKING_ESCAPE_SYSTEM;
+	ev.event_time = chrono::system_clock::now() + 120s; // 탈출장치 작동 후 2분간 시간 부여 만약 end시간이 더 가까운 경우 end시간을 우선시함
+	ev.room_number = m_clients[user_id].get_join_room_number();
+
+	m_timer_queue.push(ev);
+
+	
+	for (int i = 0; i < room.in_escape_player.size(); ++i) {
+		if (room.in_escape_player[i] == -1) {
+			room.in_escape_player[i] = user_id;
+			break;
+		}
+	}
+
+	sc_packet_request_escapesystem_working update_packet;
+
+	update_packet.size = sizeof(update_packet);
+	update_packet.type = SC_PACKET::SC_PACKET_ELECTRONIC_SYSTEM_LEVER_WORKING;
+	update_packet.index = packet->index;
+	update_packet.escape_id = user_id;
+
+	for (auto& player_id : room.in_player) {
+		if (player_id == -1)
+			continue;
+		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
 	}
 }
 
