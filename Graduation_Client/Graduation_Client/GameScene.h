@@ -115,6 +115,7 @@ public:
 	virtual void WaitingRoomrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Endingrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Powerrender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void Loadingrender(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
@@ -152,4 +153,8 @@ public:
 	virtual void update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void CheckCameraPos(const XMFLOAT3 camera);
+
+	void BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+
+	friend class Framework;
 };

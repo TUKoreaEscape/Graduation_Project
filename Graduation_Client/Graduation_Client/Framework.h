@@ -41,6 +41,9 @@ private:
 	ID3D12CommandAllocator* m_ppd3dCommandAllocators[m_nSwapChainBuffers];
 	ID3D12GraphicsCommandList* m_pd3dCommandList; //명령 큐, 명령 할당자, 명령 리스트 인터페이스 포인터이다.
 
+	ID3D12CommandAllocator* m_ppd3dBuildCommandAllocators;
+	ID3D12GraphicsCommandList* m_pd3dBuildCommandList; //명령 큐, 명령 할당자, 명령 리스트 인터페이스 포인터이다.
+
 	D3D12_CPU_DESCRIPTOR_HANDLE		m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBuffers];//
 
 	D3D12_CPU_DESCRIPTOR_HANDLE		m_d3dDsvDescriptorCPUHandle;//
@@ -91,6 +94,8 @@ private:
 	_TCHAR						m_pszFrameRate[70];
 
 	int								m_nDebugOptions = 10; // U
+
+	std::thread buildThread;
 public:
 	Framework();
 	~Framework();
@@ -121,6 +126,8 @@ public:
 	void MoveToNextFrame();
 
 	void TextRender();
+
+	void BuildObjectsThread();
 };
 
 /*

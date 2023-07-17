@@ -103,6 +103,7 @@ void Room::End_Game(bool is_tagger_win)
 		if (player_id == -1)
 			continue;
 		server.m_clients[player_id].do_send(sizeof(packet), &packet);
+		server.m_clients[player_id].set_escape_state(false);
 		if (tmp_id == -1)
 			tmp_id = player_id;
 	}

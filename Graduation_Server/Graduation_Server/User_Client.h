@@ -48,6 +48,9 @@ private: // 아이템 부분
 	bool					m_life_chip = false;
 	bool					m_item_own[4]{ false };
 
+private:
+	bool					m_escape_player = false;
+
 public:
 	unordered_set <int> room_list; 
 	unordered_set <int> view_list; // 현재는 사용하지 않지만 맵을 서버에 추가할 때 사용할 예정
@@ -136,6 +139,10 @@ public:
 	bool				get_item_own(GAME_ITEM::ITEM item) { return m_item_own[item]; }
 	void				set_life_chip(bool value) { m_life_chip = value; }
 	bool				get_life_chip() { return m_life_chip; }
+
+	// 탈출장치 관련 함수
+	void				set_escape_state(bool value) { m_escape_player = true; }
+	bool				get_escape_state() { return m_escape_player; }
 	
 
 	// 네트워크용 함수 2개

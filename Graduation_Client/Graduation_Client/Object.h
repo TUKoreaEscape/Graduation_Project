@@ -325,3 +325,27 @@ public:
 	void CollectChip() { m_nLifeChips++; };
 	void Reset();
 };
+
+class EscapeObject : public InteractionObject
+{
+public:
+	EscapeObject();
+	virtual ~EscapeObject();
+
+	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
+	void Rotate(float fPitch, float fYaw, float fRoll);
+	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
+	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
+	virtual void update(float fElapsedTime) override;
+
+	void Interaction(int playerType) override;
+	void SetOpen(bool open) override;
+
+	virtual void SetRotation(DIR d) override;
+
+public:
+	bool m_bIsReal = false;
+	void SetReal() { m_bIsReal = true; };
+	
+	void SetWorking();
+};

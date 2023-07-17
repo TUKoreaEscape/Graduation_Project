@@ -70,8 +70,6 @@ void Network::Process_Init_Position(char* ptr)
 void Network::Process_Chat(char* ptr)
 {
 	sc_packet_chat* packet = reinterpret_cast<sc_packet_chat*>(ptr);
-	
-	// 여기서 동규가 넘겨주는 채팅 관련 함수에 넣어주면 됨
 	std::cout << "[" << packet->name << "] : " << packet->message << std::endl;
 	Input::GetInstance()->Receive(packet->message, packet->name);
 }
@@ -512,12 +510,13 @@ void Network::Process_EscapeSystem_Update(char* ptr)
 	packet->index; // 해당 번호의 탈출장치 working시 뭔가 조작을 할 예정인데 이건 추후 예정
 
 	if (m_pPlayer->GetID() == packet->escape_id) {
-		m_pPlayer->SetType(TYPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
+		m_pPlayer->SetType(TYPE_ESCAPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
+		// 만약 내가 탈출한 경우 관전모드 전환일수 있으므로 카메라 조절시 여기다가 추가 예정
 	}
 	else {
 		for (int i = 0; i < 5; ++i) {
 			if (m_ppOther[i]->GetID() == packet->escape_id) {
-				m_ppOther[i]->SetType(TYPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
+				m_ppOther[i]->SetType(TYPE_ESCAPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
 				break;
 			}
 		}
