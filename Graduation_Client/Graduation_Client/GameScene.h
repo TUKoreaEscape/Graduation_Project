@@ -91,7 +91,7 @@ public:
 	GameObject* Items[NUM_ITEMS];
 
 	InteractionUI** m_ppObjectsUIs = nullptr;
-	int m_nObejctsUIs{};
+	int m_nObjectsUIs{};
 protected:
 	static ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap;
 

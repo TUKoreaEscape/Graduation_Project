@@ -992,4 +992,5 @@ void Framework::BuildObjectsThread()
 
 	WaitForGpuComplete();
 
+	scene->ReleaseUploadBuffers();
 }
