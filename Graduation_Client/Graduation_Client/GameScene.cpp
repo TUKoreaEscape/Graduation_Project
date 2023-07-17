@@ -1197,13 +1197,13 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 void GameScene::MakeTaggers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	LoadedModelInfo* pBoxModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/AmmoBox.bin", nullptr);
+	LoadedModelInfo* pBoxModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Altar.bin", nullptr);
 
 	Taggers = new TaggersBox();
 	Taggers->SetChild(pBoxModel->m_pModelRootObject, true);
 	Taggers->SetUI(0, m_ppObjectsUIs[0]);
 	Taggers->SetUI(1, m_ppObjectsUIs[5]);
-	Taggers->SetPosition(-4.0f, 0.8f, -0.5f);
+	Taggers->SetPosition(-3.71f, 0.93f, -2.44f);
 
 	if (pBoxModel) delete pBoxModel;
 }

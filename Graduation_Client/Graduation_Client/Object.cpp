@@ -1744,7 +1744,7 @@ TaggersBox::~TaggersBox()
 bool TaggersBox::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
 	float dist = (m_xmf4x4ToParent._41 - PlayerPos.x) * (m_xmf4x4ToParent._41 - PlayerPos.x) + (m_xmf4x4ToParent._43 - PlayerPos.z) * (m_xmf4x4ToParent._43 - PlayerPos.z);
-	if (dist > 4.0f) { 
+	if (dist > 25.0f) { 
 		IsNear = false;
 		return false; }
 	IsNear = true;
@@ -1768,15 +1768,18 @@ void TaggersBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (Input::GetInstance()->m_pPlayer->GetType() != TYPE_TAGGER) return;
 	if (IsNear) {
+		XMFLOAT3 pos = Input::GetInstance()->m_pPlayer->GetPosition();
+		XMFLOAT3 look = Input::GetInstance()->m_pPlayer->GetLookVector();
+		XMFLOAT3 UIpos = Vector3::Add(pos, look);
 		if (m_bActivate) {
 			if (m_ppInteractionUIs[1]) {
-				m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43);
+				m_ppInteractionUIs[1]->SetPosition(UIpos.x, 1.5f, UIpos.z);
 				m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, 0.0f, m_nUIType);
 			}
 		}
 		else {
 			if (m_ppInteractionUIs[0]) {
-				m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43);
+				m_ppInteractionUIs[0]->SetPosition(UIpos.x, 1.5f, UIpos.z);
 				m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 			}
 		}
