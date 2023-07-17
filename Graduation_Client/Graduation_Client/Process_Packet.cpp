@@ -95,6 +95,8 @@ void Network::Process_Game_End(char* ptr)
 	for (int i = 0; i < 5; ++i)
 		m_other_player_ready[i] = false;
 
+	reinterpret_cast<TaggersBox*>(m_Taggers_Box)->Reset();
+
 	GameState& game_state = *GameState::GetInstance();
 	game_state.ChangeNextState();
 
