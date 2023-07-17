@@ -1424,7 +1424,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	MakePowers(pd3dDevice, pd3dCommandList);
 	MakeBoxes(pd3dDevice, pd3dCommandList);
 	MakeTaggers(pd3dDevice, pd3dCommandList);
-	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(1.0f);
+	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.9f);
 #if USE_NETWORK
 	char id[20]{};
 	char pw[20]{};
@@ -1454,4 +1454,5 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 #if USE_CHAT_TEST
 	send_thread = std::thread{ &Network::Debug_send_thread, m_network };
 #endif
+	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(1.0f);
 }

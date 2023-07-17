@@ -42,7 +42,7 @@ Framework::Framework()
 	timeToSend = 0.0f;
 
 
-	_tcscpy_s(m_pszFrameRate, _T("fps Test ("));
+	_tcscpy_s(m_pszFrameRate, _T("Who's the Tagger? ("));
 }
 
 Framework::~Framework()
@@ -519,7 +519,7 @@ void Framework::FrameAdvance()
 			m_pdxgiSwapChain->Present(0, 0);
 			MoveToNextFrame();
 
-			time.GetFrameRate(m_pszFrameRate + 10, 37);
+			time.GetFrameRate(m_pszFrameRate + 19, 37);
 			::SetWindowText(m_hWnd, m_pszFrameRate);
 			return;
 		}
@@ -626,7 +626,7 @@ void Framework::FrameAdvance()
 	/*스왑체인을 프리젠트한다. 프리젠트를 하면 현재 렌더 타겟(후면버퍼)의 내용이 전면버퍼로 옮겨지고 렌더 타겟 인덱스가 바뀔 것이다.*/
 	MoveToNextFrame();
 
-	time.GetFrameRate(m_pszFrameRate + 10, 37);
+	time.GetFrameRate(m_pszFrameRate + 19, 37);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 
 }
