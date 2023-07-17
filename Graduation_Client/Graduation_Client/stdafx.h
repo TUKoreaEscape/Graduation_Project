@@ -32,6 +32,9 @@
 #include <d3d11on12.h>
 #include <d2d1_1helper.h>
 
+#include <Mmsystem.h>
+#pragma comment(lib,"winmm.lib")
+
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 using Microsoft::WRL::ComPtr;

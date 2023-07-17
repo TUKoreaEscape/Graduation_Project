@@ -1247,11 +1247,29 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.0f);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 0);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackEnable(1, false);
+	
+	m_pPlayer->m_pSkinnedAnimationController->SetCallbackKeys(0, 1, 2);
+	m_pPlayer->m_pSkinnedAnimationController->SetCallbackKey(0, 1, 0, 0.166f, _T("Sound/Footstep01.wav"));
+	m_pPlayer->m_pSkinnedAnimationController->SetCallbackKey(0, 1, 1, 0.5f, _T("Sound/Footstep02.wav"));
+	m_pPlayer->m_pSkinnedAnimationController->SetCallbackKeys(0, 2, 2);
+	m_pPlayer->m_pSkinnedAnimationController->SetCallbackKey(0, 2, 0, 0.166f, _T("Sound/Footstep01.wav"));
+	m_pPlayer->m_pSkinnedAnimationController->SetCallbackKey(0, 2, 1, 0.5f, _T("Sound/Footstep02.wav"));
+	m_pPlayer->m_pSkinnedAnimationController->SetCallbackKeys(0, 3, 2);
+	m_pPlayer->m_pSkinnedAnimationController->SetCallbackKey(0, 3, 0, 0.166f, _T("Sound/Footstep01.wav"));
+	m_pPlayer->m_pSkinnedAnimationController->SetCallbackKey(0, 3, 1, 0.5f, _T("Sound/Footstep02.wav"));
+	m_pPlayer->m_pSkinnedAnimationController->SetCallbackKeys(0, 4, 2);
+	m_pPlayer->m_pSkinnedAnimationController->SetCallbackKey(0, 4, 0, 0.166f, _T("Sound/Footstep01.wav"));
+	m_pPlayer->m_pSkinnedAnimationController->SetCallbackKey(0, 4, 1, 0.5f, _T("Sound/Footstep02.wav"));
 	m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -3.0f));
 	for (int j = 0; j < 6; ++j)
 		GameObject::SetParts(0, j, 0);
 	GameObject::SetParts(0, 0, 4);
 	m_pPlayer->PlayerNum = 0;
+	AnimationCallbackHandler* pAnimationCallbackHandler = new SoundCallbackHandler();
+	m_pPlayer->m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 1, pAnimationCallbackHandler);
+	m_pPlayer->m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 2, pAnimationCallbackHandler);
+	m_pPlayer->m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 3, pAnimationCallbackHandler);
+	m_pPlayer->m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 4, pAnimationCallbackHandler);
 
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.3f);
 	m_pLight = new GameObject();

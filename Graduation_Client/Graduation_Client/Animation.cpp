@@ -43,12 +43,6 @@ void AnimationSet::SetPosition(float fTrackPosition)
 	case ANIMATION_TYPE_PINGPONG:
 		break;
 	}
-
-	if (m_pAnimationCallbackHandler)
-	{
-		void* pCallbackData = GetCallbackData();
-		if (pCallbackData) m_pAnimationCallbackHandler->HandleCallback(pCallbackData);
-	}
 }
 
 XMFLOAT4X4 AnimationSet::GetSRT(int nBone)
@@ -123,6 +117,21 @@ void* AnimationSet::GetCallbackData()
 		if (::IsEqual(m_pCallbackKeys[i].m_fTime, m_fPosition, ANIMATION_CALLBACK_EPSILON)) return(m_pCallbackKeys[i].m_pCallbackData);
 	}
 	return(NULL);
+}
+
+void AnimationSet::HandleCallback()
+{
+	if (m_pAnimationCallbackHandler)
+	{
+		for (int i = 0; i < m_nCallbackKeys; i++)
+		{
+			if (::IsEqual(m_pCallbackKeys[i].m_fTime, m_fPosition, ANIMATION_CALLBACK_EPSILON))
+			{
+				if (m_pCallbackKeys[i].m_pCallbackData) m_pAnimationCallbackHandler->HandleCallback(m_pCallbackKeys[i].m_pCallbackData, m_fPosition);
+				break;
+			}
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -301,7 +310,7 @@ void AnimationController::AdvanceTime(float fTimeElapsed, GameObject* pRootGameO
 
 		for (int i = 0; i < m_nSkinnedMeshes; i++)
 		{
-			bool isNotUpdate = true;
+			/*bool isNotUpdate = true;
 			if (player == 0) {
 				for (const std::string& str : GameObject::PlayerParts) {
 					if (!strcmp(str.c_str(), m_ppSkinnedMeshes[i]->m_pstrMeshName)) {
@@ -319,7 +328,7 @@ void AnimationController::AdvanceTime(float fTimeElapsed, GameObject* pRootGameO
 				}
 			}
 			if (isNotUpdate)
-				continue;
+				continue;*/
 			for (int j = 0; j < m_pnAnimatedBoneFrames[i]; j++)
 			{
 				XMFLOAT4X4 xmf4x4Transform = Matrix4x4::Zero();
@@ -338,6 +347,11 @@ void AnimationController::AdvanceTime(float fTimeElapsed, GameObject* pRootGameO
 		}
 
 		pRootGameObject->UpdateTransform(NULL);
+
+		for (int k = 0; k < m_nAnimationTracks; k++)
+		{
+			if (m_pAnimationTracks[k].m_bEnable) m_ppAnimationSets[0]->m_ppAnimationSets[m_pAnimationTracks[k].m_nAnimationSet]->HandleCallback();
+		}
 	}
 }
 
@@ -352,4 +366,20 @@ LoadedModelInfo::~LoadedModelInfo()
 		if (m_pppAnimatedBoneFrameCaches[i]) delete[] m_pppAnimatedBoneFrameCaches[i];
 	}
 	if (m_pppAnimatedBoneFrameCaches) delete[] m_pppAnimatedBoneFrameCaches;
+}
+
+void SoundCallbackHandler::HandleCallback(void* pCallbackData, float fTrackPosition)
+{
+	_TCHAR* pWavName = (_TCHAR*)pCallbackData;
+#ifdef _WITH_DEBUG_CALLBACK_DATA
+	TCHAR pstrDebug[256] = { 0 };
+	_stprintf_s(pstrDebug, 256, _T("%s(%f)\n"), pWavName, fTrackPosition);
+	OutputDebugString(pstrDebug);
+#endif
+#ifdef _WITH_SOUND_RESOURCE
+	PlaySound(pWavName, ::ghAppInstance, SND_RESOURCE | SND_ASYNC);
+#else
+	std::cout << "Play Sound\n";
+	PlaySound(pWavName, NULL, SND_FILENAME | SND_ASYNC);
+#endif
 }

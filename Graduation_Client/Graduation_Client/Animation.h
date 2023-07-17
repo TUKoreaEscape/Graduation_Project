@@ -17,7 +17,18 @@ struct CALLBACKKEY
 class AnimationCallbackHandler
 {
 public:
-	virtual void HandleCallback(void* pCallbackData) { }
+	virtual void HandleCallback(void* pCallbackData, float fTrackPosition) { }
+};
+
+class SoundCallbackHandler : public AnimationCallbackHandler
+{
+public:
+	SoundCallbackHandler() { }
+	~SoundCallbackHandler() { }
+
+public:
+	virtual void HandleCallback(void* pCallbackData, float fTrackPosition);
+
 };
 //#define _WITH_ANIMATION_SRT		//애니메이션 행렬 대신에 SRT 정보를 사용
 #define _WITH_ANIMATION_INTERPOLATION
@@ -73,6 +84,8 @@ public:
 	void SetAnimationCallbackHandler(AnimationCallbackHandler* pCallbackHandler);
 
 	void* GetCallbackData();
+
+	void HandleCallback();
 };
 
 class AnimationSets
