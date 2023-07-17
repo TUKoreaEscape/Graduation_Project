@@ -78,18 +78,17 @@ void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	m_pTerrainShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 6, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
 	m_pTerrainShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
-	m_pDoorUIShader = new DoorUIShader();
-	m_pDoorUIShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
-	m_pDoorUIShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	m_pUIShader = new UIShader();
+	m_pUIShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 6, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
+	m_pUIShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
 }
 
 void Material::PrepareUIShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
-	DXGI_FORMAT pdxgiRtvFormats[6] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM,DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
-	
-	m_pUIShader = new UIShader();
-	m_pUIShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 6, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
-	m_pUIShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	m_pDoorUIShader = new DoorUIShader();
+	m_pDoorUIShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	m_pDoorUIShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
 void Material::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)

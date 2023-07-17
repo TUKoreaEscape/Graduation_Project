@@ -157,7 +157,7 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < m_nCustomizing; ++i) m_UICustomizing[i]->render(pd3dCommandList);
 		break;
 	case READY_TO_GAME:
-		if (GameState::GetInstance()->IsLoading()) for (int i = 0; i < m_nLoading; ++i) m_UILoading[i]->render(pd3dCommandList);
+		if (GameState::GetInstance()->IsLoading()) m_UILoading[3]->render(pd3dCommandList);
 		for (int i = 0; i < NUM_DOOR; ++i) {
 			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
 		}
@@ -293,10 +293,14 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	Material::PrepareUIShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
-	m_nLoading = 1;
+	m_nLoading = 4;
 	m_UILoading = new GameObject * [m_nLoading];
-	m_UILoading[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Loading.dds", 0.0f, 0.0f, 2.0f, 2.0f);
-
+	m_UILoading[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/LoadingPro.dds", 0.0f, 0.0f, 2.0f, 2.0f);
+	m_UILoading[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Progress_Background.dds", -0.55f, -0.65f, 0.8f, 0.14f);
+	m_UILoading[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Progress_Bar.dds", -0.55f, -0.65f, 0.8f, 0.14f);
+	m_UILoading[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Loading.dds", 0.0f, 0.0f, 2.0f, 2.0f);
+	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetUIType(PROGRESS_BAR_UI);
+	
 	m_nPlayers = 5;
 	m_ppPlayers = new Player * [m_nPlayers];
 	for (int i = 0; i < m_nPlayers; ++i) {
@@ -712,7 +716,9 @@ void GameScene::Loadingrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
-	m_UILoading[0]->render(pd3dCommandList);
+	for (int i = 0; i < m_nLoading - 1; ++i) {
+		reinterpret_cast<IngameUI*>(m_UILoading[i])->render(pd3dCommandList);
+	}
 }
 
 void GameScene::LoadSceneObjectsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName)
@@ -1204,8 +1210,10 @@ void GameScene::MakeTaggers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.0f);
 	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
+	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.2f);
 	LoadedModelInfo* pPlayerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/C74.bin", nullptr);
 	LoadedModelInfo* pClassModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InClassObject.bin", nullptr);
 	LoadedModelInfo* pPianoModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPianoRoom.bin", nullptr);
@@ -1214,7 +1222,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	LoadedModelInfo* pLobbyModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InDDD.bin", nullptr);
 	LoadedModelInfo* pCubeModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/CubeRoom.bin", nullptr);
 	LoadedModelInfo* pCeilModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Ceilling.bin", nullptr);
-
+	
 	for (int i = 0; i < m_nPlayers; ++i) {
 		m_ppPlayers[i]->SetChild(pPlayerModel->m_pModelRootObject, true);
 		m_ppPlayers[i]->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 2, pPlayerModel);
@@ -1245,11 +1253,13 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	GameObject::SetParts(0, 0, 4);
 	m_pPlayer->PlayerNum = 0;
 
+	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.3f);
 	m_pLight = new GameObject();
 	m_pLight->AddComponent<Light>();
 	m_pLight->start(pd3dDevice, pd3dCommandList);
 	m_pSkybox = new SkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
+	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.35f);
 	XMFLOAT3 xmf3Scale(1.0f, 1.0f, 1.0f);
 	XMFLOAT4 xmf4Color(1.f, 1.f, 1.f, 0.0f);
 	m_pMainTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 0, 0, 121, 81, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
@@ -1259,6 +1269,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_pForestTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 60, -60, 81, 41, xmf3Scale, xmf4Color, L"Terrain/Road_grass.dds");
 	m_pClassroomTerrain = new HeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), -20, -60, 81, 41, xmf3Scale, xmf4Color, L"Terrain/FloorTex.dds");
 
+	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.5f);
 	//UI생성 영역 dds파일 다음 x,y,width,height가 순서대로 들어간다. 아무것도 넣지않으면 화면중앙에 1x1사이즈로 나온다.
 	m_nLogin = 6;
 	m_UILogin = new GameObject * [m_nLogin];
@@ -1338,6 +1349,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 	LPVOID m_pTerrain[ROOM_COUNT]{ m_pMainTerrain ,m_pPianoTerrain,m_pBroadcastTerrain, m_pCubeTerrain ,m_pForestTerrain,m_pClassroomTerrain };
 
+	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.7f);
 	m_pCeilling = new GameObject();
 	m_pCeilling->SetChild(pCeilModel->m_pModelRootObject, true);
 	m_pCeilling->UpdateTransform(nullptr);
@@ -1397,6 +1409,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	if (pCeilModel) delete pCeilModel;
 	if (pCubeModel) delete pCubeModel;
 
+	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.8f);
 	m_nObjectsUIs = 6;
 	m_ppObjectsUIs = new InteractionUI * [m_nObjectsUIs];
 	m_ppObjectsUIs[0] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fOpen.dds");
@@ -1411,7 +1424,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	MakePowers(pd3dDevice, pd3dCommandList);
 	MakeBoxes(pd3dDevice, pd3dCommandList);
 	MakeTaggers(pd3dDevice, pd3dCommandList);
-
+	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(1.0f);
 #if USE_NETWORK
 	char id[20]{};
 	char pw[20]{};

@@ -933,12 +933,13 @@ cbuffer cbGaugeInfo : register(b3)
 #define BLOCKED_UI 5
 #define INGAME_UI 6
 #define TAGGER_UI 7
+#define  PROGRESS_BAR_UI 8
 
 VS_UI_OUTPUT VSDoorUI(VS_UI_INPUT input)
 {
 	VS_UI_OUTPUT output;
 
-	if (gnUIType == INGAME_UI) {
+	if (gnUIType == INGAME_UI || gnUIType == PROGRESS_BAR_UI) {
 		output.position = float4(input.position, 1.0f);
 	}
 	else {
@@ -981,6 +982,13 @@ float4 PSDoorUI(VS_UI_OUTPUT input) : SV_TARGET
 		if (input.uv.y - 1.0f > -gfGauge && Color.w < 0.1f)
 			Color = float4(1.0f, 0.0f, 0.0f, 1.0f);
 	}
-	clip(Color.w - 0.1f);
+    else if (gnUIType == PROGRESS_BAR_UI)
+    {
+        if (input.uv.x > gfGauge)
+        {
+            Color.w = 0;
+        }
+    }
+    clip(Color.w - 0.1f);
 	return Color;
 }

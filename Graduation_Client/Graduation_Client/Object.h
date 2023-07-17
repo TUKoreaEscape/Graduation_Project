@@ -16,6 +16,7 @@ constexpr int POWER_UI = 4;
 constexpr int BLOCKED_UI = 5;
 constexpr int INGAME_UI = 6;
 constexpr int TAGGER_UI = 7;
+constexpr int PROGRESS_BAR_UI = 8;
 
 enum DIR {
 	DEGREE0 = 0,
@@ -299,6 +300,7 @@ public:
 	void UIrender(ID3D12GraphicsCommandList* pd3dCommandList, float gauge, int type);
 
 	void SetGuage(float f) { m_fGauge = f; };
+	void SetUIType(int type) { m_UIType = type; };
 };
 
 class TaggersBox : public InteractionObject
