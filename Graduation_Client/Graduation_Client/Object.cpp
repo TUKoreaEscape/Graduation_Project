@@ -1735,6 +1735,12 @@ TaggersBox::TaggersBox()
 		m_ppInteractionUIs[i] = nullptr;
 	}
 	m_nUIType = TAGGER_UI;
+
+	m_nChips = 12;
+	m_ppChips = new GameObject * [m_nChips];
+	for (int i = 0; i < m_nChips; ++i) {
+		m_ppChips[i] = nullptr;
+	}
 }
 
 TaggersBox::~TaggersBox()
@@ -1852,10 +1858,26 @@ void TaggersBox::SetRotation(DIR d)
 {
 }
 
+void TaggersBox::CollectChip()
+{
+	m_ppChips[m_nLifeChips++]->SetDraw(false);
+}
+
 void TaggersBox::Reset()
 {
 	m_nLifeChips = 0;
 	m_bActivate = false;
+	Init();
+}
+
+void TaggersBox::Init()
+{
+	for (int i = 0; i < m_nChips; ++i) {
+		std::string str = "Chip";
+		str += std::to_string(i);
+		m_ppChips[i] = FindFrame(str.c_str());
+		m_ppChips[i]->SetDraw(true);
+	}
 }
 
 EscapeObject::EscapeObject()

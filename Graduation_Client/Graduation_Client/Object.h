@@ -319,13 +319,17 @@ public:
 	void SetOpen(bool open) override;
 
 	virtual void SetRotation(DIR d) override;
-
+	
 public:
 	int m_nLifeChips{};
 	bool m_bActivate{};
 
-	void CollectChip() { m_nLifeChips++; };
+	void CollectChip();
 	void Reset();
+	void Init();
+public:
+	int m_nChips;
+	GameObject** m_ppChips;
 };
 
 class EscapeObject : public InteractionObject
