@@ -8,7 +8,7 @@ void cGameServer::send_chat_packet(const unsigned int user_id, const unsigned in
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET::SC_PACKET_CHAT;
 	strcpy_s(packet.message, mess);
-
+	
 	m_clients[user_id].do_send(sizeof(packet), &packet);
 }
 

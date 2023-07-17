@@ -61,7 +61,6 @@ void Network::AssemblyPacket(char* net_buf, size_t io_byte)
 		if (make_packet_size == 0) {
 			make_size = ptr[0];
 			make_packet_size = make_size;
-			//std::cout << "packet size : " << make_packet_size << std::endl;
 			if (make_packet_size == 127)
 			{
 				make_packet_size *= ptr[2];
