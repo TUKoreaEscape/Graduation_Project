@@ -64,6 +64,7 @@ public:
 	static Shader* m_pUIShader;
 	static Shader* m_pDoorUIShader;
 	static void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
+	static void Material::PrepareUIShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
 
 	void SetStandardShader() { Material::SetShader(m_pStandardShader); }
 	void SetSkinnedAnimationShader() { Material::SetShader(m_pSkinnedAnimationShader); }

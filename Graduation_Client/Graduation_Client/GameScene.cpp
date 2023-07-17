@@ -291,7 +291,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 200);
 
-	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+	Material::PrepareUIShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
 	m_nLoading = 1;
 	m_UILoading = new GameObject * [m_nLoading];
@@ -603,6 +603,15 @@ void GameScene::ReleaseUploadBuffers()
 			if (m_ppBush[i]) m_ppBush[i]->ReleaseUploadBuffers();
 		}
 	}
+	for (int i = 0; i < NUM_DOOR; ++i) {
+		if (m_pDoors[i]) m_pDoors[i]->ReleaseUploadBuffers();
+	}
+	for (int i = 0; i < NUM_ITEMBOX; ++i) {
+		if (m_pBoxes[i]) m_pBoxes[i]->ReleaseUploadBuffers();
+	}
+	for (int i = 0; i < NUM_POWER; ++i) {
+		if (m_pPowers[i]) m_pPowers[i]->ReleaseUploadBuffers();
+	}
 	if (m_pLight) m_pLight->ReleaseUploadBuffers();
 	if (m_pSkybox) m_pSkybox->ReleaseUploadBuffers();
 
@@ -625,7 +634,12 @@ void GameScene::ReleaseUploadBuffers()
 	for (int i = 0; i < 6; ++i) {
 		if (m_pPVSObjects[i]) m_pPVSObjects[i]->ReleaseUploadBuffers();
 	}
-	
+	for (int i = 0; i < 6; ++i) {
+		if (Items[i]) Items[i]->ReleaseUploadBuffers();
+	}
+	for (int i = 0; i < m_nObjectsUIs; ++i) {
+		if (m_ppObjectsUIs[i]) m_ppObjectsUIs[i]->ReleaseUploadBuffers();
+	}
 }
 
 void GameScene::CreateCbvSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nConstantBufferViews, int nShaderResourceViews)
@@ -1190,6 +1204,8 @@ void GameScene::MakeTaggers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+
 	LoadedModelInfo* pPlayerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/C74.bin", nullptr);
 	LoadedModelInfo* pClassModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InClassObject.bin", nullptr);
 	LoadedModelInfo* pPianoModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPianoRoom.bin", nullptr);
@@ -1381,8 +1397,8 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	if (pCeilModel) delete pCeilModel;
 	if (pCubeModel) delete pCubeModel;
 
-	m_nObejctsUIs = 6;
-	m_ppObjectsUIs = new InteractionUI * [m_nObejctsUIs];
+	m_nObjectsUIs = 6;
+	m_ppObjectsUIs = new InteractionUI * [m_nObjectsUIs];
 	m_ppObjectsUIs[0] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fOpen.dds");
 	m_ppObjectsUIs[1] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fClose.dds");
 	m_ppObjectsUIs[2] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fPick.dds");
