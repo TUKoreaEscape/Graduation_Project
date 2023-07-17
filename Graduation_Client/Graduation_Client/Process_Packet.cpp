@@ -527,6 +527,7 @@ void Network::Process_Altar_LifeChip_Update(char* ptr)
 {
 	sc_packet_altar_lifechip_update* packet = reinterpret_cast<sc_packet_altar_lifechip_update*>(ptr);
 	packet->lifechip_count; // 이게 현재 수집된 생명칩 갯수임
+	reinterpret_cast<TaggersBox*>(m_Taggers_Box)->CollectChip();
 	std::cout << "현재 재단에 모인 생명칩 갯수 : " << packet->lifechip_count << std::endl;
 }
 

@@ -1832,7 +1832,6 @@ void TaggersBox::Interaction(int playerType)
 		if (network.m_lifechip) {
 			network.m_lifechip = false;
 			network.Send_Altar_Event();
-			CollectChip();
 		}
 #endif
 	}

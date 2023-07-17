@@ -141,7 +141,7 @@ public:
 	bool				get_life_chip() { return m_life_chip; }
 
 	// 탈출장치 관련 함수
-	void				set_escape_state(bool value) { m_escape_player = true; }
+	void				set_escape_state(bool value) { m_escape_player = value; }
 	bool				get_escape_state() { return m_escape_player; }
 	
 
