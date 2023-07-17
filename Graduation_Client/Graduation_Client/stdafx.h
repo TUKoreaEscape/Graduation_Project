@@ -45,7 +45,7 @@ using Microsoft::WRL::ComPtr;
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "imm32.lib")
 
-#define FRAME_BUFFER_WIDTH 1600
+#define FRAME_BUFFER_WIDTH 900
 #define FRAME_BUFFER_HEIGHT 900
 
 

@@ -416,7 +416,7 @@ void Player::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (PlayerNum == 0) {
 		if (GameState::GetInstance()->GetGameState() > CUSTOMIZING) {
 			GameObject* Hand = FindFrame("Gloves");
-			Hand->m_pChild->render(pd3dCommandList);
+			//Hand->m_pChild->render(pd3dCommandList);
 		}
 		else {
 			renderer->render(pd3dCommandList);

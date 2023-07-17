@@ -57,7 +57,7 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	m_pSkybox->render(pd3dCommandList);
 
-	m_pCeilling->render(pd3dCommandList);
+	//m_pCeilling->render(pd3dCommandList);
 
 	m_pMainTerrain->render(pd3dCommandList);
 	m_pPianoTerrain->render(pd3dCommandList);
@@ -70,7 +70,7 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	{
 		if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
 	}
-
+	m_pPlayer->SetPosition(XMFLOAT3(20.0f, 110.0f, 0.0f));
 	Scene::render(pd3dCommandList);
 
 	for (auto p : m_sPVS[static_cast<int>(m_pvsCamera)]) {
@@ -95,13 +95,13 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	for (int i = 0; i < NUM_POWER; ++i) {
 		if (m_pPowers[i]) {
 			m_pPowers[i]->UpdateTransform(nullptr);
-			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->render(pd3dCommandList);
+			//reinterpret_cast<PowerSwitch*>(m_pPowers[i])->render(pd3dCommandList);
 		}
 	}
 	for (int i = 0; i < NUM_ITEMBOX; ++i) {
 		if (m_pBoxes[i]) {
 			m_pBoxes[i]->UpdateTransform(nullptr);
-			reinterpret_cast<ItemBox*>(m_pBoxes[i])->render(pd3dCommandList);
+			//reinterpret_cast<ItemBox*>(m_pBoxes[i])->render(pd3dCommandList);
 		}
 	}
 	if (Taggers) {
@@ -163,6 +163,7 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		}
 		break;
 	case PLAYING_GAME:
+		break;
 		for (int i = 0; i < NUM_DOOR; ++i) {
 			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
 		}
@@ -1398,7 +1399,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_pPlayer->AddComponent<CommonMovement>();
 
 	for (int i = 0; i < m_nPlayers; ++i) {
-		AddPlayer(m_ppPlayers[i]);
+		//AddPlayer(m_ppPlayers[i]);
 	}
 	AddPlayer(m_pPlayer);
 
