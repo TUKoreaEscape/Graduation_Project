@@ -1222,7 +1222,8 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	LoadedModelInfo* pLobbyModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InDDD.bin", nullptr);
 	LoadedModelInfo* pCubeModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/CubeRoom.bin", nullptr);
 	LoadedModelInfo* pCeilModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Ceilling.bin", nullptr);
-	
+
+	AnimationCallbackHandler* pAnimationCallbackHandler = new SoundCallbackHandler();
 	for (int i = 0; i < m_nPlayers; ++i) {
 		m_ppPlayers[i]->SetChild(pPlayerModel->m_pModelRootObject, true);
 		m_ppPlayers[i]->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 2, pPlayerModel);
@@ -1230,6 +1231,22 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 0);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackEnable(1, false);//m_ppPlayers[i]->SetPosition(XMFLOAT3(i , 0.0f, -5.0f));
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetCallbackKeys(0, 1, 2);
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetCallbackKey(0, 1, 0, 0.166f, _T("Sound/Footstep01.wav"));
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetCallbackKey(0, 1, 1, 0.5f, _T("Sound/Footstep02.wav"));
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetCallbackKeys(0, 2, 2);
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetCallbackKey(0, 2, 0, 0.166f, _T("Sound/Footstep01.wav"));
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetCallbackKey(0, 2, 1, 0.5f, _T("Sound/Footstep02.wav"));
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetCallbackKeys(0, 3, 2);
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetCallbackKey(0, 3, 0, 0.166f, _T("Sound/Footstep01.wav"));
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetCallbackKey(0, 3, 1, 0.5f, _T("Sound/Footstep02.wav"));
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetCallbackKeys(0, 4, 2);
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetCallbackKey(0, 4, 0, 0.166f, _T("Sound/Footstep01.wav"));
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetCallbackKey(0, 4, 1, 0.5f, _T("Sound/Footstep02.wav")); 
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 1, pAnimationCallbackHandler);
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 2, pAnimationCallbackHandler);
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 3, pAnimationCallbackHandler);
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 4, pAnimationCallbackHandler);
 		for (int j = 0; j < 6; ++j)
 			GameObject::SetParts(i + 1, j, 0);
 		m_ppPlayers[i]->PlayerNum = i + 1;
@@ -1265,7 +1282,6 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		GameObject::SetParts(0, j, 0);
 	GameObject::SetParts(0, 0, 4);
 	m_pPlayer->PlayerNum = 0;
-	AnimationCallbackHandler* pAnimationCallbackHandler = new SoundCallbackHandler();
 	m_pPlayer->m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 1, pAnimationCallbackHandler);
 	m_pPlayer->m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 2, pAnimationCallbackHandler);
 	m_pPlayer->m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 3, pAnimationCallbackHandler);
