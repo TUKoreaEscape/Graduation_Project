@@ -1727,6 +1727,43 @@ void IngameUI::UIrender(ID3D12GraphicsCommandList* pd3dCommandList, float gauge,
 	GameObject::render(pd3dCommandList);
 }
 
+MinimapUI::MinimapUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName, float x, float y, float width, float height)
+{
+	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
+	XMStoreFloat4x4(&m_xmf4x4ToParent, XMMatrixIdentity());
+	renderer->m_nMaterials = 1;
+	renderer->m_ppMaterials = new Material * [renderer->m_nMaterials];
+	renderer->m_ppMaterials[0] = new Material(0);
+
+	UIMesh* pUIMesh = new UIMesh(pd3dDevice, pd3dCommandList, x, y, width, height);
+	SetMesh(pUIMesh);
+
+	Texture* pUITexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pUITexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, pstrFileName, RESOURCE_TEXTURE2D, 0);
+
+	GameScene::CreateShaderResourceViews(pd3dDevice, pUITexture, 0, 17);
+
+	Material* pUIMaterial = new Material(1);
+	pUIMaterial->SetTexture(pUITexture);
+	pUIMaterial->SetMinimapShader();
+
+	renderer->SetMaterial(0, pUIMaterial);
+}
+
+MinimapUI::~MinimapUI()
+{
+}
+
+void MinimapUI::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void MinimapUI::render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	UpdateShaderVariable(pd3dCommandList);
+	GameObject::render(pd3dCommandList);
+}
+
 TaggersBox::TaggersBox()
 {
 	m_nUIs = 2;

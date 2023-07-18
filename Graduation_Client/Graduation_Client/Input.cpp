@@ -96,6 +96,9 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 				else m_pPlayer->SetPlayerType(TYPE_TAGGER);
 			}
 			break;
+		case VK_TAB:
+			if (m_gamestate->GetMinimapState()) m_gamestate->ChangeMinimapState();
+			break;
 		case VK_ESCAPE:
 		{
 			//::PostQuitMessage(0);
@@ -145,6 +148,7 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 				else if (m_inputState == 2) InputIdAndPassword(wParam, m_cs_packet_login.pass_word, m_passwordNum); //passwordÀÔ·Â
 			}
 		}
+		if( wParam  ==VK_TAB && m_gamestate->GetGameState() == PLAYING_GAME && !m_gamestate->GetMinimapState()) m_gamestate->ChangeMinimapState();
 		break;
 	default:
 		break;
