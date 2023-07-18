@@ -321,6 +321,9 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	}
 
 	m_pPlayer = new Player();
+	m_pPlayer->DeleteComponent<OtherPlayerCamera>();
+	m_pPlayer->AddComponent<ThirdPersonCamera>();
+	m_pPlayer->m_pCamera = m_pPlayer->GetComponent<ThirdPersonCamera>();
 	m_pPlayer->m_pCamera->start(pd3dDevice, pd3dCommandList);
 }
 
@@ -732,7 +735,9 @@ void GameScene::Loadingrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
-	m_pPlayer->m_pCamera->update(pd3dCommandList);
+	if (m_pPlayer)
+		if (m_pPlayer->m_pCamera)
+			m_pPlayer->m_pCamera->update(pd3dCommandList);
 	for (int i = 0; i < m_nLoading - 1; ++i) {
 		reinterpret_cast<IngameUI*>(m_UILoading[i])->render(pd3dCommandList);
 	}
