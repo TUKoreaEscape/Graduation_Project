@@ -54,6 +54,7 @@ Shader* Material::m_pBushShader = nullptr;
 Shader* Material::m_pTerrainShader = nullptr;
 Shader* Material::m_pUIShader = nullptr;
 Shader* Material::m_pDoorUIShader = nullptr;
+Shader* Material::m_pMinimapShader = nullptr;
 
 void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
@@ -81,7 +82,6 @@ void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	m_pUIShader = new UIShader();
 	m_pUIShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 6, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
 	m_pUIShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
-
 }
 
 void Material::PrepareUIShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
@@ -89,6 +89,10 @@ void Material::PrepareUIShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	m_pDoorUIShader = new DoorUIShader();
 	m_pDoorUIShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	m_pDoorUIShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	m_pMinimapShader = new MinimapShader();
+	m_pMinimapShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	m_pMinimapShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
 void Material::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)

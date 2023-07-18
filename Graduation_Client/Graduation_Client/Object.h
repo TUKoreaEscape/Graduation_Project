@@ -303,6 +303,17 @@ public:
 	void SetUIType(int type) { m_UIType = type; };
 };
 
+class MinimapUI : public GameObject
+{
+public:
+	MinimapUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName, float x = 0.0f, float y = 0.0f, float width = 1.0f, float height = 1.0f);
+	virtual ~MinimapUI();
+
+	void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList);
+	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
+	void UIrender(ID3D12GraphicsCommandList* pd3dCommandList);
+};
+
 class TaggersBox : public InteractionObject
 {
 public:

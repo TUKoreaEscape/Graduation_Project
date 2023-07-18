@@ -534,7 +534,7 @@ void Framework::FrameAdvance()
 	UpdateObjects();
 	if (input->keyBuffer['1'] & 0xF0) m_nDebugOptions = 85;
 	else m_nDebugOptions = 10;
-	
+
 	switch (m_gamestate->GetGameState()) {
 	case LOGIN:
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
