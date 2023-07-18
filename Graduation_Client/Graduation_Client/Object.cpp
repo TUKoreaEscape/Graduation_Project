@@ -1899,20 +1899,20 @@ bool EscapeObject::IsPlayerNear(const XMFLOAT3& PlayerPos)
 	case DEGREE0:
 		minx = m_xmf4x4ToParent._41 - 2.0f;
 		maxx = m_xmf4x4ToParent._41 + 2.0f;
-		minz = m_xmf4x4ToParent._43 - 2.5f;
-		maxz = m_xmf4x4ToParent._43 + 2.5f;
+		minz = m_xmf4x4ToParent._43 - 0.7f;
+		maxz = m_xmf4x4ToParent._43 + 0.7f;
 		break;
 	case DEGREE90:
-		minx = m_xmf4x4ToParent._41 - 2.5f;
-		maxx = m_xmf4x4ToParent._41 + 2.5f;
+		minx = m_xmf4x4ToParent._41 - 0.7f;
+		maxx = m_xmf4x4ToParent._41 + 0.3f;
 		minz = m_xmf4x4ToParent._43 - 2.0f;
 		maxz = m_xmf4x4ToParent._43 + 2.0f;
 		break;
 	case DEGREE180:
 		minx = m_xmf4x4ToParent._41 - 2.0f;
 		maxx = m_xmf4x4ToParent._41 + 2.0f;
-		minz = m_xmf4x4ToParent._43 - 2.5f;
-		maxz = m_xmf4x4ToParent._43 + 2.5f;
+		minz = m_xmf4x4ToParent._43 - 0.7f;
+		maxz = m_xmf4x4ToParent._43 + 0.7f;
 		break;
 	default:
 		minx = m_xmf4x4ToParent._41 - 2.5f;

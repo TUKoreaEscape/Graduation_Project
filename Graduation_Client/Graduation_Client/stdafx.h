@@ -98,6 +98,7 @@ constexpr int NUM_DOOR = 6;
 constexpr int NUM_POWER = 5;
 constexpr int NUM_ITEMBOX = 20;
 constexpr int NUM_ITEMS = 6;
+constexpr int NUM_ESCAPE_LEVER = 3;
 
 constexpr float DOOR_OPEN_COOLTIME_TAGGER = 6.0f;
 constexpr float DOOR_OPEN_COOLTIME_PLAYER = 3.0f;

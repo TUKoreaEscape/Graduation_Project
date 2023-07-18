@@ -84,6 +84,7 @@ public:
 	std::thread send_thread;
 
 	InteractionObject* Taggers = nullptr;
+	InteractionObject* EscapeLevers[NUM_ESCAPE_LEVER];
 
 	std::set<PVSROOM> m_sPVS[6];
 	PVSROOM m_pvsCamera;
@@ -149,6 +150,7 @@ public:
 	void MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void MakeTaggers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void MakeEscapeLevers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 

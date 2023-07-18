@@ -104,6 +104,12 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			reinterpret_cast<ItemBox*>(m_pBoxes[i])->render(pd3dCommandList);
 		}
 	}
+	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
+		if (EscapeLevers[i]) {
+			EscapeLevers[i]->UpdateTransform(nullptr);
+			EscapeLevers[i]->render(pd3dCommandList);
+		}
+	}
 	if (Taggers) {
 		Taggers->UpdateTransform(nullptr);
 		reinterpret_cast<TaggersBox*>(Taggers)->render(pd3dCommandList);
@@ -645,6 +651,9 @@ void GameScene::ReleaseUploadBuffers()
 		if (m_ppObjectsUIs[i]) m_ppObjectsUIs[i]->ReleaseUploadBuffers();
 	}
 	if (Taggers) Taggers->ReleaseUploadBuffers();
+	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
+		if (EscapeLevers[i]) EscapeLevers[i]->ReleaseUploadBuffers();
+	}
 }
 
 void GameScene::CreateCbvSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nConstantBufferViews, int nShaderResourceViews)
@@ -1204,10 +1213,30 @@ void GameScene::MakeTaggers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	Taggers->SetChild(pAltarModel->m_pModelRootObject, true);
 	Taggers->SetUI(0, m_ppObjectsUIs[0]);
 	Taggers->SetUI(1, m_ppObjectsUIs[5]);
-	Taggers->SetPosition(-3.71f, 0.93f, -2.44f);
+	Taggers->SetPosition(-3.2f, 0.93f, -0.34f);
 	reinterpret_cast<TaggersBox*>(Taggers)->Init();
 
 	if (pAltarModel) delete pAltarModel;
+}
+
+void GameScene::MakeEscapeLevers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	LoadedModelInfo* pLeverModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/EscapeLever.bin", nullptr);
+
+	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
+		EscapeLevers[i] = new EscapeObject();
+		EscapeLevers[i]->SetChild(pLeverModel->m_pModelRootObject, true);
+		EscapeLevers[i]->SetUI(0, m_ppObjectsUIs[0]);
+		EscapeLevers[i]->SetUI(1, m_ppObjectsUIs[5]);
+	}
+	EscapeLevers[0]->SetPosition(XMFLOAT3(87.99f, 0.0f, 42.959f)); // Broad
+	reinterpret_cast<EscapeObject*>(EscapeLevers[0])->SetRotation(DEGREE0);
+	EscapeLevers[1]->SetPosition(XMFLOAT3(-43.89f, 0.0f, 41.97f)); // piano
+	reinterpret_cast<EscapeObject*>(EscapeLevers[1])->SetRotation(DEGREE0);
+	EscapeLevers[2]->SetPosition(XMFLOAT3(76.65f, 0.0f, -70.07f)); // forest
+	reinterpret_cast<EscapeObject*>(EscapeLevers[2])->SetRotation(DEGREE90);
+
+	if (pLeverModel) delete pLeverModel;
 }
 
 void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -1426,6 +1455,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	MakePowers(pd3dDevice, pd3dCommandList);
 	MakeBoxes(pd3dDevice, pd3dCommandList);
 	MakeTaggers(pd3dDevice, pd3dCommandList);
+	MakeEscapeLevers(pd3dDevice, pd3dCommandList);
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.9f);
 #if USE_NETWORK
 	char id[20]{};
