@@ -345,8 +345,11 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 			m_clients[room.in_player[i]].set_escape_state(false);
 		}
 
-		for (int i = 0; i < room.m_door_object.size(); ++i)
-			room.m_door_object[i].m_check_bounding_box = true;
+		for (auto& door_object : room.m_door_object)
+			door_object.m_check_bounding_box = true;
+
+		for (auto& electronic_system : room.m_electrinic_system)
+			electronic_system.Init_Fix();
 
 		sc_packet_init_position init_packet;
 		init_packet.size = sizeof(init_packet);
