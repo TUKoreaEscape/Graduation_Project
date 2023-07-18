@@ -2057,6 +2057,15 @@ void EscapeObject::Interaction(int playerType)
 		// Esaape
 		if (m_bIsReal) {
 			//Escape
+#if USE_NETWORK
+			Network& network = *Network::GetInstance();
+			cs_packet_request_escapesystem_working packet;
+			packet.size = sizeof(packet);
+			packet.type = CS_PACKET::CS_PACKET_REQUEST_ESCAPESYSTEM_WORKING;
+			packet.index = GetID();
+
+			network.send_packet(&packet);
+#endif
 		}
 		else {
 			// fail

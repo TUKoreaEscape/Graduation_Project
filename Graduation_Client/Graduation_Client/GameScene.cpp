@@ -1477,10 +1477,6 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	MakeEscapeLevers(pd3dDevice, pd3dCommandList);
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.9f);
 #if USE_NETWORK
-	char id[20]{};
-	char pw[20]{};
-	int select;
-
 	m_network = Network::GetInstance();
 	m_network->init_network();
 	m_network->m_pPlayer = m_pPlayer;

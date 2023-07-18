@@ -345,6 +345,8 @@ public:
 
 class EscapeObject : public InteractionObject
 {
+private:
+	int	m_escapeobject_id = -1;
 public:
 	EscapeObject();
 	virtual ~EscapeObject();
@@ -362,6 +364,8 @@ public:
 
 public:
 	bool m_bIsReal = false;
+	void SetID(int id) { m_escapeobject_id = id; }
+	int	 GetID() { return m_escapeobject_id; }
 	void SetReal() { m_bIsReal = true; };
 	
 	void SetWorking();

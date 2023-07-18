@@ -65,6 +65,8 @@ void Network::Process_Init_Position(char* ptr)
 	m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
 	for (int i = 0; i < 5; ++i)
 		m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);
+	for (int i = 0; i < 3; ++i)
+		reinterpret_cast<EscapeObject*>(m_EscapeLevers[i])->SetID(i);
 }
 
 void Network::Process_Chat(char* ptr)
