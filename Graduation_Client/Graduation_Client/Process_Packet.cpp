@@ -484,7 +484,7 @@ void Network::Process_Pick_Item_Update(char* ptr)
 	
 	if (packet->own_id == m_pPlayer->GetID()) {
 		if (packet->item_type == GAME_ITEM::ITEM_LIFECHIP)
-			m_pPlayer->SetType(TYPE_PLAYER);
+			m_pPlayer->SetPlayerType(TYPE_PLAYER);
 		else
 			m_pPlayer->m_got_item = packet->item_type;
 	}
@@ -495,7 +495,7 @@ void Network::Process_Pick_Item_Update(char* ptr)
 
 		for (int i = 0; i < 5; ++i) {
 			if (packet->own_id == m_ppOther[i]->GetID())
-				m_ppOther[i]->SetType(TYPE_PLAYER);
+				m_ppOther[i]->SetPlayerType(TYPE_PLAYER);
 		}
 	}
 }
@@ -524,14 +524,14 @@ void Network::Process_EscapeSystem_Update(char* ptr)
 	packet->index; // 해당 번호의 탈출장치 working시 뭔가 조작을 할 예정인데 이건 추후 예정
 
 	if (m_pPlayer->GetID() == packet->escape_id) {
-		m_pPlayer->SetType(TYPE_ESCAPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
+		m_pPlayer->SetPlayerType(TYPE_ESCAPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
 		GameState& game_state = *GameState::GetInstance();
 		game_state.ChangeNextState();
 	}
 	else {
 		for (int i = 0; i < 5; ++i) {
 			if (m_ppOther[i]->GetID() == packet->escape_id) {
-				m_ppOther[i]->SetType(TYPE_ESCAPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
+				m_ppOther[i]->SetPlayerType(TYPE_ESCAPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
 				break;
 			}
 		}

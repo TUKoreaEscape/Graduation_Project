@@ -51,7 +51,8 @@ void Scene::render(ID3D12GraphicsCommandList* pd3dCommandList)
 		object->Animate(m_fElapsedTime, object->PlayerNum);
 		//object->Animate(m_fElapsedTime);
 		//object->render(pd3dCommandList, 1);
-		object->render(pd3dCommandList);
+		if (object->GetType() != TYPE_ESCAPE_PLAYER)
+			object->render(pd3dCommandList);
 	}
 }
 
