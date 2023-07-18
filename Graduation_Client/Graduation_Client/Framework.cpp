@@ -445,7 +445,7 @@ void Framework::UpdateObjects()
 	timeToSend += fTimeElapsed;
 
 #if USE_NETWORK
-	if (input ->m_pPlayer->GetID() != -1 && (m_gamestate->GetGameState() == READY_TO_GAME || m_gamestate->GetGameState() == PLAYING_GAME)) {
+	if (input ->m_pPlayer->GetID() != -1 && (m_gamestate->GetGameState() == READY_TO_GAME || m_gamestate->GetGameState() == PLAYING_GAME || m_gamestate->GetGameState() == SPECTATOR_GAME) ) {
 		cs_packet_move packet;
 		packet.size = sizeof(packet);
 		packet.type = CS_PACKET::CS_PACKET_MOVE;
@@ -474,17 +474,17 @@ void Framework::UpdateObjects()
 			input->m_pPlayer->SetPosition(network->m_pPlayer_Pos);
 		}
 		//network->pos_lock.unlock();
-	}
-	for (int i = 0; i < 5; ++i)
-	{
-		if (network->m_ppOther[i]->GetID() != -1)
+
+		for (int i = 0; i < 5; ++i)
 		{
-			//network->Other_Player_Pos[i].pos_lock.lock();
-			network->m_ppOther[i]->SetPosition(network->Other_Player_Pos[i].Other_Pos);
-			//network->Other_Player_Pos[i].pos_lock.unlock();
+			if (network->m_ppOther[i]->GetID() != -1)
+			{
+				//network->Other_Player_Pos[i].pos_lock.lock();
+				network->m_ppOther[i]->SetPosition(network->Other_Player_Pos[i].Other_Pos);
+				//network->Other_Player_Pos[i].pos_lock.unlock();
+			}
 		}
 	}
-
 #endif
 
 	scene->update(fTimeElapsed, m_pd3dDevice, m_pd3dCommandList);
