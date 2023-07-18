@@ -125,7 +125,7 @@ public:
 	//CFirstPersonCamera(Camera* pCamera);
 	//virtual ~CFirstPersonCamera() { }
 	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void update(float elapsedTime) {};
+	virtual void update(float elapsedTime);
 	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
 	virtual void SetLookAt(XMFLOAT3& vLookAt);
 };
@@ -146,6 +146,15 @@ public:
 	//CThirdPersonCamera(Camera* pCamera);
 	//virtual ~CThirdPersonCamera() { }
 	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void update(float elapsedTime);
+	virtual void SetLookAt(XMFLOAT3& vLookAt);
+};
+
+class OtherPlayerCamera : public Camera
+{
+public:
+	virtual void start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
 	virtual void update(float elapsedTime);
 	virtual void SetLookAt(XMFLOAT3& vLookAt);
 };

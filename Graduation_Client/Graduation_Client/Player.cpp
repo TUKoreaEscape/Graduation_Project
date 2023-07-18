@@ -33,8 +33,8 @@ Player::Player() : GameObject()
 	m_pCameraUpdatedContext = NULL;
 
 	Input::GetInstance()->m_pPlayer = this;
-	AddComponent<ThirdPersonCamera>();
-	m_pCamera = GetComponent<ThirdPersonCamera>();
+	AddComponent<OtherPlayerCamera>();
+	m_pCamera = GetComponent<OtherPlayerCamera>();
 	m_pCamera->m_pPlayer = this;
 
 	for (int i = 0; i < 3; ++i) {
@@ -284,7 +284,7 @@ void Player::update(float fTimeElapsed)
 	m_xmf3Shift = xmf3Velocity;
 	if (m_pPlayerUpdatedContext[0]) OnPlayerUpdateCallback(fTimeElapsed);
 
-	m_pCamera->SetPosition(Vector3::Add(m_xmf3Position, m_pCamera->GetOffset()));
+	m_pCamera->update(fTimeElapsed);
 	/*DWORD nCurrentCameraMode = m_pCamera->GetMode();
 	if (m_pCameraUpdatedContext) OnCameraUpdateCallback(fTimeElapsed);
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->update(fTimeElapsed);
