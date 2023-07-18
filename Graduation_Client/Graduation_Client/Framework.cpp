@@ -80,7 +80,8 @@ void Framework::OnDestroy()
 	network.~Network();
 	scene->recv_thread.join();
 #endif
-
+	Sound& sound = *Sound::GetInstance();
+	sound.~Sound();
 
 	ReleaseObjects(); //°ÔÀÓ °´Ã¼(°ÔÀÓ ¿ùµå °´Ã¼)¸¦ ¼Ò¸êÇÑ´Ù.
 	::CloseHandle(m_hFenceEvent);
@@ -403,6 +404,8 @@ void Framework::BuildObjects()
 	input = Input::GetInstance();
 	m_gamestate = GameState::GetInstance();
 	network = Network::GetInstance();
+	sound = Sound::GetInstance();
+	sound->StartFMOD();
 	input->m_gamestate = m_gamestate;
 	scene = new GameScene();
 	scene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);

@@ -517,6 +517,28 @@ void Player::SetAnimation(int index)
 	}
 }
 
+void Player::SetAnimationCallback(AnimationCallbackHandler* handler)
+{
+	if (m_pSkinnedAnimationController) {
+		m_pSkinnedAnimationController->SetCallbackKeys(0, 1, 2);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 1, 0, 0.166f, _T("Sound/Footstep01.wav"));
+		m_pSkinnedAnimationController->SetCallbackKey(0, 1, 1, 0.5f, _T("Sound/Footstep02.wav"));
+		m_pSkinnedAnimationController->SetCallbackKeys(0, 2, 2);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 2, 0, 0.166f, _T("Sound/Footstep01.wav"));
+		m_pSkinnedAnimationController->SetCallbackKey(0, 2, 1, 0.5f, _T("Sound/Footstep02.wav"));
+		m_pSkinnedAnimationController->SetCallbackKeys(0, 3, 2);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 3, 0, 0.166f, _T("Sound/Footstep01.wav"));
+		m_pSkinnedAnimationController->SetCallbackKey(0, 3, 1, 0.5f, _T("Sound/Footstep02.wav"));
+		m_pSkinnedAnimationController->SetCallbackKeys(0, 4, 2);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 4, 0, 0.166f, _T("Sound/Footstep01.wav"));
+		m_pSkinnedAnimationController->SetCallbackKey(0, 4, 1, 0.5f, _T("Sound/Footstep02.wav"));
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 1, handler);
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 2, handler);
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 3, handler);
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 4, handler);
+	}
+}
+
 void Player::ReleaseShaderVariables()
 {
 	//if (m_pCamera) m_pCamera->ReleaseShaderVariables();

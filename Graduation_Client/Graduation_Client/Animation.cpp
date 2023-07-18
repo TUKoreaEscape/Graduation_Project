@@ -379,7 +379,6 @@ void SoundCallbackHandler::HandleCallback(void* pCallbackData, float fTrackPosit
 #ifdef _WITH_SOUND_RESOURCE
 	PlaySound(pWavName, ::ghAppInstance, SND_RESOURCE | SND_ASYNC);
 #else
-	std::cout << "Play Sound\n";
 	PlaySound(pWavName, NULL, SND_FILENAME | SND_ASYNC);
 #endif
 }

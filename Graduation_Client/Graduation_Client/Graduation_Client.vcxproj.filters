@@ -132,6 +132,9 @@
     <ClInclude Include="UI.h">
       <Filter>Engine\Framework</Filter>
     </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>Engine\Framework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -217,6 +220,9 @@
     </ClCompile>
     <ClCompile Include="Send_Packet.cpp">
       <Filter>Client\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>Engine\Framework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

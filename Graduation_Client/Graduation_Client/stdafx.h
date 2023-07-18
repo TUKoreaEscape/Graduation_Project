@@ -87,6 +87,7 @@ using Microsoft::WRL::ComPtr;
 //#define _WITH_DEBUG_SKINNING_BONE
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
+#include "inc/fmod.hpp"
 
 constexpr int TYPE_ALPHACUT = -1;
 constexpr int TYPE_OBJECT = 0;

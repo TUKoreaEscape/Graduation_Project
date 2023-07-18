@@ -1,5 +1,6 @@
 #include "Object.h"
 #include "Input.h"
+#include "Sound.h"
 
 SkyBox::SkyBox(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature)
 {
@@ -285,6 +286,8 @@ Door::Door() : InteractionObject()
 		m_ppInteractionUIs[i] = nullptr;
 	}
 	m_nUIType = DOOR_UI;
+
+	m_nDoorSoundIndex = Sound::GetInstance()->CreateEffectSound("Sound/Door.wav", 0);
 }
 
 Door::~Door()
@@ -604,12 +607,14 @@ void Door::SetOpen(bool Open)
 		if (Open == false) {
 			IsOpen = false;
 			IsWorking = true;
+			Sound::GetInstance()->Play(m_nDoorSoundIndex);
 		}
 	}
 	else {
 		if (Open == true) {
 			IsOpen = true;
 			IsWorking = true;
+			Sound::GetInstance()->Play(m_nDoorSoundIndex);
 		}
 	}
 }

@@ -166,4 +166,6 @@ public:
 	float m_fPrevPitch = 0.0f;
 	float m_fPrevRoll = 0.0f;
 	float m_fPrevYaw = 0.0f;
+
+	void SetAnimationCallback(AnimationCallbackHandler* handler);
 };

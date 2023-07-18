@@ -148,6 +148,7 @@ public:
 	void SetOpen(bool Open);
 
 	virtual bool GetIsWorking();
+	int m_nDoorSoundIndex = -1;
 };
 
 class UIObject : public GameObject
