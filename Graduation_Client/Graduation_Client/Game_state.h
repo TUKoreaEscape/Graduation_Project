@@ -8,9 +8,10 @@ enum GAME_STATE {
 	CUSTOMIZING, //커스터마이징
 	READY_TO_GAME, //술래가 정해지기 전 게임 시작 전
 	PLAYING_GAME, //게임중
-	ENDING_GAME, //게임이 끝난 후
+	ENDING_GAME, //게임이 끝난 후 (모든 플레이어 탈출 성공 or 술래 승)
 	INTERACTION_POWER, // 전력장치 수리
 	GAME_LOADING,
+	SPECTATOR_GAME, // Player가 탈출 성공했을 때
 };
 
 class GameState {

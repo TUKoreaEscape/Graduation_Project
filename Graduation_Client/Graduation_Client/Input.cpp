@@ -149,6 +149,11 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			}
 		}
 		if( wParam  ==VK_TAB && m_gamestate->GetGameState() == PLAYING_GAME && !m_gamestate->GetMinimapState()) m_gamestate->ChangeMinimapState();
+		if (m_gamestate->GetGameState() == SPECTATOR_GAME) {
+			if (wParam == VK_SPACE) {
+				m_pPlayer->SpectatorPlayerIndex = (m_pPlayer->SpectatorPlayerIndex + 1) % 5;
+			}
+		}
 		break;
 	default:
 		break;

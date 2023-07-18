@@ -93,6 +93,8 @@ public:
 
 	InteractionUI** m_ppObjectsUIs = nullptr;
 	int m_nObjectsUIs{};
+
+	int m_nSpectator = 0;
 protected:
 	static ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap;
 
@@ -117,6 +119,8 @@ public:
 	virtual void Endingrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Powerrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Loadingrender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void SpectatorPrerender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void Spectatorrender(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 

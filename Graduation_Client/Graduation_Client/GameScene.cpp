@@ -41,6 +41,159 @@ void GameScene::forrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 }
 
+void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
+	m_pPlayer->m_pCamera->update(pd3dCommandList);
+
+	switch (GameState::GetInstance()->GetGameState()) {
+	case LOGIN:
+		for (int i = 0; i < m_nLogin; ++i)
+		{
+			if (i > 2) break;
+			m_UILogin[i]->render(pd3dCommandList);
+		}
+		if (Input::GetInstance()->m_errorState != 0)
+		{
+			if (Input::GetInstance()->m_errorState == 1) m_UILogin[3]->render(pd3dCommandList);
+			else if (Input::GetInstance()->m_errorState == 2) m_UILogin[4]->render(pd3dCommandList);
+
+		}
+		if (Input::GetInstance()->m_SuccessState) m_UILogin[5]->render(pd3dCommandList);
+		break;
+	case ROOM_SELECT:
+		for (int i = 0; i < m_nRoomSelect; ++i) m_UIRoomSelect[i]->render(pd3dCommandList);
+		break;
+	case WAITING_GAME:
+		for (int i = 0; i < 5; ++i) {
+			m_ppPlayers[i]->SetLookAt(XMFLOAT3(0, 0, 0));
+		}
+		m_ppPlayers[0]->SetPosition(XMFLOAT3(6.0f, 0.0f, -5.0f));
+		m_ppPlayers[1]->SetPosition(XMFLOAT3(3.0f, 0.0f, -5.0f));
+		m_ppPlayers[2]->SetPosition(XMFLOAT3(-3.0f, 0.0f, -5.0f));
+		m_ppPlayers[3]->SetPosition(XMFLOAT3(-6.0f, 0.0f, -5.0f));
+		m_ppPlayers[4]->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
+		m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -3.0f));
+		for (int i = 0; i < m_nWaitingRoom; ++i) m_UIWaitingRoom[i]->render(pd3dCommandList);
+		break;
+	case CUSTOMIZING:
+		for (int i = 0; i < m_nCustomizing; ++i) m_UICustomizing[i]->render(pd3dCommandList);
+		break;
+	case READY_TO_GAME:
+		if (GameState::GetInstance()->IsLoading()) m_UILoading[3]->render(pd3dCommandList);
+		for (int i = 0; i < NUM_DOOR; ++i) {
+			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
+		}
+		break;
+	case PLAYING_GAME:
+		for (int i = 0; i < NUM_DOOR; ++i) {
+			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
+		}
+		for (int i = 0; i < NUM_POWER; ++i) {
+			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->UIrender(pd3dCommandList);
+		}
+		for (int i = 0; i < NUM_VENT; ++i) {
+			reinterpret_cast<Vent*>(Vents[i])->UIrender(pd3dCommandList);
+		}
+		for (int i = 0; i < NUM_ITEMBOX; ++i) {
+			reinterpret_cast<ItemBox*>(m_pBoxes[i])->UIrender(pd3dCommandList);
+		}
+		for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
+			EscapeLevers[i]->UIrender(pd3dCommandList);
+		}
+		reinterpret_cast<TaggersBox*>(Taggers)->UIrender(pd3dCommandList);
+		for (int i = 0; i < m_nPlay; ++i)
+		{
+			if (i >= 1 && i <= 3) continue;
+			if (i == 4 && !GameState::GetInstance()->GetChatState()) continue;
+			if (i == 5 && !GameState::GetInstance()->GetMinimapState()) continue;
+			m_UIPlay[i]->render(pd3dCommandList);
+		}
+		if (GameState::GetInstance()->GetMicState())
+		{
+			m_UIPlay[2]->render(pd3dCommandList);
+		}
+		else
+		{
+			m_UIPlay[3]->render(pd3dCommandList);
+		}
+
+		if (m_pPlayer->GetType() == TYPE_PLAYER)reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(1.0f);
+		else {
+			reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(-1.0f);
+#if USE_NETWORK
+			if (m_network->m_lifechip == true)
+				reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(1.0f);
+#endif		
+		}
+
+		m_UIPlay[1]->render(pd3dCommandList);
+		if (m_pPlayer->GetType() == TYPE_TAGGER) {
+			for (int i = 0; i < 3; ++i) {
+				if (m_pPlayer->GetTaggerSkill(i)) {
+					reinterpret_cast<IngameUI*>(m_UITagger[i + 3])->SetGuage(1.0f);
+					m_UITagger[i + 3]->render(pd3dCommandList);
+				}
+				else {
+					reinterpret_cast<IngameUI*>(m_UITagger[i + 3])->SetGuage(-1.0f);
+					m_UITagger[i + 3]->render(pd3dCommandList);
+				}
+			}
+			for (int i = 0; i < 3; ++i) m_UITagger[i]->render(pd3dCommandList);
+		}
+		else {
+			m_UIPlayer[0]->render(pd3dCommandList);
+			int index = m_pPlayer->GetItem();
+			if (index != -1) m_UIPlayer[1 + index]->render(pd3dCommandList);
+		}
+		break;
+	case ENDING_GAME:
+	{
+#if USE_NETWORK
+		Network& network = *Network::GetInstance();
+		if (network.m_tagger_win) {
+#endif
+#if !USE_NETWORK
+			if (0) { // TAGGER's Win
+#endif
+				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+				if (m_pPlayer->GetType() == TYPE_TAGGER) {
+					m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+				}
+				for (int i = 0; i < 5; ++i) {
+					m_ppPlayers[i]->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+					if (m_ppPlayers[i]->GetType() == TYPE_TAGGER) {
+						m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+					}
+				}
+			}
+			else { // Player's Win
+				float my_win = 0.0f;
+				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+				if (m_pPlayer->GetType() != TYPE_TAGGER) {
+					m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+					my_win = true;
+				}
+				for (int i = 0; i < 5; ++i) {
+					m_ppPlayers[i]->SetPosition(XMFLOAT3(6.0f - 3.0f * i, 0.0f, -1.0f));
+					if (m_ppPlayers[i]->GetType() != TYPE_TAGGER) {
+						m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+					}
+				}
+			}
+			for (int i = 0; i < m_Ending; ++i) m_UIEnding[i]->render(pd3dCommandList);
+			break;
+		}
+	case INTERACTION_POWER:
+		if ((m_pPlayer->m_pNearInteractionObejct))
+			reinterpret_cast<PowerSwitch*>(m_pPlayer->m_pNearInteractionObejct)->UIrender(pd3dCommandList);
+		m_UIPlayer[0]->render(pd3dCommandList);
+		int index = m_pPlayer->GetItem();
+		if (index != -1) m_UIPlayer[1 + index]->render(pd3dCommandList);
+	}
+}
+
 void GameScene::prerender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
@@ -124,159 +277,6 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	//std::cout << "x" << m_pPlayer->GetPosition().x << std::endl;
 	//std::cout << "y" << m_pPlayer->GetPosition().y << std::endl;
 	//std::cout << "z" << m_pPlayer->GetPosition().z << std::endl;
-}
-
-void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
-	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
-	m_pPlayer->m_pCamera->update(pd3dCommandList);
-
-	switch (GameState::GetInstance()->GetGameState()) {
-	case LOGIN:
-		for (int i = 0; i < m_nLogin; ++i)
-		{
-			if (i > 2) break;
-			m_UILogin[i]->render(pd3dCommandList);
-		}
-		if (Input::GetInstance()->m_errorState != 0)
-		{
-			if (Input::GetInstance()->m_errorState == 1) m_UILogin[3]->render(pd3dCommandList);
-			else if (Input::GetInstance()->m_errorState == 2) m_UILogin[4]->render(pd3dCommandList);
-			
-		}
-		if (Input::GetInstance()->m_SuccessState) m_UILogin[5]->render(pd3dCommandList);
-		break;
-	case ROOM_SELECT:
-		for (int i = 0; i < m_nRoomSelect; ++i) m_UIRoomSelect[i]->render(pd3dCommandList);
-		break;
-	case WAITING_GAME:
-		for (int i = 0; i < 5; ++i) {
-			m_ppPlayers[i]->SetLookAt(XMFLOAT3(0, 0, 0));
-		}
-		m_ppPlayers[0]->SetPosition(XMFLOAT3(6.0f, 0.0f, -5.0f));
-		m_ppPlayers[1]->SetPosition(XMFLOAT3(3.0f, 0.0f, -5.0f));
-		m_ppPlayers[2]->SetPosition(XMFLOAT3(-3.0f, 0.0f, -5.0f));
-		m_ppPlayers[3]->SetPosition(XMFLOAT3(-6.0f, 0.0f, -5.0f));
-		m_ppPlayers[4]->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
-		m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -3.0f));
-		for (int i = 0; i < m_nWaitingRoom; ++i) m_UIWaitingRoom[i]->render(pd3dCommandList);
-		break;
-	case CUSTOMIZING:
-		for (int i = 0; i < m_nCustomizing; ++i) m_UICustomizing[i]->render(pd3dCommandList);
-		break;
-	case READY_TO_GAME:
-		if (GameState::GetInstance()->IsLoading()) m_UILoading[3]->render(pd3dCommandList);
-		for (int i = 0; i < NUM_DOOR; ++i) {
-			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
-		}
-		break;
-	case PLAYING_GAME:
-		for (int i = 0; i < NUM_DOOR; ++i) {
-			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
-		}
-		for (int i = 0; i < NUM_POWER; ++i) {
-			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->UIrender(pd3dCommandList);
-		}
-		for (int i = 0; i < NUM_VENT; ++i) {
-			reinterpret_cast<Vent*>(Vents[i])->UIrender(pd3dCommandList);
-		}
-		for (int i = 0; i < NUM_ITEMBOX; ++i) {
-			reinterpret_cast<ItemBox*>(m_pBoxes[i])->UIrender(pd3dCommandList);
-		}
-		for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
-			EscapeLevers[i]->UIrender(pd3dCommandList);
-		}
-		reinterpret_cast<TaggersBox*>(Taggers)->UIrender(pd3dCommandList);
-		for (int i = 0; i < m_nPlay; ++i)
-		{
-			if (i >= 1 && i <= 3) continue;
-			if (i==4 && !GameState::GetInstance()->GetChatState()) continue;
-			if (i == 5 && !GameState::GetInstance()->GetMinimapState()) continue;
-			m_UIPlay[i]->render(pd3dCommandList);
-		}
-		if (GameState::GetInstance()->GetMicState())
-		{
-			m_UIPlay[2]->render(pd3dCommandList);
-		}
-		else
-		{
-			m_UIPlay[3]->render(pd3dCommandList);
-		}
-
-		if (m_pPlayer->GetType() == TYPE_PLAYER)reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(1.0f);
-		else {
-			reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(-1.0f);
-#if USE_NETWORK
-			if(m_network->m_lifechip == true)
-				reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(1.0f);
-#endif		
-		}
-
-		m_UIPlay[1]->render(pd3dCommandList);
-		if (m_pPlayer->GetType() == TYPE_TAGGER) {
-			for (int i = 0; i < 3; ++i) {
-				if (m_pPlayer->GetTaggerSkill(i)) {
-					reinterpret_cast<IngameUI*>(m_UITagger[i + 3])->SetGuage(1.0f);
-					m_UITagger[i + 3]->render(pd3dCommandList);
-				}
-				else {
-					reinterpret_cast<IngameUI*>(m_UITagger[i + 3])->SetGuage(-1.0f);
-					m_UITagger[i + 3]->render(pd3dCommandList);
-				}
-			}
-			for (int i = 0; i < 3; ++i) m_UITagger[i]->render(pd3dCommandList);
-		}
-		else {
-			m_UIPlayer[0]->render(pd3dCommandList);
-			int index = m_pPlayer->GetItem();
-			if (index != -1) m_UIPlayer[1 + index]->render(pd3dCommandList);
-		}
-		break;
-	case ENDING_GAME:
-	{
-#if USE_NETWORK
-		Network& network = *Network::GetInstance();
-		if (network.m_tagger_win) {
-#endif
-#if !USE_NETWORK
-			if (0) { // TAGGER's Win
-#endif
-				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-				if (m_pPlayer->GetType() == TYPE_TAGGER) {
-					m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-				}
-				for (int i = 0; i < 5; ++i) {
-					m_ppPlayers[i]->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-					if (m_ppPlayers[i]->GetType() == TYPE_TAGGER) {
-						m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-					}
-				}
-		}
-			else { // Player's Win
-				float my_win = 0.0f;
-				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-				if (m_pPlayer->GetType() != TYPE_TAGGER) {
-					m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-					my_win = true;
-				}
-				for (int i = 0; i < 5; ++i) {
-					m_ppPlayers[i]->SetPosition(XMFLOAT3(6.0f - 3.0f * i, 0.0f, -1.0f));
-					if (m_ppPlayers[i]->GetType() != TYPE_TAGGER) {
-						m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-					}
-				}
-			}
-			for (int i = 0; i < m_Ending; ++i) m_UIEnding[i]->render(pd3dCommandList);
-			break;
-	}
-	case INTERACTION_POWER:
-		if ((m_pPlayer->m_pNearInteractionObejct))
-			reinterpret_cast<PowerSwitch*>(m_pPlayer->m_pNearInteractionObejct)->UIrender(pd3dCommandList);
-		m_UIPlayer[0]->render(pd3dCommandList);
-		int index = m_pPlayer->GetItem();
-		if (index != -1) m_UIPlayer[1 + index]->render(pd3dCommandList);
-	}
 }
 
 void GameScene::WaitingRoomrender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -740,6 +740,123 @@ void GameScene::Loadingrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			m_pPlayer->m_pCamera->update(pd3dCommandList);
 	for (int i = 0; i < m_nLoading - 1; ++i) {
 		reinterpret_cast<IngameUI*>(m_UILoading[i])->render(pd3dCommandList);
+	}
+}
+
+void GameScene::SpectatorPrerender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
+
+	int index = m_pPlayer->SpectatorPlayerIndex;
+
+	bool findNew = false;
+	if (m_ppPlayers[index]->GetType() == TYPE_ESCAPE_PLAYER || m_ppPlayers[index]->GetType() == TYPE_TAGGER) {
+		for (int i = index + 1; i < 5; ++i) {
+			if (m_ppPlayers[index]->GetType() != TYPE_ESCAPE_PLAYER && m_ppPlayers[index]->GetType() != TYPE_TAGGER) {
+				findNew = true;
+				m_nSpectator = i;
+				m_pPlayer->ChangeSpectator(i);
+				break;
+			}
+		}
+		if (findNew == false) {
+			for (int i = 0; i < index; ++i) {
+				if (m_ppPlayers[index]->GetType() != TYPE_ESCAPE_PLAYER && m_ppPlayers[index]->GetType() != TYPE_TAGGER) {
+					findNew = true;
+					m_nSpectator = i;
+					m_pPlayer->ChangeSpectator(i);
+					break;
+				}
+			}
+		}
+	}
+	else {
+		m_nSpectator = index;
+	}
+	m_ppPlayers[m_nSpectator]->m_pCamera->update(pd3dCommandList);
+	XMFLOAT3 cameraPos = m_ppPlayers[m_nSpectator]->m_pCamera->GetPosition();
+	CheckCameraPos(cameraPos);
+
+	m_pLight->GetComponent<Light>()->SetWaitingLight(false);
+	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
+	if (GameState::GetInstance()->GetTick())m_pLight->GetComponent<Light>()->Updaterotate();
+}
+
+void GameScene::Spectatorrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	m_pSkybox->render(pd3dCommandList);
+
+	m_pCeilling->render(pd3dCommandList);
+
+	m_pMainTerrain->render(pd3dCommandList);
+	m_pPianoTerrain->render(pd3dCommandList);
+	m_pBroadcastTerrain->render(pd3dCommandList);
+	m_pCubeTerrain->render(pd3dCommandList);
+	m_pForestTerrain->render(pd3dCommandList);
+	m_pClassroomTerrain->render(pd3dCommandList);
+
+	for (int i = 0; i < m_nWalls; ++i)
+	{
+		if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
+	}
+
+	for (int i = 0; i < 5; ++i) {
+		if (m_ppPlayers[i]->GetType() != TYPE_ESCAPE_PLAYER) {
+			m_ppPlayers[i]->OnPrepareRender();
+			m_ppPlayers[i]->Animate(m_fElapsedTime, m_ppPlayers[i]->PlayerNum);
+			m_ppPlayers[i]->render(pd3dCommandList);
+		}
+			
+	}
+
+	for (auto p : m_sPVS[static_cast<int>(m_pvsCamera)]) {
+		m_pPVSObjects[static_cast<int>(p)]->render(pd3dCommandList);
+	}
+
+	for (int i = 0; i < NUM_VENT; ++i)
+	{
+		if (Vents[i]) {
+			Vents[i]->UpdateTransform(nullptr);
+			Vents[i]->render(pd3dCommandList);
+		}
+	}
+	for (int i = 0; i < NUM_DOOR; ++i)
+	{
+		if (m_pDoors[i]) {
+			m_pDoors[i]->UpdateTransform(nullptr);
+			m_pDoors[i]->render(pd3dCommandList);
+		}
+	}
+
+	for (int i = 0; i < NUM_POWER; ++i) {
+		if (m_pPowers[i]) {
+			m_pPowers[i]->UpdateTransform(nullptr);
+			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->render(pd3dCommandList);
+		}
+	}
+	for (int i = 0; i < NUM_ITEMBOX; ++i) {
+		if (m_pBoxes[i]) {
+			m_pBoxes[i]->UpdateTransform(nullptr);
+			reinterpret_cast<ItemBox*>(m_pBoxes[i])->render(pd3dCommandList);
+		}
+	}
+	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
+		if (EscapeLevers[i]) {
+			EscapeLevers[i]->UpdateTransform(nullptr);
+			EscapeLevers[i]->render(pd3dCommandList);
+		}
+	}
+	if (Taggers) {
+		Taggers->UpdateTransform(nullptr);
+		reinterpret_cast<TaggersBox*>(Taggers)->render(pd3dCommandList);
+	}
+	if (m_sPVS[static_cast<int>(m_pvsCamera)].count(PVSROOM::FOREST) != 0) {
+		m_pOak->render(pd3dCommandList);
+		for (int i = 0; i < m_nBush; ++i)
+		{
+			if (m_ppBush[i]) m_ppBush[i]->render(pd3dCommandList);
+		}
 	}
 }
 

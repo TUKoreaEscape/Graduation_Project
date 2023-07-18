@@ -517,6 +517,11 @@ void Player::SetAnimation(int index)
 	}
 }
 
+void Player::ChangeSpectator()
+{
+	SpectatorPlayerIndex = (SpectatorPlayerIndex + 1) % 5;
+}
+
 void Player::ReleaseShaderVariables()
 {
 	//if (m_pCamera) m_pCamera->ReleaseShaderVariables();

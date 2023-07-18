@@ -35,13 +35,17 @@ void GameState::ChangeNextState()
 			m_GameState = PLAYING_GAME;
 			break;
 		case PLAYING_GAME:
-			player->ChangeCamera(PLAYING_GAME, ENDING_GAME);
-			m_GameState = ENDING_GAME;
+			//player->ChangeCamera(PLAYING_GAME, ENDING_GAME);
+			m_GameState = SPECTATOR_GAME;
 			break;
 		case ENDING_GAME:
 			m_GameState = WAITING_GAME;
 			break;
 		case INTERACTION_POWER:
+			m_GameState = ENDING_GAME;
+			break;
+		case SPECTATOR_GAME:
+			player->ChangeCamera(PLAYING_GAME, ENDING_GAME);
 			m_GameState = ENDING_GAME;
 			break;
 	}
@@ -76,6 +80,8 @@ void GameState::ChangePrevState()
 			break;
 		case INTERACTION_POWER:
 			break;
+		case SPECTATOR_GAME:
+			break;
 	}
 	//std::cout << m_GameState << std::endl;
 }
@@ -108,6 +114,8 @@ void GameState::ChangeSameLevelState()
 			break;
 		case INTERACTION_POWER:
 			m_GameState = PLAYING_GAME;
+			break;
+		case SPECTATOR_GAME:
 			break;
 	}
 	//std::cout << m_GameState << std::endl;
