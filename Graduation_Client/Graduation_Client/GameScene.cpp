@@ -121,6 +121,9 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			if (m_ppBush[i]) m_ppBush[i]->render(pd3dCommandList);
 		}
 	}
+	//std::cout << "x" << m_pPlayer->GetPosition().x << std::endl;
+	//std::cout << "y" << m_pPlayer->GetPosition().y << std::endl;
+	//std::cout << "z" << m_pPlayer->GetPosition().z << std::endl;
 }
 
 void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -186,6 +189,7 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		{
 			if (i >= 1 && i <= 3) continue;
 			if (i==4 && !GameState::GetInstance()->GetChatState()) continue;
+			if (i == 5 && !GameState::GetInstance()->GetMinimapState()) continue;
 			m_UIPlay[i]->render(pd3dCommandList);
 		}
 		if (GameState::GetInstance()->GetMicState())
@@ -1350,7 +1354,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_UIEnding[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Ending.dds", 0.0f, 0.0f, 2.0f, 2.0f);
 	m_UIEnding[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.8f, -0.8f, 0.15f, 0.1f);
 
-	m_nPlay = 5;
+	m_nPlay = 6;
 	m_UIPlay = new GameObject * [m_nPlay];
 	m_UIPlay[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.8f, -0.75f, 0.3f, 0.4f);
 	//m_UIPlay[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.0f, 0.75f, 0.6f, 0.4f); ½Ã°è
@@ -1358,6 +1362,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_UIPlay[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Mic-on.dds", 0.5f, -0.85f, 0.07f, 0.15f);//mic-on
 	m_UIPlay[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Mic-off.dds", 0.5f, -0.85f, 0.07f, 0.15f);//mic-off
 	m_UIPlay[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/ChatBox.dds", -0.1f, -0.7f, 0.6f, 0.6f);//chatBox
+	m_UIPlay[5] = new MinimapUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Minimap2.dds", 0.0f, 0.0f, 1.0f, 1.0f);//Minimap
 
 
 	m_nPlayPlayer = 1 + 5;

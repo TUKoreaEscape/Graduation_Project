@@ -30,6 +30,7 @@ private:
 	float				m_totalLoading = 2.0f;
 	float				m_Loading = 0.0f;
 	int					m_LoadingCount = 0;
+	bool				m_MinimapOn = false;
 	GameState() {}
 	GameState(const GameState& other);
 	~GameState() {}
@@ -59,4 +60,6 @@ public:
 	bool GetMicState() { return mic_state; };
 	void ChangeChatState() { chat_state = !chat_state; };
 	bool GetChatState() { return chat_state; };
+	void ChangeMinimapState() { m_MinimapOn = !m_MinimapOn; };
+	bool GetMinimapState() { return m_MinimapOn; };
 };

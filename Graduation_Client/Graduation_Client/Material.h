@@ -63,6 +63,7 @@ public:
 	static Shader* m_pTerrainShader;
 	static Shader* m_pUIShader;
 	static Shader* m_pDoorUIShader;
+	static Shader* m_pMinimapShader;
 	static void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	static void Material::PrepareUIShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
 
@@ -72,4 +73,5 @@ public:
 	void SetTerrainShader() { Material::SetShader(m_pTerrainShader); }
 	void SetUIShader() { Material::SetShader(m_pUIShader); }
 	void SetDoorUIShader() { Material::SetShader(m_pDoorUIShader); }
+	void SetMinimapShader() { Material::SetShader(m_pMinimapShader); }
 };

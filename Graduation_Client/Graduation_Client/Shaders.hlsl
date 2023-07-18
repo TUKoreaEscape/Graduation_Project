@@ -194,7 +194,6 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStandard(VS_STANDARD_OUTPUT input, uint nPri
 
 	if (cColor.w < 0.524f)
 		discard;
-
 	output.f4Color.w = gnObjectType / 10.0f;
 
 	return(output);
@@ -953,6 +952,16 @@ VS_UI_OUTPUT VSDoorUI(VS_UI_INPUT input)
 float4 PSDoorUI(VS_UI_OUTPUT input) : SV_TARGET
 {
 	float4 Color = gtxtUITexture.Sample(gssWrap, input.uv);
+	if (gvDebugOptions.x == 60)
+	{
+		float2 newvalue = float2((10 * gvCameraPosition.x + 600) / 1600, (5.625 * -gvCameraPosition.z + 450) / 900);
+		//float2 value = input.uv - newvalue;
+		//float d = length(value);
+		if (newvalue.x < input.uv.x + 0.013 && newvalue.x > input.uv.x + 0.007 && newvalue.y < input.uv.y + 0.005 && newvalue.y > input.uv.y - 0.005)
+		{
+			Color = float4(1, 0, 1, 1);
+		}
+	}
 	if (gnUIType == DOOR_UI) {
 		if (input.uv.y - 1.0f > -gfGauge && Color.w < 0.1f) 
 			Color = float4(0.0f, 168.0f / 255.0f, 243.0f / 255.0f, 1.0f);
@@ -990,5 +999,25 @@ float4 PSDoorUI(VS_UI_OUTPUT input) : SV_TARGET
         }
     }
     clip(Color.w - 0.1f);
+	return Color;
+}
+
+VS_UI_OUTPUT VSMinimapUI(VS_UI_INPUT input)
+{
+	VS_UI_OUTPUT output;
+	output.position = float4(input.position, 1.0f);
+	output.uv = input.uv;
+	return output;
+}
+
+float4 PSMinimapUI(VS_UI_OUTPUT input) : SV_TARGET
+{
+	float4 Color = gtxtUITexture.Sample(gssWrap, input.uv);
+	float2 newvalue = float2((10 * gvCameraPosition.x + 600) / 1600, (5.625 * -gvCameraPosition.z + 450) / 900);
+	if (newvalue.x < input.uv.x + 0.014 && newvalue.x > input.uv.x + 0.006 && newvalue.y < input.uv.y + 0.007 && newvalue.y > input.uv.y - 0.007)
+	{
+		Color = float4(1, 0, 1, 1);
+	}
+	clip(Color.w - 0.1f);
 	return Color;
 }
