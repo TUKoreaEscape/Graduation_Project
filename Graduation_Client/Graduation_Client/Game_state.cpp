@@ -2,6 +2,7 @@
 #include "Game_state.h"
 #include "Input.h"
 #include "Camera.h"
+#include "Sound.h"
 
 GameState* GameState::GameStateInstance = nullptr;
 
@@ -12,13 +13,18 @@ void GameState::ChangeNextState()
 	switch (m_GameState) {
 		case GAME_LOADING:
 			m_GameState = LOGIN;
+			Sound::GetInstance()->Play(m_nLoginBG);
 			break;
 		case LOGIN:
 			m_GameState = ROOM_SELECT;
+			Sound::GetInstance()->Stop(m_nLoginBG);
+			Sound::GetInstance()->Play(m_nSelectBG);
 			break;
 		case ROOM_SELECT:
 			player->ChangeCamera(ROOM_SELECT, WAITING_GAME);
 			m_GameState = WAITING_GAME;
+			Sound::GetInstance()->Stop(m_nSelectBG);
+			Sound::GetInstance()->Play(m_nWaitingBG);
 			break;
 		case WAITING_GAME:
 			player->ChangeCamera(WAITING_GAME, READY_TO_GAME);
@@ -26,6 +32,8 @@ void GameState::ChangeNextState()
 			taggerTime = std::chrono::steady_clock::now();
 			taggercountdown = 60;
 			SetLoading(2.0f);
+			Sound::GetInstance()->Stop(m_nWaitingBG);
+			Sound::GetInstance()->Play(m_nGameBG);
 			break;
 		case CUSTOMIZING:
 			break;
@@ -37,9 +45,13 @@ void GameState::ChangeNextState()
 		case PLAYING_GAME:
 			player->ChangeCamera(PLAYING_GAME, ENDING_GAME);
 			m_GameState = ENDING_GAME;
+			Sound::GetInstance()->Stop(m_nGameBG);
+			Sound::GetInstance()->Play(m_nEndingBG);
 			break;
 		case ENDING_GAME:
 			m_GameState = WAITING_GAME;
+			Sound::GetInstance()->Stop(m_nEndingBG);
+			Sound::GetInstance()->Play(m_nWaitingBG);
 			break;
 		case INTERACTION_POWER:
 			m_GameState = ENDING_GAME;
@@ -136,4 +148,13 @@ int GameState::GetTaggerTime()
 		--taggercountdown;
 	}
 	return taggercountdown;
+}
+
+void GameState::SetBG()
+{
+	m_nLoginBG = Sound::GetInstance()->CreateBGSound("Sound/Aquarium.mp3", 0);
+	m_nSelectBG = Sound::GetInstance()->CreateBGSound("Sound/Unwelcome_School.mp3", 0);
+	m_nWaitingBG = Sound::GetInstance()->CreateBGSound("Sound/Aquarium.mp3", 0);
+	m_nGameBG = Sound::GetInstance()->CreateBGSound("Sound/Unwelcome_School.mp3", 0);
+	m_nEndingBG = Sound::GetInstance()->CreateBGSound("Sound/Aquarium.mp3", 0);
 }

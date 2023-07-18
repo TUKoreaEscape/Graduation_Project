@@ -73,12 +73,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>D:\Graduation\Graduation_Project\Graduation_Client\Graduation_Client\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>D:\Graduation\Graduation_Project\Graduation_Client\Graduation_Client\inc;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjcetDir)..\inc;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>D:\Graduation\Graduation_Project\Graduation_Client\Graduation_Client\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>D:\Graduation\Graduation_Project\Graduation_Client\Graduation_Client\inc;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjcetDir)..\inc;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

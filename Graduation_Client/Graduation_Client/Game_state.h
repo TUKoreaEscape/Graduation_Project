@@ -34,6 +34,11 @@ private:
 	GameState(const GameState& other);
 	~GameState() {}
 
+	int m_nLoginBG = -1;
+	int m_nSelectBG = -1;
+	int m_nWaitingBG = -1;
+	int m_nGameBG = -1;
+	int m_nEndingBG = -1;
 public:
 	static GameState* GetInstance() {
 		if (GameStateInstance == NULL) {
@@ -59,4 +64,5 @@ public:
 	bool GetMicState() { return mic_state; };
 	void ChangeChatState() { chat_state = !chat_state; };
 	bool GetChatState() { return chat_state; };
+	void SetBG();
 };

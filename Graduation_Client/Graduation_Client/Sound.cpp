@@ -45,3 +45,11 @@ void Sound::Play(int index)
 	m_pSystem->playSound(m_vSounds[index], nullptr, false, &m_pChannel);
 }
 
+void Sound::Stop(int index)
+{
+
+	if (index == -1) return;
+	if (index > m_nSounds) return;
+	m_pChannel->stop();
+}
+

@@ -406,6 +406,7 @@ void Framework::BuildObjects()
 	network = Network::GetInstance();
 	sound = Sound::GetInstance();
 	sound->StartFMOD();
+	m_gamestate->SetBG();
 	input->m_gamestate = m_gamestate;
 	scene = new GameScene();
 	scene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);

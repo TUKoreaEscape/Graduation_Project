@@ -21,6 +21,7 @@ public:
 	int CreateBGSound(char* file, float volume);
 
 	void Play(int index);
+	void Stop(int index);
 private:
 	FMOD::System* m_pSystem;
 	FMOD::Sound* m_pSound;
