@@ -10,7 +10,7 @@ public:
 	WSAOVERLAPPED	m_wsa_over;
 	OP_TYPE			m_comp_op;
 	WSABUF			m_wsa_buf;
-	unsigned char	m_buf[BUFSIZE];
+	unsigned char	m_buf[BUF_SIZE];
 
 public:
 	EXP_OVER(OP_TYPE comp_op, int num_byte, void* message);

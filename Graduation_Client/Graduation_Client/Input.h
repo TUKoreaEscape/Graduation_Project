@@ -29,7 +29,7 @@ public:
 	Roominfo_by10				m_Roominfo[6]{ NULL };
 	cs_packet_ready			m_cs_packet_ready{ NULL };
 	cs_packet_chat				m_cs_packet_chat{ NULL };
-	char								m_chatlist[5][50]{ "hi"};
+	char								m_chatlist[5][120]{ ""};
 	int									m_PageNum = 1;
 	int									m_Limitchatlength = 38;
 

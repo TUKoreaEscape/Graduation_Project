@@ -644,6 +644,7 @@ void GameScene::ReleaseUploadBuffers()
 	for (int i = 0; i < m_nObjectsUIs; ++i) {
 		if (m_ppObjectsUIs[i]) m_ppObjectsUIs[i]->ReleaseUploadBuffers();
 	}
+	if (Taggers) Taggers->ReleaseUploadBuffers();
 }
 
 void GameScene::CreateCbvSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nConstantBufferViews, int nShaderResourceViews)
@@ -1197,15 +1198,16 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 void GameScene::MakeTaggers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	LoadedModelInfo* pBoxModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/AmmoBox.bin", nullptr);
+	LoadedModelInfo* pAltarModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Altar.bin", nullptr);
 
 	Taggers = new TaggersBox();
-	Taggers->SetChild(pBoxModel->m_pModelRootObject, true);
+	Taggers->SetChild(pAltarModel->m_pModelRootObject, true);
 	Taggers->SetUI(0, m_ppObjectsUIs[0]);
 	Taggers->SetUI(1, m_ppObjectsUIs[5]);
-	Taggers->SetPosition(-4.0f, 0.8f, -0.5f);
+	Taggers->SetPosition(-3.71f, 0.93f, -2.44f);
+	reinterpret_cast<TaggersBox*>(Taggers)->Init();
 
-	if (pBoxModel) delete pBoxModel;
+	if (pAltarModel) delete pAltarModel;
 }
 
 void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -1377,9 +1379,9 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_UITagger[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", -0.8f, -0.8f, 0.3f, 0.3f);
 	m_UITagger[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", -0.8f, -0.45f, 0.3f, 0.3f);
 	m_UITagger[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", -0.8f, -0.1f, 0.3f, 0.3f);
-	m_UITagger[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Gloves.dds", -0.8f, -0.8f, 0.3f, 0.3f);
-	m_UITagger[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Loginfail.dds", -0.8f, -0.45f, 0.3f, 0.3f);
-	m_UITagger[5] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/life.dds", -0.8f, -0.1f, 0.3f, 0.3f);
+	m_UITagger[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"SkillImage/vent_emp.dds", -0.8f, -0.8f, 0.3f, 0.3f);
+	m_UITagger[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"SkillImage/door_emp.dds", -0.8f, -0.45f, 0.3f, 0.3f);
+	m_UITagger[5] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"SkillImage/ElectronicSystem_Close.dds", -0.8f, -0.1f, 0.3f, 0.3f);
 
 	LPVOID m_pTerrain[ROOM_COUNT]{ m_pMainTerrain ,m_pPianoTerrain,m_pBroadcastTerrain, m_pCubeTerrain ,m_pForestTerrain,m_pClassroomTerrain };
 

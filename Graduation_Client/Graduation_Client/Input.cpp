@@ -557,15 +557,15 @@ void Input::Receive(char* chat, char* name)
 {
 	for (int i = 4; i > 0; --i)
 	{
-		strcpy(m_chatlist[i], m_chatlist[i - 1]);
+		strcpy_s(m_chatlist[i], m_chatlist[i - 1]);
 	}
-	strcpy(m_chatlist[0], chat);
+	strcpy_s(m_chatlist[0], chat);
 
-	char n[24];
-	strcpy(n, name);
-	strcat(n, " : ");
-	strcat(n, m_chatlist[0]);
-	strcpy(m_chatlist[0], n);
+	char n[100];
+	strcpy_s(n, name);
+	strcat_s(n, " : ");
+	strcat_s(n, m_chatlist[0]);
+	strcpy_s(m_chatlist[0], n);
 }
 
 LRESULT Input::OnImeComposition(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
