@@ -1601,8 +1601,21 @@ void ItemBox::Interaction(int playerType)
 		switch (playerType) {
 		case TYPE_TAGGER:
 		case TYPE_PLAYER_YET:
-		case TYPE_DEAD_PLAYER:
 			IsInteraction = false;
+			break;
+		case TYPE_DEAD_PLAYER:
+			if (m_fCooltime >= BOX_OPEN_DEAD_COOLTIME) {
+#if !USE_NETWORK
+				SetOpen(true);
+#endif
+#if USE_NETWORK
+				Network& network = *Network::GetInstance();
+				network.Send_Fix_Object_Box_Update(m_item_box_index, true);
+#endif
+				m_fCooltime = 0;
+				IsInteraction = false;
+				m_fPickupCooltime = 0;
+			}
 			break;
 		case TYPE_PLAYER:
 			if (m_fCooltime >= BOX_OPEN_COOLTIME) {
@@ -1923,6 +1936,7 @@ EscapeObject::EscapeObject()
 	for (int i = 0; i < m_nUIs; ++i) {
 		m_ppInteractionUIs[i] = nullptr;
 	}
+	m_nUIType = DOOR_UI;
 }
 
 EscapeObject::~EscapeObject()
@@ -1993,15 +2007,16 @@ void EscapeObject::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void EscapeObject::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (IsNear == false) return;
 	if (IsWorking) {
 		if (m_ppInteractionUIs[0]) {
-			m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43);
-			m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, 0.0f, m_nUIType);
+			m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43);
+			m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 		}
 	}
 	else {
 		if (m_ppInteractionUIs[1]) {
-			m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43);
+			m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43);
 			m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, 0.0f, m_nUIType);
 		}
 	}
@@ -2010,11 +2025,43 @@ void EscapeObject::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 void EscapeObject::update(float fElapsedTime)
 {
 	if (false == IsWorking) return;
+	if (IsInteraction) {
+		if (IsNear) {
+			m_fCooltime += fElapsedTime;
+
+			UCHAR keyBuffer[256];
+			memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
+			if (((keyBuffer['f'] & 0xF0) == false) && ((keyBuffer['F'] & 0xF0) == false)) {
+				m_fCooltime = 0;
+				IsInteraction = false;
+			}
+		}
+		else {
+			m_fCooltime = 0;
+			IsInteraction = false;
+		}
+	}
+	else {
+		m_fCooltime = 0;
+	}
+	m_fGauge = m_fCooltime / PLAYER_ESCAPE_LEVER_COOLTIME;
 }
 
 void EscapeObject::Interaction(int playerType)
 {
 	if (false == IsWorking) return;
+	if (playerType == TYPE_TAGGER || playerType == TYPE_PLAYER_YET) return;
+
+	IsInteraction = true;
+	if (m_fCooltime >= PLAYER_ESCAPE_LEVER_COOLTIME) {
+		// Esaape
+		if (m_bIsReal) {
+			//Escape
+		}
+		else {
+			// fail
+		}
+	}
 }
 
 void EscapeObject::SetOpen(bool open)

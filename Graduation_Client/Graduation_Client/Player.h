@@ -140,11 +140,12 @@ public:
 	GameObject* m_pNearVent = nullptr;
 	GameObject* m_pNearItembox = nullptr;
 	GameObject* m_pNearTaggers = nullptr;
+	GameObject* m_pNearEscape = nullptr;
 
 	int							m_power_number = -1;
 	int							m_vent_number = -1;
 	int							m_itembox_number = -1;
-
+	int							m_escape_number = -1;
 	GAME_ITEM::ITEM				m_got_item = GAME_ITEM::ITEM_NONE;
 
 	bool						m_bTaggerSkills[3];

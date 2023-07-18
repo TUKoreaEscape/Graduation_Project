@@ -184,6 +184,9 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		for (int i = 0; i < NUM_ITEMBOX; ++i) {
 			reinterpret_cast<ItemBox*>(m_pBoxes[i])->UIrender(pd3dCommandList);
 		}
+		for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
+			EscapeLevers[i]->UIrender(pd3dCommandList);
+		}
 		reinterpret_cast<TaggersBox*>(Taggers)->UIrender(pd3dCommandList);
 		for (int i = 0; i < m_nPlay; ++i)
 		{
@@ -1019,6 +1022,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	bool IsNearVent = false;
 	bool IsNearItembox = false;
 	bool IsNearTaggers = false;
+	bool IsNearEsacpeLever = false;
 	for (int i = 0; i < NUM_DOOR; ++i) {
 		m_pDoors[i]->update(elapsedTime);
 		if (reinterpret_cast<Door*>(m_pDoors[i])->IsPlayerNear(PlayerPos)) {
@@ -1056,6 +1060,15 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 			m_pPlayer->m_vent_number = i;
 		}
 	}
+	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
+		EscapeLevers[i]->update(elapsedTime);
+		if (reinterpret_cast<EscapeObject*>(EscapeLevers[i])->IsPlayerNear(PlayerPos)) {
+			m_pPlayer->m_pNearEscape = EscapeLevers[i];
+			IsNearEsacpeLever = true;
+
+			m_pPlayer->m_escape_number = i;
+		}
+	}
 	Taggers->update(elapsedTime);
 	if (reinterpret_cast<TaggersBox*>(Taggers)->IsPlayerNear(PlayerPos)) {
 		m_pPlayer->m_pNearTaggers = Taggers;
@@ -1066,6 +1079,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	if (IsNearVent == false) m_pPlayer->m_pNearVent = nullptr;
 	if (IsNearItembox == false) m_pPlayer->m_pNearItembox = nullptr;
 	if (IsNearTaggers == false) m_pPlayer->m_pNearTaggers = nullptr;
+	if (IsNearEsacpeLever == false) m_pPlayer->m_pNearEscape = nullptr;
 }
 
 bool InArea(int startX, int startZ, int width, int length, float x, float z)

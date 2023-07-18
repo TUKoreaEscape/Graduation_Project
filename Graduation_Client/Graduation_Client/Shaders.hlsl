@@ -1018,6 +1018,10 @@ float4 PSMinimapUI(VS_UI_OUTPUT input) : SV_TARGET
 	{
 		Color = float4(1, 0, 1, 1);
 	}
-	clip(Color.w - 0.1f);
+    else
+    {
+        Color.w = 0.8f;
+    }
+	//clip(Color.w - 0.1f);
 	return Color;
 }
