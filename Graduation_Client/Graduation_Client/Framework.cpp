@@ -474,17 +474,17 @@ void Framework::UpdateObjects()
 			input->m_pPlayer->SetPosition(network->m_pPlayer_Pos);
 		}
 		//network->pos_lock.unlock();
-
-		for (int i = 0; i < 5; ++i)
+	}
+	for (int i = 0; i < 5; ++i)
+	{
+		if (network->m_ppOther[i]->GetID() != -1)
 		{
-			if (network->m_ppOther[i]->GetID() != -1)
-			{
-				//network->Other_Player_Pos[i].pos_lock.lock();
-				network->m_ppOther[i]->SetPosition(network->Other_Player_Pos[i].Other_Pos);
-				//network->Other_Player_Pos[i].pos_lock.unlock();
-			}
+			//network->Other_Player_Pos[i].pos_lock.lock();
+			network->m_ppOther[i]->SetPosition(network->Other_Player_Pos[i].Other_Pos);
+			//network->Other_Player_Pos[i].pos_lock.unlock();
 		}
 	}
+
 #endif
 
 	scene->update(fTimeElapsed, m_pd3dDevice, m_pd3dCommandList);
