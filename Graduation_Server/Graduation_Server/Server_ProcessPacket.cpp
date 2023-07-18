@@ -351,6 +351,9 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 		for (auto& electronic_system : room.m_electrinic_system)
 			electronic_system.Init_Fix();
 
+		for (auto& escape_system : room.m_escape_system)
+			escape_system.init();
+
 		sc_packet_init_position init_packet;
 		init_packet.size = sizeof(init_packet);
 		init_packet.type = SC_PACKET::SC_PACKET_INIT_POSITION;
@@ -1016,14 +1019,15 @@ void cGameServer::Process_EscapeSystem(const int user_id, void* buff)
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
 
-	if (room.m_escape_system[packet->index].Is_Activate() == false) {
+	if (room.m_escape_system[packet->index].Is_Working_Escape() == false) {
+		cout << "게임 end 타이머 작동" << endl;
 		TIMER_EVENT ev;
 		ev.event_type = EventType::WORKING_ESCAPE_SYSTEM;
 		ev.event_time = chrono::system_clock::now() + 120s; // 탈출장치 작동 후 2분간 시간 부여 만약 end시간이 더 가까운 경우 end시간을 우선시함
 		ev.room_number = m_clients[user_id].get_join_room_number();
 		m_timer_queue.push(ev);
 	}
-	room.m_escape_system[packet->index].Activate();
+	room.m_escape_system[packet->index].Working_Escape();
 
 	
 	for (int i = 0; i < room.in_escape_player.size(); ++i) {

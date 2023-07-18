@@ -232,7 +232,7 @@ void cGameServer::Process_Event(const TIMER_EVENT& ev)
 	case EventType::WORKING_ESCAPE_SYSTEM:
 	{
 		EXP_OVER* over = new EXP_OVER;
-		over->m_comp_op = OP_TYPE::OP_GAME_END; // 해당부분은 분기 처리가 필요함
+		over->m_comp_op = OP_TYPE::OP_GAME_END_BY_ESCAPE_SYSTEM;
 		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, ev.room_number, &over->m_wsa_over);
 		break;
 	}
