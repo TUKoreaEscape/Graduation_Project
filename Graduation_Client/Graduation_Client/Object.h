@@ -92,6 +92,7 @@ public:
 	float m_fGauge{};
 
 	bool m_bIsBlocked = false;
+	bool m_bDoesOtherPlayerActive = false;
 public:
 	InteractionObject();
 	virtual ~InteractionObject();
@@ -117,6 +118,9 @@ public:
 	virtual XMFLOAT3 GetPosition() { return(XMFLOAT3(m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43)); }
 
 	virtual int GetDIR() const;
+
+	void CheckStart() { m_bDoesOtherPlayerActive = true; };
+	void CheckStop() { m_bDoesOtherPlayerActive = false; };
 };
 
 class Door : public InteractionObject
@@ -175,7 +179,6 @@ public:
 	float m_fCheckCooltime{};
 	XMFLOAT4X4 m_xmf4x4MainKnobParent;
 
-	bool m_bDoesOtherPlayerActive = false;
 public:
 	PowerSwitch();
 	virtual ~PowerSwitch();
@@ -202,8 +205,6 @@ public:
 	bool CheckAnswer();
 	void Reset();
 
-	void CheckStart() { m_bDoesOtherPlayerActive = true; };
-	void CheckStop() { m_bDoesOtherPlayerActive = false; };
 
 private:
 	bool m_bAnswers[10];

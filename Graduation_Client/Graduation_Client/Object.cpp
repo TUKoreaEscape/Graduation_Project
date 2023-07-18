@@ -2051,6 +2051,7 @@ void EscapeObject::Interaction(int playerType)
 {
 	if (false == IsWorking) return;
 	if (playerType == TYPE_TAGGER || playerType == TYPE_PLAYER_YET) return;
+	if (m_bDoesOtherPlayerActive) return;
 
 	IsInteraction = true;
 	if (m_fCooltime >= PLAYER_ESCAPE_LEVER_COOLTIME) {
@@ -2066,9 +2067,11 @@ void EscapeObject::Interaction(int playerType)
 
 			network.send_packet(&packet);
 #endif
+			m_fCooltime = 0;
 		}
 		else {
-			// fail
+			m_fCooltime = 0;
+			IsInteraction = false;
 		}
 	}
 }
