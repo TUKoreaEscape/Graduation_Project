@@ -292,6 +292,7 @@ void cGameServer::WorkerThread()
 
 			Room& room = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
 			
+			room.SetSecondSkillUse(false);
 			for (int& player_id : room.in_player) {
 				if (player_id == -1)
 					continue;

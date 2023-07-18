@@ -504,6 +504,10 @@ void Network::Process_Active_EscapeSystem(char* ptr)
 {
 	sc_packet_escapesystem_activate* packet = reinterpret_cast<sc_packet_escapesystem_activate*>(ptr);
 	std::cout << "탈출장치 [" << packet->index << "]번 활성화" << std::endl;
+
+	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i)
+		reinterpret_cast<EscapeObject*>(m_EscapeLevers[i])->SetWorking();
+	reinterpret_cast<EscapeObject*>(m_EscapeLevers[packet->index])->SetReal();
 }
 
 void Network::Process_EscapeSystem_Update(char* ptr)

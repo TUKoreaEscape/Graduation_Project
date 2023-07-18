@@ -55,6 +55,7 @@ struct TIMER_EVENT {
 	float									cool_time;
 	int										room_number;
 	int										obj_id;
+	bool									enable_tagger_skill = false;
 
 	constexpr bool operator < (const TIMER_EVENT& left) const
 	{

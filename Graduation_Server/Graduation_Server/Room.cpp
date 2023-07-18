@@ -387,6 +387,7 @@ void Room::Tagger_Use_Second_Skill(int room_number)
 {
 	cGameServer& server = *cGameServer::GetInstance();
 
+	SetSecondSkillUse(true);
 	TIMER_EVENT ev;
 	ev.room_number = room_number;
 	ev.event_type = EventType::USE_SECOND_TAGGER_SKILL;

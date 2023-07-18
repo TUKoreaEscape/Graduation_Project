@@ -54,6 +54,7 @@ private: // 여긴 인게임 플레이시 사용하는 변수
 	bool				m_first_skill_enable = false;
 	bool				m_second_skill_enable = false;
 	bool				m_third_skill_enable = false;
+	bool				m_tagger_use_second_skill = false;
 	bool				m_tagger_now_collect_life_chip = false;
 	int					m_tagger_collect_chip = 0;
 
@@ -123,6 +124,9 @@ public: // 술래 스킬 사용 관련 함수들
 	void	Tagger_Use_First_Skill();
 	void	Tagger_Use_Second_Skill(int room_number);
 	void	Tagger_Use_Third_Skill();
+
+	void	SetSecondSkillUse(bool value) { m_tagger_use_second_skill = value; }
+	bool	GetSecondSkillUse() { return m_tagger_use_second_skill; }
 
 public:
 	void	Tagger_Get_Life_Chip(bool value) { m_tagger_collect_chip = value; }

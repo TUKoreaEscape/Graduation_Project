@@ -7,7 +7,7 @@
 #include "Server_Timer.h"
 
 #define  DIR_NO 100
-#define  USE_NETWORK 0
+#define  USE_NETWORK 1
 #define	 USE_VOICE 0
 
 class Door;
@@ -89,6 +89,7 @@ public: // 클라이언트 오브젝트와 연결하는 용도
 	ItemBox*			m_pBoxes[MAX_INGAME_ITEM];
 	GameObject*			m_Vents[NUM_VENT];
 	InteractionObject*	m_Taggers_Box = nullptr;
+	InteractionObject*	m_EscapeLevers[NUM_ESCAPE_LEVER];
 
 public:
 	static Network* GetInstance() {

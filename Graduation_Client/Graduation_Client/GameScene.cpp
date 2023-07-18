@@ -1500,6 +1500,9 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	for (int i = 0; i < NUM_VENT; ++i)
 		m_network->m_Vents[i] = Vents[i];
 
+	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i)
+		m_network->m_EscapeLevers[i] = EscapeLevers[i];
+
 	recv_thread = std::thread{ &Network::listen_thread, m_network };
 #endif
 #if USE_CHAT_TEST
