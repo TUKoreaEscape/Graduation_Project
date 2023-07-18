@@ -100,7 +100,13 @@ void Network::Process_Game_End(char* ptr)
 	reinterpret_cast<TaggersBox*>(m_Taggers_Box)->Reset();
 
 	GameState& game_state = *GameState::GetInstance();
-	game_state.ChangeNextState();
+
+	if(game_state.GetGameState() == SPECTATOR_GAME)
+		game_state.ChangeNextState();
+	else { // 해당부분은 추후 사용될 코드입니다.
+		for(int i = 0; i < 2; ++i)
+			game_state.ChangeNextState();
+	}
 
 	for (int i = 0; i < MAX_INGAME_ITEM; ++i) {
 		m_pBoxes[i]->SetOpen(false);
@@ -519,7 +525,8 @@ void Network::Process_EscapeSystem_Update(char* ptr)
 
 	if (m_pPlayer->GetID() == packet->escape_id) {
 		m_pPlayer->SetType(TYPE_ESCAPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
-		// 만약 내가 탈출한 경우 관전모드 전환일수 있으므로 카메라 조절시 여기다가 추가 예정
+		GameState& game_state = *GameState::GetInstance();
+		game_state.ChangeNextState();
 	}
 	else {
 		for (int i = 0; i < 5; ++i) {
