@@ -133,6 +133,7 @@ protected:
 	bool							m_collision_up_face = false;
 
 	int							m_playerType = 2;
+	bool m_bShownAnswer = false;
 
 public:
 	GameObject* m_pNearDoor = nullptr;
@@ -170,4 +171,9 @@ public:
 	int								SpectatorPlayerIndex = 0;
 	void ChangeSpectator();
 	void ChangeSpectator(int index) { SpectatorPlayerIndex = index; }
+
+	bool GetShown() const { return m_bShownAnswer; }
+	void SetShown(bool shown) {
+		m_bShownAnswer = shown;
+	}
 };

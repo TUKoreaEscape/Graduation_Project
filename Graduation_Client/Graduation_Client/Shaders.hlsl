@@ -939,8 +939,8 @@ VS_UI_OUTPUT VSDoorUI(VS_UI_INPUT input)
 	VS_UI_OUTPUT output;
 
 	if (gnUIType == INGAME_UI || gnUIType == PROGRESS_BAR_UI) {
-		output.position = float4(input.position, 1.0f);
-	}
+        output.position = mul(float4(input.position, 1.0f), gmtxGameObject);
+    }
 	else {
 		output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
 	}

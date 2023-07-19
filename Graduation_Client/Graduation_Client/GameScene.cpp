@@ -190,7 +190,22 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			reinterpret_cast<PowerSwitch*>(m_pPlayer->m_pNearInteractionObejct)->UIrender(pd3dCommandList);
 		m_UIPlayer[0]->render(pd3dCommandList);
 		int index = m_pPlayer->GetItem();
-		if (index != -1) m_UIPlayer[1 + index]->render(pd3dCommandList);
+		if (index != -1) {
+			m_UIPlayer[1 + index]->render(pd3dCommandList);
+		}
+		if (true == m_pPlayer->GetShown()) {
+			m_ppAnswerUIs[0]->render(pd3dCommandList);
+			if (index != -1) {
+				for (int i = 1; i < 11; ++i) {
+					int powerIndex{};
+#if USE_NETWORK
+					// powerIndex = network->item_to_power[index];
+#endif
+					reinterpret_cast<IngameUI*>(m_ppAnswerUIs[i])->SetAnswer((reinterpret_cast<PowerSwitch*>(m_pPowers[powerIndex])->GetAnswer(i - 1)));
+					m_ppAnswerUIs[i]->render(pd3dCommandList);
+				}
+			}
+		}
 	}
 }
 
@@ -663,6 +678,9 @@ void GameScene::ReleaseUploadBuffers()
 	if (Taggers) Taggers->ReleaseUploadBuffers();
 	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
 		if (EscapeLevers[i]) EscapeLevers[i]->ReleaseUploadBuffers();
+	}
+	for (int i = 0; i < m_nAnswerUI; ++i) {
+		if (m_ppAnswerUIs[i]) m_ppAnswerUIs[i]->ReleaseUploadBuffers();
 	}
 }
 
@@ -1519,6 +1537,20 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_UITagger[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"SkillImage/ElectronicSystem_Close.dds", -0.8f, -0.8f, 0.3f, 0.3f);
 	m_UITagger[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"SkillImage/door_emp.dds", -0.8f, -0.45f, 0.3f, 0.3f);
 	m_UITagger[5] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"SkillImage/vent_emp.dds", -0.8f, -0.1f, 0.3f, 0.3f);
+
+	m_nAnswerUI = 11;
+	m_ppAnswerUIs = new GameObject * [m_nAnswerUI];
+	m_ppAnswerUIs[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/solu.dds", -0.4f, 0.0f, 0.6f, 1.2f);
+	m_ppAnswerUIs[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, 0.36f, 0.08f, 0.04f);
+	m_ppAnswerUIs[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, 0.304f, 0.08f, 0.04f);
+	m_ppAnswerUIs[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, 0.248f, 0.08f, 0.04f);
+	m_ppAnswerUIs[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, 0.192f, 0.08f, 0.04f);
+	m_ppAnswerUIs[5] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, 0.136f, 0.08f, 0.04f);
+	m_ppAnswerUIs[6] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, 0.08f, 0.08f, 0.04f);
+	m_ppAnswerUIs[7] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, 0.024f, 0.08f, 0.04f);
+	m_ppAnswerUIs[8] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, -0.032f, 0.08f, 0.04f);
+	m_ppAnswerUIs[9] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, -0.088f, 0.08f, 0.04f);
+	m_ppAnswerUIs[10] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, -0.144f, 0.08f, 0.04f);
 
 	LPVOID m_pTerrain[ROOM_COUNT]{ m_pMainTerrain ,m_pPianoTerrain,m_pBroadcastTerrain, m_pCubeTerrain ,m_pForestTerrain,m_pClassroomTerrain };
 
