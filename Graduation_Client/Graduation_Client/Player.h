@@ -178,5 +178,7 @@ public:
 		m_bShownAnswer = shown;
 	}
 
-	void SetAnimationCallback(AnimationCallbackHandler* handler);
+	void SetAnimationCallback(int index, AnimationCallbackHandler* handler);
+	int callbackSoundsIndex = -1;
+	int channelIndex = -1;
 };

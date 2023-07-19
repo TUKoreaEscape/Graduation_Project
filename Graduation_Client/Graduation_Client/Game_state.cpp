@@ -9,22 +9,23 @@ GameState* GameState::GameStateInstance = nullptr;
 void GameState::ChangeNextState()
 {
 	Player* player = Input::GetInstance()->m_pPlayer;
+	Sound& sound = *Sound::GetInstance();
 	std::cout << m_GameState << " -> ";
 	switch (m_GameState) {
 		case GAME_LOADING:
 			m_GameState = LOGIN;
-			Sound::GetInstance()->Play(m_nLoginBG);
+			sound.PlayBG(m_nLoginBG);
 			break;
 		case LOGIN:
 			m_GameState = ROOM_SELECT;
-			Sound::GetInstance()->Stop(m_nLoginBG);
-			Sound::GetInstance()->Play(m_nSelectBG);
+			sound.StopBG(m_nLoginBG);
+			sound.PlayBG(m_nSelectBG);
 			break;
 		case ROOM_SELECT:
 			player->ChangeCamera(ROOM_SELECT, WAITING_GAME);
 			m_GameState = WAITING_GAME;
-			Sound::GetInstance()->Stop(m_nSelectBG);
-			Sound::GetInstance()->Play(m_nWaitingBG);
+			sound.StopBG(m_nSelectBG);
+			sound.PlayBG(m_nWaitingBG);
 			break;
 		case WAITING_GAME:
 			player->ChangeCamera(WAITING_GAME, READY_TO_GAME);
@@ -32,8 +33,8 @@ void GameState::ChangeNextState()
 			taggerTime = std::chrono::steady_clock::now();
 			taggercountdown = 60;
 			SetLoading(2.0f);
-			Sound::GetInstance()->Stop(m_nWaitingBG);
-			Sound::GetInstance()->Play(m_nGameBG);
+			sound.StopBG(m_nWaitingBG);
+			sound.PlayBG(m_nGameBG);
 			break;
 		case CUSTOMIZING:
 			break;
@@ -45,13 +46,11 @@ void GameState::ChangeNextState()
 		case PLAYING_GAME:
 			//player->ChangeCamera(PLAYING_GAME, ENDING_GAME);
 			m_GameState = SPECTATOR_GAME;
-			Sound::GetInstance()->Stop(m_nGameBG);
-			Sound::GetInstance()->Play(m_nEndingBG);
 			break;
 		case ENDING_GAME:
 			m_GameState = WAITING_GAME;
-			Sound::GetInstance()->Stop(m_nEndingBG);
-			Sound::GetInstance()->Play(m_nWaitingBG);
+			sound.StopBG(m_nEndingBG);
+			sound.PlayBG(m_nWaitingBG);
 			break;
 		case INTERACTION_POWER:
 			m_GameState = ENDING_GAME;
@@ -59,6 +58,8 @@ void GameState::ChangeNextState()
 		case SPECTATOR_GAME:
 			player->ChangeCamera(PLAYING_GAME, ENDING_GAME);
 			m_GameState = ENDING_GAME;
+			sound.StopBG(m_nGameBG);
+			sound.PlayBG(m_nEndingBG);
 			break;
 	}
 	//std::cout << m_GameState << std::endl;

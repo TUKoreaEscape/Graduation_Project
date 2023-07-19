@@ -287,7 +287,7 @@ Door::Door() : InteractionObject()
 	}
 	m_nUIType = DOOR_UI;
 
-	m_nDoorSoundIndex = Sound::GetInstance()->CreateEffectSound("Sound/Door.wav", 0);
+	m_nDoorSoundIndex = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav");
 }
 
 Door::~Door()
@@ -460,6 +460,9 @@ void Door::SetPosition(XMFLOAT3 xmf3Position)
 
 	LeftDoorPos = leftDoor->GetPosition();
 	RightDoorPos = rightDoor->GetPosition();
+
+	Sound& sound = *Sound::GetInstance();
+	sound.SetObjectPos(m_nDoorSoundIndex, xmf3Position.x, xmf3Position.y, xmf3Position.z);
 }
 
 void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -607,14 +610,14 @@ void Door::SetOpen(bool Open)
 		if (Open == false) {
 			IsOpen = false;
 			IsWorking = true;
-			Sound::GetInstance()->Play(m_nDoorSoundIndex);
+			Sound::GetInstance()->PlayObject(m_nDoorSoundIndex, 1.0f, m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
 		}
 	}
 	else {
 		if (Open == true) {
 			IsOpen = true;
 			IsWorking = true;
-			Sound::GetInstance()->Play(m_nDoorSoundIndex);
+			Sound::GetInstance()->PlayObject(m_nDoorSoundIndex, 1.0f, m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
 		}
 	}
 }

@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "GameObject.h"
 #include "Animation.h"
+#include "Sound.h"
 
 AnimationSet::AnimationSet(float fLength, int nFramesPerSecond, int nKeyFrames, int nSkinningBones, char* pstrName)
 {
@@ -127,7 +128,7 @@ void AnimationSet::HandleCallback()
 		{
 			if (::IsEqual(m_pCallbackKeys[i].m_fTime, m_fPosition, ANIMATION_CALLBACK_EPSILON))
 			{
-				if (m_pCallbackKeys[i].m_pCallbackData) m_pAnimationCallbackHandler->HandleCallback(m_pCallbackKeys[i].m_pCallbackData, m_fPosition);
+				if (m_pCallbackKeys[i].m_pCallbackData) m_pAnimationCallbackHandler->HandleCallback(m_pCallbackKeys[i].m_pCallbackData, m_fPosition, m_pCallbackKeys[i].m_pCallbackData2);
 				break;
 			}
 		}
@@ -154,10 +155,11 @@ void AnimationSets::SetCallbackKeys(int nAnimationSet, int nCallbackKeys)
 	m_ppAnimationSets[nAnimationSet]->m_pCallbackKeys = new CALLBACKKEY[nCallbackKeys];
 }
 
-void AnimationSets::SetCallbackKey(int nAnimationSet, int nKeyIndex, float fKeyTime, void* pData)
+void AnimationSets::SetCallbackKey(int nAnimationSet, int nKeyIndex, float fKeyTime, void* pData, void* pData2)
 {
 	m_ppAnimationSets[nAnimationSet]->m_pCallbackKeys[nKeyIndex].m_fTime = fKeyTime;
 	m_ppAnimationSets[nAnimationSet]->m_pCallbackKeys[nKeyIndex].m_pCallbackData = pData;
+	m_ppAnimationSets[nAnimationSet]->m_pCallbackKeys[nKeyIndex].m_pCallbackData2 = pData2;
 
 }
 
@@ -291,9 +293,9 @@ void AnimationController::SetCallbackKeys(int nSkinnedMesh, int nAnimationSet, i
 	if (m_ppAnimationSets && m_ppAnimationSets[nSkinnedMesh]) m_ppAnimationSets[nSkinnedMesh]->SetCallbackKeys(nAnimationSet, nCallbackKeys);
 }
 
-void AnimationController::SetCallbackKey(int nSkinnedMesh, int nAnimationSet, int nKeyIndex, float fKeyTime, void* pData)
+void AnimationController::SetCallbackKey(int nSkinnedMesh, int nAnimationSet, int nKeyIndex, float fKeyTime, void* pData, void* pData2)
 {
-	if (m_ppAnimationSets && m_ppAnimationSets[nSkinnedMesh]) m_ppAnimationSets[nSkinnedMesh]->SetCallbackKey(nAnimationSet, nKeyIndex, fKeyTime, pData);
+	if (m_ppAnimationSets && m_ppAnimationSets[nSkinnedMesh]) m_ppAnimationSets[nSkinnedMesh]->SetCallbackKey(nAnimationSet, nKeyIndex, fKeyTime, pData, pData2);
 }
 
 void AnimationController::SetAnimationCallbackHandler(int nSkinnedMesh, int nAnimationSet, AnimationCallbackHandler* pCallbackHandler)
@@ -368,17 +370,11 @@ LoadedModelInfo::~LoadedModelInfo()
 	if (m_pppAnimatedBoneFrameCaches) delete[] m_pppAnimatedBoneFrameCaches;
 }
 
-void SoundCallbackHandler::HandleCallback(void* pCallbackData, float fTrackPosition)
+void SoundCallbackHandler::HandleCallback(void* pCallbackData, float fTrackPosition, void* pCallbackData2)
 {
-	_TCHAR* pWavName = (_TCHAR*)pCallbackData;
-#ifdef _WITH_DEBUG_CALLBACK_DATA
-	TCHAR pstrDebug[256] = { 0 };
-	_stprintf_s(pstrDebug, 256, _T("%s(%f)\n"), pWavName, fTrackPosition);
-	OutputDebugString(pstrDebug);
-#endif
-#ifdef _WITH_SOUND_RESOURCE
-	PlaySound(pWavName, ::ghAppInstance, SND_RESOURCE | SND_ASYNC);
-#else
-	PlaySound(pWavName, NULL, SND_FILENAME | SND_ASYNC);
-#endif
+	int* SoundIndex = (int*)pCallbackData;
+	int* ChannelIndex = (int*)pCallbackData2;
+	std::cout << "sound Index - " << *SoundIndex << ", Channel - " << *ChannelIndex << "\n";
+	Sound& sound = *Sound::GetInstance();
+	sound.Play(*SoundIndex, 1.0f, *ChannelIndex);
 }

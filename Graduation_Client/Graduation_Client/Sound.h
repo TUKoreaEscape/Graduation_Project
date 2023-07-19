@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 
 constexpr int MAX_CHANNEL = 32;
 
@@ -18,16 +19,46 @@ public:
 
 	void StartFMOD();
 	int CreateEffectSound(char* file, float volume);
+	int CreateObjectSound(char* file);
 	int CreateBGSound(char* file, float volume);
 
-	void Play(int index);
-	void Stop(int index);
+	void Play(int index, float volume, int OtherPlayer = -1);
+	void PlayBG(int index);
+	void PlayObject(int index, float volume, float x, float y, float z);
+	void Stop(int index, int OtherPlayer = -1);
+	void StopBG(int index);
+	void StopObject(int index);
+
+	void Update(float fElapsedTime);
+	void SetListenerPos(const XMFLOAT3& listenerPos, const XMFLOAT3& look, const XMFLOAT3& up);
+
+	int CreateOtherPlayersSounds(int index);
+	void SetOtherPlayersPos(int index, const XMFLOAT3& pos);
+	void SetObjectPos(int index, float x, float y, float z);
 private:
 	FMOD::System* m_pSystem;
 	FMOD::Sound* m_pSound;
 	FMOD::Channel* m_pChannel;
+	FMOD::Reverb3D* m_pReverb;
+	FMOD_REVERB_PROPERTIES prop = FMOD_PRESET_ROOM;
+	FMOD_VECTOR m_fvPos;
+	float m_fMinDist;
+	float m_fMaxDist;
+
+	FMOD_VECTOR m_fvListenerPos;
+	FMOD_VECTOR m_fvListenerLook;
+	FMOD_VECTOR m_fvListenerUp;
+
 	unsigned int m_uiVersion;
 
 	int m_nSounds;
 	std::vector<FMOD::Sound*> m_vSounds;
+	std::vector<FMOD::Channel*> m_vChannels;
+	std::array<FMOD::Channel*, 5> m_arrOtehrPlayerChannel;
+	
+	int m_nObjects{};
+	std::vector<FMOD::Sound*> m_vObjectSounds;
+	std::vector<FMOD::Channel*> m_vObjectChannels;
+
+	FMOD::Channel* m_pBGChannel;
 };

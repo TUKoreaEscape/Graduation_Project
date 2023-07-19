@@ -7,6 +7,7 @@
 #include "Object.h"
 #include "Network.h"
 #include "Game_state.h"
+#include "Sound.h"
 
 Player::Player() : GameObject()
 {
@@ -522,21 +523,23 @@ void Player::ChangeSpectator()
 	SpectatorPlayerIndex = (SpectatorPlayerIndex + 1) % 5;
 }
 
-void Player::SetAnimationCallback(AnimationCallbackHandler* handler)
+void Player::SetAnimationCallback(int index, AnimationCallbackHandler* handler)
 {
+	channelIndex = index;
 	if (m_pSkinnedAnimationController) {
+		callbackSoundsIndex = Sound::GetInstance()->CreateOtherPlayersSounds(index);
 		m_pSkinnedAnimationController->SetCallbackKeys(0, 1, 2);
-		m_pSkinnedAnimationController->SetCallbackKey(0, 1, 0, 0.166f, _T("Sound/Footstep01.wav"));
-		m_pSkinnedAnimationController->SetCallbackKey(0, 1, 1, 0.5f, _T("Sound/Footstep02.wav"));
+		m_pSkinnedAnimationController->SetCallbackKey(0, 1, 0, 0.166f, &callbackSoundsIndex, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 1, 1, 0.5f, &callbackSoundsIndex, &channelIndex);
 		m_pSkinnedAnimationController->SetCallbackKeys(0, 2, 2);
-		m_pSkinnedAnimationController->SetCallbackKey(0, 2, 0, 0.166f, _T("Sound/Footstep01.wav"));
-		m_pSkinnedAnimationController->SetCallbackKey(0, 2, 1, 0.5f, _T("Sound/Footstep02.wav"));
+		m_pSkinnedAnimationController->SetCallbackKey(0, 2, 0, 0.166f, &callbackSoundsIndex, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 2, 1, 0.5f, &callbackSoundsIndex, &channelIndex);
 		m_pSkinnedAnimationController->SetCallbackKeys(0, 3, 2);
-		m_pSkinnedAnimationController->SetCallbackKey(0, 3, 0, 0.166f, _T("Sound/Footstep01.wav"));
-		m_pSkinnedAnimationController->SetCallbackKey(0, 3, 1, 0.5f, _T("Sound/Footstep02.wav"));
+		m_pSkinnedAnimationController->SetCallbackKey(0, 3, 0, 0.166f, &callbackSoundsIndex, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 3, 1, 0.5f, &callbackSoundsIndex, &channelIndex);
 		m_pSkinnedAnimationController->SetCallbackKeys(0, 4, 2);
-		m_pSkinnedAnimationController->SetCallbackKey(0, 4, 0, 0.166f, _T("Sound/Footstep01.wav"));
-		m_pSkinnedAnimationController->SetCallbackKey(0, 4, 1, 0.5f, _T("Sound/Footstep02.wav"));
+		m_pSkinnedAnimationController->SetCallbackKey(0, 4, 0, 0.166f, &callbackSoundsIndex, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 4, 1, 0.5f, &callbackSoundsIndex, &channelIndex);
 		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 1, handler);
 		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 2, handler);
 		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 3, handler);

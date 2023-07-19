@@ -12,12 +12,13 @@ struct CALLBACKKEY
 {
 	float  							m_fTime = 0.0f;
 	void* m_pCallbackData = NULL;
+	void* m_pCallbackData2 = nullptr;
 };
 
 class AnimationCallbackHandler
 {
 public:
-	virtual void HandleCallback(void* pCallbackData, float fTrackPosition) { }
+	virtual void HandleCallback(void* pCallbackData, float fTrackPosition, void* pCallbackData2 = nullptr) { }
 };
 
 class SoundCallbackHandler : public AnimationCallbackHandler
@@ -27,7 +28,7 @@ public:
 	~SoundCallbackHandler() { }
 
 public:
-	virtual void HandleCallback(void* pCallbackData, float fTrackPosition);
+	virtual void HandleCallback(void* pCallbackData, float fTrackPosition, void* pCallbackData2 = nullptr );
 
 };
 //#define _WITH_ANIMATION_SRT		//애니메이션 행렬 대신에 SRT 정보를 사용
@@ -107,7 +108,7 @@ public:
 
 public:
 	void SetCallbackKeys(int nAnimationSet, int nCallbackKeys);
-	void SetCallbackKey(int nAnimationSet, int nKeyIndex, float fTime, void* pData);
+	void SetCallbackKey(int nAnimationSet, int nKeyIndex, float fTime, void* pData, void* pData2 = nullptr);
 	void SetAnimationCallbackHandler(int nAnimationSet, AnimationCallbackHandler* pCallbackHandler);
 };
 
@@ -184,7 +185,7 @@ public:
 	void SetTrackWeight(int nAnimationTrack, float fWeight);
 
 	void SetCallbackKeys(int nSkinnedMesh, int nAnimationSet, int nCallbackKeys);
-	void SetCallbackKey(int nSkinnedMesh, int nAnimationSet, int nKeyIndex, float fTime, void* pData);
+	void SetCallbackKey(int nSkinnedMesh, int nAnimationSet, int nKeyIndex, float fTime, void* pData, void* pData2 = nullptr);
 	void SetAnimationCallbackHandler(int nSkinnedMesh, int nAnimationSet, AnimationCallbackHandler* pCallbackHandler);
 
 	void AdvanceTime(float fElapsedTime, GameObject* pRootGameObject, int player = -1);
