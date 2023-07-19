@@ -68,4 +68,5 @@ public:
 	bool GetChatState() { return chat_state; };
 	void ChangeMinimapState() { m_MinimapOn = !m_MinimapOn; };
 	bool GetMinimapState() { return m_MinimapOn; };
+	void SetBG();
 };
