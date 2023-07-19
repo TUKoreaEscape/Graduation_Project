@@ -928,8 +928,10 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_PLIERS, true);
 	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_WRENCH) // 2
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_WRENCH, true);
-	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_LIFECHIP) // 5
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_LIFECHIP) {
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, true);
+		m_clients[user_id].set_life_chip(true);
+	}
 
 #if PRINT
 	std::cout << "Item_box_index [" << room.m_fix_item[item_index].Get_Item_box_index() << "] : ";

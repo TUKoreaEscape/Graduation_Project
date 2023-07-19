@@ -445,6 +445,7 @@ void Network::Process_ElectronicSystem_Switch_Update(char* ptr)
 void Network::Process_ElectronicSystem_Activate(char* ptr)
 {
 	sc_packet_electronic_system_activate_update* packet = reinterpret_cast<sc_packet_electronic_system_activate_update*>(ptr);
+	m_pPowers[packet->system_index]->CheckStop();
 	m_pPowers[packet->system_index]->SetActivate(packet->activate);
 	if (packet->activate)
 		std::cout << packet->system_index << "번 전력장치 수리 완료" << std::endl;
@@ -544,12 +545,14 @@ void Network::Process_EscapeSystem_Update(char* ptr)
 
 	if (m_pPlayer->GetID() == packet->escape_id) {
 		m_pPlayer->SetPlayerType(TYPE_ESCAPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
+		reinterpret_cast<EscapeObject*>(m_EscapeLevers[packet->index])->CheckStop();
 		GameState& game_state = *GameState::GetInstance();
 		game_state.ChangeNextState();
 	}
 	else {
 		for (int i = 0; i < 5; ++i) {
 			if (m_ppOther[i]->GetID() == packet->escape_id) {
+				reinterpret_cast<EscapeObject*>(m_EscapeLevers[packet->index])->CheckStop();
 				m_ppOther[i]->SetPlayerType(TYPE_ESCAPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
 				break;
 			}
