@@ -81,6 +81,9 @@ public: // 스레드
 public: // Ready 동기화를 위해 추가한 변수
 	bool				m_other_player_ready[5]{ false };
 
+public:
+	int					m_item_to_power[5]{ 0,1,2,3,4 };
+
 public: // 클라이언트 오브젝트와 연결하는 용도
 	Player*				m_pPlayer = nullptr;;
 	Player**			m_ppOther = nullptr;

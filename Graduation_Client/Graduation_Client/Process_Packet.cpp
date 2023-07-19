@@ -54,6 +54,7 @@ void Network::Process_Init_Position(char* ptr)
 	}
 
 	for (int i = 0; i < 5; ++i) {
+		set_capture_mouse();
 		for (int j = 0; j < 6; ++j) {
 			if (m_ppOther[i]->GetID() == packet->user_id[j]) {
 				m_ppOther[i]->SetPosition(packet->position[j], true);
@@ -81,6 +82,7 @@ void Network::Process_Game_Start(char* ptr)
 	sc_packet_game_start* packet = reinterpret_cast<sc_packet_game_start*>(ptr);
 	GameState& game_state = *GameState::GetInstance();
 	game_state.SetLoading(0.0f);
+	set_capture_mouse();
 }
 
 void Network::Process_Game_End(char* ptr)
@@ -452,6 +454,12 @@ void Network::Process_Pick_Item_Init(char* ptr)
 {
 	sc_packet_pick_item_init* packet = reinterpret_cast<sc_packet_pick_item_init*>(ptr);
 	// 여기서 처리해야함
+	for (int i = 0; i < 5; ++i)
+		m_item_to_power[i] = packet->shuffle[i];
+
+	for (int i = 0; i < 5; ++i)
+		std::cout << m_item_to_power[i] << " ";
+	std::cout << std::endl;
 
 	for(int i = 0; i < MAX_INGAME_ITEM; ++i)
 		m_pBoxes[i]->SetIndex(i);

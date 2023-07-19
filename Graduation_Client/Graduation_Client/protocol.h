@@ -671,6 +671,7 @@ struct sc_packet_pick_item_init {
 	unsigned char		size;
 	unsigned char		type;
 	GameItem_Setting	data[MAX_INGAME_ITEM];
+	short				shuffle[5];
 };
 
 struct sc_packet_attack {

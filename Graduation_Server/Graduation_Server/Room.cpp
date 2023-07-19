@@ -208,6 +208,28 @@ void Room::init_fix_object_and_life_chip()
 		}
 	}
 
+	int temp_shuffle[5];
+	for (int i = 0; i < 5; ++i)
+		temp_shuffle[i] = -1;
+
+	for (int i = 0; i < 5; ++i) {
+		int t = rand() % 5;
+		int* p;
+		while (true) {
+			p = find(temp_shuffle, temp_shuffle + 5, t);
+			if (p == temp_shuffle + 5)
+			{
+				temp_shuffle[i] = t;
+				break;
+			}
+			else {
+				t += 1;
+				if (t == 5)
+					t = 0;
+			}
+		}
+	}
+
 	m_fix_item[0].Set_Item_Type(GAME_ITEM::ITEM_DRILL);
 	m_fix_item[1].Set_Item_Type(GAME_ITEM::ITEM_HAMMER);
 	m_fix_item[MAX_INGAME_ITEM - 1].Set_Item_Type(GAME_ITEM::ITEM_PLIERS);
@@ -225,6 +247,9 @@ void Room::init_fix_object_and_life_chip()
 		item_init_packet.data[i].item_box_index = m_fix_item[i].Get_Item_box_index();
 		item_init_packet.data[i].item_type = m_fix_item[i].Get_Item_Type();
 	}
+
+	for (int i = 0; i < 5; ++i)
+		item_init_packet.shuffle[i] = temp_shuffle[i];
 
 #if PRINT
 	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
