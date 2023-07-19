@@ -97,7 +97,7 @@ void Network::listen_thread()
 		{
 			int err_no = WSAGetLastError();
 			if (WSA_IO_PENDING != err_no) {
-				std::cout << "Socket Error Exit" << std::endl;
+				//std::cout << "Socket Error Exit" << std::endl;
 				TerminateProcess(info.hProcess, 1);
 				m_shutdown = true;
 				exit(0);
@@ -517,14 +517,14 @@ void Network::on_voice_talk()
 {
 	m_is_use_voice_talk = true;
 	join_voice_talk();
-	std::cout << "voice on" << std::endl;
+	//std::cout << "voice on" << std::endl;
 }
 
 void Network::off_voice_talk()
 {
 	exit_voice_talk();
 	m_is_use_voice_talk = false;
-	std::cout << "voice off" << std::endl;
+	//std::cout << "voice off" << std::endl;
 }
 
 void Network::join_voice_talk()

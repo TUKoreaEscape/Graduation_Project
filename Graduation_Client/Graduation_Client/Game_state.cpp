@@ -8,7 +8,7 @@ GameState* GameState::GameStateInstance = nullptr;
 void GameState::ChangeNextState()
 {
 	Player* player = Input::GetInstance()->m_pPlayer;
-	std::cout << m_GameState << " -> ";
+	//std::cout << m_GameState << " -> ";
 	switch (m_GameState) {
 		case GAME_LOADING:
 			m_GameState = LOGIN;
@@ -55,7 +55,7 @@ void GameState::ChangeNextState()
 void GameState::ChangePrevState()
 {
 	Player* player = Input::GetInstance()->m_pPlayer;
-	std::cout << m_GameState << " -> ";
+	//std::cout << m_GameState << " -> ";
 	switch (m_GameState) {
 		case GAME_LOADING:
 		case LOGIN:
@@ -89,7 +89,7 @@ void GameState::ChangePrevState()
 void GameState::ChangeSameLevelState()
 {
 	Player* player = Input::GetInstance()->m_pPlayer;
-	std::cout << m_GameState << " -> ";
+	//std::cout << m_GameState << " -> ";
 	switch (m_GameState) {
 		case GAME_LOADING:
 		case LOGIN:
@@ -129,7 +129,7 @@ bool GameState::GetTick()
 	if (elapsedTime != prevTime)
 	{
 		prevTime = elapsedTime;
-		std::cout << elapsedTime << std::endl;
+		//std::cout << elapsedTime << std::endl;
 		return true;
 	}
 	else return false;

@@ -275,6 +275,14 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 		m_clients[user_id]._state_lock.lock();
 		m_clients[user_id].set_state(CLIENT_STATE::ST_LOBBY);
 		m_clients[user_id]._state_lock.unlock();
+		
+		// æ∆¿Ã≈€ »πµÊ √ ±‚»≠
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_DRILL, false);
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_DRIVER, false);
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_HAMMER, false);
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, false);
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_PLIERS, false);
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_WRENCH, false);
 
 		//for (auto& p : m_clients[user_id].room_list)
 		//{
