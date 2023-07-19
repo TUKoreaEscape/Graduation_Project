@@ -103,6 +103,9 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 #endif
 		case VK_TAB:
 			if (m_gamestate->GetMinimapState()) m_gamestate->ChangeMinimapState();
+			if (m_gamestate->GetGameState() == INTERACTION_POWER) {
+				m_pPlayer->SetShown(false);
+			}
 			break;
 		case VK_ESCAPE:
 		{
@@ -157,6 +160,11 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 		if (m_gamestate->GetGameState() == SPECTATOR_GAME) {
 			if (wParam == VK_SPACE) {
 				m_pPlayer->SpectatorPlayerIndex = (m_pPlayer->SpectatorPlayerIndex + 1) % 5;
+			}
+		}
+		if (m_gamestate->GetGameState() == INTERACTION_POWER) {
+			if (wParam == VK_TAB) {
+				m_pPlayer->SetShown(true);
 			}
 		}
 		break;

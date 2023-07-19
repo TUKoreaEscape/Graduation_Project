@@ -95,6 +95,9 @@ public:
 	int m_nObjectsUIs{};
 
 	int m_nSpectator = 0;
+
+	int m_nAnswerUI{};
+	GameObject** m_ppAnswerUIs = nullptr;
 protected:
 	static ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap;
 

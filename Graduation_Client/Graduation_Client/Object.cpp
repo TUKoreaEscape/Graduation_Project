@@ -816,6 +816,10 @@ void PowerSwitch::Init()
 	m_pCup = FindFrame("Cup");
 	m_pMainKnob = FindFrame("Main_Knob");
 	m_xmf4x4MainKnobParent = m_pMainKnob->m_xmf4x4ToParent;
+	for (int i = 0; i < 10; ++i) {
+		SetAnswer(i, false);
+	}
+	SetAnswer(5, true);
 }
 
 bool PowerSwitch::IsPlayerNear(const XMFLOAT3& PlayerPos)
@@ -1738,6 +1742,16 @@ void IngameUI::UIrender(ID3D12GraphicsCommandList* pd3dCommandList, float gauge,
 {
 	UpdateShaderVariable(pd3dCommandList, gauge, type);
 	GameObject::render(pd3dCommandList);
+}
+
+void IngameUI::SetAnswer(bool on)
+{
+	if (true == on) {
+		m_xmf4x4World._41 = 0.15f;
+	}
+	else {
+		m_xmf4x4World._41 = 0.0f;
+	}
 }
 
 MinimapUI::MinimapUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName, float x, float y, float width, float height)

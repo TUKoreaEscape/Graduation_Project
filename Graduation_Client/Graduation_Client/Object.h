@@ -205,7 +205,7 @@ public:
 	bool CheckAnswer();
 	void Reset();
 
-
+	bool GetAnswer(int index) const { return m_bAnswers[index]; }
 private:
 	bool m_bAnswers[10];
 };
@@ -302,6 +302,8 @@ public:
 
 	void SetGuage(float f) { m_fGauge = f; };
 	void SetUIType(int type) { m_UIType = type; };
+
+	void SetAnswer(bool on);
 };
 
 class MinimapUI : public GameObject
