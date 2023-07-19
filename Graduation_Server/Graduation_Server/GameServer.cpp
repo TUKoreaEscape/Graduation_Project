@@ -930,6 +930,12 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 		break;
 	}
 
+	case CS_PACKET::CS_PACKET_ESCAPESYSTEM_LEVER_WORKING:
+	{
+		Process_EscapeSystem_lever_working(user_id, p);
+		break;
+	}
+
 	case CS_PACKET::CS_PACKET_REQUEST_ESCAPESYSTEM_WORKING:
 	{
 		Process_EscapeSystem(user_id, p);

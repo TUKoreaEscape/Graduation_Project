@@ -41,9 +41,9 @@ void Network::Process_Ready(char* ptr)
 void Network::Process_Init_Position(char* ptr)
 {
 	sc_packet_init_position* packet = reinterpret_cast<sc_packet_init_position*>(ptr);
-
 	for (int i = 0; i < 6; ++i) {
 		if (m_pPlayer->GetID() == packet->user_id[i]) {
+			set_capture_mouse();
 			m_pPlayer->SetPosition(packet->position[i], true);
 			m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 			m_pPlayer->SetTrackAnimationSet(0, 0);
@@ -85,6 +85,7 @@ void Network::Process_Game_Start(char* ptr)
 
 void Network::Process_Game_End(char* ptr)
 {
+	release_capture_mouse();
 	sc_packet_game_end* packet = reinterpret_cast<sc_packet_game_end*>(ptr);
 	m_tagger_win = packet->is_tagger_win;
 
@@ -516,6 +517,16 @@ void Network::Process_Active_EscapeSystem(char* ptr)
 	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i)
 		reinterpret_cast<EscapeObject*>(m_EscapeLevers[i])->SetWorking();
 	reinterpret_cast<EscapeObject*>(m_EscapeLevers[packet->index])->SetReal();
+}
+
+void Network::Process_EscapeSystem_Lever_Update(char* ptr)
+{
+	sc_packet_request_escapesystem_lever_working* packet = reinterpret_cast<sc_packet_request_escapesystem_lever_working*>(ptr);
+
+	if (packet->is_start)
+		reinterpret_cast<EscapeObject*>(m_EscapeLevers[packet->index])->CheckStart();
+	else
+		reinterpret_cast<EscapeObject*>(m_EscapeLevers[packet->index])->CheckStop();
 }
 
 void Network::Process_EscapeSystem_Update(char* ptr)

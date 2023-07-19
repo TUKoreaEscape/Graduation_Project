@@ -41,6 +41,7 @@ private:
 	Custom				data;
 
 	SHELLEXECUTEINFO	info;
+	HWND				m_hwnd;
 	HWND				hwnd_ExtMixerWin;
 	bool				m_shutdown = false;
 	int					m_my_id = -1;
@@ -101,7 +102,10 @@ public:
 	~Network();
 
 	void init_network();
-
+	void set_hwnd(HWND hWnd) { m_hwnd = hWnd; }
+	HWND get_hwnd() { return m_hwnd; }
+	void set_capture_mouse();
+	void release_capture_mouse();
 
 	void listen_thread();
 	void Debug_send_thread();
@@ -126,6 +130,7 @@ public:
 	void Process_ElectrinicSystem_Init(char* ptr);
 	void Process_ElectronicSystem_Switch_Update(char* ptr);
 	void Process_ElectronicSystem_Activate(char* ptr);
+	void Process_EscapeSystem_Lever_Update(char* ptr);
 	void Process_EscapeSystem_Update(char* ptr);
 	void Process_Attack_Packet(char* ptr);
 	void Process_LifeChip_Update(char* ptr);
