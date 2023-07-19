@@ -177,6 +177,8 @@ void cGameServer::WorkerThread()
 			packet.second_skill = false;
 			packet.third_skill = false;
 
+			m_clients[tagger_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, false);
+
 			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
 				m_clients[rl.in_player[i]].do_send(sizeof(packet), &packet);
 			delete exp_over;
@@ -298,11 +300,13 @@ void cGameServer::WorkerThread()
 					continue;
 				m_clients[player_id].do_send(sizeof(packet), &packet);
 			}
+			delete exp_over;
 			break;
 		}
 
 		case OP_TYPE::OP_USE_THIRD_TAGGER_SKILL:
 		{
+			delete exp_over;
 			break;
 		}
 
@@ -322,6 +326,7 @@ void cGameServer::WorkerThread()
 					continue;
 				m_clients[player_id].do_send(sizeof(packet), &packet);
 			}
+			delete exp_over;
 			break;
 		}
 
@@ -339,6 +344,15 @@ void cGameServer::WorkerThread()
 			
 			for (int i = 0; i < 6; ++i)
 				packet.escape_id[i] = -1;
+
+			for (auto& player_id : rl.in_player) {
+				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_WRENCH, false);
+				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_PLIERS, false);
+				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, false);
+				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_HAMMER, false);
+				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_DRIVER, false);
+				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_DRILL, false);
+			}
 
 			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
 			{
@@ -443,6 +457,7 @@ void cGameServer::WorkerThread()
 
 		case OP_TYPE::OP_SERVER_END:
 		{
+			delete exp_over;
 			EXP_OVER* over = new EXP_OVER;
 			over->m_comp_op = OP_TYPE::OP_SERVER_END;
 			PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, 0, &over->m_wsa_over);

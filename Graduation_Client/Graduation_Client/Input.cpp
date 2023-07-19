@@ -565,8 +565,8 @@ void Input::DeleteIdAndPassword(char* str, int& num)
 {
 	if (num > 0)
 	{
-		str[num] = '\0';
 		num--;
+		str[num] = '\0';
 	}
 	else if (num == 0)
 	{
