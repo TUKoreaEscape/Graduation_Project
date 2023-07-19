@@ -2058,6 +2058,17 @@ void EscapeObject::update(float fElapsedTime)
 		memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
 		if (((keyBuffer['f'] & 0xF0) == false) && ((keyBuffer['F'] & 0xF0) == false)) {
 			if (false == IsEqual(m_fCooltime, 0)) {
+#if USE_NETWORK
+				Network& network = *Network::GetInstance();
+
+				cs_packet_electronic_system_lever_working packet;
+				packet.size = sizeof(packet);
+				packet.type = CS_PACKET::CS_PACKET_ESCAPESYSTEM_LEVER_WORKING;
+				packet.index = GetID();
+				packet.is_start = false;
+
+				network.send_packet(&packet);
+#endif
 				// Send CheckStop();
 			}
 			m_fCooltime = 0;
@@ -2066,6 +2077,17 @@ void EscapeObject::update(float fElapsedTime)
 	}
 	else {
 		if (false == IsEqual(m_fCooltime, 0)) {
+#if USE_NETWORK
+			Network& network = *Network::GetInstance();
+
+			cs_packet_electronic_system_lever_working packet;
+			packet.size = sizeof(packet);
+			packet.type = CS_PACKET::CS_PACKET_ESCAPESYSTEM_LEVER_WORKING;
+			packet.index = GetID();
+			packet.is_start = false;
+
+			network.send_packet(&packet);
+#endif
 			// Send CheckStop();
 		}
 		m_fCooltime = 0;
@@ -2082,6 +2104,17 @@ void EscapeObject::Interaction(int playerType)
 
 	IsInteraction = true;
 	if (IsEqual(m_fCooltime, 0)) {
+#if USE_NETWORK
+		Network& network = *Network::GetInstance();
+
+		cs_packet_electronic_system_lever_working packet;
+		packet.size = sizeof(packet);
+		packet.type = CS_PACKET::CS_PACKET_ESCAPESYSTEM_LEVER_WORKING;
+		packet.index = GetID();
+		packet.is_start = true;
+
+		network.send_packet(&packet);
+#endif
 		//  Send CheckStart();
 	}
 	if (m_fCooltime >= PLAYER_ESCAPE_LEVER_COOLTIME) {
@@ -2099,6 +2132,17 @@ void EscapeObject::Interaction(int playerType)
 		}
 		else {
 			if (false == IsEqual(m_fCooltime, 0)) {
+#if USE_NETWORK
+				Network& network = *Network::GetInstance();
+
+				cs_packet_electronic_system_lever_working packet;
+				packet.size = sizeof(packet);
+				packet.type = CS_PACKET::CS_PACKET_ESCAPESYSTEM_LEVER_WORKING;
+				packet.index = GetID();
+				packet.is_start = false;
+
+				network.send_packet(&packet);
+#endif
 				// send CheckStop();
 				m_fCheckCooltime = 0;
 			}

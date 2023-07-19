@@ -346,7 +346,7 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 		}
 
 		for (auto& door_object : room.m_door_object)
-			door_object.m_check_bounding_box = true;
+			door_object.init();
 
 		for (auto& electronic_system : room.m_electrinic_system)
 			electronic_system.Init_Fix();
@@ -1001,6 +1001,24 @@ void cGameServer::Process_Altar_LifeChip_Update(const int user_id)
 	{
 		// 여기는 Tagger가 승리한 조건을 달성한 경우 활성화
 		room.End_Game(true);
+	}
+}
+
+void cGameServer::Process_EscapeSystem_lever_working(const int user_id, void* buff)
+{
+	cs_packet_request_escapesystem_lever_working* packet = reinterpret_cast<cs_packet_request_escapesystem_lever_working*>(buff);
+	
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+	sc_packet_request_escapesystem_lever_working update_packet;
+	update_packet.size = sizeof(update_packet);
+	update_packet.type = SC_PACKET::SC_PACKET_ESCAPESYSTEM_LEVER_WORKING;
+	update_packet.index = packet->index;
+	
+	for (int& player_id : room.in_player) {
+		if (player_id == -1)
+			continue;
+		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
 	}
 }
 

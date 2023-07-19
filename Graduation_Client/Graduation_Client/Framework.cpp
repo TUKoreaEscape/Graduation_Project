@@ -68,6 +68,11 @@ bool Framework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 	BuildObjects(); //렌더링할 게임 객체를 생성한다.
 
+#if USE_NETWORK
+	Network& network = *Network::GetInstance();
+	network.set_hwnd(m_hWnd);
+#endif
+
 	return(true);
 }
 

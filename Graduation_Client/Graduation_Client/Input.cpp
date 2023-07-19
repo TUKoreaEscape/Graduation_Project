@@ -78,6 +78,7 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			speed = 60.0f;
 			break;
 		case VK_F6:
+#if !USE_NETWORK
 			if (m_gamestate->GetGameState() == GAME_LOADING) break;
 			m_gamestate->ChangeNextState();
 			break;
@@ -87,15 +88,18 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 		case VK_F8:
 			m_gamestate->ChangeSameLevelState();
 			break;
+#endif
 		case VK_F12:
 			m_debuglight = !m_debuglight;
 			break;
+#if !USE_NETWORK
 		case VK_F3:
 			if (m_pPlayer) {
 				if (m_pPlayer->m_Type == TYPE_TAGGER) m_pPlayer->SetPlayerType(TYPE_PLAYER);
 				else m_pPlayer->SetPlayerType(TYPE_TAGGER);
 			}
 			break;
+#endif
 		case VK_TAB:
 			if (m_gamestate->GetMinimapState()) m_gamestate->ChangeMinimapState();
 			break;
