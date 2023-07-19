@@ -113,6 +113,7 @@ void GameState::ChangeSameLevelState()
 		case ENDING_GAME:
 			break;
 		case INTERACTION_POWER:
+			player->SetShown(false);
 			m_GameState = PLAYING_GAME;
 			break;
 		case SPECTATOR_GAME:
