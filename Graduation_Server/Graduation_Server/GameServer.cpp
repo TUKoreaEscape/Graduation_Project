@@ -804,29 +804,29 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_PACKET_CREATE_ROOM:
 	{
-		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY) // 로그인하고 로비에 있을때만 방 생성 가능
-			Process_Create_Room(user_id, p);
+		//if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY) // 로그인하고 로비에 있을때만 방 생성 가능
+		Process_Create_Room(user_id, p);
 		break;
 	}
 
 	case CS_PACKET::CS_PACKET_JOIN_ROOM:
 	{
-		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY)
-			Process_Join_Room(user_id, p);
+		//if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_LOBBY)
+		Process_Join_Room(user_id, p);
 		break;
 	}
 
 	case CS_PACKET::CS_PACKET_READY:
 	{
-		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_GAMEROOM)
-			Process_Ready(user_id, p);
+		//if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_GAMEROOM)
+		Process_Ready(user_id, p);
 		break;
 	}
 	
 	case CS_PACKET::CS_PACKET_EXIT_ROOM:
 	{
-		if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_GAMEROOM)
-			Process_Exit_Room(user_id, p);
+		//if (Y_LOGIN == m_clients[user_id].get_login_state() && m_clients[user_id].get_state() == CLIENT_STATE::ST_GAMEROOM)
+		Process_Exit_Room(user_id, p);
 		break;
 	}
 
