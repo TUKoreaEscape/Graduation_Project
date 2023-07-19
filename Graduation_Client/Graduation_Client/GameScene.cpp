@@ -1368,12 +1368,13 @@ void GameScene::MakeEscapeLevers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 		EscapeLevers[i]->SetChild(pLeverModel->m_pModelRootObject, true);
 		EscapeLevers[i]->SetUI(0, m_ppObjectsUIs[0]);
 		EscapeLevers[i]->SetUI(1, m_ppObjectsUIs[5]);
+		EscapeLevers[i]->Init();
 	}
-	EscapeLevers[0]->SetPosition(XMFLOAT3(87.99f, 0.0f, 42.959f)); // Broad
+	EscapeLevers[0]->SetPosition(XMFLOAT3(87.99f, -0.4077f, 42.959f)); // Broad
 	reinterpret_cast<EscapeObject*>(EscapeLevers[0])->SetRotation(DEGREE0);
-	EscapeLevers[1]->SetPosition(XMFLOAT3(-43.89f, 0.0f, 41.97f)); // piano
+	EscapeLevers[1]->SetPosition(XMFLOAT3(-43.89f, -0.4077f, 41.97f)); // piano
 	reinterpret_cast<EscapeObject*>(EscapeLevers[1])->SetRotation(DEGREE0);
-	EscapeLevers[2]->SetPosition(XMFLOAT3(76.65f, 0.0f, -70.07f)); // forest
+	EscapeLevers[2]->SetPosition(XMFLOAT3(76.65f, -0.4077f, -70.07f)); // forest
 	reinterpret_cast<EscapeObject*>(EscapeLevers[2])->SetRotation(DEGREE90);
 
 	if (pLeverModel) delete pLeverModel;

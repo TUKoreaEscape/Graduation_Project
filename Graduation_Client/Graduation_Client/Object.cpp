@@ -1943,6 +1943,13 @@ EscapeObject::~EscapeObject()
 {
 }
 
+void EscapeObject::Init()
+{
+	m_pArm = FindFrame("Arm");
+	m_xmf4x4ArmParent = m_pArm->m_xmf4x4ToParent;
+	SetWorking();
+}
+
 bool EscapeObject::IsPlayerNear(const XMFLOAT3& PlayerPos)
 {
 	float minx, maxx, minz, maxz;
@@ -2002,7 +2009,20 @@ void EscapeObject::Rotate(float fPitch, float fYaw, float fRoll)
 
 void EscapeObject::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	XMFLOAT4X4 prevMat = m_pArm->m_xmf4x4ToParent;
+	UpdateTransform(nullptr);
+	if (IsInteraction || m_bDoesOtherPlayerActive) {
+		XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_fCooltime * 9), XMConvertToRadians(0), XMConvertToRadians(0));
+		m_pArm->m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_pArm->m_xmf4x4ToParent);
+
+		UpdateTransform(nullptr);
+	}
+	else {
+		m_pArm->m_xmf4x4ToParent = m_xmf4x4ArmParent;
+	}
+
 	GameObject::render(pd3dCommandList);
+	m_pArm->m_xmf4x4ToParent = m_xmf4x4ArmParent;
 }
 
 void EscapeObject::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -2026,9 +2046,9 @@ void EscapeObject::update(float fElapsedTime)
 {
 	if (false == IsWorking) return;
 	if (IsInteraction == false) {
-		if (m_bDoesOtherPlayerActive) m_fCheckCooltime += fElapsedTime;
+		if (m_bDoesOtherPlayerActive) m_fCooltime += fElapsedTime;
 		else {
-			m_fCheckCooltime = 0;
+			m_fCooltime = 0;
 		}
 		return;
 	}

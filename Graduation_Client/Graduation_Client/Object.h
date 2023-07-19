@@ -352,6 +352,7 @@ public:
 	EscapeObject();
 	virtual ~EscapeObject();
 
+	void Init() override;
 	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
 	void Rotate(float fPitch, float fYaw, float fRoll);
 	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
@@ -372,4 +373,6 @@ public:
 	void SetWorking();
 
 	float m_fCheckCooltime{};
+	GameObject* m_pArm = nullptr;
+	XMFLOAT4X4 m_xmf4x4ArmParent;
 };
