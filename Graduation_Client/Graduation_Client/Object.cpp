@@ -973,6 +973,7 @@ void PowerSwitch::update(float fElapsedTime)
 		m_bClear = true;
 		m_bIsOperating = false;
 		Input::GetInstance()->m_gamestate->ChangeSameLevelState();
+		Input::GetInstance()->m_pPlayer->UseItem();
 #if USE_NETWORK
 		cs_packet_request_electronic_system_activate packet;
 		packet.size = sizeof(packet);

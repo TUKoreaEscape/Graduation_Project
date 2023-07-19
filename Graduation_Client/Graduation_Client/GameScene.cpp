@@ -199,7 +199,8 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 				for (int i = 1; i < 11; ++i) {
 					int powerIndex{};
 #if USE_NETWORK
-					// powerIndex = network->item_to_power[index];
+					Network& network = *Network::GetInstance();
+					powerIndex = network.m_item_to_power[index];
 #endif
 					reinterpret_cast<IngameUI*>(m_ppAnswerUIs[i])->SetAnswer((reinterpret_cast<PowerSwitch*>(m_pPowers[powerIndex])->GetAnswer(i - 1)));
 					m_ppAnswerUIs[i]->render(pd3dCommandList);
