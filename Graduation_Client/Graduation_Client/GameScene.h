@@ -84,6 +84,7 @@ public:
 	std::thread send_thread;
 
 	InteractionObject* Taggers = nullptr;
+	InteractionObject* EscapeLevers[NUM_ESCAPE_LEVER];
 
 	std::set<PVSROOM> m_sPVS[6];
 	PVSROOM m_pvsCamera;
@@ -92,6 +93,11 @@ public:
 
 	InteractionUI** m_ppObjectsUIs = nullptr;
 	int m_nObjectsUIs{};
+
+	int m_nSpectator = 0;
+
+	int m_nAnswerUI{};
+	GameObject** m_ppAnswerUIs = nullptr;
 protected:
 	static ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap;
 
@@ -116,6 +122,8 @@ public:
 	virtual void Endingrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Powerrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Loadingrender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void SpectatorPrerender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void Spectatorrender(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
@@ -149,6 +157,7 @@ public:
 	void MakePowers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void MakeTaggers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void MakeEscapeLevers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 

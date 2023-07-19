@@ -8,9 +8,10 @@ enum GAME_STATE {
 	CUSTOMIZING, //커스터마이징
 	READY_TO_GAME, //술래가 정해지기 전 게임 시작 전
 	PLAYING_GAME, //게임중
-	ENDING_GAME, //게임이 끝난 후
+	ENDING_GAME, //게임이 끝난 후 (모든 플레이어 탈출 성공 or 술래 승)
 	INTERACTION_POWER, // 전력장치 수리
 	GAME_LOADING,
+	SPECTATOR_GAME, // Player가 탈출 성공했을 때
 };
 
 class GameState {
@@ -30,6 +31,7 @@ private:
 	float				m_totalLoading = 2.0f;
 	float				m_Loading = 0.0f;
 	int					m_LoadingCount = 0;
+	bool				m_MinimapOn = false;
 	GameState() {}
 	GameState(const GameState& other);
 	~GameState() {}
@@ -64,5 +66,6 @@ public:
 	bool GetMicState() { return mic_state; };
 	void ChangeChatState() { chat_state = !chat_state; };
 	bool GetChatState() { return chat_state; };
-	void SetBG();
+	void ChangeMinimapState() { m_MinimapOn = !m_MinimapOn; };
+	bool GetMinimapState() { return m_MinimapOn; };
 };

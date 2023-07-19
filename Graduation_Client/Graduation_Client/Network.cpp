@@ -409,6 +409,12 @@ void Network::ProcessPacket(char* ptr)
 		break;
 	}
 
+	case SC_PACKET::SC_PACKET_ESCAPESYSTEM_LEVER_WORKING:
+	{
+		Process_EscapeSystem_Lever_Update(ptr);
+		break;
+	}
+
 	case SC_PACKET::SC_PACKET_REQUEST_ESCAPESYSTEM_WORKING:
 	{
 		Process_EscapeSystem_Update(ptr); // 탈출장치를 조작 한 경우
@@ -562,4 +568,30 @@ void Network::exit_voice_talk()
 		TerminateProcess(info.hProcess, 1);
 		set_voice_talk_working_state(false);
 	}
+}
+
+void Network::set_capture_mouse()
+{
+	//RECT rcClient;
+	//GetClientRect(*m_hwnd, &rcClient);
+	//POINT ptCenter = { (rcClient.right - rcClient.left) / 2, (rcClient.bottom - rcClient.top) / 2 };
+	//POINT ptMouse;
+
+	//GetCursorPos(&ptMouse);
+	//if (ptMouse.x != ptCenter.x || ptMouse.y != ptCenter.y) {
+	//	SetCursorPos(ptCenter.x, ptCenter.y);
+	//}
+	//::SetCapture(*m_hwnd);
+	//::GetCursorPos(&Input::GetInstance()->m_ptOldCursorPos);
+	Input::GetInstance()->KeyBoard(m_hwnd, WM_KEYUP, VK_F1, NULL);
+}
+
+void Network::release_capture_mouse()
+{
+	//RECT rcClient;
+	//GetClientRect(*m_hwnd, &rcClient);
+	//POINT ptCenter = { (rcClient.right - rcClient.left) / 2, (rcClient.bottom - rcClient.top) / 2 };
+	//POINT ptMouse;
+	//::ReleaseCapture();
+	Input::GetInstance()->KeyBoard(m_hwnd, WM_KEYUP, VK_F2, NULL);
 }

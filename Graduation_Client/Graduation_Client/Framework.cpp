@@ -68,6 +68,11 @@ bool Framework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 	BuildObjects(); //렌더링할 게임 객체를 생성한다.
 
+#if USE_NETWORK
+	Network& network = *Network::GetInstance();
+	network.m_hwnd = hMainWnd;
+#endif
+
 	return(true);
 }
 
@@ -449,7 +454,7 @@ void Framework::UpdateObjects()
 	timeToSend += fTimeElapsed;
 
 #if USE_NETWORK
-	if (input ->m_pPlayer->GetID() != -1 && (m_gamestate->GetGameState() == READY_TO_GAME || m_gamestate->GetGameState() == PLAYING_GAME)) {
+	if (input ->m_pPlayer->GetID() != -1 && (m_gamestate->GetGameState() == READY_TO_GAME || m_gamestate->GetGameState() == PLAYING_GAME || m_gamestate->GetGameState() == SPECTATOR_GAME) ) {
 		cs_packet_move packet;
 		packet.size = sizeof(packet);
 		packet.type = CS_PACKET::CS_PACKET_MOVE;
@@ -538,7 +543,7 @@ void Framework::FrameAdvance()
 	UpdateObjects();
 	if (input->keyBuffer['1'] & 0xF0) m_nDebugOptions = 85;
 	else m_nDebugOptions = 10;
-	
+
 	switch (m_gamestate->GetGameState()) {
 	case LOGIN:
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
@@ -598,6 +603,15 @@ void Framework::FrameAdvance()
 		scene->Endingrender(m_pd3dCommandList);
 		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
 		break;
+	case SPECTATOR_GAME:
+		if (scene) scene->SpectatorPrerender(m_pd3dCommandList);
+		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+		if (scene) scene->Spectatorrender(m_pd3dCommandList);
+		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
+		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
+		m_pEdgeShader->Render(m_pd3dCommandList);
+		break;
 	case INTERACTION_POWER:
 		if (scene) scene->prerender(m_pd3dCommandList); 
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
@@ -608,6 +622,7 @@ void Framework::FrameAdvance()
 		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
 		m_pEdgeShader->Render(m_pd3dCommandList);
 		scene->UIrender(m_pd3dCommandList); // Door UI
+		break;
 	}
 	//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 	//if(Input::GetInstance()->keyBuffer['1'] & 0xF0) m_pEdgeShader->Render(m_pd3dCommandList);

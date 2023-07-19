@@ -91,6 +91,9 @@ void CommonMovement::update(float elapsedTime)
 				if (Input::GetInstance()->m_pPlayer->m_pNearTaggers) {
 					Input::GetInstance()->m_pPlayer->m_pNearTaggers->Interaction(playerType);
 				}
+				if (Input::GetInstance()->m_pPlayer->m_pNearEscape) {
+					Input::GetInstance()->m_pPlayer->m_pNearEscape->Interaction(playerType);
+				}
 			}
 		}
 

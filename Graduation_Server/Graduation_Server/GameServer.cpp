@@ -292,6 +292,7 @@ void cGameServer::WorkerThread()
 
 			Room& room = *m_room_manager->Get_Room_Info(static_cast<int>(iocp_key));
 			
+			room.SetSecondSkillUse(false);
 			for (int& player_id : room.in_player) {
 				if (player_id == -1)
 					continue;
@@ -926,6 +927,18 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 	case CS_PACKET::CS_PACKET_REQUEST_ELETRONIC_SYSTEM_ATIVATE:
 	{
 		Process_ElectronicSystem_Activate(user_id, p);
+		break;
+	}
+
+	case CS_PACKET::CS_PACKET_ESCAPESYSTEM_LEVER_WORKING:
+	{
+		Process_EscapeSystem_lever_working(user_id, p);
+		break;
+	}
+
+	case CS_PACKET::CS_PACKET_REQUEST_ESCAPESYSTEM_WORKING:
+	{
+		Process_EscapeSystem(user_id, p);
 		break;
 	}
 

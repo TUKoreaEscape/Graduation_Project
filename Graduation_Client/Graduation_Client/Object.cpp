@@ -821,6 +821,10 @@ void PowerSwitch::Init()
 	m_pCup = FindFrame("Cup");
 	m_pMainKnob = FindFrame("Main_Knob");
 	m_xmf4x4MainKnobParent = m_pMainKnob->m_xmf4x4ToParent;
+	for (int i = 0; i < 10; ++i) {
+		SetAnswer(i, false);
+	}
+	SetAnswer(5, true);
 }
 
 bool PowerSwitch::IsPlayerNear(const XMFLOAT3& PlayerPos)
@@ -974,6 +978,7 @@ void PowerSwitch::update(float fElapsedTime)
 		m_bClear = true;
 		m_bIsOperating = false;
 		Input::GetInstance()->m_gamestate->ChangeSameLevelState();
+		Input::GetInstance()->m_pPlayer->UseItem();
 #if USE_NETWORK
 		cs_packet_request_electronic_system_activate packet;
 		packet.size = sizeof(packet);
@@ -1606,8 +1611,21 @@ void ItemBox::Interaction(int playerType)
 		switch (playerType) {
 		case TYPE_TAGGER:
 		case TYPE_PLAYER_YET:
-		case TYPE_DEAD_PLAYER:
 			IsInteraction = false;
+			break;
+		case TYPE_DEAD_PLAYER:
+			if (m_fCooltime >= BOX_OPEN_DEAD_COOLTIME) {
+#if !USE_NETWORK
+				SetOpen(true);
+#endif
+#if USE_NETWORK
+				Network& network = *Network::GetInstance();
+				network.Send_Fix_Object_Box_Update(m_item_box_index, true);
+#endif
+				m_fCooltime = 0;
+				IsInteraction = false;
+				m_fPickupCooltime = 0;
+			}
 			break;
 		case TYPE_PLAYER:
 			if (m_fCooltime >= BOX_OPEN_COOLTIME) {
@@ -1729,6 +1747,53 @@ void IngameUI::render(ID3D12GraphicsCommandList* pd3dCommandList)
 void IngameUI::UIrender(ID3D12GraphicsCommandList* pd3dCommandList, float gauge, int type)
 {
 	UpdateShaderVariable(pd3dCommandList, gauge, type);
+	GameObject::render(pd3dCommandList);
+}
+
+void IngameUI::SetAnswer(bool on)
+{
+	if (true == on) {
+		m_xmf4x4World._41 = 0.15f;
+	}
+	else {
+		m_xmf4x4World._41 = 0.0f;
+	}
+}
+
+MinimapUI::MinimapUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName, float x, float y, float width, float height)
+{
+	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
+	XMStoreFloat4x4(&m_xmf4x4ToParent, XMMatrixIdentity());
+	renderer->m_nMaterials = 1;
+	renderer->m_ppMaterials = new Material * [renderer->m_nMaterials];
+	renderer->m_ppMaterials[0] = new Material(0);
+
+	UIMesh* pUIMesh = new UIMesh(pd3dDevice, pd3dCommandList, x, y, width, height);
+	SetMesh(pUIMesh);
+
+	Texture* pUITexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pUITexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, pstrFileName, RESOURCE_TEXTURE2D, 0);
+
+	GameScene::CreateShaderResourceViews(pd3dDevice, pUITexture, 0, 17);
+
+	Material* pUIMaterial = new Material(1);
+	pUIMaterial->SetTexture(pUITexture);
+	pUIMaterial->SetMinimapShader();
+
+	renderer->SetMaterial(0, pUIMaterial);
+}
+
+MinimapUI::~MinimapUI()
+{
+}
+
+void MinimapUI::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void MinimapUI::render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	UpdateShaderVariable(pd3dCommandList);
 	GameObject::render(pd3dCommandList);
 }
 
@@ -1891,10 +1956,17 @@ EscapeObject::EscapeObject()
 	for (int i = 0; i < m_nUIs; ++i) {
 		m_ppInteractionUIs[i] = nullptr;
 	}
+	m_nUIType = DOOR_UI;
 }
 
 EscapeObject::~EscapeObject()
 {
+}
+
+void EscapeObject::Init()
+{
+	m_pArm = FindFrame("Arm");
+	m_xmf4x4ArmParent = m_pArm->m_xmf4x4ToParent;
 }
 
 bool EscapeObject::IsPlayerNear(const XMFLOAT3& PlayerPos)
@@ -1904,20 +1976,20 @@ bool EscapeObject::IsPlayerNear(const XMFLOAT3& PlayerPos)
 	case DEGREE0:
 		minx = m_xmf4x4ToParent._41 - 2.0f;
 		maxx = m_xmf4x4ToParent._41 + 2.0f;
-		minz = m_xmf4x4ToParent._43 - 2.5f;
-		maxz = m_xmf4x4ToParent._43 + 2.5f;
+		minz = m_xmf4x4ToParent._43 - 0.7f;
+		maxz = m_xmf4x4ToParent._43 + 0.7f;
 		break;
 	case DEGREE90:
-		minx = m_xmf4x4ToParent._41 - 2.5f;
-		maxx = m_xmf4x4ToParent._41 + 2.5f;
+		minx = m_xmf4x4ToParent._41 - 0.7f;
+		maxx = m_xmf4x4ToParent._41 + 0.3f;
 		minz = m_xmf4x4ToParent._43 - 2.0f;
 		maxz = m_xmf4x4ToParent._43 + 2.0f;
 		break;
 	case DEGREE180:
 		minx = m_xmf4x4ToParent._41 - 2.0f;
 		maxx = m_xmf4x4ToParent._41 + 2.0f;
-		minz = m_xmf4x4ToParent._43 - 2.5f;
-		maxz = m_xmf4x4ToParent._43 + 2.5f;
+		minz = m_xmf4x4ToParent._43 - 0.7f;
+		maxz = m_xmf4x4ToParent._43 + 0.7f;
 		break;
 	default:
 		minx = m_xmf4x4ToParent._41 - 2.5f;
@@ -1956,20 +2028,34 @@ void EscapeObject::Rotate(float fPitch, float fYaw, float fRoll)
 
 void EscapeObject::render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	XMFLOAT4X4 prevMat = m_pArm->m_xmf4x4ToParent;
+	UpdateTransform(nullptr);
+	if (IsInteraction || m_bDoesOtherPlayerActive) {
+		XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_fCooltime * 9), XMConvertToRadians(0), XMConvertToRadians(0));
+		m_pArm->m_xmf4x4ToParent = Matrix4x4::Multiply(mtxRotate, m_pArm->m_xmf4x4ToParent);
+
+		UpdateTransform(nullptr);
+	}
+	else {
+		m_pArm->m_xmf4x4ToParent = m_xmf4x4ArmParent;
+	}
+
 	GameObject::render(pd3dCommandList);
+	m_pArm->m_xmf4x4ToParent = m_xmf4x4ArmParent;
 }
 
 void EscapeObject::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (IsNear == false) return;
 	if (IsWorking) {
 		if (m_ppInteractionUIs[0]) {
-			m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43);
-			m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, 0.0f, m_nUIType);
+			m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43);
+			m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 		}
 	}
 	else {
 		if (m_ppInteractionUIs[1]) {
-			m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.5f, m_xmf4x4ToParent._43);
+			m_ppInteractionUIs[1]->SetPosition(m_xmf4x4ToParent._41, 1.0f, m_xmf4x4ToParent._43);
 			m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, 0.0f, m_nUIType);
 		}
 	}
@@ -1978,11 +2064,113 @@ void EscapeObject::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 void EscapeObject::update(float fElapsedTime)
 {
 	if (false == IsWorking) return;
+	if (IsInteraction == false) {
+		if (m_bDoesOtherPlayerActive) m_fCooltime += fElapsedTime;
+		else {
+			m_fCooltime = 0;
+		}
+		return;
+	}
+	if (IsNear) {
+		m_fCooltime += fElapsedTime;
+		UCHAR keyBuffer[256];
+		memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
+		if (((keyBuffer['f'] & 0xF0) == false) && ((keyBuffer['F'] & 0xF0) == false)) {
+			if (false == IsEqual(m_fCooltime, 0)) {
+#if USE_NETWORK
+				// Send CheckStop();
+				Network& network = *Network::GetInstance();
+
+				cs_packet_request_escapesystem_lever_working packet;
+				packet.size = sizeof(packet);
+				packet.type = CS_PACKET::CS_PACKET_ESCAPESYSTEM_LEVER_WORKING;
+				packet.index = GetID();
+				packet.is_start = false;
+
+				network.send_packet(&packet);
+#endif
+			
+			}
+			m_fCooltime = 0;
+			IsInteraction = false;
+		}
+	}
+	else {
+		if (false == IsEqual(m_fCooltime, 0)) {
+#if USE_NETWORK
+			// Send CheckStop();
+			Network& network = *Network::GetInstance();
+
+			cs_packet_request_escapesystem_lever_working packet;
+			packet.size = sizeof(packet);
+			packet.type = CS_PACKET::CS_PACKET_ESCAPESYSTEM_LEVER_WORKING;
+			packet.index = GetID();
+			packet.is_start = false;
+
+			network.send_packet(&packet);
+#endif
+		}
+		m_fCooltime = 0;
+		IsInteraction = false;
+	}
+	m_fGauge = m_fCooltime / PLAYER_ESCAPE_LEVER_COOLTIME;
 }
 
 void EscapeObject::Interaction(int playerType)
 {
 	if (false == IsWorking) return;
+	if (playerType == TYPE_TAGGER || playerType == TYPE_PLAYER_YET) return;
+	if (m_bDoesOtherPlayerActive) return;
+
+	IsInteraction = true;
+	if (IsEqual(m_fCooltime, 0)) {
+#if USE_NETWORK
+		//  Send CheckStart();
+		Network& network = *Network::GetInstance();
+
+		cs_packet_request_escapesystem_lever_working packet;
+		packet.size = sizeof(packet);
+		packet.type = CS_PACKET::CS_PACKET_ESCAPESYSTEM_LEVER_WORKING;
+		packet.index = GetID();
+		packet.is_start = true;
+
+		network.send_packet(&packet);
+#endif
+	}
+	if (m_fCooltime >= PLAYER_ESCAPE_LEVER_COOLTIME) {
+		if (m_bIsReal) {
+#if USE_NETWORK
+			Network& network = *Network::GetInstance();
+			cs_packet_request_escapesystem_lever_working packet;
+			packet.size = sizeof(packet);
+			packet.type = CS_PACKET::CS_PACKET_REQUEST_ESCAPESYSTEM_WORKING;
+			packet.index = GetID();
+
+			network.send_packet(&packet);
+#endif
+			m_fCooltime = 0;
+		}
+		else {
+			if (false == IsEqual(m_fCooltime, 0)) {
+#if USE_NETWORK
+				// send CheckStop();
+				Network& network = *Network::GetInstance();
+
+				cs_packet_request_escapesystem_lever_working packet;
+				packet.size = sizeof(packet);
+				packet.type = CS_PACKET::CS_PACKET_ESCAPESYSTEM_LEVER_WORKING;
+				packet.index = GetID();
+				packet.is_start = false;
+
+				network.send_packet(&packet);
+#endif
+				
+				m_fCheckCooltime = 0;
+			}
+			m_fCooltime = 0;
+			IsInteraction = false;
+		}
+	}
 }
 
 void EscapeObject::SetOpen(bool open)

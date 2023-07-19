@@ -92,6 +92,7 @@ public:
 	float m_fGauge{};
 
 	bool m_bIsBlocked = false;
+	bool m_bDoesOtherPlayerActive = false;
 public:
 	InteractionObject();
 	virtual ~InteractionObject();
@@ -117,6 +118,9 @@ public:
 	virtual XMFLOAT3 GetPosition() { return(XMFLOAT3(m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43)); }
 
 	virtual int GetDIR() const;
+
+	void CheckStart() { m_bDoesOtherPlayerActive = true; };
+	void CheckStop() { m_bDoesOtherPlayerActive = false; };
 };
 
 class Door : public InteractionObject
@@ -176,7 +180,6 @@ public:
 	float m_fCheckCooltime{};
 	XMFLOAT4X4 m_xmf4x4MainKnobParent;
 
-	bool m_bDoesOtherPlayerActive = false;
 public:
 	PowerSwitch();
 	virtual ~PowerSwitch();
@@ -203,9 +206,7 @@ public:
 	bool CheckAnswer();
 	void Reset();
 
-	void CheckStart() { m_bDoesOtherPlayerActive = true; };
-	void CheckStop() { m_bDoesOtherPlayerActive = false; };
-
+	bool GetAnswer(int index) const { return m_bAnswers[index]; }
 private:
 	bool m_bAnswers[10];
 };
@@ -302,6 +303,19 @@ public:
 
 	void SetGuage(float f) { m_fGauge = f; };
 	void SetUIType(int type) { m_UIType = type; };
+
+	void SetAnswer(bool on);
+};
+
+class MinimapUI : public GameObject
+{
+public:
+	MinimapUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName, float x = 0.0f, float y = 0.0f, float width = 1.0f, float height = 1.0f);
+	virtual ~MinimapUI();
+
+	void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList);
+	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
+	void UIrender(ID3D12GraphicsCommandList* pd3dCommandList);
 };
 
 class TaggersBox : public InteractionObject
@@ -335,10 +349,13 @@ public:
 
 class EscapeObject : public InteractionObject
 {
+private:
+	int	m_escapeobject_id = -1;
 public:
 	EscapeObject();
 	virtual ~EscapeObject();
 
+	void Init() override;
 	bool IsPlayerNear(const XMFLOAT3& PlayerPos) override;
 	void Rotate(float fPitch, float fYaw, float fRoll);
 	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
@@ -352,7 +369,13 @@ public:
 
 public:
 	bool m_bIsReal = false;
+	void SetID(int id) { m_escapeobject_id = id; }
+	int	 GetID() { return m_escapeobject_id; }
 	void SetReal() { m_bIsReal = true; };
 	
 	void SetWorking();
+
+	float m_fCheckCooltime{};
+	GameObject* m_pArm = nullptr;
+	XMFLOAT4X4 m_xmf4x4ArmParent;
 };

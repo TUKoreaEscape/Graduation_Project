@@ -345,8 +345,14 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 			m_clients[room.in_player[i]].set_escape_state(false);
 		}
 
-		for (int i = 0; i < room.m_door_object.size(); ++i)
-			room.m_door_object[i].m_check_bounding_box = true;
+		for (auto& door_object : room.m_door_object)
+			door_object.init();
+
+		for (auto& electronic_system : room.m_electrinic_system)
+			electronic_system.Init_Fix();
+
+		for (auto& escape_system : room.m_escape_system)
+			escape_system.init();
 
 		sc_packet_init_position init_packet;
 		init_packet.size = sizeof(init_packet);
@@ -922,8 +928,10 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_PLIERS, true);
 	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_WRENCH) // 2
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_WRENCH, true);
-	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_LIFECHIP) // 5
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_LIFECHIP) {
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, true);
+		m_clients[user_id].set_life_chip(true);
+	}
 
 #if PRINT
 	std::cout << "Item_box_index [" << room.m_fix_item[item_index].Get_Item_box_index() << "] : ";
@@ -998,6 +1006,27 @@ void cGameServer::Process_Altar_LifeChip_Update(const int user_id)
 	}
 }
 
+void cGameServer::Process_EscapeSystem_lever_working(const int user_id, void* buff)
+{
+	cs_packet_request_escapesystem_lever_working* packet = reinterpret_cast<cs_packet_request_escapesystem_lever_working*>(buff);
+	
+	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
+
+	sc_packet_request_escapesystem_lever_working update_packet;
+	update_packet.size = sizeof(update_packet);
+	update_packet.type = SC_PACKET::SC_PACKET_ESCAPESYSTEM_LEVER_WORKING;
+	update_packet.index = packet->index;
+	update_packet.is_start = packet->is_start;
+	
+	for (int& player_id : room.in_player) {
+		if (player_id == -1)
+			continue;
+		if (player_id == user_id)
+			continue;
+		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
+	}
+}
+
 void cGameServer::Process_EscapeSystem(const int user_id, void* buff)
 {
 	// 해당위치에 탈출장치 조작패킷 도착할 예정
@@ -1013,14 +1042,15 @@ void cGameServer::Process_EscapeSystem(const int user_id, void* buff)
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
 
-	if (room.m_escape_system[packet->index].Is_Activate() == false) {
+	if (room.m_escape_system[packet->index].Is_Working_Escape() == false) {
+		cout << "게임 end 타이머 작동" << endl;
 		TIMER_EVENT ev;
 		ev.event_type = EventType::WORKING_ESCAPE_SYSTEM;
 		ev.event_time = chrono::system_clock::now() + 120s; // 탈출장치 작동 후 2분간 시간 부여 만약 end시간이 더 가까운 경우 end시간을 우선시함
 		ev.room_number = m_clients[user_id].get_join_room_number();
 		m_timer_queue.push(ev);
 	}
-	room.m_escape_system[packet->index].Activate();
+	room.m_escape_system[packet->index].Working_Escape();
 
 	
 	for (int i = 0; i < room.in_escape_player.size(); ++i) {

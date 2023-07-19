@@ -114,6 +114,7 @@ public:
 	~ElectronicSystem() = default;
 
 	void Reset();
+	void Init_Fix() { m_fixed_system = false; }
 
 	void init_electrinic_switch_data(int idx, bool value) { m_correct_on_off_switch[idx] = value; }
 

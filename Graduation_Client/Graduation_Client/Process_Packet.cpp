@@ -41,9 +41,9 @@ void Network::Process_Ready(char* ptr)
 void Network::Process_Init_Position(char* ptr)
 {
 	sc_packet_init_position* packet = reinterpret_cast<sc_packet_init_position*>(ptr);
-
 	for (int i = 0; i < 6; ++i) {
 		if (m_pPlayer->GetID() == packet->user_id[i]) {
+			set_capture_mouse();
 			m_pPlayer->SetPosition(packet->position[i], true);
 			m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 			m_pPlayer->SetTrackAnimationSet(0, 0);
@@ -54,6 +54,7 @@ void Network::Process_Init_Position(char* ptr)
 	}
 
 	for (int i = 0; i < 5; ++i) {
+		set_capture_mouse();
 		for (int j = 0; j < 6; ++j) {
 			if (m_ppOther[i]->GetID() == packet->user_id[j]) {
 				m_ppOther[i]->SetPosition(packet->position[j], true);
@@ -65,6 +66,14 @@ void Network::Process_Init_Position(char* ptr)
 	m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
 	for (int i = 0; i < 5; ++i)
 		m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);
+
+	for (int i = 0; i < 3; ++i) {
+		reinterpret_cast<EscapeObject*>(m_EscapeLevers[i])->SetID(i);
+		reinterpret_cast<EscapeObject*>(m_EscapeLevers[i])->SetActivate(false);
+	}
+
+	for (auto& door_object : m_pDoors)
+		door_object->SetOpen(false);
 }
 
 void Network::Process_Chat(char* ptr)
@@ -79,10 +88,12 @@ void Network::Process_Game_Start(char* ptr)
 	sc_packet_game_start* packet = reinterpret_cast<sc_packet_game_start*>(ptr);
 	GameState& game_state = *GameState::GetInstance();
 	game_state.SetLoading(0.0f);
+	set_capture_mouse();
 }
 
 void Network::Process_Game_End(char* ptr)
 {
+	release_capture_mouse();
 	sc_packet_game_end* packet = reinterpret_cast<sc_packet_game_end*>(ptr);
 	m_tagger_win = packet->is_tagger_win;
 
@@ -98,7 +109,13 @@ void Network::Process_Game_End(char* ptr)
 	reinterpret_cast<TaggersBox*>(m_Taggers_Box)->Reset();
 
 	GameState& game_state = *GameState::GetInstance();
-	game_state.ChangeNextState();
+
+	if(game_state.GetGameState() == SPECTATOR_GAME)
+		game_state.ChangeNextState();
+	else { // 해당부분은 추후 사용될 코드입니다.
+		for(int i = 0; i < 2; ++i)
+			game_state.ChangeNextState();
+	}
 
 	for (int i = 0; i < MAX_INGAME_ITEM; ++i) {
 		m_pBoxes[i]->SetOpen(false);
@@ -415,6 +432,7 @@ void Network::Process_ElectrinicSystem_Init(char* ptr)
 		std::cout << i << " : ";
 		m_pPowers[i]->SetIndex(i);
 		m_pPowers[i]->SetActivate(false);
+		m_pPowers[i]->SetOpen(false);
 		for (int idx = 0; idx < 10; ++idx)
 		{
 			std::cout << static_cast<int>(packet->data[i].value[idx]) << " ";
@@ -434,6 +452,7 @@ void Network::Process_ElectronicSystem_Switch_Update(char* ptr)
 void Network::Process_ElectronicSystem_Activate(char* ptr)
 {
 	sc_packet_electronic_system_activate_update* packet = reinterpret_cast<sc_packet_electronic_system_activate_update*>(ptr);
+	m_pPowers[packet->system_index]->CheckStop();
 	m_pPowers[packet->system_index]->SetActivate(packet->activate);
 	if (packet->activate)
 		std::cout << packet->system_index << "번 전력장치 수리 완료" << std::endl;
@@ -443,9 +462,17 @@ void Network::Process_Pick_Item_Init(char* ptr)
 {
 	sc_packet_pick_item_init* packet = reinterpret_cast<sc_packet_pick_item_init*>(ptr);
 	// 여기서 처리해야함
+	for (int i = 0; i < 5; ++i)
+		m_item_to_power[i] = packet->shuffle[i];
 
-	for(int i = 0; i < MAX_INGAME_ITEM; ++i)
+	for (int i = 0; i < 5; ++i)
+		std::cout << m_item_to_power[i] << " ";
+	std::cout << std::endl;
+
+	for (int i = 0; i < MAX_INGAME_ITEM; ++i) {
 		m_pBoxes[i]->SetIndex(i);
+		m_pBoxes[i]->SetOpen(false);
+	}
 
 	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
 	{
@@ -476,7 +503,7 @@ void Network::Process_Pick_Item_Update(char* ptr)
 	
 	if (packet->own_id == m_pPlayer->GetID()) {
 		if (packet->item_type == GAME_ITEM::ITEM_LIFECHIP)
-			m_pPlayer->SetType(TYPE_PLAYER);
+			m_pPlayer->SetPlayerType(TYPE_PLAYER);
 		else
 			m_pPlayer->m_got_item = packet->item_type;
 	}
@@ -487,7 +514,7 @@ void Network::Process_Pick_Item_Update(char* ptr)
 
 		for (int i = 0; i < 5; ++i) {
 			if (packet->own_id == m_ppOther[i]->GetID())
-				m_ppOther[i]->SetType(TYPE_PLAYER);
+				m_ppOther[i]->SetPlayerType(TYPE_PLAYER);
 		}
 	}
 }
@@ -504,6 +531,20 @@ void Network::Process_Active_EscapeSystem(char* ptr)
 {
 	sc_packet_escapesystem_activate* packet = reinterpret_cast<sc_packet_escapesystem_activate*>(ptr);
 	std::cout << "탈출장치 [" << packet->index << "]번 활성화" << std::endl;
+
+	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i)
+		reinterpret_cast<EscapeObject*>(m_EscapeLevers[i])->SetWorking();
+	reinterpret_cast<EscapeObject*>(m_EscapeLevers[packet->index])->SetReal();
+}
+
+void Network::Process_EscapeSystem_Lever_Update(char* ptr)
+{
+	sc_packet_request_escapesystem_lever_working* packet = reinterpret_cast<sc_packet_request_escapesystem_lever_working*>(ptr);
+
+	if (packet->is_start)
+		reinterpret_cast<EscapeObject*>(m_EscapeLevers[packet->index])->CheckStart();
+	else
+		reinterpret_cast<EscapeObject*>(m_EscapeLevers[packet->index])->CheckStop();
 }
 
 void Network::Process_EscapeSystem_Update(char* ptr)
@@ -512,13 +553,16 @@ void Network::Process_EscapeSystem_Update(char* ptr)
 	packet->index; // 해당 번호의 탈출장치 working시 뭔가 조작을 할 예정인데 이건 추후 예정
 
 	if (m_pPlayer->GetID() == packet->escape_id) {
-		m_pPlayer->SetType(TYPE_ESCAPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
-		// 만약 내가 탈출한 경우 관전모드 전환일수 있으므로 카메라 조절시 여기다가 추가 예정
+		m_pPlayer->SetPlayerType(TYPE_ESCAPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
+		reinterpret_cast<EscapeObject*>(m_EscapeLevers[packet->index])->CheckStop();
+		GameState& game_state = *GameState::GetInstance();
+		game_state.ChangeNextState();
 	}
 	else {
 		for (int i = 0; i < 5; ++i) {
 			if (m_ppOther[i]->GetID() == packet->escape_id) {
-				m_ppOther[i]->SetType(TYPE_ESCAPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
+				reinterpret_cast<EscapeObject*>(m_EscapeLevers[packet->index])->CheckStop();
+				m_ppOther[i]->SetPlayerType(TYPE_ESCAPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함
 				break;
 			}
 		}

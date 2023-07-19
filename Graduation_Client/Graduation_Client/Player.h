@@ -133,6 +133,7 @@ protected:
 	bool							m_collision_up_face = false;
 
 	int							m_playerType = 2;
+	bool m_bShownAnswer = false;
 
 public:
 	GameObject* m_pNearDoor = nullptr;
@@ -140,12 +141,14 @@ public:
 	GameObject* m_pNearVent = nullptr;
 	GameObject* m_pNearItembox = nullptr;
 	GameObject* m_pNearTaggers = nullptr;
+	GameObject* m_pNearEscape = nullptr;
 
 	int							m_power_number = -1;
 	int							m_vent_number = -1;
 	int							m_itembox_number = -1;
-
+	int							m_escape_number = -1;
 	GAME_ITEM::ITEM				m_got_item = GAME_ITEM::ITEM_NONE;
+	void UseItem() { m_got_item = GAME_ITEM::ITEM_NONE; }
 
 	bool						m_bTaggerSkills[3];
 
@@ -166,6 +169,14 @@ public:
 	float m_fPrevPitch = 0.0f;
 	float m_fPrevRoll = 0.0f;
 	float m_fPrevYaw = 0.0f;
+	int								SpectatorPlayerIndex = 0;
+	void ChangeSpectator();
+	void ChangeSpectator(int index) { SpectatorPlayerIndex = index; }
+
+	bool GetShown() const { return m_bShownAnswer; }
+	void SetShown(bool shown) {
+		m_bShownAnswer = shown;
+	}
 
 	void SetAnimationCallback(AnimationCallbackHandler* handler);
 };

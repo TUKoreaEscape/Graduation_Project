@@ -44,7 +44,6 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 	POINT ptMouse;
 	switch (nMessageID)
 	{
-		break;
 	case WM_KEYUP:
 		switch (wParam)
 		{
@@ -53,7 +52,7 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			if (m_gamestate->GetGameState() == PLAYING_GAME && !m_gamestate->GetChatState())
 			{
 				m_gamestate->ChangeMicState();
-				std::cout << "m키 누름" << std::endl;
+				//std::cout << "m키 누름" << std::endl;
 				if (m_gamestate->GetMicState())
 					Network::GetInstance()->on_voice_talk();
 				else
@@ -67,9 +66,11 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			}
 			::SetCapture(hWnd);
 			::GetCursorPos(&m_ptOldCursorPos);
+			std::cout << "마우스 캡차 동작" << std::endl;
 			break;
 		case VK_F2:
 			::ReleaseCapture();
+			std::cout << "마우스 캡차 릴리즈" << std::endl;
 			break;
 		case VK_F4:
 			speed = 160.0f;
@@ -78,6 +79,7 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			speed = 60.0f;
 			break;
 		case VK_F6:
+#if !USE_NETWORK
 			if (m_gamestate->GetGameState() == GAME_LOADING) break;
 			m_gamestate->ChangeNextState();
 			break;
@@ -87,13 +89,22 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 		case VK_F8:
 			m_gamestate->ChangeSameLevelState();
 			break;
+#endif
 		case VK_F12:
 			m_debuglight = !m_debuglight;
 			break;
+#if !USE_NETWORK
 		case VK_F3:
 			if (m_pPlayer) {
 				if (m_pPlayer->m_Type == TYPE_TAGGER) m_pPlayer->SetPlayerType(TYPE_PLAYER);
 				else m_pPlayer->SetPlayerType(TYPE_TAGGER);
+			}
+			break;
+#endif
+		case VK_TAB:
+			if (m_gamestate->GetMinimapState()) m_gamestate->ChangeMinimapState();
+			if (m_gamestate->GetGameState() == INTERACTION_POWER) {
+				m_pPlayer->SetShown(false);
 			}
 			break;
 		case VK_ESCAPE:
@@ -143,6 +154,17 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			{
 				if (m_inputState == 1) InputIdAndPassword(wParam, m_cs_packet_login.id, m_idNum);//id입력
 				else if (m_inputState == 2) InputIdAndPassword(wParam, m_cs_packet_login.pass_word, m_passwordNum); //password입력
+			}
+		}
+		if( wParam  ==VK_TAB && m_gamestate->GetGameState() == PLAYING_GAME && !m_gamestate->GetMinimapState()) m_gamestate->ChangeMinimapState();
+		if (m_gamestate->GetGameState() == SPECTATOR_GAME) {
+			if (wParam == VK_SPACE) {
+				m_pPlayer->SpectatorPlayerIndex = (m_pPlayer->SpectatorPlayerIndex + 1) % 5;
+			}
+		}
+		if (m_gamestate->GetGameState() == INTERACTION_POWER) {
+			if (wParam == VK_TAB) {
+				m_pPlayer->SetShown(true);
 			}
 		}
 		break;

@@ -41,6 +41,7 @@ private:
 	Custom				data;
 
 	SHELLEXECUTEINFO	info;
+	
 	HWND				hwnd_ExtMixerWin;
 	bool				m_shutdown = false;
 	int					m_my_id = -1;
@@ -80,6 +81,9 @@ public: // 스레드
 public: // Ready 동기화를 위해 추가한 변수
 	bool				m_other_player_ready[5]{ false };
 
+public:
+	int					m_item_to_power[5]{ 0,1,2,3,4 };
+
 public: // 클라이언트 오브젝트와 연결하는 용도
 	Player*				m_pPlayer = nullptr;;
 	Player**			m_ppOther = nullptr;
@@ -89,7 +93,8 @@ public: // 클라이언트 오브젝트와 연결하는 용도
 	ItemBox*			m_pBoxes[MAX_INGAME_ITEM];
 	GameObject*			m_Vents[NUM_VENT];
 	InteractionObject*	m_Taggers_Box = nullptr;
-
+	InteractionObject*	m_EscapeLevers[NUM_ESCAPE_LEVER];
+	HWND				m_hwnd;
 public:
 	static Network* GetInstance() {
 		if (NetworkInstance == NULL) {
@@ -100,7 +105,8 @@ public:
 	~Network();
 
 	void init_network();
-
+	void set_capture_mouse();
+	void release_capture_mouse();
 
 	void listen_thread();
 	void Debug_send_thread();
@@ -125,6 +131,7 @@ public:
 	void Process_ElectrinicSystem_Init(char* ptr);
 	void Process_ElectronicSystem_Switch_Update(char* ptr);
 	void Process_ElectronicSystem_Activate(char* ptr);
+	void Process_EscapeSystem_Lever_Update(char* ptr);
 	void Process_EscapeSystem_Update(char* ptr);
 	void Process_Attack_Packet(char* ptr);
 	void Process_LifeChip_Update(char* ptr);

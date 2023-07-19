@@ -41,6 +41,175 @@ void GameScene::forrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 }
 
+void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
+	m_pPlayer->m_pCamera->update(pd3dCommandList);
+
+	switch (GameState::GetInstance()->GetGameState()) {
+	case LOGIN:
+		for (int i = 0; i < m_nLogin; ++i)
+		{
+			if (i > 2) break;
+			m_UILogin[i]->render(pd3dCommandList);
+		}
+		if (Input::GetInstance()->m_errorState != 0)
+		{
+			if (Input::GetInstance()->m_errorState == 1) m_UILogin[3]->render(pd3dCommandList);
+			else if (Input::GetInstance()->m_errorState == 2) m_UILogin[4]->render(pd3dCommandList);
+
+		}
+		if (Input::GetInstance()->m_SuccessState) m_UILogin[5]->render(pd3dCommandList);
+		break;
+	case ROOM_SELECT:
+		for (int i = 0; i < m_nRoomSelect; ++i) m_UIRoomSelect[i]->render(pd3dCommandList);
+		break;
+	case WAITING_GAME:
+		for (int i = 0; i < 5; ++i) {
+			m_ppPlayers[i]->SetLookAt(XMFLOAT3(0, 0, 0));
+		}
+		m_ppPlayers[0]->SetPosition(XMFLOAT3(6.0f, 0.0f, -5.0f));
+		m_ppPlayers[1]->SetPosition(XMFLOAT3(3.0f, 0.0f, -5.0f));
+		m_ppPlayers[2]->SetPosition(XMFLOAT3(-3.0f, 0.0f, -5.0f));
+		m_ppPlayers[3]->SetPosition(XMFLOAT3(-6.0f, 0.0f, -5.0f));
+		m_ppPlayers[4]->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
+		m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -3.0f));
+		for (int i = 0; i < m_nWaitingRoom; ++i) m_UIWaitingRoom[i]->render(pd3dCommandList);
+		break;
+	case CUSTOMIZING:
+		for (int i = 0; i < m_nCustomizing; ++i) m_UICustomizing[i]->render(pd3dCommandList);
+		break;
+	case READY_TO_GAME:
+		if (GameState::GetInstance()->IsLoading()) m_UILoading[3]->render(pd3dCommandList);
+		for (int i = 0; i < NUM_DOOR; ++i) {
+			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
+		}
+		break;
+	case PLAYING_GAME:
+		for (int i = 0; i < NUM_DOOR; ++i) {
+			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
+		}
+		for (int i = 0; i < NUM_POWER; ++i) {
+			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->UIrender(pd3dCommandList);
+		}
+		for (int i = 0; i < NUM_VENT; ++i) {
+			reinterpret_cast<Vent*>(Vents[i])->UIrender(pd3dCommandList);
+		}
+		for (int i = 0; i < NUM_ITEMBOX; ++i) {
+			reinterpret_cast<ItemBox*>(m_pBoxes[i])->UIrender(pd3dCommandList);
+		}
+		for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
+			EscapeLevers[i]->UIrender(pd3dCommandList);
+		}
+		reinterpret_cast<TaggersBox*>(Taggers)->UIrender(pd3dCommandList);
+		for (int i = 0; i < m_nPlay; ++i)
+		{
+			if (i >= 1 && i <= 3) continue;
+			if (i == 4 && !GameState::GetInstance()->GetChatState()) continue;
+			if (i == 5 && !GameState::GetInstance()->GetMinimapState()) continue;
+			m_UIPlay[i]->render(pd3dCommandList);
+		}
+		if (GameState::GetInstance()->GetMicState())
+		{
+			m_UIPlay[2]->render(pd3dCommandList);
+		}
+		else
+		{
+			m_UIPlay[3]->render(pd3dCommandList);
+		}
+
+		if (m_pPlayer->GetType() == TYPE_PLAYER)reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(1.0f);
+		else {
+			reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(-1.0f);
+#if USE_NETWORK
+			if (m_network->m_lifechip == true)
+				reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(1.0f);
+#endif		
+		}
+
+		m_UIPlay[1]->render(pd3dCommandList);
+		if (m_pPlayer->GetType() == TYPE_TAGGER) {
+			for (int i = 0; i < 3; ++i) {
+				if (m_pPlayer->GetTaggerSkill(i)) {
+					reinterpret_cast<IngameUI*>(m_UITagger[i + 3])->SetGuage(1.0f);
+					m_UITagger[i + 3]->render(pd3dCommandList);
+				}
+				else {
+					reinterpret_cast<IngameUI*>(m_UITagger[i + 3])->SetGuage(-1.0f);
+					m_UITagger[i + 3]->render(pd3dCommandList);
+				}
+			}
+			for (int i = 0; i < 3; ++i) m_UITagger[i]->render(pd3dCommandList);
+		}
+		else {
+			m_UIPlayer[0]->render(pd3dCommandList);
+			int index = m_pPlayer->GetItem();
+			if (index != -1) m_UIPlayer[1 + index]->render(pd3dCommandList);
+		}
+		break;
+	case ENDING_GAME:
+	{
+#if USE_NETWORK
+		Network& network = *Network::GetInstance();
+		if (network.m_tagger_win) {
+#endif
+#if !USE_NETWORK
+			if (0) { // TAGGER's Win
+#endif
+				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+				if (m_pPlayer->GetType() == TYPE_TAGGER) {
+					m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+				}
+				for (int i = 0; i < 5; ++i) {
+					m_ppPlayers[i]->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+					if (m_ppPlayers[i]->GetType() == TYPE_TAGGER) {
+						m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+					}
+				}
+			}
+			else { // Player's Win
+				float my_win = 0.0f;
+				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+				if (m_pPlayer->GetType() != TYPE_TAGGER) {
+					m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+					my_win = true;
+				}
+				for (int i = 0; i < 5; ++i) {
+					m_ppPlayers[i]->SetPosition(XMFLOAT3(6.0f - 3.0f * i, 0.0f, -1.0f));
+					if (m_ppPlayers[i]->GetType() != TYPE_TAGGER) {
+						m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+					}
+				}
+			}
+			for (int i = 0; i < m_Ending; ++i) m_UIEnding[i]->render(pd3dCommandList);
+			break;
+		}
+	case INTERACTION_POWER:
+		if ((m_pPlayer->m_pNearInteractionObejct))
+			reinterpret_cast<PowerSwitch*>(m_pPlayer->m_pNearInteractionObejct)->UIrender(pd3dCommandList);
+		m_UIPlayer[0]->render(pd3dCommandList);
+		int index = m_pPlayer->GetItem();
+		if (index != -1) {
+			m_UIPlayer[1 + index]->render(pd3dCommandList);
+		}
+		if (true == m_pPlayer->GetShown()) {
+			m_ppAnswerUIs[0]->render(pd3dCommandList);
+			if (index != -1) {
+				for (int i = 1; i < 11; ++i) {
+					int powerIndex{};
+#if USE_NETWORK
+					Network& network = *Network::GetInstance();
+					powerIndex = network.m_item_to_power[index];
+#endif
+					reinterpret_cast<IngameUI*>(m_ppAnswerUIs[i])->SetAnswer((reinterpret_cast<PowerSwitch*>(m_pPowers[powerIndex])->GetAnswer(i - 1)));
+					m_ppAnswerUIs[i]->render(pd3dCommandList);
+				}
+			}
+		}
+	}
+}
+
 void GameScene::prerender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
@@ -104,6 +273,12 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			reinterpret_cast<ItemBox*>(m_pBoxes[i])->render(pd3dCommandList);
 		}
 	}
+	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
+		if (EscapeLevers[i]) {
+			EscapeLevers[i]->UpdateTransform(nullptr);
+			EscapeLevers[i]->render(pd3dCommandList);
+		}
+	}
 	if (Taggers) {
 		Taggers->UpdateTransform(nullptr);
 		reinterpret_cast<TaggersBox*>(Taggers)->render(pd3dCommandList);
@@ -115,155 +290,9 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			if (m_ppBush[i]) m_ppBush[i]->render(pd3dCommandList);
 		}
 	}
-}
-
-void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
-	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
-	m_pPlayer->m_pCamera->update(pd3dCommandList);
-
-	switch (GameState::GetInstance()->GetGameState()) {
-	case LOGIN:
-		for (int i = 0; i < m_nLogin; ++i)
-		{
-			if (i > 2) break;
-			m_UILogin[i]->render(pd3dCommandList);
-		}
-		if (Input::GetInstance()->m_errorState != 0)
-		{
-			if (Input::GetInstance()->m_errorState == 1) m_UILogin[3]->render(pd3dCommandList);
-			else if (Input::GetInstance()->m_errorState == 2) m_UILogin[4]->render(pd3dCommandList);
-			
-		}
-		if (Input::GetInstance()->m_SuccessState) m_UILogin[5]->render(pd3dCommandList);
-		break;
-	case ROOM_SELECT:
-		for (int i = 0; i < m_nRoomSelect; ++i) m_UIRoomSelect[i]->render(pd3dCommandList);
-		break;
-	case WAITING_GAME:
-		for (int i = 0; i < 5; ++i) {
-			m_ppPlayers[i]->SetLookAt(XMFLOAT3(0, 0, 0));
-		}
-		m_ppPlayers[0]->SetPosition(XMFLOAT3(6.0f, 0.0f, -5.0f));
-		m_ppPlayers[1]->SetPosition(XMFLOAT3(3.0f, 0.0f, -5.0f));
-		m_ppPlayers[2]->SetPosition(XMFLOAT3(-3.0f, 0.0f, -5.0f));
-		m_ppPlayers[3]->SetPosition(XMFLOAT3(-6.0f, 0.0f, -5.0f));
-		m_ppPlayers[4]->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
-		m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -3.0f));
-		for (int i = 0; i < m_nWaitingRoom; ++i) m_UIWaitingRoom[i]->render(pd3dCommandList);
-		break;
-	case CUSTOMIZING:
-		for (int i = 0; i < m_nCustomizing; ++i) m_UICustomizing[i]->render(pd3dCommandList);
-		break;
-	case READY_TO_GAME:
-		if (GameState::GetInstance()->IsLoading()) m_UILoading[3]->render(pd3dCommandList);
-		for (int i = 0; i < NUM_DOOR; ++i) {
-			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
-		}
-		break;
-	case PLAYING_GAME:
-		for (int i = 0; i < NUM_DOOR; ++i) {
-			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
-		}
-		for (int i = 0; i < NUM_POWER; ++i) {
-			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->UIrender(pd3dCommandList);
-		}
-		for (int i = 0; i < NUM_VENT; ++i) {
-			reinterpret_cast<Vent*>(Vents[i])->UIrender(pd3dCommandList);
-		}
-		for (int i = 0; i < NUM_ITEMBOX; ++i) {
-			reinterpret_cast<ItemBox*>(m_pBoxes[i])->UIrender(pd3dCommandList);
-		}
-		reinterpret_cast<TaggersBox*>(Taggers)->UIrender(pd3dCommandList);
-		for (int i = 0; i < m_nPlay; ++i)
-		{
-			if (i >= 1 && i <= 3) continue;
-			if (i==4 && !GameState::GetInstance()->GetChatState()) continue;
-			m_UIPlay[i]->render(pd3dCommandList);
-		}
-		if (GameState::GetInstance()->GetMicState())
-		{
-			m_UIPlay[2]->render(pd3dCommandList);
-		}
-		else
-		{
-			m_UIPlay[3]->render(pd3dCommandList);
-		}
-
-		if (m_pPlayer->GetType() == TYPE_PLAYER)reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(1.0f);
-		else {
-			reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(-1.0f);
-#if USE_NETWORK
-			if(m_network->m_lifechip == true)
-				reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(1.0f);
-#endif		
-		}
-
-		m_UIPlay[1]->render(pd3dCommandList);
-		if (m_pPlayer->GetType() == TYPE_TAGGER) {
-			for (int i = 0; i < 3; ++i) {
-				if (m_pPlayer->GetTaggerSkill(i)) {
-					reinterpret_cast<IngameUI*>(m_UITagger[i + 3])->SetGuage(1.0f);
-					m_UITagger[i + 3]->render(pd3dCommandList);
-				}
-				else {
-					reinterpret_cast<IngameUI*>(m_UITagger[i + 3])->SetGuage(-1.0f);
-					m_UITagger[i + 3]->render(pd3dCommandList);
-				}
-			}
-			for (int i = 0; i < 3; ++i) m_UITagger[i]->render(pd3dCommandList);
-		}
-		else {
-			m_UIPlayer[0]->render(pd3dCommandList);
-			int index = m_pPlayer->GetItem();
-			if (index != -1) m_UIPlayer[1 + index]->render(pd3dCommandList);
-		}
-		break;
-	case ENDING_GAME:
-	{
-#if USE_NETWORK
-		Network& network = *Network::GetInstance();
-		if (network.m_tagger_win) {
-#endif
-#if !USE_NETWORK
-			if (0) { // TAGGER's Win
-#endif
-				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-				if (m_pPlayer->GetType() == TYPE_TAGGER) {
-					m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-				}
-				for (int i = 0; i < 5; ++i) {
-					m_ppPlayers[i]->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-					if (m_ppPlayers[i]->GetType() == TYPE_TAGGER) {
-						m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-					}
-				}
-		}
-			else { // Player's Win
-				float my_win = 0.0f;
-				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-				if (m_pPlayer->GetType() != TYPE_TAGGER) {
-					m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-					my_win = true;
-				}
-				for (int i = 0; i < 5; ++i) {
-					m_ppPlayers[i]->SetPosition(XMFLOAT3(6.0f - 3.0f * i, 0.0f, -1.0f));
-					if (m_ppPlayers[i]->GetType() != TYPE_TAGGER) {
-						m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-					}
-				}
-			}
-			for (int i = 0; i < m_Ending; ++i) m_UIEnding[i]->render(pd3dCommandList);
-			break;
-	}
-	case INTERACTION_POWER:
-		if ((m_pPlayer->m_pNearInteractionObejct))
-			reinterpret_cast<PowerSwitch*>(m_pPlayer->m_pNearInteractionObejct)->UIrender(pd3dCommandList);
-		m_UIPlayer[0]->render(pd3dCommandList);
-		int index = m_pPlayer->GetItem();
-		if (index != -1) m_UIPlayer[1 + index]->render(pd3dCommandList);
-	}
+	//std::cout << "x" << m_pPlayer->GetPosition().x << std::endl;
+	//std::cout << "y" << m_pPlayer->GetPosition().y << std::endl;
+	//std::cout << "z" << m_pPlayer->GetPosition().z << std::endl;
 }
 
 void GameScene::WaitingRoomrender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -308,6 +337,9 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	}
 
 	m_pPlayer = new Player();
+	m_pPlayer->DeleteComponent<OtherPlayerCamera>();
+	m_pPlayer->AddComponent<ThirdPersonCamera>();
+	m_pPlayer->m_pCamera = m_pPlayer->GetComponent<ThirdPersonCamera>();
 	m_pPlayer->m_pCamera->start(pd3dDevice, pd3dCommandList);
 }
 
@@ -645,6 +677,12 @@ void GameScene::ReleaseUploadBuffers()
 		if (m_ppObjectsUIs[i]) m_ppObjectsUIs[i]->ReleaseUploadBuffers();
 	}
 	if (Taggers) Taggers->ReleaseUploadBuffers();
+	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
+		if (EscapeLevers[i]) EscapeLevers[i]->ReleaseUploadBuffers();
+	}
+	for (int i = 0; i < m_nAnswerUI; ++i) {
+		if (m_ppAnswerUIs[i]) m_ppAnswerUIs[i]->ReleaseUploadBuffers();
+	}
 }
 
 void GameScene::CreateCbvSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nConstantBufferViews, int nShaderResourceViews)
@@ -716,9 +754,128 @@ void GameScene::Loadingrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
-	m_pPlayer->m_pCamera->update(pd3dCommandList);
+	if (m_pPlayer)
+		if (m_pPlayer->m_pCamera)
+			m_pPlayer->m_pCamera->update(pd3dCommandList);
 	for (int i = 0; i < m_nLoading - 1; ++i) {
 		reinterpret_cast<IngameUI*>(m_UILoading[i])->render(pd3dCommandList);
+	}
+}
+
+void GameScene::SpectatorPrerender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
+
+	int index = m_pPlayer->SpectatorPlayerIndex;
+
+	bool findNew = false;
+	if (m_ppPlayers[index]->GetType() == TYPE_ESCAPE_PLAYER || m_ppPlayers[index]->GetType() == TYPE_TAGGER) {
+		for (int i = index + 1; i < 5; ++i) {
+			if (m_ppPlayers[index]->GetType() != TYPE_ESCAPE_PLAYER && m_ppPlayers[index]->GetType() != TYPE_TAGGER) {
+				findNew = true;
+				m_nSpectator = i;
+				m_pPlayer->ChangeSpectator(i);
+				break;
+			}
+		}
+		if (findNew == false) {
+			for (int i = 0; i < index; ++i) {
+				if (m_ppPlayers[index]->GetType() != TYPE_ESCAPE_PLAYER && m_ppPlayers[index]->GetType() != TYPE_TAGGER) {
+					findNew = true;
+					m_nSpectator = i;
+					m_pPlayer->ChangeSpectator(i);
+					break;
+				}
+			}
+		}
+	}
+	else {
+		m_nSpectator = index;
+	}
+	m_ppPlayers[m_nSpectator]->m_pCamera->update(pd3dCommandList);
+	XMFLOAT3 cameraPos = m_ppPlayers[m_nSpectator]->m_pCamera->GetPosition();
+	CheckCameraPos(cameraPos);
+
+	m_pLight->GetComponent<Light>()->SetWaitingLight(false);
+	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
+	if (GameState::GetInstance()->GetTick())m_pLight->GetComponent<Light>()->Updaterotate();
+}
+
+void GameScene::Spectatorrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	m_pSkybox->render(pd3dCommandList);
+
+	m_pCeilling->render(pd3dCommandList);
+
+	m_pMainTerrain->render(pd3dCommandList);
+	m_pPianoTerrain->render(pd3dCommandList);
+	m_pBroadcastTerrain->render(pd3dCommandList);
+	m_pCubeTerrain->render(pd3dCommandList);
+	m_pForestTerrain->render(pd3dCommandList);
+	m_pClassroomTerrain->render(pd3dCommandList);
+
+	for (int i = 0; i < m_nWalls; ++i)
+	{
+		if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
+	}
+
+	for (int i = 0; i < 5; ++i) {
+		if (m_ppPlayers[i]->GetType() != TYPE_ESCAPE_PLAYER) {
+			m_ppPlayers[i]->OnPrepareRender();
+			m_ppPlayers[i]->Animate(m_fElapsedTime, m_ppPlayers[i]->PlayerNum);
+			m_ppPlayers[i]->render(pd3dCommandList);
+		}
+			
+	}
+
+	for (auto p : m_sPVS[static_cast<int>(m_pvsCamera)]) {
+		m_pPVSObjects[static_cast<int>(p)]->render(pd3dCommandList);
+	}
+
+	for (int i = 0; i < NUM_VENT; ++i)
+	{
+		if (Vents[i]) {
+			Vents[i]->UpdateTransform(nullptr);
+			Vents[i]->render(pd3dCommandList);
+		}
+	}
+	for (int i = 0; i < NUM_DOOR; ++i)
+	{
+		if (m_pDoors[i]) {
+			m_pDoors[i]->UpdateTransform(nullptr);
+			m_pDoors[i]->render(pd3dCommandList);
+		}
+	}
+
+	for (int i = 0; i < NUM_POWER; ++i) {
+		if (m_pPowers[i]) {
+			m_pPowers[i]->UpdateTransform(nullptr);
+			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->render(pd3dCommandList);
+		}
+	}
+	for (int i = 0; i < NUM_ITEMBOX; ++i) {
+		if (m_pBoxes[i]) {
+			m_pBoxes[i]->UpdateTransform(nullptr);
+			reinterpret_cast<ItemBox*>(m_pBoxes[i])->render(pd3dCommandList);
+		}
+	}
+	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
+		if (EscapeLevers[i]) {
+			EscapeLevers[i]->UpdateTransform(nullptr);
+			EscapeLevers[i]->render(pd3dCommandList);
+		}
+	}
+	if (Taggers) {
+		Taggers->UpdateTransform(nullptr);
+		reinterpret_cast<TaggersBox*>(Taggers)->render(pd3dCommandList);
+	}
+	if (m_sPVS[static_cast<int>(m_pvsCamera)].count(PVSROOM::FOREST) != 0) {
+		m_pOak->render(pd3dCommandList);
+		for (int i = 0; i < m_nBush; ++i)
+		{
+			if (m_ppBush[i]) m_ppBush[i]->render(pd3dCommandList);
+		}
 	}
 }
 
@@ -1006,6 +1163,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	bool IsNearVent = false;
 	bool IsNearItembox = false;
 	bool IsNearTaggers = false;
+	bool IsNearEsacpeLever = false;
 	for (int i = 0; i < NUM_DOOR; ++i) {
 		m_pDoors[i]->update(elapsedTime);
 		if (reinterpret_cast<Door*>(m_pDoors[i])->IsPlayerNear(PlayerPos)) {
@@ -1043,6 +1201,15 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 			m_pPlayer->m_vent_number = i;
 		}
 	}
+	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
+		EscapeLevers[i]->update(elapsedTime);
+		if (reinterpret_cast<EscapeObject*>(EscapeLevers[i])->IsPlayerNear(PlayerPos)) {
+			m_pPlayer->m_pNearEscape = EscapeLevers[i];
+			IsNearEsacpeLever = true;
+
+			m_pPlayer->m_escape_number = i;
+		}
+	}
 	Taggers->update(elapsedTime);
 	if (reinterpret_cast<TaggersBox*>(Taggers)->IsPlayerNear(PlayerPos)) {
 		m_pPlayer->m_pNearTaggers = Taggers;
@@ -1053,6 +1220,7 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	if (IsNearVent == false) m_pPlayer->m_pNearVent = nullptr;
 	if (IsNearItembox == false) m_pPlayer->m_pNearItembox = nullptr;
 	if (IsNearTaggers == false) m_pPlayer->m_pNearTaggers = nullptr;
+	if (IsNearEsacpeLever == false) m_pPlayer->m_pNearEscape = nullptr;
 }
 
 bool InArea(int startX, int startZ, int width, int length, float x, float z)
@@ -1204,10 +1372,31 @@ void GameScene::MakeTaggers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	Taggers->SetChild(pAltarModel->m_pModelRootObject, true);
 	Taggers->SetUI(0, m_ppObjectsUIs[0]);
 	Taggers->SetUI(1, m_ppObjectsUIs[5]);
-	Taggers->SetPosition(-3.71f, 0.93f, -2.44f);
+	Taggers->SetPosition(-3.2f, 0.93f, -0.34f);
 	reinterpret_cast<TaggersBox*>(Taggers)->Init();
 
 	if (pAltarModel) delete pAltarModel;
+}
+
+void GameScene::MakeEscapeLevers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	LoadedModelInfo* pLeverModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/EscapeLever.bin", nullptr);
+
+	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
+		EscapeLevers[i] = new EscapeObject();
+		EscapeLevers[i]->SetChild(pLeverModel->m_pModelRootObject, true);
+		EscapeLevers[i]->SetUI(0, m_ppObjectsUIs[0]);
+		EscapeLevers[i]->SetUI(1, m_ppObjectsUIs[5]);
+		EscapeLevers[i]->Init();
+	}
+	EscapeLevers[0]->SetPosition(XMFLOAT3(87.99f, -0.4077f, 42.959f)); // Broad
+	reinterpret_cast<EscapeObject*>(EscapeLevers[0])->SetRotation(DEGREE0);
+	EscapeLevers[1]->SetPosition(XMFLOAT3(-43.89f, -0.4077f, 41.97f)); // piano
+	reinterpret_cast<EscapeObject*>(EscapeLevers[1])->SetRotation(DEGREE0);
+	EscapeLevers[2]->SetPosition(XMFLOAT3(76.65f, -0.4077f, -70.07f)); // forest
+	reinterpret_cast<EscapeObject*>(EscapeLevers[2])->SetRotation(DEGREE90);
+
+	if (pLeverModel) delete pLeverModel;
 }
 
 void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -1329,7 +1518,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_UIEnding[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Ending.dds", 0.0f, 0.0f, 2.0f, 2.0f);
 	m_UIEnding[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.8f, -0.8f, 0.15f, 0.1f);
 
-	m_nPlay = 5;
+	m_nPlay = 6;
 	m_UIPlay = new GameObject * [m_nPlay];
 	m_UIPlay[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.8f, -0.75f, 0.3f, 0.4f);
 	//m_UIPlay[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.0f, 0.75f, 0.6f, 0.4f); ½Ã°è
@@ -1337,6 +1526,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_UIPlay[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Mic-on.dds", 0.5f, -0.85f, 0.07f, 0.15f);//mic-on
 	m_UIPlay[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Mic-off.dds", 0.5f, -0.85f, 0.07f, 0.15f);//mic-off
 	m_UIPlay[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/ChatBox.dds", -0.1f, -0.7f, 0.6f, 0.6f);//chatBox
+	m_UIPlay[5] = new MinimapUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Minimap2.dds", 0.0f, 0.0f, 1.0f, 1.0f);//Minimap
 
 
 	m_nPlayPlayer = 1 + 5;
@@ -1353,9 +1543,23 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_UITagger[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", -0.8f, -0.8f, 0.3f, 0.3f);
 	m_UITagger[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", -0.8f, -0.45f, 0.3f, 0.3f);
 	m_UITagger[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", -0.8f, -0.1f, 0.3f, 0.3f);
-	m_UITagger[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"SkillImage/vent_emp.dds", -0.8f, -0.8f, 0.3f, 0.3f);
+	m_UITagger[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"SkillImage/ElectronicSystem_Close.dds", -0.8f, -0.8f, 0.3f, 0.3f);
 	m_UITagger[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"SkillImage/door_emp.dds", -0.8f, -0.45f, 0.3f, 0.3f);
-	m_UITagger[5] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"SkillImage/ElectronicSystem_Close.dds", -0.8f, -0.1f, 0.3f, 0.3f);
+	m_UITagger[5] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"SkillImage/vent_emp.dds", -0.8f, -0.1f, 0.3f, 0.3f);
+
+	m_nAnswerUI = 11;
+	m_ppAnswerUIs = new GameObject * [m_nAnswerUI];
+	m_ppAnswerUIs[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/solu.dds", -0.4f, 0.0f, 0.6f, 1.2f);
+	m_ppAnswerUIs[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, 0.36f, 0.08f, 0.04f);
+	m_ppAnswerUIs[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, 0.304f, 0.08f, 0.04f);
+	m_ppAnswerUIs[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, 0.248f, 0.08f, 0.04f);
+	m_ppAnswerUIs[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, 0.192f, 0.08f, 0.04f);
+	m_ppAnswerUIs[5] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, 0.136f, 0.08f, 0.04f);
+	m_ppAnswerUIs[6] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, 0.08f, 0.08f, 0.04f);
+	m_ppAnswerUIs[7] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, 0.024f, 0.08f, 0.04f);
+	m_ppAnswerUIs[8] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, -0.032f, 0.08f, 0.04f);
+	m_ppAnswerUIs[9] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, -0.088f, 0.08f, 0.04f);
+	m_ppAnswerUIs[10] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, -0.144f, 0.08f, 0.04f);
 
 	LPVOID m_pTerrain[ROOM_COUNT]{ m_pMainTerrain ,m_pPianoTerrain,m_pBroadcastTerrain, m_pCubeTerrain ,m_pForestTerrain,m_pClassroomTerrain };
 
@@ -1434,12 +1638,9 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	MakePowers(pd3dDevice, pd3dCommandList);
 	MakeBoxes(pd3dDevice, pd3dCommandList);
 	MakeTaggers(pd3dDevice, pd3dCommandList);
+	MakeEscapeLevers(pd3dDevice, pd3dCommandList);
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.9f);
 #if USE_NETWORK
-	char id[20]{};
-	char pw[20]{};
-	int select;
-
 	m_network = Network::GetInstance();
 	m_network->init_network();
 	m_network->m_pPlayer = m_pPlayer;
@@ -1458,6 +1659,9 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 	for (int i = 0; i < NUM_VENT; ++i)
 		m_network->m_Vents[i] = Vents[i];
+
+	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i)
+		m_network->m_EscapeLevers[i] = EscapeLevers[i];
 
 	recv_thread = std::thread{ &Network::listen_thread, m_network };
 #endif
