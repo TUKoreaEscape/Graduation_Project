@@ -1947,7 +1947,6 @@ void EscapeObject::Init()
 {
 	m_pArm = FindFrame("Arm");
 	m_xmf4x4ArmParent = m_pArm->m_xmf4x4ToParent;
-	SetWorking();
 }
 
 bool EscapeObject::IsPlayerNear(const XMFLOAT3& PlayerPos)
@@ -2059,9 +2058,10 @@ void EscapeObject::update(float fElapsedTime)
 		if (((keyBuffer['f'] & 0xF0) == false) && ((keyBuffer['F'] & 0xF0) == false)) {
 			if (false == IsEqual(m_fCooltime, 0)) {
 #if USE_NETWORK
+				// Send CheckStop();
 				Network& network = *Network::GetInstance();
 
-				cs_packet_electronic_system_lever_working packet;
+				cs_packet_request_escapesystem_lever_working packet;
 				packet.size = sizeof(packet);
 				packet.type = CS_PACKET::CS_PACKET_ESCAPESYSTEM_LEVER_WORKING;
 				packet.index = GetID();
@@ -2069,7 +2069,7 @@ void EscapeObject::update(float fElapsedTime)
 
 				network.send_packet(&packet);
 #endif
-				// Send CheckStop();
+			
 			}
 			m_fCooltime = 0;
 			IsInteraction = false;
@@ -2078,9 +2078,10 @@ void EscapeObject::update(float fElapsedTime)
 	else {
 		if (false == IsEqual(m_fCooltime, 0)) {
 #if USE_NETWORK
+			// Send CheckStop();
 			Network& network = *Network::GetInstance();
 
-			cs_packet_electronic_system_lever_working packet;
+			cs_packet_request_escapesystem_lever_working packet;
 			packet.size = sizeof(packet);
 			packet.type = CS_PACKET::CS_PACKET_ESCAPESYSTEM_LEVER_WORKING;
 			packet.index = GetID();
@@ -2088,7 +2089,6 @@ void EscapeObject::update(float fElapsedTime)
 
 			network.send_packet(&packet);
 #endif
-			// Send CheckStop();
 		}
 		m_fCooltime = 0;
 		IsInteraction = false;
@@ -2105,9 +2105,10 @@ void EscapeObject::Interaction(int playerType)
 	IsInteraction = true;
 	if (IsEqual(m_fCooltime, 0)) {
 #if USE_NETWORK
+		//  Send CheckStart();
 		Network& network = *Network::GetInstance();
 
-		cs_packet_electronic_system_lever_working packet;
+		cs_packet_request_escapesystem_lever_working packet;
 		packet.size = sizeof(packet);
 		packet.type = CS_PACKET::CS_PACKET_ESCAPESYSTEM_LEVER_WORKING;
 		packet.index = GetID();
@@ -2115,13 +2116,12 @@ void EscapeObject::Interaction(int playerType)
 
 		network.send_packet(&packet);
 #endif
-		//  Send CheckStart();
 	}
 	if (m_fCooltime >= PLAYER_ESCAPE_LEVER_COOLTIME) {
 		if (m_bIsReal) {
 #if USE_NETWORK
 			Network& network = *Network::GetInstance();
-			cs_packet_request_escapesystem_working packet;
+			cs_packet_request_escapesystem_lever_working packet;
 			packet.size = sizeof(packet);
 			packet.type = CS_PACKET::CS_PACKET_REQUEST_ESCAPESYSTEM_WORKING;
 			packet.index = GetID();
@@ -2133,9 +2133,10 @@ void EscapeObject::Interaction(int playerType)
 		else {
 			if (false == IsEqual(m_fCooltime, 0)) {
 #if USE_NETWORK
+				// send CheckStop();
 				Network& network = *Network::GetInstance();
 
-				cs_packet_electronic_system_lever_working packet;
+				cs_packet_request_escapesystem_lever_working packet;
 				packet.size = sizeof(packet);
 				packet.type = CS_PACKET::CS_PACKET_ESCAPESYSTEM_LEVER_WORKING;
 				packet.index = GetID();
@@ -2143,7 +2144,7 @@ void EscapeObject::Interaction(int playerType)
 
 				network.send_packet(&packet);
 #endif
-				// send CheckStop();
+				
 				m_fCheckCooltime = 0;
 			}
 			m_fCooltime = 0;

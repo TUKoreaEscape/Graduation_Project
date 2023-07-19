@@ -24,7 +24,7 @@ void RoomManager::init_object() // 맵에 배치할 오브젝트를 로드해야하는곳입니다. 
 	// 여긴 맵에 존재하는 벽, 고정된 오브젝트의 충돌 정보를 서버에 로드하는 공간입니다.
 //======================= Fixed and Wall Object Read =======================
 	FILE* pFile = nullptr;
-	fopen_s(&pFile, "walls/FixedObjectsBounding0718.bin", "rb");
+	fopen_s(&pFile, "walls/FixedObjectsBounding0719.bin", "rb");
 	if (pFile)
 		rewind(pFile);
 

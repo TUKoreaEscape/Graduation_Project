@@ -1014,9 +1014,12 @@ void cGameServer::Process_EscapeSystem_lever_working(const int user_id, void* bu
 	update_packet.size = sizeof(update_packet);
 	update_packet.type = SC_PACKET::SC_PACKET_ESCAPESYSTEM_LEVER_WORKING;
 	update_packet.index = packet->index;
+	update_packet.is_start = packet->is_start;
 	
 	for (int& player_id : room.in_player) {
 		if (player_id == -1)
+			continue;
+		if (player_id == user_id)
 			continue;
 		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
 	}

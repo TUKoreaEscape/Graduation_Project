@@ -315,6 +315,7 @@ struct cs_packet_request_escapesystem_lever_working {
 	unsigned char	type;
 
 	short			index;
+	bool			is_start;
 };
 
 struct cs_packet_request_escapesystem_working {
