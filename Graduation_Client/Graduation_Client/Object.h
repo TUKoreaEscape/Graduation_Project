@@ -370,4 +370,6 @@ public:
 	void SetReal() { m_bIsReal = true; };
 	
 	void SetWorking();
+
+	float m_fCheckCooltime{};
 };

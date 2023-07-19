@@ -2025,24 +2025,31 @@ void EscapeObject::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 void EscapeObject::update(float fElapsedTime)
 {
 	if (false == IsWorking) return;
-	if (IsInteraction) {
-		if (IsNear) {
-			m_fCooltime += fElapsedTime;
-
-			UCHAR keyBuffer[256];
-			memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
-			if (((keyBuffer['f'] & 0xF0) == false) && ((keyBuffer['F'] & 0xF0) == false)) {
-				m_fCooltime = 0;
-				IsInteraction = false;
-			}
-		}
+	if (IsInteraction == false) {
+		if (m_bDoesOtherPlayerActive) m_fCheckCooltime += fElapsedTime;
 		else {
+			m_fCheckCooltime = 0;
+		}
+		return;
+	}
+	if (IsNear) {
+		m_fCooltime += fElapsedTime;
+		UCHAR keyBuffer[256];
+		memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
+		if (((keyBuffer['f'] & 0xF0) == false) && ((keyBuffer['F'] & 0xF0) == false)) {
+			if (false == IsEqual(m_fCooltime, 0)) {
+				// Send CheckStop();
+			}
 			m_fCooltime = 0;
 			IsInteraction = false;
 		}
 	}
 	else {
+		if (false == IsEqual(m_fCooltime, 0)) {
+			// Send CheckStop();
+		}
 		m_fCooltime = 0;
+		IsInteraction = false;
 	}
 	m_fGauge = m_fCooltime / PLAYER_ESCAPE_LEVER_COOLTIME;
 }
@@ -2054,10 +2061,11 @@ void EscapeObject::Interaction(int playerType)
 	if (m_bDoesOtherPlayerActive) return;
 
 	IsInteraction = true;
+	if (IsEqual(m_fCooltime, 0)) {
+		//  Send CheckStart();
+	}
 	if (m_fCooltime >= PLAYER_ESCAPE_LEVER_COOLTIME) {
-		// Esaape
 		if (m_bIsReal) {
-			//Escape
 #if USE_NETWORK
 			Network& network = *Network::GetInstance();
 			cs_packet_request_escapesystem_working packet;
@@ -2070,6 +2078,10 @@ void EscapeObject::Interaction(int playerType)
 			m_fCooltime = 0;
 		}
 		else {
+			if (false == IsEqual(m_fCooltime, 0)) {
+				// send CheckStop();
+				m_fCheckCooltime = 0;
+			}
 			m_fCooltime = 0;
 			IsInteraction = false;
 		}
