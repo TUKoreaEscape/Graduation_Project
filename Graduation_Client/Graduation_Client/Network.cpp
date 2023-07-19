@@ -93,15 +93,9 @@ void Network::listen_thread()
 		WSABUF wsabuf{ BUF_SIZE, buf };
 		DWORD recv_byte{ 0 }, recv_flag{ 0 };
 
-		if (WSARecv(m_socket, &wsabuf, 1, &recv_byte, &recv_flag, nullptr, nullptr) == SOCKET_ERROR)
-		{
-			int err_no = WSAGetLastError();
-			if (WSA_IO_PENDING != err_no) {
-				//std::cout << "Socket Error Exit" << std::endl;
-				TerminateProcess(info.hProcess, 1);
-				m_shutdown = true;
-				exit(0);
-			}
+		int ret = WSARecv(m_socket, &wsabuf, 1, &recv_byte, &recv_flag, nullptr, nullptr);
+		if (ret == SOCKET_ERROR && WSAGetLastError() != WSAEWOULDBLOCK) {
+			std::cout << "RecvSizeType" << std::endl;
 		}
 
 		if (recv_byte > 0) {
