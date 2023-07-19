@@ -179,6 +179,7 @@ public:
 	}
 
 	void SetAnimationCallback(int index, AnimationCallbackHandler* handler);
-	int callbackSoundsIndex = -1;
+	int FootstepCallback1 = -1;
+	int FootstepCallback2 = -1;
 	int channelIndex = -1;
 };

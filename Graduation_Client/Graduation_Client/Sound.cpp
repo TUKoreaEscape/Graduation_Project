@@ -21,6 +21,9 @@ void Sound::StartFMOD()
 
 	m_fvListenerPos = { 0.0f, 0.0f, -1.0f };
 	m_pSystem->set3DListenerAttributes(0, &m_fvListenerPos, 0, 0, 0);
+
+	for (auto& chan : m_arrOtehrPlayerChannel)
+		chan = nullptr;
 }
 
 int Sound::CreateEffectSound(char* file, float volume)
@@ -76,6 +79,7 @@ void Sound::PlayBG(int index)
 	if (index > m_nSounds) return;
 	m_pSystem->playSound(m_vSounds[index], nullptr, false, &m_pBGChannel);
 	m_pBGChannel->setVolume(0.05f);
+	m_pBGChannel->setMute(true);
 }
 
 void Sound::PlayObject(int index, float volume, float x, float y, float z)
@@ -120,9 +124,9 @@ void Sound::SetListenerPos(const XMFLOAT3& listenerPos, const XMFLOAT3& listener
 	m_pSystem->set3DListenerAttributes(0, &m_fvListenerPos, 0, &m_fvListenerLook, &m_fvListenerUp);
 }
 
-int Sound::CreateOtherPlayersSounds(int index)
+int Sound::CreatePlayersSounds(char* file, int index)
 {
-	m_pSystem->createSound("Sound/Footstep01.wav", FMOD_3D | FMOD_LOOP_OFF, 0, &m_pSound);
+	m_pSystem->createSound(file, FMOD_3D | FMOD_LOOP_OFF | FMOD_3D_LINEARROLLOFF, 0, &m_pSound);
 	m_vSounds.push_back(m_pSound);
 	m_nSounds++;
 	return m_nSounds - 1;
@@ -132,6 +136,7 @@ void Sound::SetOtherPlayersPos(int index, const XMFLOAT3& pos)
 {
 	FMOD_VECTOR fmodPos = { pos.x, pos.y, pos.z };
 	m_arrOtehrPlayerChannel[index]->set3DAttributes(&fmodPos, 0);
+	//m_arrOtehrPlayerChannel[index]->setPaused(false);
 }
 
 void Sound::SetObjectPos(int index, float x, float y, float z)

@@ -527,19 +527,20 @@ void Player::SetAnimationCallback(int index, AnimationCallbackHandler* handler)
 {
 	channelIndex = index;
 	if (m_pSkinnedAnimationController) {
-		callbackSoundsIndex = Sound::GetInstance()->CreateOtherPlayersSounds(index);
+		FootstepCallback1 = Sound::GetInstance()->CreatePlayersSounds("Sound/Footstep01.wav", index);
+		FootstepCallback2 = Sound::GetInstance()->CreatePlayersSounds("Sound/Footstep02.wav", index);
 		m_pSkinnedAnimationController->SetCallbackKeys(0, 1, 2);
-		m_pSkinnedAnimationController->SetCallbackKey(0, 1, 0, 0.166f, &callbackSoundsIndex, &channelIndex);
-		m_pSkinnedAnimationController->SetCallbackKey(0, 1, 1, 0.5f, &callbackSoundsIndex, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 1, 0, 0.166f, &FootstepCallback1, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 1, 1, 0.5f, &FootstepCallback2, &channelIndex);
 		m_pSkinnedAnimationController->SetCallbackKeys(0, 2, 2);
-		m_pSkinnedAnimationController->SetCallbackKey(0, 2, 0, 0.166f, &callbackSoundsIndex, &channelIndex);
-		m_pSkinnedAnimationController->SetCallbackKey(0, 2, 1, 0.5f, &callbackSoundsIndex, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 2, 0, 0.166f, &FootstepCallback1, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 2, 1, 0.5f, &FootstepCallback2, &channelIndex);
 		m_pSkinnedAnimationController->SetCallbackKeys(0, 3, 2);
-		m_pSkinnedAnimationController->SetCallbackKey(0, 3, 0, 0.166f, &callbackSoundsIndex, &channelIndex);
-		m_pSkinnedAnimationController->SetCallbackKey(0, 3, 1, 0.5f, &callbackSoundsIndex, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 3, 0, 0.166f, &FootstepCallback1, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 3, 1, 0.5f, &FootstepCallback2, &channelIndex);
 		m_pSkinnedAnimationController->SetCallbackKeys(0, 4, 2);
-		m_pSkinnedAnimationController->SetCallbackKey(0, 4, 0, 0.166f, &callbackSoundsIndex, &channelIndex);
-		m_pSkinnedAnimationController->SetCallbackKey(0, 4, 1, 0.5f, &callbackSoundsIndex, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 4, 0, 0.166f, &FootstepCallback1, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 4, 1, 0.5f, &FootstepCallback2, &channelIndex);
 		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 1, handler);
 		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 2, handler);
 		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 3, handler);

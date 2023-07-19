@@ -32,7 +32,7 @@ public:
 	void Update(float fElapsedTime);
 	void SetListenerPos(const XMFLOAT3& listenerPos, const XMFLOAT3& look, const XMFLOAT3& up);
 
-	int CreateOtherPlayersSounds(int index);
+	int CreatePlayersSounds(char* file, int index);
 	void SetOtherPlayersPos(int index, const XMFLOAT3& pos);
 	void SetObjectPos(int index, float x, float y, float z);
 private:

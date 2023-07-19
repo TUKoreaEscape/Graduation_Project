@@ -350,7 +350,7 @@ void AnimationController::AdvanceTime(float fTimeElapsed, GameObject* pRootGameO
 
 		pRootGameObject->UpdateTransform(NULL);
 
-		for (int k = 0; k < m_nAnimationTracks; k++)
+		for (int k = 0; k < 1; k++)
 		{
 			if (m_pAnimationTracks[k].m_bEnable) m_ppAnimationSets[0]->m_ppAnimationSets[m_pAnimationTracks[k].m_nAnimationSet]->HandleCallback();
 		}
@@ -374,7 +374,7 @@ void SoundCallbackHandler::HandleCallback(void* pCallbackData, float fTrackPosit
 {
 	int* SoundIndex = (int*)pCallbackData;
 	int* ChannelIndex = (int*)pCallbackData2;
-	std::cout << "sound Index - " << *SoundIndex << ", Channel - " << *ChannelIndex << "\n";
+	std::cout << "sound Index - " << *SoundIndex << ", Channel - " << *ChannelIndex << " fucking - " << fTrackPosition <<"\n";
 	Sound& sound = *Sound::GetInstance();
 	sound.Play(*SoundIndex, 1.0f, *ChannelIndex);
 }
