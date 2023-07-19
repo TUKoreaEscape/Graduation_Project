@@ -66,8 +66,14 @@ void Network::Process_Init_Position(char* ptr)
 	m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
 	for (int i = 0; i < 5; ++i)
 		m_ppOther[i]->SetPlayerType(TYPE_PLAYER_YET);
-	for (int i = 0; i < 3; ++i)
+
+	for (int i = 0; i < 3; ++i) {
 		reinterpret_cast<EscapeObject*>(m_EscapeLevers[i])->SetID(i);
+		reinterpret_cast<EscapeObject*>(m_EscapeLevers[i])->SetActivate(false);
+	}
+
+	for (auto& door_object : m_pDoors)
+		door_object->SetOpen(false);
 }
 
 void Network::Process_Chat(char* ptr)
@@ -426,6 +432,7 @@ void Network::Process_ElectrinicSystem_Init(char* ptr)
 		std::cout << i << " : ";
 		m_pPowers[i]->SetIndex(i);
 		m_pPowers[i]->SetActivate(false);
+		m_pPowers[i]->SetOpen(false);
 		for (int idx = 0; idx < 10; ++idx)
 		{
 			std::cout << static_cast<int>(packet->data[i].value[idx]) << " ";
@@ -462,8 +469,10 @@ void Network::Process_Pick_Item_Init(char* ptr)
 		std::cout << m_item_to_power[i] << " ";
 	std::cout << std::endl;
 
-	for(int i = 0; i < MAX_INGAME_ITEM; ++i)
+	for (int i = 0; i < MAX_INGAME_ITEM; ++i) {
 		m_pBoxes[i]->SetIndex(i);
+		m_pBoxes[i]->SetOpen(false);
+	}
 
 	for (int i = 0; i < MAX_INGAME_ITEM; ++i)
 	{
