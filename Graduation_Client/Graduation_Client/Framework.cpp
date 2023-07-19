@@ -70,7 +70,7 @@ bool Framework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 #if USE_NETWORK
 	Network& network = *Network::GetInstance();
-	network.set_hwnd(m_hWnd);
+	network.m_hwnd = hMainWnd;
 #endif
 
 	return(true);

@@ -44,7 +44,6 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 	POINT ptMouse;
 	switch (nMessageID)
 	{
-		break;
 	case WM_KEYUP:
 		switch (wParam)
 		{
@@ -53,7 +52,7 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			if (m_gamestate->GetGameState() == PLAYING_GAME && !m_gamestate->GetChatState())
 			{
 				m_gamestate->ChangeMicState();
-				std::cout << "m키 누름" << std::endl;
+				//std::cout << "m키 누름" << std::endl;
 				if (m_gamestate->GetMicState())
 					Network::GetInstance()->on_voice_talk();
 				else
@@ -67,9 +66,11 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			}
 			::SetCapture(hWnd);
 			::GetCursorPos(&m_ptOldCursorPos);
+			std::cout << "마우스 캡차 동작" << std::endl;
 			break;
 		case VK_F2:
 			::ReleaseCapture();
+			std::cout << "마우스 캡차 릴리즈" << std::endl;
 			break;
 		case VK_F4:
 			speed = 160.0f;

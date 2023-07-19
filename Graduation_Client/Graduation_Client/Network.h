@@ -41,7 +41,7 @@ private:
 	Custom				data;
 
 	SHELLEXECUTEINFO	info;
-	HWND				m_hwnd;
+	
 	HWND				hwnd_ExtMixerWin;
 	bool				m_shutdown = false;
 	int					m_my_id = -1;
@@ -91,7 +91,7 @@ public: // 클라이언트 오브젝트와 연결하는 용도
 	GameObject*			m_Vents[NUM_VENT];
 	InteractionObject*	m_Taggers_Box = nullptr;
 	InteractionObject*	m_EscapeLevers[NUM_ESCAPE_LEVER];
-
+	HWND				m_hwnd;
 public:
 	static Network* GetInstance() {
 		if (NetworkInstance == NULL) {
@@ -102,8 +102,6 @@ public:
 	~Network();
 
 	void init_network();
-	void set_hwnd(HWND hWnd) { m_hwnd = hWnd; }
-	HWND get_hwnd() { return m_hwnd; }
 	void set_capture_mouse();
 	void release_capture_mouse();
 

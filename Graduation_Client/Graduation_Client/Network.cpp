@@ -572,24 +572,26 @@ void Network::exit_voice_talk()
 
 void Network::set_capture_mouse()
 {
-	RECT rcClient;
-	GetClientRect(get_hwnd(), &rcClient);
-	POINT ptCenter = { (rcClient.right - rcClient.left) / 2, (rcClient.bottom - rcClient.top) / 2 };
-	POINT ptMouse;
+	//RECT rcClient;
+	//GetClientRect(*m_hwnd, &rcClient);
+	//POINT ptCenter = { (rcClient.right - rcClient.left) / 2, (rcClient.bottom - rcClient.top) / 2 };
+	//POINT ptMouse;
 
-	GetCursorPos(&ptMouse);
-	if (ptMouse.x != ptCenter.x || ptMouse.y != ptCenter.y) {
-		SetCursorPos(ptCenter.x, ptCenter.y);
-	}
-	::SetCapture(get_hwnd());
-	::GetCursorPos(&Input::GetInstance()->m_ptOldCursorPos);
+	//GetCursorPos(&ptMouse);
+	//if (ptMouse.x != ptCenter.x || ptMouse.y != ptCenter.y) {
+	//	SetCursorPos(ptCenter.x, ptCenter.y);
+	//}
+	//::SetCapture(*m_hwnd);
+	//::GetCursorPos(&Input::GetInstance()->m_ptOldCursorPos);
+	Input::GetInstance()->KeyBoard(m_hwnd, WM_KEYUP, VK_F1, NULL);
 }
 
 void Network::release_capture_mouse()
 {
-	RECT rcClient;
-	GetClientRect(get_hwnd(), &rcClient);
-	POINT ptCenter = { (rcClient.right - rcClient.left) / 2, (rcClient.bottom - rcClient.top) / 2 };
-	POINT ptMouse;
-	::ReleaseCapture();
+	//RECT rcClient;
+	//GetClientRect(*m_hwnd, &rcClient);
+	//POINT ptCenter = { (rcClient.right - rcClient.left) / 2, (rcClient.bottom - rcClient.top) / 2 };
+	//POINT ptMouse;
+	//::ReleaseCapture();
+	Input::GetInstance()->KeyBoard(m_hwnd, WM_KEYUP, VK_F2, NULL);
 }
