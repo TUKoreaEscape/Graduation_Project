@@ -14,6 +14,7 @@ void CommonMovement::update(float elapsedTime)
 	if (GameState::GetInstance()->GetChatState()) return;
 		UCHAR keyBuffer[256];
 		DWORD dwDirection = 0;
+		bool bInteraction = false;
 		bool		m_emptyKey = false;
 		float speed = Input::GetInstance()->speed;
 		memcpy(keyBuffer, Input::GetInstance()->keyBuffer, (sizeof(keyBuffer)));
@@ -75,24 +76,31 @@ void CommonMovement::update(float elapsedTime)
 			if (Input::GetInstance()->m_pPlayer->m_pNearDoor)
 			{
 				bool DoorState = Input::GetInstance()->m_pPlayer->m_pNearDoor->IsOpen;
-				if (Input::GetInstance()->m_pPlayer->m_pNearDoor->GetIsWorking() == false)
+				if (Input::GetInstance()->m_pPlayer->m_pNearDoor->GetIsWorking() == false) {
 					Input::GetInstance()->m_pPlayer->m_pNearDoor->Interaction(playerType);
+					bInteraction = true;
+				}
 			}
 			if (Input::GetInstance()->m_gamestate->GetGameState() == PLAYING_GAME) {
 				if (Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct) {
 					Input::GetInstance()->m_pPlayer->m_pNearInteractionObejct->Interaction(playerType);
+					bInteraction = true;
 				}
 				if (Input::GetInstance()->m_pPlayer->m_pNearVent) {
 					Input::GetInstance()->m_pPlayer->m_pNearVent->Interaction(playerType);
+					bInteraction = true;
 				}
 				if (Input::GetInstance()->m_pPlayer->m_pNearItembox) {
 					Input::GetInstance()->m_pPlayer->m_pNearItembox->Interaction(playerType);
+					bInteraction = true;
 				}
 				if (Input::GetInstance()->m_pPlayer->m_pNearTaggers) {
 					Input::GetInstance()->m_pPlayer->m_pNearTaggers->Interaction(playerType);
+					bInteraction = true;
 				}
 				if (Input::GetInstance()->m_pPlayer->m_pNearEscape) {
 					Input::GetInstance()->m_pPlayer->m_pNearEscape->Interaction(playerType);
+					bInteraction = true;
 				}
 			}
 		}
@@ -153,7 +161,10 @@ void CommonMovement::update(float elapsedTime)
 		}
 		else if (m_emptyKey && !Input::GetInstance()->m_pPlayer->GetIsFalling())
 		{
-			gameObject->SetAnimation(0);
+			if (bInteraction)
+				gameObject->SetAnimation(11);
+			else 
+				gameObject->SetAnimation(0);
 			Input::GetInstance()->m_pPlayer->SetDirection(DIR_EMPTY);
 		}
 }
