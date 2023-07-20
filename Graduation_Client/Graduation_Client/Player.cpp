@@ -443,6 +443,7 @@ void Player::SetLookAt(XMFLOAT3& xmf3Target, XMFLOAT3& xmf3Up)
 	m_xmf3Look = Vector3::Normalize(look);
 	m_xmf3Up = xmf3Up;
 	m_xmf3Right = Vector3::CrossProduct(m_xmf3Up, m_xmf3Look, true);
+	m_fPitch = 0; m_fRoll = 0; m_fYaw = 0;
 	//m_xmf3Up = Vector3::CrossProduct(m_xmf3Look, m_xmf3Right, true);
 
 	if (m_pCamera) m_pCamera->SetLookAt(xmf3Target);
