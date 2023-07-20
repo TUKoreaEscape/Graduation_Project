@@ -189,7 +189,6 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		if ((m_pPlayer->m_pNearInteractionObejct))
 			reinterpret_cast<PowerSwitch*>(m_pPlayer->m_pNearInteractionObejct)->UIrender(pd3dCommandList);
 		m_UIPlayer[0]->render(pd3dCommandList);
-		m_UIPlayer[6]->render(pd3dCommandList);
 		int index = m_pPlayer->GetItem();
 		if (index != -1) {
 			m_UIPlayer[1 + index]->render(pd3dCommandList);
@@ -208,6 +207,8 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 				}
 			}
 		}
+		m_UIPlayer[6]->render(pd3dCommandList);
+		break;
 	}
 }
 
@@ -1373,6 +1374,7 @@ void GameScene::MakeTaggers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	Taggers->SetChild(pAltarModel->m_pModelRootObject, true);
 	Taggers->SetUI(0, m_ppObjectsUIs[8]);
 	Taggers->SetUI(1, m_ppObjectsUIs[6]);
+	Taggers->SetUI(2, m_ppObjectsUIs[5]);
 	Taggers->SetPosition(-3.2f, 0.93f, -0.34f);
 	reinterpret_cast<TaggersBox*>(Taggers)->Init();
 
@@ -1530,7 +1532,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_UIPlayer[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Wrench.dds", -0.75f, -0.75f, 0.3f, 0.4f);
 	m_UIPlayer[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Pliers.dds", -0.75f, -0.75f, 0.3f, 0.4f);
 	m_UIPlayer[5] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Driver.dds", -0.75f, -0.75f, 0.3f, 0.4f);
-	m_UIPlayer[6] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/tab.dds", -0.7f, -0.68f, 0.1f, 0.1f);
+	m_UIPlayer[6] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/tab.dds", -0.65f, -0.6f, 0.1f, 0.1f);
 
 	m_nPlayTagger = 3 + 3;
 	m_UITagger = new GameObject * [m_nPlayTagger];
