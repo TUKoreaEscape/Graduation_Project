@@ -1,7 +1,7 @@
 #pragma once
 #include <DirectXMath.h>
 // 클라이언트와 서버간 통신에 사용할 구조체를 정의합니다.
-const short SERVER_PORT = 5000;
+const short SERVER_PORT = 9000;
 const int	BUFSIZE = 1024;
 const int	MAX_CHAT_SIZE = 100;
 
@@ -13,6 +13,7 @@ const int  MAX_ROOM_INFO_SEND = 6;
 const int CHECK_MAX_PACKET_SIZE = 127;
 
 const int BUF_SIZE = 5000;
+constexpr int KEEP_ALIVE_TIMEOUT = 15;
 // ----- 클라이언트가 서버에게 보낼때 ------
 #define MAX_INGAME_ITEM 20
 #define VOICE_ISSUER "작성해야됨"
@@ -183,7 +184,6 @@ struct cs_packet_move { // 이동관련 데이터
 
 	unsigned char		input_key;
 	bool				is_jump;
-	float				yaw;
 	Look				look;
 	Right				right;
 	DirectX::XMFLOAT3	velocity;

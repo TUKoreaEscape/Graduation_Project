@@ -1,7 +1,7 @@
 #pragma once
 #include <DirectXMath.h>
 // 클라이언트와 서버간 통신에 사용할 구조체를 정의합니다.
-const short SERVER_PORT = 5000;
+const short SERVER_PORT = 9000;
 const int	BUFSIZE = 1024;
 const int	MAX_CHAT_SIZE = 100;
 
@@ -183,7 +183,6 @@ struct cs_packet_move { // 이동관련 데이터
 
 	unsigned char		input_key;
 	bool				is_jump;
-	float				yaw;
 	Look				look;
 	Right				right;
 	DirectX::XMFLOAT3	velocity;

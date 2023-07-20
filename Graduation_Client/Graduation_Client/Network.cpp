@@ -95,8 +95,11 @@ void Network::listen_thread()
 
 		int ret = WSARecv(m_socket, &wsabuf, 1, &recv_byte, &recv_flag, nullptr, nullptr);
 		if (ret == SOCKET_ERROR && WSAGetLastError() != WSAEWOULDBLOCK) {
-			if(ret != WSA_IO_PENDING)
+			int error_number = WSAGetLastError();
+			if (error_number != WSA_IO_PENDING) {
 				std::cout << "RecvSizeType" << std::endl;
+				exit(0);
+			}
 		}
 
 		if (recv_byte > 0) {

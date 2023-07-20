@@ -26,8 +26,8 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	auto start_time = chrono::steady_clock::now();
 	cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(buff);
 	m_clients[user_id].set_user_velocity(packet->velocity);
-	m_clients[user_id].set_user_yaw(packet->yaw);
-	m_clients[user_id].update_rotation(packet->yaw);
+	//m_clients[user_id].set_user_yaw(packet->yaw);
+	//m_clients[user_id].update_rotation(packet->yaw);
 	m_clients[user_id].set_look(packet->look);
 	m_clients[user_id].set_right(packet->right);
 	m_clients[user_id].set_inputKey(packet->input_key);

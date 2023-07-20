@@ -466,7 +466,7 @@ void Framework::UpdateObjects()
 		packet.right.y = input->m_pPlayer->GetRightVector().y * 100;
 		packet.right.z = input->m_pPlayer->GetRightVector().z * 100;
 
-		packet.yaw = input->m_pPlayer->GetYaw();
+		//packet.yaw = input->m_pPlayer->GetYaw();
 		packet.is_jump = input->m_pPlayer->GetIsFalling();
 		//std::cout << packet.xmf3Shift.x << ", " << packet.xmf3Shift.y << ", " << packet.xmf3Shift.z << std::endl;
 		//std::cout << packet.look.x << ", " << packet.look.y << ", " << packet.look.z << std::endl;

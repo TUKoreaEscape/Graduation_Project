@@ -103,14 +103,14 @@ void cGameServer::WorkerThread()
 				NULL, err_no,
 				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 				(LPTSTR)&lpMsgBuf, 0, 0);
-			std::wcout << lpMsgBuf << std::endl;
+			std::wcout << lpMsgBuf << std::endl << endl;
 
 			LocalFree(lpMsgBuf);
 #endif
 			Disconnect(client_id);
 
 #if SOCKET_ERROR_PRINT
-			cout << "disconnect ID : " << client_id << endl;
+			cout << "disconnect ID : " << client_id << endl << endl;
 #endif
 			if (exp_over->m_comp_op == OP_SEND)
 				delete exp_over;
@@ -494,6 +494,10 @@ void cGameServer::Accept(EXP_OVER* exp_over)
 		ZeroMemory(&exp_over->m_wsa_over, sizeof(exp_over->m_wsa_over));
 		c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 		*(reinterpret_cast<SOCKET*>(exp_over->m_buf)) = c_socket;
+		int keepAlive = 1;
+		int keepAliveTimeout = KEEP_ALIVE_TIMEOUT * 1000; // ms 단위로 타임아웃 설정
+		setsockopt(c_socket, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char*>(&keepAlive), sizeof(keepAlive));
+		setsockopt(c_socket, IPPROTO_TCP, TCP_KEEPALIVE, reinterpret_cast<char*>(&keepAliveTimeout), sizeof(keepAliveTimeout));
 		AcceptEx(C_IOCP::m_listen_socket, c_socket, exp_over->m_buf + 8, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &exp_over->m_wsa_over);
 	}
 }
