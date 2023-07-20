@@ -61,5 +61,10 @@ private:
 	std::vector<FMOD::Sound*> m_vObjectSounds;
 	std::vector<FMOD::Channel*> m_vObjectChannels;
 
+	FMOD_VECTOR cube[36] = { };
+
 	FMOD::Channel* m_pBGChannel;
+	FMOD::Geometry* m_pGeo;
+
+	int m_nWalls[5]{};
 };

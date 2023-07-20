@@ -823,9 +823,9 @@ float4 Outline(VS_SCREEN_RECT_TEXTURED_OUTPUT input)
 	if (k < 0.05f)
 		myColor = float4(0, 0, 0, 1);
 	else if (k < 0.3f)
-		myColor = float4(0, 1, 0, 1);
+		myColor = float4(0, 0.6f, 0, 1);
 	else if (k < 0.5f)
-		myColor = float4(1, 0, 0, 1);
+		myColor = float4(0.6f, 0, 0, 1);
 	else
 		myColor = float4(0.2, 0.2, 0.2, 1);
 	float4 f4EdgeColor = float4(myColor.xyz, myColor.w * fEdge);
