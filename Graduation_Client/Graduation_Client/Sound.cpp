@@ -22,7 +22,7 @@ void Sound::StartFMOD()
 	m_fvListenerPos = { 0.0f, 0.0f, -1.0f };
 	m_pSystem->set3DListenerAttributes(0, &m_fvListenerPos, 0, 0, 0);
 
-	for (auto& chan : m_arrOtehrPlayerChannel)
+	for (auto& chan : m_arrOtherPlayerChannel)
 		chan = nullptr;
 }
 
@@ -65,8 +65,10 @@ void Sound::Play(int index, float volume, int otherPlayer)
 	if (index == -1) return;
 	if (index > m_nSounds) return;
 	if (otherPlayer != -1) {
-		m_pSystem->playSound(m_vSounds[index], 0, true, &m_arrOtehrPlayerChannel[otherPlayer]);
-		m_arrOtehrPlayerChannel[otherPlayer]->setVolume(volume);
+		m_pSystem->playSound(m_vSounds[index], 0, true, &m_arrOtherPlayerChannel[otherPlayer]);
+		m_arrOtherPlayerChannel[otherPlayer]->setVolume(volume);
+		m_arrOtherPlayerChannel[otherPlayer]->set3DAttributes(&m_arrOtherPlayerPos[otherPlayer], 0);
+		m_arrOtherPlayerChannel[otherPlayer]->setPaused(false);
 		return;
 	}
 	m_pSystem->playSound(m_vSounds[index], nullptr, false, &m_pChannel);
@@ -95,7 +97,7 @@ void Sound::Stop(int index, int OtherPlayer)
 	if (index == -1) return;
 	if (index > m_nSounds) return;
 	if (OtherPlayer != -1) {
-		m_arrOtehrPlayerChannel[OtherPlayer]->stop();
+		m_arrOtherPlayerChannel[OtherPlayer]->stop();
 	}
 	else
 		m_pChannel->stop();
@@ -127,6 +129,7 @@ void Sound::SetListenerPos(const XMFLOAT3& listenerPos, const XMFLOAT3& listener
 int Sound::CreatePlayersSounds(char* file, int index)
 {
 	m_pSystem->createSound(file, FMOD_3D | FMOD_LOOP_OFF | FMOD_3D_LINEARROLLOFF, 0, &m_pSound);
+	m_pSound->set3DMinMaxDistance(10.0f, 50.0f);
 	m_vSounds.push_back(m_pSound);
 	m_nSounds++;
 	return m_nSounds - 1;
@@ -134,9 +137,7 @@ int Sound::CreatePlayersSounds(char* file, int index)
 
 void Sound::SetOtherPlayersPos(int index, const XMFLOAT3& pos)
 {
-	FMOD_VECTOR fmodPos = { pos.x, pos.y, pos.z };
-	m_arrOtehrPlayerChannel[index]->set3DAttributes(&fmodPos, 0);
-	//m_arrOtehrPlayerChannel[index]->setPaused(false);
+	m_arrOtherPlayerPos[index] = {pos.x, pos.y, pos.z};
 }
 
 void Sound::SetObjectPos(int index, float x, float y, float z)

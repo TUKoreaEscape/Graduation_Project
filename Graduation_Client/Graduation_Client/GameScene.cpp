@@ -1425,7 +1425,6 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	LoadedModelInfo* pCubeModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/CubeRoom.bin", nullptr);
 	LoadedModelInfo* pCeilModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Ceilling.bin", nullptr);
 
-	AnimationCallbackHandler* pAnimationCallbackHandler = new SoundCallbackHandler();
 	for (int i = 0; i < m_nPlayers; ++i) {
 		m_ppPlayers[i]->SetChild(pPlayerModel->m_pModelRootObject, true);
 		m_ppPlayers[i]->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 2, pPlayerModel);
@@ -1433,7 +1432,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 0);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackEnable(1, false);//m_ppPlayers[i]->SetPosition(XMFLOAT3(i , 0.0f, -5.0f));
-		m_ppPlayers[i]->SetAnimationCallback(i, pAnimationCallbackHandler);
+		m_ppPlayers[i]->SetAnimationCallback(i);
 		for (int j = 0; j < 6; ++j)
 			GameObject::SetParts(i + 1, j, 0);
 		m_ppPlayers[i]->PlayerNum = i + 1;
@@ -1452,18 +1451,14 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.0f);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 0);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackEnable(1, false);
-	m_pPlayer->SetAnimationCallback(-1, pAnimationCallbackHandler);
+	m_pPlayer->SetAnimationCallback(-1);
 
 	m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -3.0f));
 	for (int j = 0; j < 6; ++j)
 		GameObject::SetParts(0, j, 0);
 	GameObject::SetParts(0, 0, 4);
 	m_pPlayer->PlayerNum = 0;
-	m_pPlayer->m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 1, pAnimationCallbackHandler);
-	m_pPlayer->m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 2, pAnimationCallbackHandler);
-	m_pPlayer->m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 3, pAnimationCallbackHandler);
-	m_pPlayer->m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 4, pAnimationCallbackHandler);
-
+	
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.3f);
 	m_pLight = new GameObject();
 	m_pLight->AddComponent<Light>();

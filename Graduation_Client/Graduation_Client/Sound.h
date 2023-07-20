@@ -54,7 +54,8 @@ private:
 	int m_nSounds;
 	std::vector<FMOD::Sound*> m_vSounds;
 	std::vector<FMOD::Channel*> m_vChannels;
-	std::array<FMOD::Channel*, 5> m_arrOtehrPlayerChannel;
+	std::array<FMOD::Channel*, 5> m_arrOtherPlayerChannel;
+	std::array<FMOD_VECTOR, 5> m_arrOtherPlayerPos{};
 	
 	int m_nObjects{};
 	std::vector<FMOD::Sound*> m_vObjectSounds;

@@ -6,7 +6,7 @@ class GameObject;
 #define ANIMATION_TYPE_LOOP			1
 #define ANIMATION_TYPE_PINGPONG		2
 
-#define ANIMATION_CALLBACK_EPSILON 0.008f
+#define ANIMATION_CALLBACK_EPSILON 0.01f
 
 struct CALLBACKKEY
 {
@@ -81,12 +81,12 @@ public:
 	XMFLOAT4X4 GetSRT(int nBone);
 
 	void SetCallbackKeys(int nCallbackKeys);
-	void SetCallbackKey(int nKeyIndex, float fTime, void* pData);
+	void SetCallbackKey(int nKeyIndex, float fTime, void* pData, void* pData2 = nullptr);
 	void SetAnimationCallbackHandler(AnimationCallbackHandler* pCallbackHandler);
 
 	void* GetCallbackData();
 
-	void HandleCallback();
+	void HandleCallback(CALLBACKKEY* key);
 };
 
 class AnimationSets
@@ -187,6 +187,9 @@ public:
 	void SetCallbackKeys(int nSkinnedMesh, int nAnimationSet, int nCallbackKeys);
 	void SetCallbackKey(int nSkinnedMesh, int nAnimationSet, int nKeyIndex, float fTime, void* pData, void* pData2 = nullptr);
 	void SetAnimationCallbackHandler(int nSkinnedMesh, int nAnimationSet, AnimationCallbackHandler* pCallbackHandler);
+	
+	int 							m_nCallbackKeys = 0;
+	CALLBACKKEY* m_pCallbackKeys = NULL;
 
 	void AdvanceTime(float fElapsedTime, GameObject* pRootGameObject, int player = -1);
 };

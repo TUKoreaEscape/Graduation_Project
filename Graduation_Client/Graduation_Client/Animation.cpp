@@ -100,10 +100,11 @@ void AnimationSet::SetCallbackKeys(int nCallbackKeys)
 	m_pCallbackKeys = new CALLBACKKEY[nCallbackKeys];
 }
 
-void AnimationSet::SetCallbackKey(int nKeyIndex, float fKeyTime, void* pData)
+void AnimationSet::SetCallbackKey(int nKeyIndex, float fKeyTime, void* pData, void* pData2)
 {
 	m_pCallbackKeys[nKeyIndex].m_fTime = fKeyTime;
 	m_pCallbackKeys[nKeyIndex].m_pCallbackData = pData;
+	m_pCallbackKeys[nKeyIndex].m_pCallbackData2 = pData2;
 }
 
 void AnimationSet::SetAnimationCallbackHandler(AnimationCallbackHandler* pCallbackHandler)
@@ -120,7 +121,7 @@ void* AnimationSet::GetCallbackData()
 	return(NULL);
 }
 
-void AnimationSet::HandleCallback()
+void AnimationSet::HandleCallback(CALLBACKKEY* key)
 {
 	if (m_pAnimationCallbackHandler)
 	{
@@ -128,7 +129,7 @@ void AnimationSet::HandleCallback()
 		{
 			if (::IsEqual(m_pCallbackKeys[i].m_fTime, m_fPosition, ANIMATION_CALLBACK_EPSILON))
 			{
-				if (m_pCallbackKeys[i].m_pCallbackData) m_pAnimationCallbackHandler->HandleCallback(m_pCallbackKeys[i].m_pCallbackData, m_fPosition, m_pCallbackKeys[i].m_pCallbackData2);
+				if (m_pCallbackKeys[i].m_pCallbackData) m_pAnimationCallbackHandler->HandleCallback(key[i].m_pCallbackData, m_fPosition, key[i].m_pCallbackData2);
 				break;
 			}
 		}
@@ -291,11 +292,16 @@ void AnimationController::SetTrackWeight(int nAnimationTrack, float fWeight)
 void AnimationController::SetCallbackKeys(int nSkinnedMesh, int nAnimationSet, int nCallbackKeys)
 {
 	if (m_ppAnimationSets && m_ppAnimationSets[nSkinnedMesh]) m_ppAnimationSets[nSkinnedMesh]->SetCallbackKeys(nAnimationSet, nCallbackKeys);
+	m_nCallbackKeys = nCallbackKeys;
+	m_pCallbackKeys = new CALLBACKKEY[nCallbackKeys];
 }
 
 void AnimationController::SetCallbackKey(int nSkinnedMesh, int nAnimationSet, int nKeyIndex, float fKeyTime, void* pData, void* pData2)
 {
 	if (m_ppAnimationSets && m_ppAnimationSets[nSkinnedMesh]) m_ppAnimationSets[nSkinnedMesh]->SetCallbackKey(nAnimationSet, nKeyIndex, fKeyTime, pData, pData2);
+	m_pCallbackKeys[nKeyIndex].m_fTime = fKeyTime;
+	m_pCallbackKeys[nKeyIndex].m_pCallbackData = pData;
+	m_pCallbackKeys[nKeyIndex].m_pCallbackData2 = pData2;
 }
 
 void AnimationController::SetAnimationCallbackHandler(int nSkinnedMesh, int nAnimationSet, AnimationCallbackHandler* pCallbackHandler)
@@ -352,7 +358,7 @@ void AnimationController::AdvanceTime(float fTimeElapsed, GameObject* pRootGameO
 
 		for (int k = 0; k < 1; k++)
 		{
-			if (m_pAnimationTracks[k].m_bEnable) m_ppAnimationSets[0]->m_ppAnimationSets[m_pAnimationTracks[k].m_nAnimationSet]->HandleCallback();
+			if (m_pAnimationTracks[k].m_bEnable) m_ppAnimationSets[0]->m_ppAnimationSets[m_pAnimationTracks[k].m_nAnimationSet]->HandleCallback(m_pCallbackKeys);
 		}
 	}
 }

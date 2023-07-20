@@ -524,8 +524,9 @@ void Player::ChangeSpectator()
 	SpectatorPlayerIndex = (SpectatorPlayerIndex + 1) % 5;
 }
 
-void Player::SetAnimationCallback(int index, AnimationCallbackHandler* handler)
+void Player::SetAnimationCallback(int index)
 {
+	AnimationCallbackHandler* pAnimationCallbackHandler = new SoundCallbackHandler();
 	channelIndex = index;
 	if (m_pSkinnedAnimationController) {
 		FootstepCallback1 = Sound::GetInstance()->CreatePlayersSounds("Sound/Footstep01.wav", index);
@@ -542,10 +543,10 @@ void Player::SetAnimationCallback(int index, AnimationCallbackHandler* handler)
 		m_pSkinnedAnimationController->SetCallbackKeys(0, 4, 2);
 		m_pSkinnedAnimationController->SetCallbackKey(0, 4, 0, 0.166f, &FootstepCallback1, &channelIndex);
 		m_pSkinnedAnimationController->SetCallbackKey(0, 4, 1, 0.5f, &FootstepCallback2, &channelIndex);
-		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 1, handler);
-		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 2, handler);
-		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 3, handler);
-		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 4, handler);
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 1, pAnimationCallbackHandler);
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 2, pAnimationCallbackHandler);
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 3, pAnimationCallbackHandler);
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 4, pAnimationCallbackHandler);
 	}
 }
 
