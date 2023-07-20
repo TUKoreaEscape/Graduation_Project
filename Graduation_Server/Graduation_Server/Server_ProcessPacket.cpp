@@ -275,6 +275,14 @@ void cGameServer::Process_Exit_Room(const int user_id, void* buff)
 		m_clients[user_id]._state_lock.lock();
 		m_clients[user_id].set_state(CLIENT_STATE::ST_LOBBY);
 		m_clients[user_id]._state_lock.unlock();
+		
+		// æ∆¿Ã≈€ »πµÊ √ ±‚»≠
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_DRILL, false);
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_DRIVER, false);
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_HAMMER, false);
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, false);
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_PLIERS, false);
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_WRENCH, false);
 
 		//for (auto& p : m_clients[user_id].room_list)
 		//{
@@ -371,7 +379,7 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 			index++;
 		}
 
-		for (auto recv_id : room.in_player)
+		for (auto& recv_id : room.in_player)
 		{
 			if (recv_id == -1)
 				continue;
@@ -384,6 +392,12 @@ void cGameServer::Process_Ready(const int user_id, void* buff)
 		ev.room_number = m_clients[user_id].get_join_room_number();
 
 		m_timer_queue.push(ev);
+
+		for (auto& player_id : room.in_player) {
+			if (player_id == -1)
+				continue;
+			m_clients[player_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, true);
+		}
 	}
 	else {
 		sc_packet_ready ready_packet;
@@ -575,6 +589,7 @@ void cGameServer::Process_Attack(const int user_id)
 				{
 					room.Tagger_Get_Life_Chip(true);
 					m_clients[other_player_id].set_life_chip(false);
+					m_clients[other_player_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, false);
 
 					sc_packet_life_chip_update update_packet;
 					update_packet.size = sizeof(update_packet);
@@ -928,10 +943,13 @@ void cGameServer::Process_Pick_Fix_Item(const int user_id, void* buff)
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_PLIERS, true);
 	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_WRENCH) // 2
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_WRENCH, true);
-	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_LIFECHIP) {
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_DRIVER) // 4
+		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_DRIVER, true);
+	else if (room.m_fix_item[item_index].Get_Item_Type() == GAME_ITEM::ITEM_LIFECHIP) { // 5
 		m_clients[user_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, true);
 		m_clients[user_id].set_life_chip(true);
 	}
+
 
 #if PRINT
 	std::cout << "Item_box_index [" << room.m_fix_item[item_index].Get_Item_box_index() << "] : ";

@@ -559,6 +559,8 @@ CollisionInfo Room::is_collision_player_to_vent(const int& player_id, const XMFL
 		if (!object.m_check_bounding_box) {
 			if (player_id != m_tagger_id)
 				continue;
+			if (player_id == -1)
+				continue;
 		}
 
 		if (check_box.Intersects(object.Get_BoundingBox()))

@@ -93,15 +93,10 @@ void Network::listen_thread()
 		WSABUF wsabuf{ BUF_SIZE, buf };
 		DWORD recv_byte{ 0 }, recv_flag{ 0 };
 
-		if (WSARecv(m_socket, &wsabuf, 1, &recv_byte, &recv_flag, nullptr, nullptr) == SOCKET_ERROR)
-		{
-			int err_no = WSAGetLastError();
-			if (WSA_IO_PENDING != err_no) {
-				std::cout << "Socket Error Exit" << std::endl;
-				TerminateProcess(info.hProcess, 1);
-				m_shutdown = true;
-				exit(0);
-			}
+		int ret = WSARecv(m_socket, &wsabuf, 1, &recv_byte, &recv_flag, nullptr, nullptr);
+		if (ret == SOCKET_ERROR && WSAGetLastError() != WSAEWOULDBLOCK) {
+			if(ret != WSA_IO_PENDING)
+				std::cout << "RecvSizeType" << std::endl;
 		}
 
 		if (recv_byte > 0) {
@@ -517,14 +512,14 @@ void Network::on_voice_talk()
 {
 	m_is_use_voice_talk = true;
 	join_voice_talk();
-	std::cout << "voice on" << std::endl;
+	//std::cout << "voice on" << std::endl;
 }
 
 void Network::off_voice_talk()
 {
 	exit_voice_talk();
 	m_is_use_voice_talk = false;
-	std::cout << "voice off" << std::endl;
+	//std::cout << "voice off" << std::endl;
 }
 
 void Network::join_voice_talk()

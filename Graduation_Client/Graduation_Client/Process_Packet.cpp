@@ -79,7 +79,6 @@ void Network::Process_Init_Position(char* ptr)
 void Network::Process_Chat(char* ptr)
 {
 	sc_packet_chat* packet = reinterpret_cast<sc_packet_chat*>(ptr);
-	std::cout << "[" << packet->name << "] : " << packet->message << std::endl;
 	Input::GetInstance()->Receive(packet->message, packet->name);
 }
 
@@ -112,7 +111,7 @@ void Network::Process_Game_End(char* ptr)
 
 	if(game_state.GetGameState() == SPECTATOR_GAME)
 		game_state.ChangeNextState();
-	else { // 해당부분은 추후 사용될 코드입니다.
+	else { // 탈출을 못하여 PLAYING GAME 상태이거나 술래가 승리한 경우 STATE를 2번 바꿔야 GAME_END로 넘어가짐
 		for(int i = 0; i < 2; ++i)
 			game_state.ChangeNextState();
 	}
@@ -429,17 +428,17 @@ void Network::Process_ElectrinicSystem_Init(char* ptr)
 
 	for (int i = 0; i < 5; ++i)
 	{
-		std::cout << i << " : ";
+		//std::cout << i << " : ";
 		m_pPowers[i]->SetIndex(i);
 		m_pPowers[i]->SetActivate(false);
 		m_pPowers[i]->SetOpen(false);
 		for (int idx = 0; idx < 10; ++idx)
 		{
-			std::cout << static_cast<int>(packet->data[i].value[idx]) << " ";
+			//std::cout << static_cast<int>(packet->data[i].value[idx]) << " ";
 			m_pPowers[i]->SetAnswer(idx, packet->data[i].value[idx]);
 			m_pPowers[i]->SetSwitchValue(idx, false);
 		}
-		std::cout << std::endl;
+		//std::cout << std::endl;
 	}
 }
 
@@ -454,8 +453,8 @@ void Network::Process_ElectronicSystem_Activate(char* ptr)
 	sc_packet_electronic_system_activate_update* packet = reinterpret_cast<sc_packet_electronic_system_activate_update*>(ptr);
 	m_pPowers[packet->system_index]->CheckStop();
 	m_pPowers[packet->system_index]->SetActivate(packet->activate);
-	if (packet->activate)
-		std::cout << packet->system_index << "번 전력장치 수리 완료" << std::endl;
+	//if (packet->activate)
+	//	std::cout << packet->system_index << "번 전력장치 수리 완료" << std::endl;
 }
 
 void Network::Process_Pick_Item_Init(char* ptr)
@@ -465,9 +464,9 @@ void Network::Process_Pick_Item_Init(char* ptr)
 	for (int i = 0; i < 5; ++i)
 		m_item_to_power[i] = packet->shuffle[i];
 
-	for (int i = 0; i < 5; ++i)
-		std::cout << m_item_to_power[i] << " ";
-	std::cout << std::endl;
+	//for (int i = 0; i < 5; ++i)
+	//	std::cout << m_item_to_power[i] << " ";
+	//std::cout << std::endl;
 
 	for (int i = 0; i < MAX_INGAME_ITEM; ++i) {
 		m_pBoxes[i]->SetIndex(i);
@@ -530,7 +529,7 @@ void Network::Process_Active_Altar(char* ptr)
 void Network::Process_Active_EscapeSystem(char* ptr)
 {
 	sc_packet_escapesystem_activate* packet = reinterpret_cast<sc_packet_escapesystem_activate*>(ptr);
-	std::cout << "탈출장치 [" << packet->index << "]번 활성화" << std::endl;
+	//std::cout << "탈출장치 [" << packet->index << "]번 활성화" << std::endl;
 
 	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i)
 		reinterpret_cast<EscapeObject*>(m_EscapeLevers[i])->SetWorking();
@@ -574,16 +573,12 @@ void Network::Process_Altar_LifeChip_Update(char* ptr)
 	sc_packet_altar_lifechip_update* packet = reinterpret_cast<sc_packet_altar_lifechip_update*>(ptr);
 	packet->lifechip_count; // 이게 현재 수집된 생명칩 갯수임
 	reinterpret_cast<TaggersBox*>(m_Taggers_Box)->CollectChip();
-	std::cout << "현재 재단에 모인 생명칩 갯수 : " << packet->lifechip_count << std::endl;
 }
 
 void Network::Process_Activate_Tagger_Skill(char* ptr)
 {
 	sc_packet_tagger_skill* packet = reinterpret_cast<sc_packet_tagger_skill*>(ptr);
 
-	std::cout << "first skill : " << packet->first_skill << std::endl;
-	std::cout << "second_skill : " << packet->second_skill << std::endl;
-	std::cout << "third_skill : " << packet->third_skill << std::endl;
 	if (packet->first_skill)
 		m_pPlayer->SetTaggerSkill(0);
 	if (packet->second_skill)

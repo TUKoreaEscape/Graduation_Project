@@ -66,11 +66,11 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			}
 			::SetCapture(hWnd);
 			::GetCursorPos(&m_ptOldCursorPos);
-			std::cout << "마우스 캡차 동작" << std::endl;
+			//std::cout << "마우스 캡차 동작" << std::endl;
 			break;
 		case VK_F2:
 			::ReleaseCapture();
-			std::cout << "마우스 캡차 릴리즈" << std::endl;
+			//std::cout << "마우스 캡차 릴리즈" << std::endl;
 			break;
 		case VK_F4:
 			speed = 160.0f;
@@ -393,36 +393,36 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 						}
 					}
 					else if (i == 2) {
-						std::cout << "HEAD" << std::endl; // HEAD
+						//std::cout << "HEAD" << std::endl; // HEAD
 						m_nCosIndex = 5;
 					}
 					else if (i == 3) {
-						std::cout << "Eyes" << std::endl; // Eyes
+						//std::cout << "Eyes" << std::endl; // Eyes
 						m_nCosIndex = 2;
 					}
 					else if (i == 4) {
-						std::cout << "Mouthandnoses" << std::endl; //Mouthandnoses
+						//std::cout << "Mouthandnoses" << std::endl; //Mouthandnoses
 						m_nCosIndex = 4;
 					}
 					else if (i == 5) {
-						std::cout << "Body" << std::endl; // Body
+						//std::cout << "Body" << std::endl; // Body
 						m_nCosIndex = 0;
 					}
 					else if (i == 6) {
-						std::cout << "BodyParts" << std::endl; //BodyParts
+						//std::cout << "BodyParts" << std::endl; //BodyParts
 						m_nCosIndex = 1;
 					}
 					else if (i == 7) {
-						std::cout << "Gloves" << std::endl; //Gloves
+						//std::cout << "Gloves" << std::endl; //Gloves
 						m_nCosIndex = 3;
 					}
 					else if (i == 8) {
-						std::cout << "CustomizingRArrow" << std::endl; //CustomizingRArrow
+						//std::cout << "CustomizingRArrow" << std::endl; //CustomizingRArrow
 						int n = m_pPlayer->FindPlayerPart(m_nCosIndex);
 						m_pPlayer->ChangePlayerPart(m_nCosIndex, n, true);
 					}
 					else if (i == 9) {
-						std::cout << "CustomizingLArrow" << std::endl; //CustomizingLArrow
+						//std::cout << "CustomizingLArrow" << std::endl; //CustomizingLArrow
 						int n = m_pPlayer->FindPlayerPart(m_nCosIndex);
 						m_pPlayer->ChangePlayerPart(m_nCosIndex, n, false);
 					}
@@ -469,26 +469,26 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 					int item = m_pPlayer->GetItem();
 					switch (item) {
 					case 0:
-						std::cout << "hammer\n";
+						//std::cout << "hammer\n";
 						break;
 					case 1:
-						std::cout << "drill\n";
+						//std::cout << "drill\n";
 						break;
 					case 2:
-						std::cout << "wrench\n";
+						//std::cout << "wrench\n";
 						break;
 					case 3:
-						std::cout << "pliers\n";
+						//std::cout << "pliers\n";
 						break;
 					case 4:
-						std::cout << "driver\n";
+						//std::cout << "driver\n";
 						break;
 					default:
-						std::cout << "no item\n";
+						//std::cout << "no item\n";
 						break;
 					}
 				}
-				std::cout << "정답 출력 해줘야함" << std::endl;
+				//std::cout << "정답 출력 해줘야함" << std::endl;
 			}
 		}
 		//std::cout << xPos << " " << yPos << std::endl;
@@ -571,8 +571,8 @@ void Input::DeleteIdAndPassword(char* str, int& num)
 {
 	if (num > 0)
 	{
-		str[num] = '\0';
 		num--;
+		str[num] = '\0';
 	}
 	else if (num == 0)
 	{
@@ -652,7 +652,7 @@ LRESULT Input::OnImeComposition(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 				m_cs_packet_chat.type = CS_PACKET::CS_PACKET_CHAT;
 				m_cs_packet_chat.room_number = network.m_join_room_number;
 				network.send_packet(&m_cs_packet_chat);
-				std::cout << "send : " << m_cs_packet_chat.message << std::endl;
+				//std::cout << "send : " << m_cs_packet_chat.message << std::endl;
 #endif
 				memset(m_cs_packet_chat.message, 0, 50);
 				memset(tmp, 0, 100);

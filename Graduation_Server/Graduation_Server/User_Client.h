@@ -46,7 +46,7 @@ private:
 
 private: // 아이템 부분
 	bool					m_life_chip = false;
-	bool					m_item_own[4]{ false };
+	bool					m_item_own[6]{ false };
 
 private:
 	bool					m_escape_player = false;
