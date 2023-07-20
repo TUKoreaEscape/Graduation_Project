@@ -1416,7 +1416,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.2f);
-	LoadedModelInfo* pPlayerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/C74.bin", nullptr);
+	LoadedModelInfo* pPlayerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/C720.bin", nullptr);
 	LoadedModelInfo* pClassModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InClassObject.bin", nullptr);
 	LoadedModelInfo* pPianoModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPianoRoom.bin", nullptr);
 	LoadedModelInfo* pBroadcastModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InBroadcast.bin", nullptr);
@@ -1428,7 +1428,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	for (int i = 0; i < m_nPlayers; ++i) {
 		m_ppPlayers[i]->SetChild(pPlayerModel->m_pModelRootObject, true);
 		m_ppPlayers[i]->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 2, pPlayerModel);
-		m_ppPlayers[i]->SetAnimation(0);
+		m_ppPlayers[i]->SetAnimation(IDLE);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 0);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackEnable(1, false);//m_ppPlayers[i]->SetPosition(XMFLOAT3(i , 0.0f, -5.0f));
@@ -1443,11 +1443,11 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_ppPlayers[2]->SetPosition(XMFLOAT3(-3.0f, 0.0f, -5.0f));
 	m_ppPlayers[3]->SetPosition(XMFLOAT3(-6.0f, 0.0f, -5.0f));
 	m_ppPlayers[4]->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
-	m_ppPlayers[0]->SetAnimation(1);
+	m_ppPlayers[0]->SetAnimation(RUN_FWD);
 
 	m_pPlayer->SetChild(pPlayerModel->m_pModelRootObject, true);
 	m_pPlayer->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 2, pPlayerModel);
-	m_pPlayer->SetAnimation(0);
+	m_pPlayer->SetAnimation(IDLE);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.0f);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 0);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackEnable(1, false);

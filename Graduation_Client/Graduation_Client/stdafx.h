@@ -191,6 +191,21 @@ enum HEADS {
 	HEAD21
 };
 
+enum ANIMATION {
+	IDLE = 0,
+	RUN_FWD,
+	RUN_BWD,
+	RUN_LEFT,
+	RUN_RIGHT,
+	JUMP,
+	JUMP_END,
+	ATTACK,
+	HIT,
+	DANCE,
+	VICTORY,
+	INTERACTION,
+};
+
 struct RECT_FLOAT {
 	double left = 0.f;
 	double top = 0.f;
