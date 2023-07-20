@@ -1843,29 +1843,30 @@ void TaggersBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		XMFLOAT3 AltarToPlayer = XMFLOAT3(pos.x - m_xmf4x4ToParent._41, pos.y - m_xmf4x4ToParent._42, pos.z - m_xmf4x4ToParent._43);
 		if (m_bActivate) {
 #if USE_NETWORK
+			Network& network = *Network::GetInstance();
 			//  (술래가 생명칩이 있는 경우 
-			if (1) {
+			if (network.m_lifechip) {
 				if (m_ppInteractionUIs[1]) {
-					m_ppInteractionUIs[1]->SetPosition(AltarToPlayer.x * 0.8f + m_xmf4x4ToParent._41, 1.5f, AltarToPlayer.z * 0.8f + m_xmf4x4ToParent._43);
+					m_ppInteractionUIs[1]->SetPosition(AltarToPlayer.x * 0.8f + m_xmf4x4ToParent._41, 2.0f, AltarToPlayer.z * 0.8f + m_xmf4x4ToParent._43);
 					m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, 0.0f, m_nUIType);
 				}
 			}
 			else {
 				if (m_ppInteractionUIs[2]) {
-					m_ppInteractionUIs[2]->SetPosition(AltarToPlayer.x * 0.8f + m_xmf4x4ToParent._41, 1.5f, AltarToPlayer.z * 0.8f + m_xmf4x4ToParent._43);
+					m_ppInteractionUIs[2]->SetPosition(AltarToPlayer.x * 0.8f + m_xmf4x4ToParent._41, 2.0f, AltarToPlayer.z * 0.8f + m_xmf4x4ToParent._43);
 					m_ppInteractionUIs[2]->BillboardRender(pd3dCommandList, m_dir, 0.0f, m_nUIType);
 				}
 			}
 #else
 			if (m_ppInteractionUIs[1]) {
-				m_ppInteractionUIs[1]->SetPosition(AltarToPlayer.x * 0.8f + m_xmf4x4ToParent._41, 1.5f, AltarToPlayer.z * 0.8f + m_xmf4x4ToParent._43);
+				m_ppInteractionUIs[1]->SetPosition(AltarToPlayer.x * 0.8f + m_xmf4x4ToParent._41, 2.0f, AltarToPlayer.z * 0.8f + m_xmf4x4ToParent._43);
 				m_ppInteractionUIs[1]->BillboardRender(pd3dCommandList, m_dir, 0.0f, m_nUIType);
 			}
 #endif
 		}
 		else {
 			if (m_ppInteractionUIs[0]) {
-				m_ppInteractionUIs[0]->SetPosition(AltarToPlayer.x * 0.8f + m_xmf4x4ToParent._41, 1.5f, AltarToPlayer.z * 0.8f + m_xmf4x4ToParent._43);
+				m_ppInteractionUIs[0]->SetPosition(AltarToPlayer.x * 0.8f + m_xmf4x4ToParent._41, 2.0f, AltarToPlayer.z * 0.8f + m_xmf4x4ToParent._43);
 				m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
 			}
 		}
