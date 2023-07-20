@@ -513,6 +513,7 @@ void Player::SetAnimation(int index)
 	m_pSkinnedAnimationController->SetTrackAnimationSet(0, index);
 	m_pSkinnedAnimationController->SetTrackWeight(0, 0.3f);
 	if (m_nPrevAnimation == index) return;
+	else if (index > RUN_RIGHT) return;
 	else {
 		if (!m_bIsBlending)	m_fBlendingTime = 0;
 		m_bIsBlending = true;
