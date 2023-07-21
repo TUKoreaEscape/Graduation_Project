@@ -330,7 +330,7 @@ struct TOLIGHTSPACES
 	TOOBJECTSPACEINFO				m_pToLightSpaces[MAX_LIGHTS];
 };
 
-class DepthRenderShader : public Shader
+class DepthRenderShader : public StandardShader
 {
 public:
 	DepthRenderShader(GameScene* pScene, LIGHT* pLights);

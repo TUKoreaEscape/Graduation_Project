@@ -53,8 +53,8 @@ using Microsoft::WRL::ComPtr;
 #define _DEPTH_BUFFER_WIDTH		(FRAME_BUFFER_WIDTH * 4)
 #define _DEPTH_BUFFER_HEIGHT	(FRAME_BUFFER_HEIGHT * 4)
 
-#define _PLANE_WIDTH			1024
-#define _PLANE_HEIGHT			1024
+#define _PLANE_WIDTH			160
+#define _PLANE_HEIGHT			160
 
 #include <list>
 #include <queue>

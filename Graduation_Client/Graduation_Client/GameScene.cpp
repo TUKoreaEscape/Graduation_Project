@@ -230,7 +230,7 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	m_pSkybox->render(pd3dCommandList);
 
-	m_pCeilling->render(pd3dCommandList);
+	//m_pCeilling->render(pd3dCommandList);
 
 	m_pMainTerrain->render(pd3dCommandList);
 	m_pPianoTerrain->render(pd3dCommandList);
@@ -675,70 +675,74 @@ ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDe
 
 void GameScene::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	m_pSkybox->render(pd3dCommandList);
+	m_pSkybox->Depthrender(pd3dCommandList);
 
-	//m_pCeilling->render(pd3dCommandList);
+	//m_pCeilling->Depthrender(pd3dCommandList);
 
-	m_pMainTerrain->render(pd3dCommandList);
-	m_pPianoTerrain->render(pd3dCommandList);
-	m_pBroadcastTerrain->render(pd3dCommandList);
-	m_pCubeTerrain->render(pd3dCommandList);
-	m_pForestTerrain->render(pd3dCommandList);
-	m_pClassroomTerrain->render(pd3dCommandList);
+	m_pMainTerrain->Depthrender(pd3dCommandList);
+	m_pPianoTerrain->Depthrender(pd3dCommandList);
+	m_pBroadcastTerrain->Depthrender(pd3dCommandList);
+	m_pCubeTerrain->Depthrender(pd3dCommandList);
+	m_pForestTerrain->Depthrender(pd3dCommandList);
+	m_pClassroomTerrain->Depthrender(pd3dCommandList);
 
 	for (int i = 0; i < m_nWalls; ++i)
 	{
-		if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
+		if (m_ppWalls[i]) m_ppWalls[i]->Depthrender(pd3dCommandList);
 	}
 
-	Scene::render(pd3dCommandList);
-
+	for (int i = 0; i < 5; ++i) {
+		if (m_ppPlayers[i]) {
+			m_ppPlayers[i]->OnPrepareRender();
+			m_ppPlayers[i]->Depthrender(pd3dCommandList);
+		}
+	}
 	for (auto p : m_sPVS[static_cast<int>(m_pvsCamera)]) {
-		m_pPVSObjects[static_cast<int>(p)]->render(pd3dCommandList);
+		m_pPVSObjects[static_cast<int>(p)]->Depthrender(pd3dCommandList);
 	}
 
 	for (int i = 0; i < NUM_VENT; ++i)
 	{
 		if (Vents[i]) {
 			Vents[i]->UpdateTransform(nullptr);
-			Vents[i]->render(pd3dCommandList);
+			Vents[i]->Depthrender(pd3dCommandList);
 		}
 	}
 	for (int i = 0; i < NUM_DOOR; ++i)
 	{
 		if (m_pDoors[i]) {
 			m_pDoors[i]->UpdateTransform(nullptr);
-			m_pDoors[i]->render(pd3dCommandList);
+			m_pDoors[i]->Depthrender(pd3dCommandList);
 		}
 	}
 
 	for (int i = 0; i < NUM_POWER; ++i) {
 		if (m_pPowers[i]) {
 			m_pPowers[i]->UpdateTransform(nullptr);
-			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->render(pd3dCommandList);
+			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->Depthrender(pd3dCommandList);
 		}
 	}
 	for (int i = 0; i < NUM_ITEMBOX; ++i) {
 		if (m_pBoxes[i]) {
 			m_pBoxes[i]->UpdateTransform(nullptr);
-			reinterpret_cast<ItemBox*>(m_pBoxes[i])->render(pd3dCommandList);
+			reinterpret_cast<ItemBox*>(m_pBoxes[i])->Depthrender(pd3dCommandList);
 		}
 	}
 	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
 		if (EscapeLevers[i]) {
 			EscapeLevers[i]->UpdateTransform(nullptr);
-			EscapeLevers[i]->render(pd3dCommandList);
+			EscapeLevers[i]->Depthrender(pd3dCommandList);
 		}
 	}
 	if (Taggers) {
 		Taggers->UpdateTransform(nullptr);
-		reinterpret_cast<TaggersBox*>(Taggers)->render(pd3dCommandList);
+		reinterpret_cast<TaggersBox*>(Taggers)->Depthrender(pd3dCommandList);
 	}
 	if (m_sPVS[static_cast<int>(m_pvsCamera)].count(PVSROOM::FOREST) != 0) {
-		m_pOak->render(pd3dCommandList);
+		m_pOak->Depthrender(pd3dCommandList);
 		for (int i = 0; i < m_nBush; ++i)
 		{
-			if (m_ppBush[i]) m_ppBush[i]->render(pd3dCommandList);
+			if (m_ppBush[i]) m_ppBush[i]->Depthrender(pd3dCommandList);
 		}
 	}
 }

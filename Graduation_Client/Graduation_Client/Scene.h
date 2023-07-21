@@ -33,7 +33,7 @@ public:
 	}
 	virtual void update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
-
+	virtual void Depthrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	void PushDelete(GameObject* gameObject)
 	{
 		if (std::find(deletionQueue.begin(), deletionQueue.end(), gameObject) == deletionQueue.end()) deletionQueue.push_back(gameObject);
