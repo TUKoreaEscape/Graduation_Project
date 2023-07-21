@@ -122,6 +122,8 @@ public:
 	virtual void SpectatorPrerender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Spectatorrender(ID3D12GraphicsCommandList* pd3dCommandList);
 
+	virtual void Shadowrender(ID3D12GraphicsCommandList* pd3dCommandList);
+
 	void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void ReleaseObjects();

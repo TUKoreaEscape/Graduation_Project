@@ -28,7 +28,7 @@ void Light::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComma
 	m_pLights[1].m_xmf3Position = XMFLOAT3(0, 5.f, 0.0f);
 	m_pLights[1].m_xmf3Direction = XMFLOAT3(0.0f, .0f, 0.0f);
 	m_pLights[1].m_xmf3Attenuation = XMFLOAT3(1.0f, 0.001f, 0.0001f);
-
+	
 	m_pLights[2].m_bEnable = false;
 	m_pLights[2].m_nType = SPOT_LIGHT;
 	m_pLights[2].m_fRange = 30.0f;

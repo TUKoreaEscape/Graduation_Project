@@ -81,6 +81,17 @@ using Microsoft::WRL::ComPtr;
 
 #pragma comment(lib, "dxguid.lib")
 
+#define POINT_LIGHT				1
+#define SPOT_LIGHT				2
+#define DIRECTIONAL_LIGHT		3
+#define MAX_LIGHTS				3
+#define MAX_DEPTH_TEXTURES		MAX_LIGHTS
+#define _DEPTH_BUFFER_WIDTH		(FRAME_BUFFER_WIDTH * 4)
+#define _DEPTH_BUFFER_HEIGHT		(FRAME_BUFFER_HEIGHT * 4)
+#define _PLANE_WIDTH			1024
+#define _PLANE_HEIGHT			1024
+
+
 //#define _WITH_DEBUG_SKINNING_BONE
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.

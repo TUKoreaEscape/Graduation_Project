@@ -34,7 +34,7 @@ private:
 	ID3D12DescriptorHeap* m_pd3dRtvDescriptorHeap;
 	
 	ID3D12Resource *m_pd3dDepthStencilBuffer;
-	ID3D12DescriptorHeap* m_pd3dDsvDescriptorHeap;
+	ID3D12DescriptorHeap* m_pd3dDsvDescriptorHeap = NULL;
 	
 	ID3D12CommandQueue *m_pd3dCommandQueue;
 	//ID3D12CommandAllocator* m_pd3dCommandAllocator;
