@@ -49,6 +49,7 @@ using Microsoft::WRL::ComPtr;
 #define FRAME_BUFFER_HEIGHT 900
 
 #define _WITH_SHADOW_MAP_SHADOW
+#define _WITH_RASTERIZER_DEPTH_BIAS
 
 #define _DEPTH_BUFFER_WIDTH		(FRAME_BUFFER_WIDTH * 4)
 #define _DEPTH_BUFFER_HEIGHT	(FRAME_BUFFER_HEIGHT * 4)
@@ -91,7 +92,7 @@ using Microsoft::WRL::ComPtr;
 //#define _WITH_DEBUG_SKINNING_BONE
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
-#define MAX_LIGHTS 3
+#define MAX_LIGHTS 5
 
 constexpr int TYPE_ALPHACUT = -1;
 constexpr int TYPE_OBJECT = 0;

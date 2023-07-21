@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------
-#define MAX_LIGHTS			3
+#define MAX_LIGHTS			5
 #define MAX_MATERIALS		512 
 
 #define POINT_LIGHT			1
@@ -36,7 +36,7 @@ cbuffer cbLights : register(b4)
 
 #define FRAME_BUFFER_WIDTH		1600
 #define FRAME_BUFFER_HEIGHT		900
-#define _WITH_PCF_FILTERING
+//#define _WITH_PCF_FILTERING
 #define _DEPTH_BUFFER_WIDTH		(FRAME_BUFFER_WIDTH * 4)
 #define _DEPTH_BUFFER_HEIGHT	(FRAME_BUFFER_HEIGHT * 4)
 

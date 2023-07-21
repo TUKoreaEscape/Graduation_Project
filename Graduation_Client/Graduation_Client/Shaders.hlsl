@@ -202,7 +202,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStandard(VS_STANDARD_OUTPUT input, uint nPri
 	output.f4Albedo = cAlbedoColor;
 
 	//output.f4Scene = output.f4Color = lerp(output.f4Illumination, output.f4Texture, 0.7f);
-	output.f4Scene = output.f4Color = output.f4Albedo* cIllumination;
+    output.f4Scene = output.f4Color = output.f4Albedo * cIllumination + cEmissionColor;
 
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uv);
@@ -341,10 +341,10 @@ VS_STANDARD_OUTPUT VSSkinnedAnimationStandard(VS_SKINNED_STANDARD_INPUT input)
 	output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
 	output.uv = input.uv;
 	
-    for (int i = 0; i < MAX_LIGHTS; i++)
+    for (int j = 0; j < MAX_LIGHTS; j++)
     {
-        if (gcbToLightSpaces[i].f4Position.w != 0.0f)
-            output.uvs[i] = mul(positionW, gcbToLightSpaces[i].mtxToTexture);
+        if (gcbToLightSpaces[j].f4Position.w != 0.0f)
+            output.uvs[j] = mul(positionW, gcbToLightSpaces[j].mtxToTexture);
     }
 	
 	return(output);
@@ -708,6 +708,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 	//float4 cIllumination = Lighting(input.positionW, normalW);
 	
     float4 cIllumination = Lighting(input.positionW, normalize(input.normalW), true, input.uvs);
+    clip(cIllumination.w - 0.15f);
 	//return(lerp(cColor, cIllumination, 0.5f));
 	//output.f4Illumination = cIllumination;
 
@@ -719,7 +720,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 
 	//output.f4Scene = output.f4Color = output.f4Illumination * output.f4Texture;
 	//output.f4Scene = output.f4Color = lerp(output.f4Illumination, output.f4Texture, 0.7f);
-	output.f4Scene = output.f4Color = output.f4Albedo * cIllumination;
+    output.f4Scene = output.f4Color = output.f4Albedo * cIllumination + cEmissionColor;
 	//output.f4Normal = float4(input.normalW.xyz * 0.5f + 0.5f, input.position.z);
 	//output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
 

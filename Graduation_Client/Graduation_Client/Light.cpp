@@ -4,24 +4,23 @@
 
 void Light::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	m_nLights = 3;
+	m_nLights = 5;
 	m_pLights = new LIGHT[m_nLights];
 	::ZeroMemory(m_pLights, sizeof(LIGHT) * m_nLights);
 
-	float global = 0.5f;
+	float global = 0.8f;
 	m_xmf4GlobalAmbient = XMFLOAT4(global, global, global, 1.0f);
 
 	m_pLights[0].m_bEnable = true;
 	m_pLights[0].m_nType = DIRECTIONAL_LIGHT;
-	m_pLights[0].m_fRange = 2000.0f;
-	m_pLights[0].m_xmf4Ambient = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
-	m_pLights[0].m_xmf4Diffuse = XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f);
+	m_pLights[0].m_fRange = 1000.0f;
+	m_pLights[0].m_xmf4Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_pLights[0].m_xmf4Diffuse = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
 	m_pLights[0].m_xmf4Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 0.0f);
-	m_pLights[0].m_xmf3Direction = XMFLOAT3(0.0f, -1.0f, 0.0f);
-	m_pLights[0].m_xmf3Position = XMFLOAT3(-(_PLANE_WIDTH * 0.5f), 512.0f, 0.0f);
+	m_pLights[0].m_xmf3Direction = XMFLOAT3(1.0f, -1.0f, 0.0f);
+	m_pLights[0].m_xmf3Position = XMFLOAT3(0.0f, 50.0f, 0.0f);
 
-
-	float lightpower = 1.0f;
+	/*float lightpower = 1.0f;
 	m_pLights[1].m_bEnable = false;
 	m_pLights[1].m_nType = POINT_LIGHT;
 	m_pLights[1].m_fRange = 50.0f;
@@ -30,7 +29,34 @@ void Light::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComma
 	m_pLights[1].m_xmf4Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.0f);
 	m_pLights[1].m_xmf3Position = XMFLOAT3(0, 5.f, 0.0f);
 	m_pLights[1].m_xmf3Direction = XMFLOAT3(0.0f, .0f, 0.0f);
-	m_pLights[1].m_xmf3Attenuation = XMFLOAT3(1.0f, 0.001f, 0.0001f);
+	m_pLights[1].m_xmf3Attenuation = XMFLOAT3(1.0f, 0.001f, 0.0001f);*/
+
+	m_pLights[1].m_bEnable = true;
+	m_pLights[1].m_nType = DIRECTIONAL_LIGHT;
+	m_pLights[1].m_fRange = 1000.0f;
+	m_pLights[1].m_xmf4Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_pLights[1].m_xmf4Diffuse = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+	m_pLights[1].m_xmf4Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 0.0f);
+	m_pLights[1].m_xmf3Direction = XMFLOAT3(-1.0f, -1.0f, 0.0f);
+	m_pLights[1].m_xmf3Position = XMFLOAT3(0, 50.0f, 0.0f);
+
+	m_pLights[3].m_bEnable = true;
+	m_pLights[3].m_nType = DIRECTIONAL_LIGHT;
+	m_pLights[3].m_fRange = 1000.0f;
+	m_pLights[3].m_xmf4Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_pLights[3].m_xmf4Diffuse = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+	m_pLights[3].m_xmf4Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 0.0f);
+	m_pLights[3].m_xmf3Direction = XMFLOAT3(0.0f, -1.0f, 1.0f);
+	m_pLights[3].m_xmf3Position = XMFLOAT3(0, 50.0f, 0.0f);
+
+	m_pLights[4].m_bEnable = true;
+	m_pLights[4].m_nType = DIRECTIONAL_LIGHT;
+	m_pLights[4].m_fRange = 1000.0f;
+	m_pLights[4].m_xmf4Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_pLights[4].m_xmf4Diffuse = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+	m_pLights[4].m_xmf4Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 0.0f);
+	m_pLights[4].m_xmf3Direction = XMFLOAT3(0.0f, -1.0f, -1.0f);
+	m_pLights[4].m_xmf3Position = XMFLOAT3(0, 50.0f, 0.0f);
 
 	m_pLights[2].m_bEnable = false;
 	m_pLights[2].m_nType = SPOT_LIGHT;
@@ -63,6 +89,7 @@ void Light::update(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Light::Updaterotate()
 {
+	return;
 	if (GameState::GetInstance()->GetInitLight())
 	{
 		rotationAngle = 270.0f;
