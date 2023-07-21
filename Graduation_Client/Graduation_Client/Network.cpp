@@ -257,10 +257,12 @@ void Network::ProcessPacket(char* ptr)
 		if (m_pPlayer->GetID() == packet->id) {
 			m_pPlayer->SetPlayerType(TYPE_TAGGER);
 			m_before_player_type = TYPE_TAGGER;
+			Input::GetInstance()->speed *= 1.1f;
 		}
 		else {
 			m_pPlayer->SetPlayerType(TYPE_PLAYER);
 			m_before_player_type = TYPE_PLAYER;
+			Input::GetInstance()->speed = 60.f;
 		}
 
 		for (int i = 0; i < 5; ++i)
