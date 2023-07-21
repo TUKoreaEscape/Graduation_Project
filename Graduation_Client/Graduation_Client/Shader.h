@@ -1,5 +1,9 @@
 #pragma once
 #include "Texture.h"
+#include "Camera.h"
+#include "Light.h"
+
+class GameScene;
 
 class Shader
 {
@@ -27,6 +31,7 @@ public:
 
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nRenderTargets, DXGI_FORMAT* pdxgiRtvFormats, DXGI_FORMAT dxgiDsvFormat);
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE d3dPrimitiveTopology, UINT nRenderTargets, DXGI_FORMAT* pdxgiRtvFormats, DXGI_FORMAT dxgiDsvFormat);
 
 	void CreateCbvSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nConstantBufferViews, int nShaderResourceViews);
 	void CreateShaderResourceViews(ID3D12Device* pd3dDevice, Texture* pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex);
@@ -312,4 +317,93 @@ public:
 
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nRenderTargets, DXGI_FORMAT* pdxgiRtvFormats, DXGI_FORMAT dxgiDsvFormat);
+};
+
+struct TOOBJECTSPACEINFO
+{
+	XMFLOAT4X4						m_xmf4x4ToTexture;
+	XMFLOAT4						m_xmf4Position;
+};
+
+struct TOLIGHTSPACES
+{
+	TOOBJECTSPACEINFO				m_pToLightSpaces[MAX_LIGHTS];
+};
+
+class DepthRenderShader : public Shader
+{
+public:
+	DepthRenderShader(GameScene* pScene, LIGHT* pLights);
+	virtual ~DepthRenderShader();
+	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
+	virtual D3D12_RASTERIZER_DESC CreateRasterizerState();
+
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
+
+	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void ReleaseShaderVariables();
+
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
+	virtual void ReleaseObjects();
+
+	void PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommandList);
+
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, Camera* camera);
+
+protected:
+	Texture* m_pDepthTexture = NULL;
+	Camera* m_ppDepthRenderCameras[MAX_LIGHTS];
+
+	ID3D12DescriptorHeap* m_pd3dRtvDescriptorHeap = NULL;
+	D3D12_CPU_DESCRIPTOR_HANDLE		m_pd3dRtvCPUDescriptorHandles[MAX_LIGHTS];
+
+	ID3D12DescriptorHeap* m_pd3dDsvDescriptorHeap = NULL;
+	ID3D12Resource* m_pd3dDepthBuffer = NULL;
+	D3D12_CPU_DESCRIPTOR_HANDLE		m_d3dDsvDescriptorCPUHandle;
+
+	XMMATRIX						m_xmProjectionToTexture;
+
+public:
+	Texture* GetDepthTexture() { return(m_pDepthTexture); }
+	ID3D12Resource* GetDepthTextureResource(UINT nIndex) { return(m_pDepthTexture->GetResource(nIndex)); }
+
+public:
+	GameScene* m_pScene;
+
+protected:
+	LIGHT* m_pLights = NULL;
+
+	TOLIGHTSPACES* m_pToLightSpaces;
+
+	ID3D12Resource* m_pd3dcbToLightSpaces = NULL;
+	TOLIGHTSPACES* m_pcbMappedToLightSpaces = NULL;
+};
+
+class ShadowMapShader : public DeferredObjectsShader
+{
+public:
+	ShadowMapShader(GameScene* pScene);
+	virtual ~ShadowMapShader();
+
+	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
+
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
+
+	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void ReleaseShaderVariables();
+
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
+	virtual void AnimateObjects(float fTimeElapsed) { }
+	virtual void ReleaseObjects();
+
+	virtual void ReleaseUploadBuffers();
+
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
+public:
+	Texture* m_pDepthTexture = nullptr;
+
+	GameScene* m_pScene;
 };

@@ -226,6 +226,8 @@ void GameScene::prerender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	m_pPlayer->m_pCamera->update(pd3dCommandList);
+
 	m_pSkybox->render(pd3dCommandList);
 
 	m_pCeilling->render(pd3dCommandList);
@@ -332,6 +334,11 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_UILoading[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Loading.dds", 0.0f, 0.0f, 2.0f, 2.0f);
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetUIType(PROGRESS_BAR_UI);
 	
+	m_pLight = new GameObject();
+	m_pLight->AddComponent<Light>();
+	m_pLight->start(pd3dDevice, pd3dCommandList);
+	m_pLights = reinterpret_cast<Light*>(m_pLight)->GetLights();
+	
 	m_nPlayers = 5;
 	m_ppPlayers = new Player * [m_nPlayers];
 	for (int i = 0; i < m_nPlayers; ++i) {
@@ -395,7 +402,7 @@ ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDe
 {
 	ID3D12RootSignature* pd3dGraphicsRootSignature = NULL;
 
-	D3D12_DESCRIPTOR_RANGE pd3dDescriptorRanges[12];
+	D3D12_DESCRIPTOR_RANGE pd3dDescriptorRanges[13];
 
 	pd3dDescriptorRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	pd3dDescriptorRanges[0].NumDescriptors = 1;
@@ -469,8 +476,13 @@ ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDe
 	pd3dDescriptorRanges[11].RegisterSpace = 0;
 	pd3dDescriptorRanges[11].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
+	pd3dDescriptorRanges[12].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	pd3dDescriptorRanges[12].NumDescriptors = MAX_LIGHTS;
+	pd3dDescriptorRanges[12].BaseShaderRegister = 22;
+	pd3dDescriptorRanges[12].RegisterSpace = 0;
+	pd3dDescriptorRanges[12].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	D3D12_ROOT_PARAMETER pd3dRootParameters[19];
+	D3D12_ROOT_PARAMETER pd3dRootParameters[21];
 
 	pd3dRootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	pd3dRootParameters[0].Descriptor.ShaderRegister = 1; //Camera
@@ -568,7 +580,18 @@ ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDe
 	pd3dRootParameters[18].Constants.ShaderRegister = 3;
 	pd3dRootParameters[18].Constants.RegisterSpace = 0;
 	pd3dRootParameters[18].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	D3D12_STATIC_SAMPLER_DESC pd3dSamplerDescs[2];
+	
+	pd3dRootParameters[19].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	pd3dRootParameters[19].DescriptorTable.NumDescriptorRanges = 1;
+	pd3dRootParameters[19].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[12]);
+	pd3dRootParameters[19].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+	pd3dRootParameters[20].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	pd3dRootParameters[20].Descriptor.ShaderRegister = 6; //ToLight
+	pd3dRootParameters[20].Descriptor.RegisterSpace = 0;
+	pd3dRootParameters[20].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+	D3D12_STATIC_SAMPLER_DESC pd3dSamplerDescs[4];
 
 	pd3dSamplerDescs[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
 	pd3dSamplerDescs[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
@@ -596,6 +619,34 @@ ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDe
 	pd3dSamplerDescs[1].RegisterSpace = 0;
 	pd3dSamplerDescs[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
+	pd3dSamplerDescs[2].Filter = D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+	pd3dSamplerDescs[2].AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	pd3dSamplerDescs[2].AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	pd3dSamplerDescs[2].AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	pd3dSamplerDescs[2].MipLODBias = 0.0f;
+	pd3dSamplerDescs[2].MaxAnisotropy = 1;
+	pd3dSamplerDescs[2].ComparisonFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; //D3D12_COMPARISON_FUNC_LESS
+	pd3dSamplerDescs[2].BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE; // D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK;
+	pd3dSamplerDescs[2].MinLOD = 0;
+	pd3dSamplerDescs[2].MaxLOD = D3D12_FLOAT32_MAX;
+	pd3dSamplerDescs[2].ShaderRegister = 2;
+	pd3dSamplerDescs[2].RegisterSpace = 0;
+	pd3dSamplerDescs[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+	pd3dSamplerDescs[3].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	pd3dSamplerDescs[3].AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	pd3dSamplerDescs[3].AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	pd3dSamplerDescs[3].AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	pd3dSamplerDescs[3].MipLODBias = 0.0f;
+	pd3dSamplerDescs[3].MaxAnisotropy = 1;
+	pd3dSamplerDescs[3].ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	pd3dSamplerDescs[3].BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK;
+	pd3dSamplerDescs[3].MinLOD = 0;
+	pd3dSamplerDescs[3].MaxLOD = D3D12_FLOAT32_MAX;
+	pd3dSamplerDescs[3].ShaderRegister = 3;
+	pd3dSamplerDescs[3].RegisterSpace = 0;
+	pd3dSamplerDescs[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
 	D3D12_ROOT_SIGNATURE_FLAGS d3dRootSignatureFlags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
@@ -620,6 +671,76 @@ ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDe
 	if (pd3dErrorBlob) pd3dErrorBlob->Release();
 
 	return(pd3dGraphicsRootSignature);
+}
+
+void GameScene::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	m_pSkybox->render(pd3dCommandList);
+
+	//m_pCeilling->render(pd3dCommandList);
+
+	m_pMainTerrain->render(pd3dCommandList);
+	m_pPianoTerrain->render(pd3dCommandList);
+	m_pBroadcastTerrain->render(pd3dCommandList);
+	m_pCubeTerrain->render(pd3dCommandList);
+	m_pForestTerrain->render(pd3dCommandList);
+	m_pClassroomTerrain->render(pd3dCommandList);
+
+	for (int i = 0; i < m_nWalls; ++i)
+	{
+		if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
+	}
+
+	Scene::render(pd3dCommandList);
+
+	for (auto p : m_sPVS[static_cast<int>(m_pvsCamera)]) {
+		m_pPVSObjects[static_cast<int>(p)]->render(pd3dCommandList);
+	}
+
+	for (int i = 0; i < NUM_VENT; ++i)
+	{
+		if (Vents[i]) {
+			Vents[i]->UpdateTransform(nullptr);
+			Vents[i]->render(pd3dCommandList);
+		}
+	}
+	for (int i = 0; i < NUM_DOOR; ++i)
+	{
+		if (m_pDoors[i]) {
+			m_pDoors[i]->UpdateTransform(nullptr);
+			m_pDoors[i]->render(pd3dCommandList);
+		}
+	}
+
+	for (int i = 0; i < NUM_POWER; ++i) {
+		if (m_pPowers[i]) {
+			m_pPowers[i]->UpdateTransform(nullptr);
+			reinterpret_cast<PowerSwitch*>(m_pPowers[i])->render(pd3dCommandList);
+		}
+	}
+	for (int i = 0; i < NUM_ITEMBOX; ++i) {
+		if (m_pBoxes[i]) {
+			m_pBoxes[i]->UpdateTransform(nullptr);
+			reinterpret_cast<ItemBox*>(m_pBoxes[i])->render(pd3dCommandList);
+		}
+	}
+	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i) {
+		if (EscapeLevers[i]) {
+			EscapeLevers[i]->UpdateTransform(nullptr);
+			EscapeLevers[i]->render(pd3dCommandList);
+		}
+	}
+	if (Taggers) {
+		Taggers->UpdateTransform(nullptr);
+		reinterpret_cast<TaggersBox*>(Taggers)->render(pd3dCommandList);
+	}
+	if (m_sPVS[static_cast<int>(m_pvsCamera)].count(PVSROOM::FOREST) != 0) {
+		m_pOak->render(pd3dCommandList);
+		for (int i = 0; i < m_nBush; ++i)
+		{
+			if (m_ppBush[i]) m_ppBush[i]->render(pd3dCommandList);
+		}
+	}
 }
 
 void GameScene::ReleaseUploadBuffers()
@@ -1448,9 +1569,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_pPlayer->PlayerNum = 0;
 
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.3f);
-	m_pLight = new GameObject();
-	m_pLight->AddComponent<Light>();
-	m_pLight->start(pd3dDevice, pd3dCommandList);
+	
 	m_pSkybox = new SkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.35f);

@@ -424,7 +424,18 @@ void Framework::BuildObjects()
 
 	DXGI_FORMAT pdxgiDepthSrvFormats[1] = { DXGI_FORMAT_R32_FLOAT };
 	m_pEdgeShader->CreateShaderResourceViews(m_pd3dDevice, 1, &m_pd3dDepthStencilBuffer, pdxgiDepthSrvFormats);
-
+	
+	LIGHT* lights = (LIGHT*)reinterpret_cast<Light*>(scene->m_pLight->GetComponent<Light>())->m_pLights;
+	m_pDepthRenderShader = new DepthRenderShader(scene, lights);
+	DXGI_FORMAT pdxgiRtvFormats[1] = { DXGI_FORMAT_R32_FLOAT };
+	m_pDepthRenderShader->CreateShader(m_pd3dDevice, scene->GetGraphicsRootSignature(), D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
+	m_pDepthRenderShader->BuildObjects(m_pd3dDevice, m_pd3dCommandList, NULL);
+	
+	DXGI_FORMAT RtvFormats[6] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM,DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
+	m_pShadowMapShader = new ShadowMapShader(scene);
+	m_pShadowMapShader->CreateShader(m_pd3dDevice, scene->GetGraphicsRootSignature(), 6, RtvFormats, DXGI_FORMAT_D32_FLOAT);
+	m_pShadowMapShader->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
+	
 	m_pd3dCommandList->Close();
 	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
@@ -503,14 +514,16 @@ void Framework::FrameAdvance()
 {
 	time.Tick(60.0);
 	
-	HRESULT hResult = m_ppd3dCommandAllocators[m_nSwapChainBufferIndex]->Reset();
-	hResult = m_pd3dCommandList->Reset(m_ppd3dCommandAllocators[m_nSwapChainBufferIndex], NULL); //명령 할당자와 명령 리스트를 리셋한다.
-
-	::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	HRESULT hResult;
 	
 	if (m_gamestate->GetGameState() == GAME_LOADING) {
 		hResult = WaitForSingleObject(buildThread.native_handle(), 30);
 		if (hResult == WAIT_TIMEOUT) {
+			hResult = m_ppd3dCommandAllocators[m_nSwapChainBufferIndex]->Reset();
+			hResult = m_pd3dCommandList->Reset(m_ppd3dCommandAllocators[m_nSwapChainBufferIndex], NULL); //명령 할당자와 명령 리스트를 리셋한다.
+
+			::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
 			m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 			m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 			scene->Loadingrender(m_pd3dCommandList);
@@ -533,8 +546,17 @@ void Framework::FrameAdvance()
 			buildThread.join();
 		}
 	}
+	hResult = m_ppd3dCommandAllocators[m_nSwapChainBufferIndex]->Reset();
+	hResult = m_pd3dCommandList->Reset(m_ppd3dCommandAllocators[m_nSwapChainBufferIndex], NULL); //명령 할당자와 명령 리스트를 리셋한다.
+
+	if (scene) scene->prerender(m_pd3dCommandList);
+	m_pDepthRenderShader->PrepareShadowMap(m_pd3dCommandList);
+
+	::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 	input->Update(m_hWnd);
+
+	float pfClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
 
 	UpdateObjects();
 	if (input->keyBuffer['1'] & 0xF0) m_nDebugOptions = 85;
@@ -582,8 +604,12 @@ void Framework::FrameAdvance()
 	case PLAYING_GAME:
 		if (scene) scene->prerender(m_pd3dCommandList);
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
-		//렌더링 코드는 여기에 추가될 것이다.
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+
+		//렌더링 코드는 여기에 추가될 것이다.
+		//m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+		m_pDepthRenderShader->UpdateShaderVariables(m_pd3dCommandList);
+		m_pShadowMapShader->UpdateShaderVariables(m_pd3dCommandList);
 		if (scene) scene->defrender(m_pd3dCommandList);
 		//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 		//if (scene) scene->forrender(m_pd3dCommandList);

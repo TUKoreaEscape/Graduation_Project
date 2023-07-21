@@ -88,6 +88,8 @@ private:
 	float           timeToSend;
 
 	LaplacianEdgeShader		*m_pEdgeShader = NULL;
+	DepthRenderShader* m_pDepthRenderShader = nullptr;
+	ShadowMapShader* m_pShadowMapShader = nullptr;
 
 	Network* network = NULL;
 
