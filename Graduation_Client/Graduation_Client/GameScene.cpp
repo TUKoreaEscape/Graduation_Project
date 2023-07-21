@@ -688,7 +688,7 @@ void GameScene::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	for (int i = 0; i < m_nWalls; ++i)
 	{
-		if (m_ppWalls[i]) m_ppWalls[i]->Depthrender(pd3dCommandList);
+		//if (m_ppWalls[i]) m_ppWalls[i]->Depthrender(pd3dCommandList);
 	}
 
 	for (int i = 0; i < 5; ++i) {

@@ -436,6 +436,10 @@ void Framework::BuildObjects()
 	m_pShadowMapShader->CreateShader(m_pd3dDevice, scene->GetGraphicsRootSignature(), 6, RtvFormats, DXGI_FORMAT_D32_FLOAT);
 	m_pShadowMapShader->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
 	
+	m_pShadowMapToViewport = new TextureToViewportShader();
+	m_pShadowMapToViewport->CreateShader(m_pd3dDevice, scene->GetGraphicsRootSignature(), D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
+	m_pShadowMapToViewport->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
+
 	m_pd3dCommandList->Close();
 	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
@@ -602,6 +606,7 @@ void Framework::FrameAdvance()
 		scene->UIrender(m_pd3dCommandList); // Door UI
 		break;
 	case PLAYING_GAME:
+	{
 		if (scene) scene->prerender(m_pd3dCommandList);
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
@@ -611,6 +616,14 @@ void Framework::FrameAdvance()
 		m_pDepthRenderShader->UpdateShaderVariables(m_pd3dCommandList);
 		m_pShadowMapShader->UpdateShaderVariables(m_pd3dCommandList);
 		if (scene) scene->defrender(m_pd3dCommandList);
+
+		D3D12_VIEWPORT d3dViewport = { 0.0f, 0.0f, FRAME_BUFFER_WIDTH * 0.25f, FRAME_BUFFER_HEIGHT * 0.25f, 0.0f, 1.0f };
+		D3D12_RECT d3dScissorRect = { 0, 0, FRAME_BUFFER_WIDTH / 4, FRAME_BUFFER_HEIGHT / 4 };
+		m_pd3dCommandList->RSSetViewports(1, &d3dViewport);
+		m_pd3dCommandList->RSSetScissorRects(1, &d3dScissorRect);
+		if (m_pShadowMapToViewport) m_pShadowMapToViewport->Render(m_pd3dCommandList);
+
+
 		//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 		//if (scene) scene->forrender(m_pd3dCommandList);
 		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
@@ -618,6 +631,7 @@ void Framework::FrameAdvance()
 		m_pEdgeShader->Render(m_pd3dCommandList);
 		scene->UIrender(m_pd3dCommandList); // Door UI
 		break;
+	}
 	case ENDING_GAME:
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);

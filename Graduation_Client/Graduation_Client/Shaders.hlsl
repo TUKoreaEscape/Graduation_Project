@@ -1134,3 +1134,98 @@ PS_DEPTH_OUTPUT PSDepthWriteShader(VS_STANDARD_OUTPUT input)
 
     return (output);
 }
+
+struct VS_TEXTURED_OUTPUT
+{
+    float4 position : SV_POSITION;
+    float2 uv : TEXCOORD;
+};
+
+VS_TEXTURED_OUTPUT VSTextureToViewport(uint nVertexID : SV_VertexID)
+{
+    VS_TEXTURED_OUTPUT output = (VS_TEXTURED_OUTPUT) 0;
+
+    if (nVertexID == 0)
+    {
+        output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f);
+        output.uv = float2(0.0f, 0.0f);
+    }
+    if (nVertexID == 1)
+    {
+        output.position = float4(+1.0f, +1.0f, 0.0f, 1.0f);
+        output.uv = float2(1.0f, 0.0f);
+    }
+    if (nVertexID == 2)
+    {
+        output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f);
+        output.uv = float2(1.0f, 1.0f);
+    }
+    if (nVertexID == 3)
+    {
+        output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f);
+        output.uv = float2(0.0f, 0.0f);
+    }
+    if (nVertexID == 4)
+    {
+        output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f);
+        output.uv = float2(1.0f, 1.0f);
+    }
+    if (nVertexID == 5)
+    {
+        output.position = float4(-1.0f, -1.0f, 0.0f, 1.0f);
+        output.uv = float2(0.0f, 1.0f);
+    }
+
+    return (output);
+}
+
+float4 GetColorFromDepth2(float fDepth)
+{
+    float4 cColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+
+    if (fDepth < 0.00625f)
+        cColor = float4(1.0f, 0.0f, 0.0f, 1.0f);
+    else if (fDepth < 0.0125f)
+        cColor = float4(0.0f, 1.0f, 0.0f, 1.0f);
+    else if (fDepth < 0.025f)
+        cColor = float4(0.0f, 0.0f, 1.0f, 1.0f);
+    else if (fDepth < 0.05f)
+        cColor = float4(1.0f, 1.0f, 0.0f, 1.0f);
+    else if (fDepth < 0.075f)
+        cColor = float4(0.0f, 1.0f, 1.0f, 1.0f);
+    else if (fDepth < 0.1f)
+        cColor = float4(1.0f, 0.5f, 0.5f, 1.0f);
+    else if (fDepth < 0.4f)
+        cColor = float4(0.5f, 1.0f, 1.0f, 1.0f);
+    else if (fDepth < 0.6f)
+        cColor = float4(1.0f, 0.0f, 1.0f, 1.0f);
+    else if (fDepth < 0.8f)
+        cColor = float4(0.5f, 0.5f, 1.0f, 1.0f);
+    else if (fDepth < 0.9f)
+        cColor = float4(0.5f, 1.0f, 0.5f, 1.0f);
+    else if (fDepth < 0.95f)
+        cColor = float4(0.5f, 0.0f, 0.5f, 1.0f);
+    else if (fDepth < 0.99f)
+        cColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+    else if (fDepth < 0.999f)
+        cColor = float4(1.0f, 0.0f, 1.0f, 1.0f);
+    else if (fDepth == 1.0f)
+        cColor = float4(0.5f, 0.5f, 0.5f, 1.0f);
+    else if (fDepth > 1.0f)
+        cColor = float4(0.0f, 0.0f, 0.5f, 1.0f);
+    else
+        cColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+
+    return (cColor);
+}
+
+SamplerState gssBorder : register(s3);
+
+float4 PSTextureToViewport(VS_TEXTURED_OUTPUT input) : SV_Target
+{
+	float4 cColor = gtxtDepthTextures[0].SampleLevel(gssBorder, input.uv, 0).r * 1.0f;
+
+	cColor = GetColorFromDepth2(cColor.r);
+
+    return (cColor);
+}
