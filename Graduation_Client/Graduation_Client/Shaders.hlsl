@@ -1,4 +1,10 @@
-#include "Light.hlsl"
+struct MATERIAL
+{
+	float4					m_cAmbient;
+	float4					m_cDiffuse;
+	float4					m_cSpecular; //a = power
+	float4					m_cEmissive;
+};
 
 cbuffer cbCameraInfo : register(b1)
 {
@@ -16,17 +22,20 @@ cbuffer cbGameObjectInfo : register(b0)
 	MATERIAL				gMaterial : packoffset(c4);
 	uint					gnTexturesMask : packoffset(c8.x);
 	int						gnObjectType : packoffset(c8.y);
+	uint					gnMaterial : packoffset(c8.z);
+};
+
+#include "Light.hlsl"
+
+struct CB_TOOBJECTSPACE
+{
+	matrix		mtxToTexture;
+	float4		f4Position;
 };
 
 cbuffer cbDebug : register(b2)
 {
 	int4 gvDebugOptions : packoffset(c0);
-};
-
-
-cbuffer cbProjectorSpace : register(b5)
-{
-	CB_TOOBJECTSPACE gcbToProjectorSpaces[MAX_LIGHTS];
 };
 
 cbuffer cbToLightSpace : register(b6)
@@ -176,7 +185,8 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStandard(VS_STANDARD_OUTPUT input, uint nPri
 	{
 		normalW = normalize(input.normalW);
 	}
-	float4 cIllumination = Lighting(input.positionW, normalW);
+	float4 uvs[MAX_LIGHTS];
+	float4 cIllumination = Lighting(input.positionW, input.normalW, false, uvs);
 	//output.f4Illumination = cIllumination;
 
 	float3 uvw = float3(input.uv, nPrimitiveID / 2);
@@ -240,7 +250,8 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSAlpha(VS_STANDARD_OUTPUT input, uint nPrimit
 	{
 		normalW = normalize(input.normalW);
 	}
-	float4 cIllumination = Lighting(input.positionW, normalW);
+	float4 uvs[MAX_LIGHTS];
+	float4 cIllumination = Lighting(input.positionW, input.normalW, false, uvs);
 
 	//output.f4Illumination = cIllumination;
 
@@ -411,7 +422,8 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTerrain(VS_TERRAIN_OUTPUT input, uint nPrimi
 
 	float3 normalW = normalize(input.normalW);
 
-	float4 cIllumination = Lighting(input.positionW, normalW);
+	float4 uvs[MAX_LIGHTS];
+	float4 cIllumination = Lighting(input.positionW, input.normalW, false, uvs);
 	//output.f4Illumination = cIllumination;
 
 	//float3 uvw = float3(input.uv0, nPrimitiveID / 2);
@@ -474,7 +486,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSSkyBox(VS_SKYBOX_CUBEMAP_OUTPUT input, uint 
 
 	float3 normalW = normalize(input.normalW);
 
-	float4 cIllumination = Lighting(input.positionL, normalW);
+	//float4 cIllumination = Lighting(input.positionL, normalW);
 	//output.f4Illumination = cIllumination;
 
 	output.f4Albedo = cColor;
@@ -544,7 +556,8 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWall(VS_WALL_OUTPUT input, uint nPrimitiveID
 
 	float3 normalW = normalize(input.normalW);
 
-	float4 cIllumination = Lighting(input.positionW, normalW);
+	float4 uvs[MAX_LIGHTS];
+	float4 cIllumination = Lighting(input.positionW, input.normalW, false, uvs);
 	//output.f4Illumination = cIllumination;
 
 	float3 uvw = float3(input.uv, nPrimitiveID / 2);
@@ -604,9 +617,10 @@ VS_TEXTURED_LIGHTING_OUTPUT VSTexturedLighting(VS_TEXTURED_LIGHTING_INPUT input)
 float4 PSTexturedLighting(VS_TEXTURED_LIGHTING_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID) : SV_TARGET0
 {
 	float3 uvw = float3(input.uv, nPrimitiveID / 2);
-	float4 cColor = gtxtAlbedoTexture.Sample(gssWrap, uvw);
+	float4 cColor = gtxtAlbedoTexture.Sample(gssWrap, float2(uvw.x,uvw.y));
 	input.normalW = normalize(input.normalW);
-	float4 cIllumination = Lighting(input.positionW, input.normalW);
+	float4 uvs[MAX_LIGHTS];
+	float4 cIllumination = Lighting(input.positionW, input.normalW, false, uvs);
 	//output.f4Color.w = (float)gnObjectType;
 	return(cColor * cIllumination);
 }
@@ -656,7 +670,8 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 		normalW = normalize(input.normalW);
 	}
 
-	float4 cIllumination = Lighting(input.positionW, normalW);
+	float4 uvs[MAX_LIGHTS];
+	float4 cIllumination = Lighting(input.positionW, input.normalW, false, uvs);
 	//return(lerp(cColor, cIllumination, 0.5f));
 	//output.f4Illumination = cIllumination;
 
@@ -1063,4 +1078,191 @@ float4 PSLighting(VS_LIGHTING_OUTPUT input) : SV_TARGET
 
 	//	return(cIllumination);
 		return(float4(input.normalW * 0.5f + 0.5f, 1.0f));
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+struct VS_CIRCULAR_SHADOW_INPUT
+{
+	float3 center : POSITION;
+	float2 size : TEXCOORD;
+};
+
+VS_CIRCULAR_SHADOW_INPUT VSCircularShadow(VS_CIRCULAR_SHADOW_INPUT input)
+{
+	return(input);
+}
+
+struct GS_CIRCULAR_SHADOW_GEOMETRY_OUTPUT
+{
+	float4 position : SV_POSITION;
+	float2 uv : TEXCOORD;
+};
+
+static float2 pf2UVs[4] = { float2(0.0f,1.0f), float2(0.0f,0.0f), float2(1.0f,1.0f), float2(1.0f,0.0f) };
+
+[maxvertexcount(4)]
+void GSCircularShadow(point VS_CIRCULAR_SHADOW_INPUT input[1], inout TriangleStream<GS_CIRCULAR_SHADOW_GEOMETRY_OUTPUT> outStream)
+{
+	float fHalfWidth = input[0].size.x * 0.5f;
+	float fHalfDepth = input[0].size.y * 0.5f;
+
+	float3 f3Right = float3(1.0f, 0.0f, 0.0f);
+	float3 f3Look = float3(0.0f, 0.0f, 1.0f);
+
+	float4 pf4Vertices[4];
+	pf4Vertices[0] = float4(input[0].center.xyz - (fHalfWidth * f3Right) - (fHalfDepth * f3Look), 1.0f);
+	pf4Vertices[1] = float4(input[0].center.xyz - (fHalfWidth * f3Right) + (fHalfDepth * f3Look), 1.0f);
+	pf4Vertices[2] = float4(input[0].center.xyz + (fHalfWidth * f3Right) - (fHalfDepth * f3Look), 1.0f);
+	pf4Vertices[3] = float4(input[0].center.xyz + (fHalfWidth * f3Right) + (fHalfDepth * f3Look), 1.0f);
+
+	GS_CIRCULAR_SHADOW_GEOMETRY_OUTPUT output;
+	for (int i = 0; i < 4; i++)
+	{
+		output.position = mul(mul(pf4Vertices[i], gmtxView), gmtxProjection);
+		output.uv = pf2UVs[i];
+
+		outStream.Append(output);
+	}
+}
+
+Texture2D gtxtCircularShadowTexture : register(t0);
+
+float4 PSCircularShadow(GS_CIRCULAR_SHADOW_GEOMETRY_OUTPUT input) : SV_TARGET
+{
+	float4 cColor = gtxtCircularShadowTexture.Sample(gssWrap, input.uv);
+
+	return(cColor);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+struct VS_PLANAR_SHADOW_OUTPUT
+{
+	float4 position : SV_POSITION;
+};
+
+VS_PLANAR_SHADOW_OUTPUT VSPlanarShadow(VS_LIGHTING_INPUT input)
+{
+	VS_PLANAR_SHADOW_OUTPUT output;
+
+	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+
+	return(output);
+}
+
+float4 PSPlanarShadow(VS_PLANAR_SHADOW_OUTPUT input) : SV_TARGET
+{
+	return(float4(0.26f, 0.26f, 0.26f, 1.0f));
+}
+
+struct PS_DEPTH_OUTPUT
+{
+	float fzPosition : SV_Target;
+	float fDepth : SV_Depth;
+};
+
+PS_DEPTH_OUTPUT PSDepthWriteShader(VS_LIGHTING_OUTPUT input)
+{
+	PS_DEPTH_OUTPUT output;
+
+	output.fzPosition = input.position.z;
+	output.fDepth = input.position.z;
+
+	return(output);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+struct VS_SHADOW_MAP_OUTPUT
+{
+	float4 position : SV_POSITION;
+	float3 positionW : POSITION;
+	float3 normalW : NORMAL;
+
+	float4 uvs[MAX_LIGHTS] : TEXCOORD0;
+};
+
+VS_SHADOW_MAP_OUTPUT VSShadowMapShadow(VS_LIGHTING_INPUT input)
+{
+	VS_SHADOW_MAP_OUTPUT output = (VS_SHADOW_MAP_OUTPUT)0;
+
+	float4 positionW = mul(float4(input.position, 1.0f), gmtxGameObject);
+	output.positionW = positionW.xyz;
+	output.position = mul(mul(positionW, gmtxView), gmtxProjection);
+	output.normalW = mul(float4(input.normal, 0.0f), gmtxGameObject).xyz;
+
+	for (int i = 0; i < MAX_LIGHTS; i++)
+	{
+		if (gcbToLightSpaces[i].f4Position.w != 0.0f) output.uvs[i] = mul(positionW, gcbToLightSpaces[i].mtxToTexture);
+	}
+
+	return(output);
+}
+
+float4 PSShadowMapShadow(VS_SHADOW_MAP_OUTPUT input) : SV_TARGET
+{
+	float4 cIllumination = Lighting(input.positionW, normalize(input.normalW), true, input.uvs);
+
+	//	cIllumination = saturate(gtxtDepthTextures[3].SampleLevel(gssProjector, f3uvw.xy, 0).r);
+
+		return(cIllumination);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+struct VS_TEXTURED_OUTPUT
+{
+	float4 position : SV_POSITION;
+	float2 uv : TEXCOORD;
+};
+
+VS_TEXTURED_OUTPUT VSTextureToViewport(uint nVertexID : SV_VertexID)
+{
+	VS_TEXTURED_OUTPUT output = (VS_TEXTURED_OUTPUT)0;
+
+	if (nVertexID == 0) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
+	if (nVertexID == 1) { output.position = float4(+1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 0.0f); }
+	if (nVertexID == 2) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
+	if (nVertexID == 3) { output.position = float4(-1.0f, +1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 0.0f); }
+	if (nVertexID == 4) { output.position = float4(+1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(1.0f, 1.0f); }
+	if (nVertexID == 5) { output.position = float4(-1.0f, -1.0f, 0.0f, 1.0f); output.uv = float2(0.0f, 1.0f); }
+
+	return(output);
+}
+
+//float4 GetColorFromDepth(float fDepth)
+//{
+//	float4 cColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+//
+//	if (fDepth < 0.00625f) cColor = float4(1.0f, 0.0f, 0.0f, 1.0f);
+//	else if (fDepth < 0.0125f) cColor = float4(0.0f, 1.0f, 0.0f, 1.0f);
+//	else if (fDepth < 0.025f) cColor = float4(0.0f, 0.0f, 1.0f, 1.0f);
+//	else if (fDepth < 0.05f) cColor = float4(1.0f, 1.0f, 0.0f, 1.0f);
+//	else if (fDepth < 0.075f) cColor = float4(0.0f, 1.0f, 1.0f, 1.0f);
+//	else if (fDepth < 0.1f) cColor = float4(1.0f, 0.5f, 0.5f, 1.0f);
+//	else if (fDepth < 0.4f) cColor = float4(0.5f, 1.0f, 1.0f, 1.0f);
+//	else if (fDepth < 0.6f) cColor = float4(1.0f, 0.0f, 1.0f, 1.0f);
+//	else if (fDepth < 0.8f) cColor = float4(0.5f, 0.5f, 1.0f, 1.0f);
+//	else if (fDepth < 0.9f) cColor = float4(0.5f, 1.0f, 0.5f, 1.0f);
+//	else if (fDepth < 0.95f) cColor = float4(0.5f, 0.0f, 0.5f, 1.0f);
+//	else if (fDepth < 0.99f) cColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+//	else if (fDepth < 0.999f) cColor = float4(1.0f, 0.0f, 1.0f, 1.0f);
+//	else if (fDepth == 1.0f) cColor = float4(0.5f, 0.5f, 0.5f, 1.0f);
+//	else if (fDepth > 1.0f) cColor = float4(0.0f, 0.0f, 0.5f, 1.0f);
+//	else cColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+//
+//	return(cColor);
+//}
+
+SamplerState gssBorder : register(s3);
+
+float4 PSTextureToViewport(VS_TEXTURED_OUTPUT input) : SV_Target
+{
+	float4 cColor = gtxtDepthTextures[1].SampleLevel(gssBorder, input.uv, 0).r * 1.0f;
+
+	//	cColor = GetColorFromDepth(cColor.r);
+
+		return(cColor);
 }

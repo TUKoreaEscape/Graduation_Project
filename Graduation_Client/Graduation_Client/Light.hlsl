@@ -10,14 +10,6 @@
 #define _WITH_THETA_PHI_CONES
 //#define _WITH_REFLECT
 
-struct MATERIAL
-{
-	float4					m_cAmbient;
-	float4					m_cDiffuse;
-	float4					m_cSpecular; //a = power
-	float4					m_cEmissive;
-};
-
 struct LIGHT
 {
 	float4					m_cAmbient;

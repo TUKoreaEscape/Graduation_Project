@@ -186,6 +186,8 @@ void StandardRenderer::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dComma
 	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4World, 0);
 	int type = gameObject->GetType();
 	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 1, &type, 33);
+	int num = 10; //gnMaterial값을 넣어주기위해 임시로 넣어둔 친구
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 1, &num, 34);
 }
 
 void StandardRenderer::ReleaseUploadBuffers()
