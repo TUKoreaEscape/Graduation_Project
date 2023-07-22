@@ -34,7 +34,7 @@ public:
 	
 	virtual void update(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Updaterotate();
-
+	LIGHT* GetLights() const { return m_pLights; }
 public:
 	LIGHT* m_pLights = nullptr;
 	int m_nLights = 0;

@@ -33,6 +33,20 @@ void StandardRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 }
 
+void StandardRenderer::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (gameObject->m_pMesh)
+	{
+		UpdateShaderVariable(pd3dCommandList, &gameObject->m_xmf4x4World);
+		if (m_nMaterials > 0) {
+			for (int i = 0; i < m_nMaterials; ++i) {
+				if (!gameObject->isNotDraw)
+					gameObject->m_pMesh->Render(pd3dCommandList, i);
+			}
+		}
+	}
+}
+
 void StandardRenderer::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, GameObject* pParent, FILE* pInFile, Shader* pShader)
 {
 	char pstrToken[64] = { '\0' };
@@ -186,8 +200,6 @@ void StandardRenderer::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dComma
 	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4World, 0);
 	int type = gameObject->GetType();
 	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 1, &type, 33);
-	int num = 10; //gnMaterial값을 넣어주기위해 임시로 넣어둔 친구
-	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 1, &num, 34);
 }
 
 void StandardRenderer::ReleaseUploadBuffers()

@@ -27,11 +27,6 @@ struct LIGHT
 	float					padding;
 };
 
-cbuffer cbMaterial : register(b9)
-{
-	MATERIAL			gMaterials[MAX_MATERIALS];
-};
-
 cbuffer cbLights : register(b4)
 {
 	LIGHT					gLights[MAX_LIGHTS];
@@ -72,7 +67,7 @@ float Compute5x5ShadowFactor(float2 uv, float fDepth, uint nIndex)
 {
 	float fPercentLit = 0.0f;
 
-	return(fPercentLit / 25.0f);
+	return (fPercentLit / 25.0f);
 }
 
 float4 DirectionalLight(int nIndex, float3 vNormal, float3 vToCamera)
@@ -82,23 +77,23 @@ float4 DirectionalLight(int nIndex, float3 vNormal, float3 vToCamera)
 	float fSpecularFactor = 0.0f;
 	if (fDiffuseFactor > 0.0f)
 	{
-		if (gMaterials[gnMaterial].m_cSpecular.a != 0.0f)
+		if (gMaterial.m_cSpecular.a != 0.0f)
 		{
 #ifdef _WITH_REFLECT
 			float3 vReflect = reflect(-vToLight, vNormal);
-			fSpecularFactor = pow(max(dot(vReflect, vToCamera), 0.0f), gMaterials[gnMaterial].m_cSpecular.a);
+			fSpecularFactor = pow(max(dot(vReflect, vToCamera), 0.0f), gMaterial.m_cSpecular.a);
 #else
 #ifdef _WITH_LOCAL_VIEWER_HIGHLIGHTING
 			float3 vHalf = normalize(vToCamera + vToLight);
 #else
 			float3 vHalf = float3(0.0f, 1.0f, 0.0f);
 #endif
-			fSpecularFactor = pow(max(dot(vHalf, vNormal), 0.0f), gMaterials[gnMaterial].m_cSpecular.a);
+			fSpecularFactor = pow(max(dot(vHalf, vNormal), 0.0f), gMaterial.m_cSpecular.a);
 #endif
 		}
 	}
 
-	return((gLights[nIndex].m_cDiffuse * fDiffuseFactor * gMaterials[gnMaterial].m_cDiffuse) + (gLights[nIndex].m_cSpecular * fSpecularFactor * gMaterials[gnMaterial].m_cSpecular));
+	return((gLights[nIndex].m_cAmbient * gMaterial.m_cAmbient) + (gLights[nIndex].m_cDiffuse * fDiffuseFactor * gMaterial.m_cDiffuse) + (gLights[nIndex].m_cSpecular * fSpecularFactor * gMaterial.m_cSpecular));
 }
 
 float4 PointLight(int nIndex, float3 vPosition, float3 vNormal, float3 vToCamera)
@@ -112,25 +107,24 @@ float4 PointLight(int nIndex, float3 vPosition, float3 vNormal, float3 vToCamera
 		float fDiffuseFactor = dot(vToLight, vNormal);
 		if (fDiffuseFactor > 0.0f)
 		{
-			if (gMaterials[gnMaterial].m_cSpecular.a != 0.0f)
+			if (gMaterial.m_cSpecular.a != 0.0f)
 			{
 #ifdef _WITH_REFLECT
 				float3 vReflect = reflect(-vToLight, vNormal);
-				fSpecularFactor = pow(max(dot(vReflect, vToCamera), 0.0f), gMaterials[gnMaterial].m_cSpecular.a);
+				fSpecularFactor = pow(max(dot(vReflect, vToCamera), 0.0f), gMaterial.m_cSpecular.a);
 #else
 #ifdef _WITH_LOCAL_VIEWER_HIGHLIGHTING
 				float3 vHalf = normalize(vToCamera + vToLight);
 #else
 				float3 vHalf = float3(0.0f, 1.0f, 0.0f);
 #endif
-				fSpecularFactor = pow(max(dot(vHalf, vNormal), 0.0f), gMaterials[gnMaterial].m_cSpecular.a);
+				fSpecularFactor = pow(max(dot(vHalf, vNormal), 0.0f), gMaterial.m_cSpecular.a);
 #endif
 			}
 		}
-
 		float fAttenuationFactor = 1.0f / dot(gLights[nIndex].m_vAttenuation, float3(1.0f, fDistance, fDistance * fDistance));
 
-		return(((gLights[nIndex].m_cDiffuse * fDiffuseFactor * gMaterials[gnMaterial].m_cDiffuse) + (gLights[nIndex].m_cSpecular * fSpecularFactor * gMaterials[gnMaterial].m_cSpecular)) * fAttenuationFactor);
+		return(((gLights[nIndex].m_cAmbient * gMaterial.m_cAmbient) + (gLights[nIndex].m_cDiffuse * fDiffuseFactor * gMaterial.m_cDiffuse) + (gLights[nIndex].m_cSpecular * fSpecularFactor * gMaterial.m_cSpecular)) * fAttenuationFactor);
 	}
 	return(float4(0.0f, 0.0f, 0.0f, 0.0f));
 }
@@ -146,18 +140,18 @@ float4 SpotLight(int nIndex, float3 vPosition, float3 vNormal, float3 vToCamera)
 		float fDiffuseFactor = dot(vToLight, vNormal);
 		if (fDiffuseFactor > 0.0f)
 		{
-			if (gMaterials[gnMaterial].m_cSpecular.a != 0.0f)
+			if (gMaterial.m_cSpecular.a != 0.0f)
 			{
 #ifdef _WITH_REFLECT
 				float3 vReflect = reflect(-vToLight, vNormal);
-				fSpecularFactor = pow(max(dot(vReflect, vToCamera), 0.0f), gMaterials[gnMaterial].m_cSpecular.a);
+				fSpecularFactor = pow(max(dot(vReflect, vToCamera), 0.0f), gMaterial.m_cSpecular.a);
 #else
 #ifdef _WITH_LOCAL_VIEWER_HIGHLIGHTING
 				float3 vHalf = normalize(vToCamera + vToLight);
 #else
 				float3 vHalf = float3(0.0f, 1.0f, 0.0f);
 #endif
-				fSpecularFactor = pow(max(dot(vHalf, vNormal), 0.0f), gMaterials[gnMaterial].m_cSpecular.a);
+				fSpecularFactor = pow(max(dot(vHalf, vNormal), 0.0f), gMaterial.m_cSpecular.a);
 #endif
 			}
 		}
@@ -167,12 +161,41 @@ float4 SpotLight(int nIndex, float3 vPosition, float3 vNormal, float3 vToCamera)
 #else
 		float fSpotFactor = pow(max(dot(-vToLight, gLights[i].m_vDirection), 0.0f), gLights[i].m_fFalloff);
 #endif
-
 		float fAttenuationFactor = 1.0f / dot(gLights[nIndex].m_vAttenuation, float3(1.0f, fDistance, fDistance * fDistance));
 
-		return(((gLights[nIndex].m_cDiffuse * fDiffuseFactor * gMaterials[gnMaterial].m_cDiffuse) + (gLights[nIndex].m_cSpecular * fSpecularFactor * gMaterials[gnMaterial].m_cSpecular)) * fSpotFactor * fAttenuationFactor);
+		return(((gLights[nIndex].m_cAmbient * gMaterial.m_cAmbient) + (gLights[nIndex].m_cDiffuse * fDiffuseFactor * gMaterial.m_cDiffuse) + (gLights[nIndex].m_cSpecular * fSpecularFactor * gMaterial.m_cSpecular)) * fAttenuationFactor * fSpotFactor);
 	}
 	return(float4(0.0f, 0.0f, 0.0f, 0.0f));
+}
+
+float4 Lighting(float3 vPosition, float3 vNormal)
+{
+	float3 vCameraPosition = float3(gvCameraPosition.x, gvCameraPosition.y, gvCameraPosition.z);
+	float3 vToCamera = normalize(vCameraPosition - vPosition);
+
+	float4 cColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	[unroll(MAX_LIGHTS)] for (int i = 0; i < gnLights; i++)
+	{
+		if (gLights[i].m_bEnable)
+		{
+			if (gLights[i].m_nType == DIRECTIONAL_LIGHT)
+			{
+				cColor += DirectionalLight(i, vNormal, vToCamera);
+			}
+			else if (gLights[i].m_nType == POINT_LIGHT)
+			{
+				cColor += PointLight(i, vPosition, vNormal, vToCamera);
+			}
+			else if (gLights[i].m_nType == SPOT_LIGHT)
+			{
+				cColor += SpotLight(i, vPosition, vNormal, vToCamera);
+			}
+		}
+	}
+	cColor += (gcGlobalAmbientLight);
+	cColor.a = gMaterial.m_cDiffuse.a;
+
+	return(cColor);
 }
 
 float4 Lighting(float3 vPosition, float3 vNormal, bool bShadow, float4 uvs[MAX_LIGHTS])
@@ -190,7 +213,8 @@ float4 Lighting(float3 vPosition, float3 vNormal, bool bShadow, float4 uvs[MAX_L
 #ifdef _WITH_PCF_FILTERING
 			if (bShadow) fShadowFactor = Compute3x3ShadowFactor(uvs[i].xy / uvs[i].ww, uvs[i].z / uvs[i].w, i);
 #else
-			if (bShadow) fShadowFactor = gtxtDepthTextures[i].SampleCmpLevelZero(gssComparisonPCFShadow, uvs[i].xy / uvs[i].ww, uvs[i].z / uvs[i].w).r;
+			if (bShadow)
+				fShadowFactor = gtxtDepthTextures[i].SampleCmpLevelZero(gssComparisonPCFShadow, uvs[i].xy / uvs[i].ww, uvs[i].z / uvs[i].w).r;
 #endif
 
 			if (gLights[i].m_nType == DIRECTIONAL_LIGHT)
@@ -206,12 +230,12 @@ float4 Lighting(float3 vPosition, float3 vNormal, bool bShadow, float4 uvs[MAX_L
 				cColor += SpotLight(i, vPosition, vNormal, vToCamera) * fShadowFactor;
 				//				cColor += SpotLight(i, vPosition, vNormal, vToCamera);
 			}
-			cColor += gLights[i].m_cAmbient * gMaterials[gnMaterial].m_cAmbient;;
+			cColor += gLights[i].m_cAmbient * gMaterial.m_cAmbient;
 		}
 	}
 
-	cColor += (gcGlobalAmbientLight * gMaterials[gnMaterial].m_cAmbient);
-	cColor.a = gMaterials[gnMaterial].m_cDiffuse.a;
+	cColor += (gcGlobalAmbientLight * gMaterial.m_cAmbient);
+	cColor.a = gMaterial.m_cDiffuse.a;
 
-	return(cColor);
+	return (cColor);
 }
