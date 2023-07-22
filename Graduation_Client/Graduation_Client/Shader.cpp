@@ -1490,6 +1490,7 @@ void DepthRenderShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 		m_ppDepthRenderCameras[i]->start(pd3dDevice, pd3dCommandList);
 		m_ppDepthRenderCameras[i]->SetViewport(0, 0, _DEPTH_BUFFER_WIDTH, _DEPTH_BUFFER_HEIGHT, 0.0f, 1.0f);
 		m_ppDepthRenderCameras[i]->SetScissorRect(0, 0, _DEPTH_BUFFER_WIDTH, _DEPTH_BUFFER_HEIGHT);
+		m_ppDepthRenderCameras[i]->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	}
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -1678,7 +1679,7 @@ void ShadowMapShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_pDepthTexture = (Texture*)pContext;
 	m_pDepthTexture->AddRef();
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, m_pDepthTexture->GetTextures());
+	//CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, m_pDepthTexture->GetTextures());
 	GameScene::CreateShaderResourceViews(pd3dDevice, m_pDepthTexture, 0, 20);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -1698,9 +1699,9 @@ void ShadowMapShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 	//m_pScene->Shadowrender(pd3dCommandList);
 
 
-	if (m_pScene) {
-		m_pScene->Depthrender(pd3dCommandList);
-	}
+	//if (m_pScene) {
+	//	m_pScene->Depthrender(pd3dCommandList);
+	//}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

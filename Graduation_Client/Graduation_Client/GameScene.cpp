@@ -208,6 +208,8 @@ void GameScene::prerender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	m_pPlayer->m_pCamera->update(pd3dCommandList);
+
 	m_pSkybox->render(pd3dCommandList);
 
 	m_pCeilling->render(pd3dCommandList);
@@ -296,13 +298,6 @@ void GameScene::Endingrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
 	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
 	Scene::render(pd3dCommandList);
-}
-
-void GameScene::Shadowrender(ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
-	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
-	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
 }
 
 void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)

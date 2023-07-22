@@ -507,7 +507,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSSkyBox(VS_SKYBOX_CUBEMAP_OUTPUT input, uint 
 
 	float3 normalW = normalize(input.normalW);
 
-	//float4 cIllumination = Lighting(input.positionL, normalW);
+	float4 cIllumination = Lighting(input.positionL, normalW);
 	//output.f4Illumination = cIllumination;
 
 	output.f4Albedo = cColor;
@@ -992,7 +992,7 @@ VS_UI_OUTPUT VSDoorUI(VS_UI_INPUT input)
 	VS_UI_OUTPUT output;
 
 	if (gnUIType == INGAME_UI || gnUIType == PROGRESS_BAR_UI) {
-		output.position = float4(input.position, 1.0f);
+		output.position = mul(float4(input.position, 1.0f), gmtxGameObject);
 	}
 	else {
 		output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);

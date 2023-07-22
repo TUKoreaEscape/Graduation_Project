@@ -611,16 +611,16 @@ void Framework::FrameAdvance()
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 
+		//렌더링 코드는 여기에 추가될 것이다.
+		//m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 		m_pDepthRenderShader->UpdateShaderVariables(m_pd3dCommandList);
-		if (m_pShadowMapShader) m_pShadowMapShader->Render(m_pd3dCommandList);
+		m_pShadowMapShader->UpdateShaderVariables(m_pd3dCommandList);
 		if (scene) scene->defrender(m_pd3dCommandList);
-		//m_pShadowMapShader->UpdateShaderVariables(m_pd3dCommandList);
 
 		m_pd3dCommandList->RSSetViewports(1, &d3dViewport);
 		m_pd3dCommandList->RSSetScissorRects(1, &d3dScissorRect);
-
-		//if (scene) scene->defrender(m_pd3dCommandList);
 		if (m_pShadowMapToViewport) m_pShadowMapToViewport->Render(m_pd3dCommandList);
+
 
 		//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 		//if (scene) scene->forrender(m_pd3dCommandList);

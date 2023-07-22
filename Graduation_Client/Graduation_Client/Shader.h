@@ -398,7 +398,7 @@ protected:
 	TOLIGHTSPACES* m_pcbMappedToLightSpaces = NULL;
 };
 
-class ShadowMapShader : public IlluminatedShader
+class ShadowMapShader : public DeferredObjectsShader
 {
 public:
 	ShadowMapShader(GameScene* Scene);
