@@ -41,6 +41,12 @@ void Network::init_network()
 	m_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 	int option = TRUE;
 	setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, (const char*)&option, sizeof(option));
+
+	int dscpValue = 46; // Change this value to your desired DSCP value
+	int result = setsockopt(m_socket, IPPROTO_IP, IP_TOS, (const char*)&dscpValue, sizeof(dscpValue));
+	if (result == SOCKET_ERROR) {
+		std::cout << "Failed DSCP Value" << std::endl;
+	}
 	SOCKADDR_IN server_addr;
 	ZeroMemory(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
