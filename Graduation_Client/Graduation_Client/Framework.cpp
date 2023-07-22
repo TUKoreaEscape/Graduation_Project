@@ -617,10 +617,9 @@ void Framework::FrameAdvance()
 		m_pShadowMapShader->UpdateShaderVariables(m_pd3dCommandList);
 		if (scene) scene->defrender(m_pd3dCommandList);
 
-		m_pd3dCommandList->RSSetViewports(1, &d3dViewport);
-		m_pd3dCommandList->RSSetScissorRects(1, &d3dScissorRect);
-		if (m_pShadowMapToViewport) m_pShadowMapToViewport->Render(m_pd3dCommandList);
-
+		//m_pd3dCommandList->RSSetViewports(1, &d3dViewport);
+		//m_pd3dCommandList->RSSetScissorRects(1, &d3dScissorRect);
+		//if (m_pShadowMapToViewport) m_pShadowMapToViewport->Render(m_pd3dCommandList);
 
 		//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 		//if (scene) scene->forrender(m_pd3dCommandList);

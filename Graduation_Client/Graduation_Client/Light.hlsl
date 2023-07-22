@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------
-#define MAX_LIGHTS			3 
+#define MAX_LIGHTS			3
 #define MAX_MATERIALS		512 
 
 #define POINT_LIGHT			1
@@ -36,7 +36,7 @@ cbuffer cbLights : register(b4)
 
 #define FRAME_BUFFER_WIDTH		1600
 #define FRAME_BUFFER_HEIGHT		900
-
+//#define _WITH_PCF_FILTERING
 #define _DEPTH_BUFFER_WIDTH		(FRAME_BUFFER_WIDTH * 4)
 #define _DEPTH_BUFFER_HEIGHT	(FRAME_BUFFER_HEIGHT * 4)
 
@@ -60,7 +60,7 @@ float Compute3x3ShadowFactor(float2 uv, float fDepth, uint nIndex)
 	fPercentLit += gtxtDepthTextures[nIndex].SampleCmpLevelZero(gssComparisonPCFShadow, uv + float2(+DELTA_X, -DELTA_Y), fDepth).r;
 	fPercentLit += gtxtDepthTextures[nIndex].SampleCmpLevelZero(gssComparisonPCFShadow, uv + float2(+DELTA_X, +DELTA_Y), fDepth).r;
 
-	return(fPercentLit / 9.0f);
+	return (fPercentLit / 9.0f);
 }
 
 float Compute5x5ShadowFactor(float2 uv, float fDepth, uint nIndex)
@@ -234,7 +234,7 @@ float4 Lighting(float3 vPosition, float3 vNormal, bool bShadow, float4 uvs[MAX_L
 		}
 	}
 
-	cColor += (gcGlobalAmbientLight * gMaterial.m_cAmbient);
+	cColor += (gcGlobalAmbientLight);
 	cColor.a = gMaterial.m_cDiffuse.a;
 
 	return (cColor);
