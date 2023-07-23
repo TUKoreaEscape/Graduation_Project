@@ -43,7 +43,6 @@ void Network::Process_Init_Position(char* ptr)
 	sc_packet_init_position* packet = reinterpret_cast<sc_packet_init_position*>(ptr);
 	for (int i = 0; i < 6; ++i) {
 		if (m_pPlayer->GetID() == packet->user_id[i]) {
-			set_capture_mouse();
 			m_pPlayer->SetPosition(packet->position[i], true);
 			m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 			m_pPlayer->SetTrackAnimationSet(0, 0);
@@ -54,7 +53,6 @@ void Network::Process_Init_Position(char* ptr)
 	}
 
 	for (int i = 0; i < 5; ++i) {
-		set_capture_mouse();
 		for (int j = 0; j < 6; ++j) {
 			if (m_ppOther[i]->GetID() == packet->user_id[j]) {
 				m_ppOther[i]->SetPosition(packet->position[j], true);
@@ -92,7 +90,6 @@ void Network::Process_Game_Start(char* ptr)
 
 void Network::Process_Game_End(char* ptr)
 {
-	release_capture_mouse();
 	sc_packet_game_end* packet = reinterpret_cast<sc_packet_game_end*>(ptr);
 	m_tagger_win = packet->is_tagger_win;
 
