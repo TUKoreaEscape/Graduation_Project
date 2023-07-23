@@ -25,9 +25,11 @@ void CLIENT::do_recv()
 	{
 		int error_num = WSAGetLastError();
 		if (ERROR_IO_PENDING != error_num) {
+#if SOCKET_ERROR_PRINT
 			error_display(error_num);
 			cout << "recv error" << endl;
 			//cGameServer::GetInstance()->Disconnect(m_id);
+#endif
 		}
 	}
 }
@@ -41,8 +43,10 @@ void CLIENT::do_send(int num_byte, void* mess)
 	{
 		int error_num = WSAGetLastError();
 		if (ERROR_IO_PENDING != error_num) {
+#if SOCKET_ERROR_PRINT
 			error_display(error_num);
 			cout << "send error" << endl;
+#endif
 			delete ex_over;
 		}
 	}

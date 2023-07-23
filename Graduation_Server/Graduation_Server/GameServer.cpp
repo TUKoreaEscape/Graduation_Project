@@ -464,7 +464,7 @@ void cGameServer::WorkerThread()
 			break;
 		}
 		default:
-			cout << exp_over->m_comp_op << " : recv" << endl;
+			//cout << exp_over->m_comp_op << " : recv" << endl;
 			break;
 
 		}
