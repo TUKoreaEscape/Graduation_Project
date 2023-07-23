@@ -13,6 +13,7 @@ const int  MAX_ROOM_INFO_SEND = 6;
 const int CHECK_MAX_PACKET_SIZE = 127;
 
 const int BUF_SIZE = 5000;
+constexpr int KEEP_ALIVE_TIMEOUT = 15;
 // ----- 클라이언트가 서버에게 보낼때 ------
 #define MAX_INGAME_ITEM 20
 #define VOICE_ISSUER "작성해야됨"
@@ -429,7 +430,8 @@ namespace SC_PACKET
 		SC_PACKET_PICK_ITEM_INIT,
 		SC_PACKET_ITEM_BOX_UPDATE,
 		SC_PACKET_PICK_ITEM_UPDATE,
-		SC_PACKET_GAME_END
+		SC_PACKET_GAME_END,
+		SC_PACKET_PLAYER_RATE
 	};
 }
 
@@ -810,6 +812,17 @@ struct sc_packet_game_end {
 
 	bool			is_tagger_win;
 	short			escape_id[6];
+};
+
+struct sc_packet_player_rate {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned int	total_play;
+	unsigned int	tagger_play;
+	unsigned int	runner_play;
+	unsigned int	tagger_win;
+	unsigned int	runner_win;
 };
 
 // 여긴 StressTest용 패킷입니다

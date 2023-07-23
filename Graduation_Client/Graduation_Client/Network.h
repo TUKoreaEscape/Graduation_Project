@@ -7,7 +7,7 @@
 #include "Server_Timer.h"
 
 #define  DIR_NO 100
-#define  USE_NETWORK 0
+#define  USE_NETWORK 1
 #define	 USE_VOICE 0
 
 class Door;
@@ -113,6 +113,7 @@ public:
 	void AssemblyPacket(char* netbuf, size_t io_byte);
 	void ProcessPacket(char* ptr);
 
+	void Process_PlayerRate(char* ptr);
 	void Process_Player_Move(char* ptr);
 	void Process_Other_Player_Move(char* ptr);
 	void Process_Other_Move(char* ptr);

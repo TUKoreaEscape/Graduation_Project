@@ -430,7 +430,8 @@ namespace SC_PACKET
 		SC_PACKET_PICK_ITEM_INIT,
 		SC_PACKET_ITEM_BOX_UPDATE,
 		SC_PACKET_PICK_ITEM_UPDATE,
-		SC_PACKET_GAME_END
+		SC_PACKET_GAME_END,
+		SC_PACKET_PLAYER_RATE
 	};
 }
 
@@ -811,6 +812,17 @@ struct sc_packet_game_end {
 
 	bool			is_tagger_win;
 	short			escape_id[6];
+};
+
+struct sc_packet_player_rate {
+	unsigned char	size;
+	unsigned char	type;
+
+	unsigned int	total_play;
+	unsigned int	tagger_play;
+	unsigned int	runner_play;
+	unsigned int	tagger_win;
+	unsigned int	runner_win;
 };
 
 // 여긴 StressTest용 패킷입니다

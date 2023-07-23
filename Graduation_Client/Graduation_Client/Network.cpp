@@ -167,6 +167,12 @@ void Network::ProcessPacket(char* ptr)
 		break;
 	}
 
+	case SC_PACKET::SC_PACKET_PLAYER_RATE:
+	{
+		Process_PlayerRate(ptr);
+		break;
+	}
+
 	case SC_PACKET::SC_PACKET_CREATE_ROOM_OK:
 	{
 		set_join_room_state(true);

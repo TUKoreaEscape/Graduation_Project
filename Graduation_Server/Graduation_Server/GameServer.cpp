@@ -354,6 +354,13 @@ void cGameServer::WorkerThread()
 				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_HAMMER, false);
 				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_DRIVER, false);
 				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_DRILL, false);
+				m_clients[player_id].Add_Total_Play();
+				if (rl.Get_Tagger_ID() == player_id) {
+					m_clients[player_id].Add_Tagger_Play();
+					m_clients[player_id].Add_Tagger_Win();
+				}
+				else
+					m_clients[player_id].Add_Runner_Play();
 			}
 
 			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
@@ -411,8 +418,18 @@ void cGameServer::WorkerThread()
 			packet.type = SC_PACKET::SC_PACKET_GAME_END;
 			packet.is_tagger_win = false; // ¿Ã∞« πÊø°º≠ ¥©∞° ¿Ã∞Â¥¬¡ˆ ¡∂∞«¿ª ≥—∞‹¡‡æﬂ«‘
 
+			for (auto& player_id : rl.in_player) {
+				m_clients[player_id].Add_Total_Play();
+				if (player_id == rl.Get_Tagger_ID())
+					m_clients[player_id].Add_Tagger_Play();
+				else
+					m_clients[player_id].Add_Runner_Play();
+			}
+
 			for (int i = 0; i < 6; ++i) {
 				packet.escape_id[i] = rl.in_escape_player[i];
+				if(rl.in_escape_player[i] != -1)
+					m_clients[rl.in_escape_player[i]].Add_Runner_Win();
 				rl.in_escape_player[i] = -1;
 			}
 
@@ -568,6 +585,11 @@ void cGameServer::Disconnect(const unsigned int _user_id) // ≈¨∂Û¿Ãæ∆Æ ø¨∞·¿ª «
 		request.request_id = _user_id;
 		request.request_custom_data;
 		request.request_name = convertID; 
+		m_database->insert_request(request);
+
+		Player_Rate rate_data = m_clients[_user_id].Get_PlayerRate();
+		request.type = REQUEST_SAVE_PLAYER_RATE;
+		request.request_player_rate = rate_data;
 		m_database->insert_request(request);
 	}
 	// ø©±‚º≠ √ ±‚»≠

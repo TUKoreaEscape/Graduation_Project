@@ -3,6 +3,26 @@
 #include "GameObject.h"
 #include "Input.h"
 
+void Network::Process_PlayerRate(char* ptr)
+{
+	sc_packet_player_rate* packet = reinterpret_cast<sc_packet_player_rate*>(ptr);
+
+	std::cout << "============= ÇÃ·¹ÀÌ¾î ·¹ÀÌÆÃ Á¤º¸ =============" << std::endl;
+	std::cout << "ÃÑ ÇÃ·¹ÀÌ È½¼ö : " << packet->total_play << std::endl;
+	std::cout << "¼ú·¡ ÇÃ·¹ÀÌ È½¼ö : " << packet->tagger_play;
+	if(packet->tagger_play != 0)
+		std::cout << " || [½Â·ü : " << static_cast<float>(static_cast<float>(packet->tagger_win) / static_cast<float>(packet->tagger_play)) * 100 << "%]" << std::endl;
+	else
+		std::cout << " || [½Â·ü : 0%]" << std::endl;
+
+	std::cout << "»ýÁ¸ÀÚ ÇÃ·¹ÀÌ È½¼ö : " << packet->runner_play;
+	if(packet->runner_play != 0)
+		std::cout << " || [½Â·ü : " << static_cast<float>(static_cast<float>(packet->runner_win) / static_cast<float>(packet->runner_play)) * 100 << "%]" << std::endl;
+	else
+		std::cout << " || [½Â·ü : 0%]" << std::endl;
+	std::cout << "=======================================" << std::endl;
+}
+
 void Network::Process_Player_Exit(char* ptr)
 {
 	sc_packet_player_exit* packet = reinterpret_cast<sc_packet_player_exit*>(ptr);

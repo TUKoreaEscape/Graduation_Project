@@ -13,6 +13,8 @@ private:
 	CLIENT_STATE::STATE		m_state = CLIENT_STATE::ST_FREE;
 	CLIENT_ROLE::STATE		m_role = CLIENT_ROLE::ROLE_NONE;
 
+	Player_Rate				m_rate{};
+
 	unsigned short			m_prev_size{};
 	int						m_id{};
 	int						m_join_room_number{};
@@ -169,4 +171,14 @@ public:
 	bool				get_first_skill_enable() { return m_first_skill_able; }
 	bool				get_second_skill_enable() { return m_second_skill_able; }
 	bool				get_third_skill_enable() { return m_third_skill_able; }
+
+public:
+	void				Load_PlayerRate(Player_Rate& rate) { m_rate = rate; }
+	void				Add_Total_Play() { m_rate.total_play++; }
+	void				Add_Tagger_Play() { m_rate.tagger_play++; }
+	void				Add_Runner_Play() { m_rate.runner_play++; }
+	void				Add_Tagger_Win() { m_rate.tagger_win++; }
+	void				Add_Runner_Win() { m_rate.runner_win++; }
+
+	Player_Rate			Get_PlayerRate() { return m_rate; }
 };
