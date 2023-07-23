@@ -1401,7 +1401,7 @@ D3D12_RASTERIZER_DESC DepthRenderShader::CreateRasterizerState()
 	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
 	d3dRasterizerDesc.FrontCounterClockwise = FALSE;
 #ifdef _WITH_RASTERIZER_DEPTH_BIAS
-	d3dRasterizerDesc.DepthBias = 10000; // 250000
+	d3dRasterizerDesc.DepthBias = 250000; // 250000
 #endif
 	d3dRasterizerDesc.DepthBiasClamp = 0.0f;
 	d3dRasterizerDesc.SlopeScaledDepthBias = 1.0f;
