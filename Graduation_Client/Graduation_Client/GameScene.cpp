@@ -150,41 +150,24 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		break;
 	case ENDING_GAME:
 	{
+		for (int i = 0; i < 5; ++i) {
+			m_ppPlayers[i]->SetLookAt(XMFLOAT3(0, 0, 0));
+		}
 #if USE_NETWORK
 		Network& network = *Network::GetInstance();
 		if (network.m_tagger_win) {
 #endif
 #if !USE_NETWORK
-			if (0) { // TAGGER's Win
+		if (0) { // TAGGER's Win
+			m_UIEnding[2]->render(pd3dCommandList);
 #endif
-				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-				if (m_pPlayer->GetType() == TYPE_TAGGER) {
-					m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-				}
-				for (int i = 0; i < 5; ++i) {
-					m_ppPlayers[i]->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-					if (m_ppPlayers[i]->GetType() == TYPE_TAGGER) {
-						m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-					}
-				}
-			}
-			else { // Player's Win
-				float my_win = 0.0f;
-				m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-				if (m_pPlayer->GetType() != TYPE_TAGGER) {
-					m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-					my_win = true;
-				}
-				for (int i = 0; i < 5; ++i) {
-					m_ppPlayers[i]->SetPosition(XMFLOAT3(6.0f - 3.0f * i, 0.0f, -1.0f));
-					if (m_ppPlayers[i]->GetType() != TYPE_TAGGER) {
-						m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-					}
-				}
-			}
-			for (int i = 0; i < m_Ending; ++i) m_UIEnding[i]->render(pd3dCommandList);
-			break;
 		}
+		else {
+			m_UIEnding[1]->render(pd3dCommandList);
+		}
+		m_UIEnding[0]->render(pd3dCommandList);
+		break;
+	}
 	case INTERACTION_POWER:
 		if ((m_pPlayer->m_pNearInteractionObejct))
 			reinterpret_cast<PowerSwitch*>(m_pPlayer->m_pNearInteractionObejct)->UIrender(pd3dCommandList);
@@ -311,9 +294,61 @@ void GameScene::Endingrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
+	m_pPlayer->SetPosition(XMFLOAT3(0.0f, -2.0f, -3.0f));
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
 	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
-	Scene::render(pd3dCommandList);
+		
+#if USE_NETWORK
+	Network& network = *Network::GetInstance();
+	if (network.m_tagger_win) {
+#endif
+#if !USE_NETWORK
+	if (0) { // TAGGER's Win
+#endif
+		m_pPlayer->OnPrepareRender();
+		m_pPlayer->Animate(m_fElapsedTime, m_pPlayer->PlayerNum);
+		if (m_pPlayer->GetType() == TYPE_TAGGER) {
+			m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+			m_pPlayer->render(pd3dCommandList);
+		}
+		else {
+			for (int i = 0; i < 5; ++i) {
+				m_ppPlayers[i]->OnPrepareRender();
+				m_ppPlayers[i]->Animate(m_fElapsedTime, m_ppPlayers[i]->PlayerNum);
+				if (m_ppPlayers[i]->GetType() == TYPE_TAGGER) {
+					m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+					m_ppPlayers[i]->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+					m_ppPlayers[i]->render(pd3dCommandList);
+				}
+			}
+		}
+	}
+	else {
+		int EscapeNum = 0;
+		m_pPlayer->OnPrepareRender();
+		m_pPlayer->Animate(m_fElapsedTime, m_pPlayer->PlayerNum);
+		if (m_pPlayer->GetType() == TYPE_ESCAPE_PLAYER) {
+			m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+			m_pPlayer->render(pd3dCommandList);
+		}
+		for (int i = 0; i < 5; ++i) {
+			if (m_ppPlayers[i]->GetType() == TYPE_ESCAPE_PLAYER) {
+				EscapeNum++;
+			}
+		}
+		float StartXPos = (EscapeNum - 1) * -1.5f;
+		for (int i = 0; i < 5; ++i) {
+			if (m_ppPlayers[i]->GetType() == TYPE_ESCAPE_PLAYER) {
+				m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
+				m_ppPlayers[i]->SetPosition(XMFLOAT3(StartXPos, -2.0f, -5.0f));
+				m_ppPlayers[i]->OnPrepareRender();
+				m_ppPlayers[i]->Animate(m_fElapsedTime, m_ppPlayers[i]->PlayerNum);
+				m_ppPlayers[i]->render(pd3dCommandList);
+				StartXPos += 3.0f;
+			}
+		}
+	}
+	m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -3.0f));
 }
 
 void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -1435,6 +1470,10 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_ppPlayers[3]->SetPosition(XMFLOAT3(-6.0f, 0.0f, -5.0f));
 	m_ppPlayers[4]->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
 
+	m_ppPlayers[0]->SetPlayerType(TYPE_ESCAPE_PLAYER);
+	m_ppPlayers[1]->SetPlayerType(TYPE_ESCAPE_PLAYER);
+	m_ppPlayers[2]->SetPlayerType(TYPE_ESCAPE_PLAYER);
+
 	m_pPlayer->SetChild(pPlayerModel->m_pModelRootObject, true);
 	m_pPlayer->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 2, pPlayerModel);
 	m_pPlayer->SetAnimation(0);
@@ -1508,10 +1547,11 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_UICustomizing[9] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/CustomizingRArrow.dds", 0.5f, 0.f, 0.1f, 0.15f);
 	m_UICustomizing[10] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/CustomizingLArrow.dds", -0.5f, 0.f, 0.1f, 0.15f);
 
-	m_Ending = 2;
+	m_Ending = 3;
 	m_UIEnding = new GameObject * [m_Ending];
-	m_UIEnding[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Ending.dds", 0.0f, 0.0f, 2.0f, 2.0f);
-	m_UIEnding[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.8f, -0.8f, 0.15f, 0.1f);
+	m_UIEnding[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.8f, -0.8f, 0.15f, 0.1f);
+	m_UIEnding[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SurvivorWin.dds", 0.0f, 0.0f, 2.0f, 2.0f);
+	m_UIEnding[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/TaggerWin.dds", 0.0f, 0.0f, 2.0f, 2.0f);
 
 	m_nPlay = 6;
 	m_UIPlay = new GameObject * [m_nPlay];
@@ -1602,7 +1642,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 
 	m_pPlayer->SetPlayerUpdatedContext(m_pTerrain);
-	m_pPlayer->SetPlayerType(TYPE_DEAD_PLAYER);
+	m_pPlayer->SetPlayerType(TYPE_ESCAPE_PLAYER);
 	m_pPlayer->AddComponent<CommonMovement>();
 
 	for (int i = 0; i < m_nPlayers; ++i) {
