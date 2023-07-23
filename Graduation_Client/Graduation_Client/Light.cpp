@@ -64,7 +64,7 @@ void Light::Updaterotate()
 {
 	if (GameState::GetInstance()->GetInitLight())
 	{
-		rotationAngle = 270.0f;
+		rotationAngle = 315.f;
 		rotationSpeed = 0.25f;
 
 		float global = 0.5f;
