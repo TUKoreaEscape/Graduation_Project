@@ -669,13 +669,13 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 	float4 cAlbedoColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	if (gnTexturesMask & MATERIAL_ALBEDO_MAP) {
 		cAlbedoColor = gtxtAlbedoTexture.Sample(gssWrap, input.uv);
-		cAlbedoColor = cAlbedoColor * gMaterial.m_cDiffuse;
+		//cAlbedoColor = cAlbedoColor * gMaterial.m_cDiffuse;
 	}
 	else cAlbedoColor = gMaterial.m_cDiffuse;
 	float4 cSpecularColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	if (gnTexturesMask & MATERIAL_SPECULAR_MAP) {
 		cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uv);
-		cSpecularColor = cSpecularColor * gMaterial.m_cSpecular;
+		//cSpecularColor = cSpecularColor * gMaterial.m_cSpecular;
 	}
 	float4 cNormalColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	if (gnTexturesMask & MATERIAL_NORMAL_MAP) cNormalColor = gtxtNormalTexture.Sample(gssWrap, input.uv);
@@ -686,10 +686,10 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 	float4 cEmissionColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	if (gnTexturesMask & MATERIAL_EMISSION_MAP) {
 		cEmissionColor = gtxtEmissionTexture.Sample(gssWrap, input.uv);
-		cEmissionColor = cEmissionColor * gMaterial.m_cEmissive;
+		//cEmissionColor = cEmissionColor * gMaterial.m_cEmissive;
 	}
-	float4 cColor = cAlbedoColor + cSpecularColor + cEmissionColor;
-	
+    float4 cColor = cAlbedoColor + cSpecularColor;
+
 	if (gnObjectType < 0)
 		clip(cColor.a - 0.1f);
 

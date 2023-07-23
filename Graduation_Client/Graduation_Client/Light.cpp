@@ -8,7 +8,7 @@ void Light::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComma
 	m_pLights = new LIGHT[m_nLights];
 	::ZeroMemory(m_pLights, sizeof(LIGHT) * m_nLights);
 
-	float global = 0.8f;
+	float global = 0.3f;
 	m_xmf4GlobalAmbient = XMFLOAT4(global, global, global, 1.0f);
 
 	m_pLights[0].m_bEnable = true;
