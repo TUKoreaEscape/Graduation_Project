@@ -2,11 +2,6 @@
 #include "stdafx.h"
 #include "Component.h"
 
-#define MAX_LIGHTS 16
-#define POINT_LIGHT						1
-#define SPOT_LIGHT						2
-#define DIRECTIONAL_LIGHT				3
-
 struct LIGHT
 {
 	XMFLOAT4							m_xmf4Ambient;
@@ -39,7 +34,7 @@ public:
 	
 	virtual void update(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Updaterotate();
-
+	LIGHT* GetLights() const { return m_pLights; }
 public:
 	LIGHT* m_pLights = nullptr;
 	int m_nLights = 0;

@@ -118,6 +118,13 @@ void Camera::GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlaneD
 	m_xmf4x4Projection = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
 }
 
+void Camera::GenerateOrthographicProjectionMatrix(float fNearPlaneDistance, float fFarPlaneDistance, float fWidth, float fHeight)
+{
+	XMMATRIX xmmtxProjection = XMMatrixOrthographicLH(fWidth, fHeight, fNearPlaneDistance, fFarPlaneDistance);
+	//	XMMATRIX xmmtxProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
+	XMStoreFloat4x4(&m_xmf4x4Projection, xmmtxProjection);
+}
+
 void Camera::GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3LookAt, XMFLOAT3 xmf3Up)
 {
 	m_xmf3Position = xmf3Position;
@@ -186,6 +193,14 @@ void Camera::SetViewportsAndScissorRects(ID3D12GraphicsCommandList* pd3dCommandL
 {
 	pd3dCommandList->RSSetViewports(1, &m_d3dViewport);
 	pd3dCommandList->RSSetScissorRects(1, &m_d3dScissorRect);
+}
+
+void Camera::SetLookAt(XMFLOAT3& vLookAt)
+{
+	XMFLOAT4X4 mtxLookAt = Matrix4x4::LookAtLH(m_xmf3Position, vLookAt, XMFLOAT3(0,1,0));
+	m_xmf3Right = XMFLOAT3(mtxLookAt._11, mtxLookAt._21, mtxLookAt._31);
+	m_xmf3Up = XMFLOAT3(mtxLookAt._12, mtxLookAt._22, mtxLookAt._32);
+	m_xmf3Look = XMFLOAT3(mtxLookAt._13, mtxLookAt._23, mtxLookAt._33);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -258,6 +273,7 @@ void FirstPersonCamera::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 
 void FirstPersonCamera::update(float elapsedTime)
 {
+	if (m_pPlayer == NULL) m_pPlayer = Input::GetInstance()->m_pPlayer;
 	SetPosition(Vector3::Add(m_pPlayer->GetPosition(), m_xmf3Offset));
 }
 

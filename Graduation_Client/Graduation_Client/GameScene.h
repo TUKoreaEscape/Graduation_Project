@@ -33,6 +33,7 @@ public:
 	Player** m_ppPlayers = nullptr;
 
 	GameObject* m_pLight = nullptr;
+	LIGHT* m_pLights = nullptr;
 	GameObject* m_pSkybox = nullptr;
 
 	GameObject* m_pPianoTerrain = nullptr;
@@ -124,7 +125,7 @@ public:
 	virtual void Loadingrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void SpectatorPrerender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Spectatorrender(ID3D12GraphicsCommandList* pd3dCommandList);
-
+	virtual void Depthrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void ReleaseObjects();

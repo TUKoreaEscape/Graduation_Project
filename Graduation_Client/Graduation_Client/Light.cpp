@@ -13,10 +13,12 @@ void Light::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComma
 
 	m_pLights[0].m_bEnable = true;
 	m_pLights[0].m_nType = DIRECTIONAL_LIGHT;
-	m_pLights[0].m_xmf4Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
-	m_pLights[0].m_xmf4Diffuse = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
+	m_pLights[0].m_fRange = 2000.0f;
+	m_pLights[0].m_xmf4Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_pLights[0].m_xmf4Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_pLights[0].m_xmf4Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 0.0f);
-	m_pLights[0].m_xmf3Direction = XMFLOAT3(0.0f, -1.0f, 0.0f);
+	m_pLights[0].m_xmf3Direction = XMFLOAT3(1.0f, -1.0f, 0.0f);
+	m_pLights[0].m_xmf3Position = XMFLOAT3(0.0f, 30.f, 0.0f);
 
 	float lightpower = 1.0f;
 	m_pLights[1].m_bEnable = false;
@@ -28,7 +30,7 @@ void Light::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComma
 	m_pLights[1].m_xmf3Position = XMFLOAT3(0, 5.f, 0.0f);
 	m_pLights[1].m_xmf3Direction = XMFLOAT3(0.0f, .0f, 0.0f);
 	m_pLights[1].m_xmf3Attenuation = XMFLOAT3(1.0f, 0.001f, 0.0001f);
-
+	
 	m_pLights[2].m_bEnable = false;
 	m_pLights[2].m_nType = SPOT_LIGHT;
 	m_pLights[2].m_fRange = 30.0f;
@@ -70,10 +72,12 @@ void Light::Updaterotate()
 
 		m_pLights[0].m_bEnable = true;
 		m_pLights[0].m_nType = DIRECTIONAL_LIGHT;
-		m_pLights[0].m_xmf4Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
-		m_pLights[0].m_xmf4Diffuse = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
+		m_pLights[0].m_fRange = 2000.0f;
+		m_pLights[0].m_xmf4Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		m_pLights[0].m_xmf4Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 		m_pLights[0].m_xmf4Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 0.0f);
-		m_pLights[0].m_xmf3Direction = XMFLOAT3(0.0f, -1.0f, 0.0f);
+		m_pLights[0].m_xmf3Direction = XMFLOAT3(1.0f, -1.0f, 0.0f);
+		m_pLights[0].m_xmf3Position = XMFLOAT3(0.0f, 30.0f, 0.0f);
 		GameState::GetInstance()->SetInitLight();
 	}
 	// 회전 각도 업데이트

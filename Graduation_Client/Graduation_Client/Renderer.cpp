@@ -33,6 +33,20 @@ void StandardRenderer::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 }
 
+void StandardRenderer::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (gameObject->m_pMesh)
+	{
+		UpdateShaderVariable(pd3dCommandList, &gameObject->m_xmf4x4World);
+		if (m_nMaterials > 0) {
+			for (int i = 0; i < m_nMaterials; ++i) {
+				if (!gameObject->isNotDraw)
+					gameObject->m_pMesh->Render(pd3dCommandList, i);
+			}
+		}
+	}
+}
+
 void StandardRenderer::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, GameObject* pParent, FILE* pInFile, Shader* pShader)
 {
 	char pstrToken[64] = { '\0' };
