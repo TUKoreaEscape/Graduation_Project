@@ -12,6 +12,8 @@ void Network::Process_Player_Exit(char* ptr)
 			continue;
 		if (m_ppOther[i]->GetID() == packet->user_id) {
 			m_ppOther[i]->SetID(-1);
+			if (GameState::GetInstance()->GetGameState() == PLAYING_GAME) // 게임도중 사라진 경우 아예 제거목적
+				m_ppOther[i]->SetPosition(XMFLOAT3(-5000, -5000, -5000));
 		}
 	}
 }

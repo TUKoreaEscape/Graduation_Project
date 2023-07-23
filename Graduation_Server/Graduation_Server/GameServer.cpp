@@ -346,6 +346,8 @@ void cGameServer::WorkerThread()
 				packet.escape_id[i] = -1;
 
 			for (auto& player_id : rl.in_player) {
+				if (player_id == -1)
+					continue;
 				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_WRENCH, false);
 				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_PLIERS, false);
 				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, false);
@@ -381,8 +383,9 @@ void cGameServer::WorkerThread()
 
 			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
 			{
-				if(rl.in_player[i] != -1)
-					send_put_player_data(rl.in_player[i]);
+				if (rl.in_player[i] == -1)
+					continue;
+				send_put_player_data(rl.in_player[i]);
 				for (int idx = 0; idx < JOIN_ROOM_MAX_USER; ++idx)
 				{
 					if (rl.in_player[idx] == -1)
@@ -570,6 +573,12 @@ void cGameServer::Disconnect(const unsigned int _user_id) // Å¬¶óÀÌ¾ðÆ® ¿¬°áÀ» Ç
 	// ¿©±â¼­ ÃÊ±âÈ­
 	if (server_end != true) {
 		if (cl.get_join_room_number() != -1) {
+			cl.set_item_own(GAME_ITEM::ITEM_WRENCH, false);
+			cl.set_item_own(GAME_ITEM::ITEM_PLIERS, false);
+			cl.set_item_own(GAME_ITEM::ITEM_LIFECHIP, false);
+			cl.set_item_own(GAME_ITEM::ITEM_HAMMER, false);
+			cl.set_item_own(GAME_ITEM::ITEM_DRIVER, false);
+			cl.set_item_own(GAME_ITEM::ITEM_DRILL, false);
 			int disconnect_room_number = cl.get_join_room_number();
 			Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
 			rl.in_player_lock.lock();
