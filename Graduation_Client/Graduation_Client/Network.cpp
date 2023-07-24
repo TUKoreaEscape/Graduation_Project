@@ -41,6 +41,12 @@ void Network::init_network()
 	m_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 	int option = TRUE;
 	setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, (const char*)&option, sizeof(option));
+
+	int dscpValue = 46; // Change this value to your desired DSCP value
+	int result = setsockopt(m_socket, IPPROTO_IP, IP_TOS, (const char*)&dscpValue, sizeof(dscpValue));
+	if (result == SOCKET_ERROR) {
+		std::cout << "Failed DSCP Value" << std::endl;
+	}
 	SOCKADDR_IN server_addr;
 	ZeroMemory(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
@@ -95,8 +101,11 @@ void Network::listen_thread()
 
 		int ret = WSARecv(m_socket, &wsabuf, 1, &recv_byte, &recv_flag, nullptr, nullptr);
 		if (ret == SOCKET_ERROR && WSAGetLastError() != WSAEWOULDBLOCK) {
-			if(ret != WSA_IO_PENDING)
+			int error_number = WSAGetLastError();
+			if (error_number != WSA_IO_PENDING) {
 				std::cout << "RecvSizeType" << std::endl;
+				exit(0);
+			}
 		}
 
 		if (recv_byte > 0) {
@@ -155,6 +164,12 @@ void Network::ProcessPacket(char* ptr)
 		join_voice_talk();
 		GameState& game_state = *GameState::GetInstance();
 		game_state.ChangeNextState();
+		break;
+	}
+
+	case SC_PACKET::SC_PACKET_PLAYER_RATE:
+	{
+		Process_PlayerRate(ptr);
 		break;
 	}
 
@@ -254,10 +269,12 @@ void Network::ProcessPacket(char* ptr)
 		if (m_pPlayer->GetID() == packet->id) {
 			m_pPlayer->SetPlayerType(TYPE_TAGGER);
 			m_before_player_type = TYPE_TAGGER;
+			Input::GetInstance()->speed *= 1.1f;
 		}
 		else {
 			m_pPlayer->SetPlayerType(TYPE_PLAYER);
 			m_before_player_type = TYPE_PLAYER;
+			Input::GetInstance()->speed = 60.f;
 		}
 
 		for (int i = 0; i < 5; ++i)

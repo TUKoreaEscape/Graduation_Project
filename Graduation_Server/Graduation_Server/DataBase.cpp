@@ -152,11 +152,72 @@ int DataBase::create_id(std::wstring user_id, std::wstring user_pw)
 	return 2; // 그냥 에러임
 }
 
+Player_Rate DataBase::Load_PlayerRate(std::wstring user_id)
+{
+	std::wstring wp{};
+
+	Player_Rate rate_data{};
+
+	wp += L"EXEC Get_Rate ";
+	wp += user_id;
+
+	retcode = retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)wp.c_str(), SQL_NTS);
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+	{
+		retcode = SQLBindCol(hstmt, 1, SQL_C_LONG, &rate_total_play, 10, &cb_rate_total_play);
+		retcode = SQLBindCol(hstmt, 2, SQL_C_LONG, &rate_tagger_play, 10, &cb_rate_tagger_play);
+		retcode = SQLBindCol(hstmt, 3, SQL_C_LONG, &rate_runner_play, 10, &cb_rate_runner_play);
+		retcode = SQLBindCol(hstmt, 4, SQL_C_LONG, &rate_tagger_win, 10, &cb_rate_tagger_win);
+		retcode = SQLBindCol(hstmt, 5, SQL_C_LONG, &rate_runner_win, 10, &cb_rate_runner_win);
+
+		retcode = SQLFetch(hstmt);
+
+		if (retcode == SQL_ERROR)
+			show_error();
+
+		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO){
+			rate_data.total_play = static_cast<int>(rate_total_play);
+			rate_data.tagger_play = static_cast<int>(rate_tagger_play);
+			rate_data.runner_play = static_cast<int>(rate_runner_play);
+			rate_data.tagger_win = static_cast<int>(rate_tagger_win);
+			rate_data.runner_win = static_cast<int>(rate_runner_win);
+		}
+	}
+
+	return rate_data;
+}
+
+int DataBase::Save_PlayerRate(std::wstring user_id, Player_Rate& save_data)
+{
+	std::wstring wp{};
+
+	wp += L"EXEC Save_PlayerRate ";
+	wp += user_id;
+	wp += L", ";
+	wp += std::to_wstring(save_data.total_play);
+	wp += L", ";
+	wp += std::to_wstring(save_data.tagger_play);
+	wp += L", ";
+	wp += std::to_wstring(save_data.runner_play);
+	wp += L", ";
+	wp += std::to_wstring(save_data.tagger_win);
+	wp += L", ";
+	wp += std::to_wstring(save_data.runner_win);
+
+	retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)wp.c_str(), SQL_NTS);
+
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+		return 0;
+	return 1;
+}
+
 Custom DataBase::Load_Customizing(std::wstring user_id)
 {
 	std::wstring wp{};
 
-	Custom custom_data = {};
+	Custom custom_data{};
 	wp += L"EXEC Get_Custom ";
 	wp += user_id;
 
@@ -260,6 +321,9 @@ void DataBase::DataBaseThread()
 					DB_Request req = request;
 					req.type = REQUEST_LOAD_CUSTOMIZING;
 					request_db_queue.emplace(req);
+
+					req.type = REQUEST_LOAD_PLAYER_RATE;
+					request_db_queue.emplace(req);
 				}
 				else
 				{
@@ -321,6 +385,30 @@ void DataBase::DataBaseThread()
 			{
 				Save_Customizing(request.request_name, request.request_custom_data);
 				//cout << "커스터마이징 정보 저장 완료" << endl;
+				break;
+			}
+
+			case REQUEST_LOAD_PLAYER_RATE:
+			{
+				cGameServer& server = *cGameServer::GetInstance();
+				Player_Rate data = Load_PlayerRate(request.request_name);
+				server.m_clients[request.request_id].Load_PlayerRate(data);
+
+				sc_packet_player_rate packet;
+				packet.size = sizeof(packet);
+				packet.type = SC_PACKET::SC_PACKET_PLAYER_RATE;
+				packet.total_play = data.total_play;
+				packet.tagger_play = data.tagger_play;
+				packet.tagger_win = data.tagger_win;
+				packet.runner_play = data.runner_play;
+				packet.runner_win = data.runner_win;
+				server.m_clients[request.request_id].do_send(sizeof(packet), &packet);
+				break;
+			}
+
+			case REQUEST_SAVE_PLAYER_RATE:
+			{
+				Save_PlayerRate(request.request_name, request.request_player_rate);
 				break;
 			}
 

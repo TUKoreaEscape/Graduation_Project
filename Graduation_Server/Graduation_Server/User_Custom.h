@@ -69,6 +69,24 @@ struct Custom {
 	}
 };
 
+struct Player_Rate {
+	int		total_play;
+	int		tagger_play;
+	int		runner_play;
+	int		tagger_win;
+	int		runner_win;
+
+	Player_Rate& operator=(Player_Rate& ref) {
+		total_play = ref.total_play;
+		tagger_play = ref.tagger_play;
+		runner_play = ref.runner_play;
+		tagger_win = ref.tagger_win;
+		runner_win = ref.runner_win;
+
+		return ref;
+	}
+};
+
 class Customizing_Info {
 private:
 	HEADS			m_head;

@@ -103,14 +103,14 @@ void cGameServer::WorkerThread()
 				NULL, err_no,
 				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 				(LPTSTR)&lpMsgBuf, 0, 0);
-			std::wcout << lpMsgBuf << std::endl;
+			std::wcout << lpMsgBuf << std::endl << endl;
 
 			LocalFree(lpMsgBuf);
 #endif
 			Disconnect(client_id);
 
 #if SOCKET_ERROR_PRINT
-			cout << "disconnect ID : " << client_id << endl;
+			cout << "disconnect ID : " << client_id << endl << endl;
 #endif
 			if (exp_over->m_comp_op == OP_SEND)
 				delete exp_over;
@@ -346,12 +346,21 @@ void cGameServer::WorkerThread()
 				packet.escape_id[i] = -1;
 
 			for (auto& player_id : rl.in_player) {
+				if (player_id == -1)
+					continue;
 				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_WRENCH, false);
 				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_PLIERS, false);
 				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, false);
 				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_HAMMER, false);
 				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_DRIVER, false);
 				m_clients[player_id].set_item_own(GAME_ITEM::ITEM_DRILL, false);
+				m_clients[player_id].Add_Total_Play();
+				if (rl.Get_Tagger_ID() == player_id) {
+					m_clients[player_id].Add_Tagger_Play();
+					m_clients[player_id].Add_Tagger_Win();
+				}
+				else
+					m_clients[player_id].Add_Runner_Play();
 			}
 
 			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
@@ -381,8 +390,9 @@ void cGameServer::WorkerThread()
 
 			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
 			{
-				if(rl.in_player[i] != -1)
-					send_put_player_data(rl.in_player[i]);
+				if (rl.in_player[i] == -1)
+					continue;
+				send_put_player_data(rl.in_player[i]);
 				for (int idx = 0; idx < JOIN_ROOM_MAX_USER; ++idx)
 				{
 					if (rl.in_player[idx] == -1)
@@ -408,8 +418,18 @@ void cGameServer::WorkerThread()
 			packet.type = SC_PACKET::SC_PACKET_GAME_END;
 			packet.is_tagger_win = false; // ¿Ã∞« πÊø°º≠ ¥©∞° ¿Ã∞Â¥¬¡ˆ ¡∂∞«¿ª ≥—∞‹¡‡æﬂ«‘
 
+			for (auto& player_id : rl.in_player) {
+				m_clients[player_id].Add_Total_Play();
+				if (player_id == rl.Get_Tagger_ID())
+					m_clients[player_id].Add_Tagger_Play();
+				else
+					m_clients[player_id].Add_Runner_Play();
+			}
+
 			for (int i = 0; i < 6; ++i) {
 				packet.escape_id[i] = rl.in_escape_player[i];
+				if(rl.in_escape_player[i] != -1)
+					m_clients[rl.in_escape_player[i]].Add_Runner_Win();
 				rl.in_escape_player[i] = -1;
 			}
 
@@ -464,7 +484,7 @@ void cGameServer::WorkerThread()
 			break;
 		}
 		default:
-			cout << exp_over->m_comp_op << " : recv" << endl;
+			//cout << exp_over->m_comp_op << " : recv" << endl;
 			break;
 
 		}
@@ -494,6 +514,10 @@ void cGameServer::Accept(EXP_OVER* exp_over)
 		ZeroMemory(&exp_over->m_wsa_over, sizeof(exp_over->m_wsa_over));
 		c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 		*(reinterpret_cast<SOCKET*>(exp_over->m_buf)) = c_socket;
+		int keepAlive = 1;
+		int keepAliveTimeout = KEEP_ALIVE_TIMEOUT * 1000; // ms ¥‹¿ß∑Œ ≈∏¿”æ∆øÙ º≥¡§
+		setsockopt(c_socket, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char*>(&keepAlive), sizeof(keepAlive));
+		setsockopt(c_socket, IPPROTO_TCP, TCP_KEEPALIVE, reinterpret_cast<char*>(&keepAliveTimeout), sizeof(keepAliveTimeout));
 		AcceptEx(C_IOCP::m_listen_socket, c_socket, exp_over->m_buf + 8, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &exp_over->m_wsa_over);
 	}
 }
@@ -562,10 +586,21 @@ void cGameServer::Disconnect(const unsigned int _user_id) // ≈¨∂Û¿Ãæ∆Æ ø¨∞·¿ª «
 		request.request_custom_data;
 		request.request_name = convertID; 
 		m_database->insert_request(request);
+
+		Player_Rate rate_data = m_clients[_user_id].Get_PlayerRate();
+		request.type = REQUEST_SAVE_PLAYER_RATE;
+		request.request_player_rate = rate_data;
+		m_database->insert_request(request);
 	}
 	// ø©±‚º≠ √ ±‚»≠
 	if (server_end != true) {
 		if (cl.get_join_room_number() != -1) {
+			cl.set_item_own(GAME_ITEM::ITEM_WRENCH, false);
+			cl.set_item_own(GAME_ITEM::ITEM_PLIERS, false);
+			cl.set_item_own(GAME_ITEM::ITEM_LIFECHIP, false);
+			cl.set_item_own(GAME_ITEM::ITEM_HAMMER, false);
+			cl.set_item_own(GAME_ITEM::ITEM_DRIVER, false);
+			cl.set_item_own(GAME_ITEM::ITEM_DRILL, false);
 			int disconnect_room_number = cl.get_join_room_number();
 			Room& rl = *m_room_manager->Get_Room_Info(cl.get_join_room_number());
 			rl.in_player_lock.lock();

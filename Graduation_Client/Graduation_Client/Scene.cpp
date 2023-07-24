@@ -56,6 +56,17 @@ void Scene::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 }
 
+void Scene::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	for (auto& object : gameObjects) {
+		object->OnPrepareRender();
+		//object->Animate(m_fElapsedTime, object->PlayerNum);
+		if (object->GetType() != TYPE_ESCAPE_PLAYER)
+			object->Depthrender(pd3dCommandList);
+	}
+}
+
+
 void Scene::AddPlayer(GameObject* player)
 {
 	creationQueue.push(player);

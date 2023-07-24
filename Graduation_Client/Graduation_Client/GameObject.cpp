@@ -74,6 +74,14 @@ void GameObject::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (m_pChild) m_pChild->render(pd3dCommandList);
 }
 
+void GameObject::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	renderer->Depthrender(pd3dCommandList);
+	if (m_pSibling) m_pSibling->Depthrender(pd3dCommandList);
+	if (m_pChild) m_pChild->Depthrender(pd3dCommandList);
+}
+
+
 Texture* GameObject::FindReplicatedTexture(_TCHAR* pstrTextureName)
 {
 	Texture* pTexture = nullptr;

@@ -36,7 +36,7 @@ private:
 
 private:
 	SOCKET				m_socket;
-	const char*			SERVER_ADDR = "172.30.1.52";
+	const char*			SERVER_ADDR = "127.0.0.1";
 	Server_Timer		m_server_counter;
 	Custom				data;
 
@@ -113,6 +113,7 @@ public:
 	void AssemblyPacket(char* netbuf, size_t io_byte);
 	void ProcessPacket(char* ptr);
 
+	void Process_PlayerRate(char* ptr);
 	void Process_Player_Move(char* ptr);
 	void Process_Other_Player_Move(char* ptr);
 	void Process_Other_Move(char* ptr);

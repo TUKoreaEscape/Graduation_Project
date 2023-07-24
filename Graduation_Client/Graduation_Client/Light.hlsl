@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------
-#define MAX_LIGHTS			16 
+#define MAX_LIGHTS			3
 #define MAX_MATERIALS		512 
 
 #define POINT_LIGHT			1
@@ -33,6 +33,56 @@ cbuffer cbLights : register(b4)
 	float4					gcGlobalAmbientLight;
 	int						gnLights;
 };
+
+#define FRAME_BUFFER_WIDTH		1600
+#define FRAME_BUFFER_HEIGHT		900
+#define _WITH_PCF_FILTERING
+#define _DEPTH_BUFFER_WIDTH		(FRAME_BUFFER_WIDTH * 8)
+#define _DEPTH_BUFFER_HEIGHT	(FRAME_BUFFER_HEIGHT * 8)
+#define _WITH_LOCAL_VIEWER_HIGHLIGHTING
+
+#define DELTA_X					(1.0f / _DEPTH_BUFFER_WIDTH * 2)
+#define DELTA_Y					(1.0f / _DEPTH_BUFFER_HEIGHT * 2)
+
+#define MAX_DEPTH_TEXTURES		MAX_LIGHTS
+
+Texture2D<float> gtxtDepthTextures[MAX_DEPTH_TEXTURES] : register(t22);
+SamplerComparisonState gssComparisonPCFShadow : register(s2);
+
+float Compute3x3ShadowFactor(float2 uv, float fDepth, uint nIndex)
+{
+	float fPercentLit = gtxtDepthTextures[nIndex].SampleCmpLevelZero(gssComparisonPCFShadow, uv, fDepth).r;
+	fPercentLit += gtxtDepthTextures[nIndex].SampleCmpLevelZero(gssComparisonPCFShadow, uv + float2(-DELTA_X, 0.0f), fDepth).r;
+	fPercentLit += gtxtDepthTextures[nIndex].SampleCmpLevelZero(gssComparisonPCFShadow, uv + float2(+DELTA_X, 0.0f), fDepth).r;
+	fPercentLit += gtxtDepthTextures[nIndex].SampleCmpLevelZero(gssComparisonPCFShadow, uv + float2(0.0f, -DELTA_Y), fDepth).r;
+	fPercentLit += gtxtDepthTextures[nIndex].SampleCmpLevelZero(gssComparisonPCFShadow, uv + float2(0.0f, +DELTA_Y), fDepth).r;
+	fPercentLit += gtxtDepthTextures[nIndex].SampleCmpLevelZero(gssComparisonPCFShadow, uv + float2(-DELTA_X, -DELTA_Y), fDepth).r;
+	fPercentLit += gtxtDepthTextures[nIndex].SampleCmpLevelZero(gssComparisonPCFShadow, uv + float2(-DELTA_X, +DELTA_Y), fDepth).r;
+	fPercentLit += gtxtDepthTextures[nIndex].SampleCmpLevelZero(gssComparisonPCFShadow, uv + float2(+DELTA_X, -DELTA_Y), fDepth).r;
+	fPercentLit += gtxtDepthTextures[nIndex].SampleCmpLevelZero(gssComparisonPCFShadow, uv + float2(+DELTA_X, +DELTA_Y), fDepth).r;
+
+	return (fPercentLit / 9.0f);
+}
+
+float Compute5x5ShadowFactor(float2 uv, float fDepth, uint nIndex)
+{
+	float fPercentLit = 0.0f;
+
+	// 5x5 영역의 샘플링을 수행하고 그림자 팩터를 누적합니다.
+	for (int y = -2; y <= 2; y++)
+	{
+		for (int x = -2; x <= 2; x++)
+		{
+			float2 offsetUV = uv + float2(x * DELTA_X, y * DELTA_Y);
+			fPercentLit += gtxtDepthTextures[nIndex].SampleCmpLevelZero(gssComparisonPCFShadow, offsetUV, fDepth).r;
+		}
+	}
+
+	// 총 25개의 샘플을 평균내서 그림자 팩터를 계산합니다.
+	fPercentLit /= 25.0f;
+
+	return fPercentLit;
+}
 
 float4 DirectionalLight(int nIndex, float3 vNormal, float3 vToCamera)
 {
@@ -162,3 +212,44 @@ float4 Lighting(float3 vPosition, float3 vNormal)
 	return(cColor);
 }
 
+float4 Lighting(float3 vPosition, float3 vNormal, bool bShadow, float4 uvs[MAX_LIGHTS])
+{
+	float3 vCameraPosition = float3(gvCameraPosition.x, gvCameraPosition.y, gvCameraPosition.z);
+	float3 vToCamera = normalize(vCameraPosition - vPosition);
+
+	float4 cColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	[unroll]
+	for (int i = 0; i < MAX_LIGHTS; i++)
+	{
+		if (gLights[i].m_bEnable)
+		{
+			float fShadowFactor = 1.0f;
+#ifdef _WITH_PCF_FILTERING
+			if (bShadow) fShadowFactor = Compute5x5ShadowFactor(uvs[i].xy / uvs[i].ww, uvs[i].z / uvs[i].w, i);
+#else
+			if (bShadow)
+				fShadowFactor = gtxtDepthTextures[i].SampleCmpLevelZero(gssComparisonPCFShadow, uvs[i].xy / uvs[i].ww, uvs[i].z / uvs[i].w).r;
+#endif
+
+			if (gLights[i].m_nType == DIRECTIONAL_LIGHT)
+			{
+				cColor += DirectionalLight(i, vNormal, vToCamera) * fShadowFactor;
+			}
+			else if (gLights[i].m_nType == POINT_LIGHT)
+			{
+				cColor += PointLight(i, vPosition, vNormal, vToCamera) * fShadowFactor;
+			}
+			else if (gLights[i].m_nType == SPOT_LIGHT)
+			{
+				cColor += SpotLight(i, vPosition, vNormal, vToCamera) * fShadowFactor;
+				//				cColor += SpotLight(i, vPosition, vNormal, vToCamera);
+			}
+			cColor += gLights[i].m_cAmbient * gMaterial.m_cAmbient;
+		}
+	}
+
+	cColor += (gcGlobalAmbientLight);
+	cColor.a = gMaterial.m_cDiffuse.a;
+
+	return (cColor);
+}
