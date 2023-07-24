@@ -390,26 +390,9 @@ void Player::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->UpdateShaderVariables(pd3dCommandList, PlayerNum);
 
 	if (GameState::GetInstance()->GetGameState() == ENDING_GAME) {
-#if USE_NETWORK
-		Network& network = *Network::GetInstance();
-		if(network.m_tagger_win){
-#endif
-#if !USE_NETWORK
-		if (0) { // Tagger's Win
-#endif
-			if (this->GetType() == TYPE_TAGGER) {
-				renderer->render(pd3dCommandList);
-				if (m_pSibling) m_pSibling->render(pd3dCommandList);
-				if (m_pChild) m_pChild->render(pd3dCommandList);
-			}
-		}
-		else {
-			if (this->GetType() == TYPE_PLAYER || this->GetType() == TYPE_DEAD_PLAYER) {
-				renderer->render(pd3dCommandList);
-				if (m_pSibling) m_pSibling->render(pd3dCommandList);
-				if (m_pChild) m_pChild->render(pd3dCommandList);
-			}
-		}
+		renderer->render(pd3dCommandList);
+		if (m_pSibling) m_pSibling->render(pd3dCommandList);
+		if (m_pChild) m_pChild->render(pd3dCommandList);
 		return;
 	}
 

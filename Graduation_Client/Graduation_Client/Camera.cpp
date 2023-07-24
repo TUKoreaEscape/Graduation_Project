@@ -330,7 +330,7 @@ void ThirdPersonCamera::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	m_pPlayer = Input::GetInstance()->m_pPlayer;
 	SetTimeLag(0.05f);
 	SetOffset(XMFLOAT3(0.0f, 3.0f, 5.0f));
-	GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 75.0f);
+	GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
 	SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 	SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
 	//m_pPlayer->SetPosition(XMFLOAT3(0, 0, 0));
@@ -403,7 +403,7 @@ void CustomizingCamera::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 
 		XMFLOAT3 xmf3Offset = Vector3::TransformCoord(m_xmf3Offset, xmf4x4Rotate);
 		XMFLOAT3 pos = m_pPlayer->GetPosition();
-		pos.y -= 0.5f;
+		pos.y += 0.5f;
 		XMFLOAT3 xmf3Position = Vector3::Add(pos, xmf3Offset);
 		XMFLOAT3 xmf3Direction = Vector3::Subtract(xmf3Position, m_xmf3Position);
 		float fLength = Vector3::Length(xmf3Direction);
@@ -414,7 +414,7 @@ void CustomizingCamera::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 		if (fDistance > 0)
 		{
 			m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Direction, fDistance);
-			SetLookAt(m_pPlayer->GetPosition());
+			SetLookAt(pos);
 		}
 	}
 }
