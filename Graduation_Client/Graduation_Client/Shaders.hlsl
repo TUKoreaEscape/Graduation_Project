@@ -195,7 +195,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStandard(VS_STANDARD_OUTPUT input, uint nPri
 	{
 		normalW = normalize(input.normalW);
 	}
-	float4 cIllumination = Lighting(input.positionW, normalW, true, input.uvs);
+	float4 cIllumination = Lighting(input.positionW, normalW, false, input.uvs);
 	//output.f4Illumination = cIllumination;
 
 	float3 uvw = float3(input.uv, nPrimitiveID / 2);
