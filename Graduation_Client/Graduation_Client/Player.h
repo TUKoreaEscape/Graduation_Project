@@ -178,4 +178,9 @@ public:
 	void SetShown(bool shown) {
 		m_bShownAnswer = shown;
 	}
+
+	void SetAnimationCallback(int index);
+	int FootstepCallback1 = -1;
+	int FootstepCallback2 = -1;
+	int channelIndex = -1;
 };

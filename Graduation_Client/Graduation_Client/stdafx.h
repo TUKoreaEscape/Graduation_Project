@@ -32,6 +32,9 @@
 #include <d3d11on12.h>
 #include <d2d1_1helper.h>
 
+#include <Mmsystem.h>
+#pragma comment(lib,"winmm.lib")
+
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 using Microsoft::WRL::ComPtr;
@@ -97,6 +100,7 @@ using Microsoft::WRL::ComPtr;
 //#define _WITH_DEBUG_SKINNING_BONE
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
+#include "inc/fmod.hpp"
 
 constexpr int TYPE_ALPHACUT = -1;
 constexpr int TYPE_OBJECT = 0;
@@ -198,6 +202,21 @@ enum HEADS {
 	HEAD11, HEAD12, HEAD13, HEAD14, HEAD15,
 	HEAD16, HEAD17, HEAD18, HEAD19, HEAD20,
 	HEAD21
+};
+
+enum ANIMATION {
+	IDLE = 0,
+	RUN_FWD,
+	RUN_BWD,
+	RUN_LEFT,
+	RUN_RIGHT,
+	JUMP,
+	JUMP_END,
+	ATTACK,
+	HIT,
+	DANCE,
+	VICTORY,
+	INTERACTION,
 };
 
 struct RECT_FLOAT {

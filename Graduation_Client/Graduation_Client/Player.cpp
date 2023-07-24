@@ -7,6 +7,7 @@
 #include "Object.h"
 #include "Network.h"
 #include "Game_state.h"
+#include "Sound.h"
 
 Player::Player() : GameObject()
 {
@@ -502,7 +503,7 @@ void Player::SetAnimation(int index)
 	m_pSkinnedAnimationController->SetTrackAnimationSet(0, index);
 	m_pSkinnedAnimationController->SetTrackWeight(0, 0.3f);
 	if (m_nPrevAnimation == index) return;
-	if (index > 5) return;
+	else if (index > RUN_RIGHT) return;
 	else {
 		if (!m_bIsBlending)	m_fBlendingTime = 0;
 		m_bIsBlending = true;
@@ -512,6 +513,32 @@ void Player::SetAnimation(int index)
 void Player::ChangeSpectator()
 {
 	SpectatorPlayerIndex = (SpectatorPlayerIndex + 1) % 5;
+}
+
+void Player::SetAnimationCallback(int index)
+{
+	AnimationCallbackHandler* pAnimationCallbackHandler = new SoundCallbackHandler();
+	channelIndex = index;
+	if (m_pSkinnedAnimationController) {
+		FootstepCallback1 = Sound::GetInstance()->CreatePlayersSounds("Sound/Footstep01.wav", index);
+		FootstepCallback2 = Sound::GetInstance()->CreatePlayersSounds("Sound/Footstep02.wav", index);
+		m_pSkinnedAnimationController->SetCallbackKeys(0, 1, 2);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 1, 0, 0.166f, &FootstepCallback1, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 1, 1, 0.5f, &FootstepCallback2, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKeys(0, 2, 2);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 2, 0, 0.166f, &FootstepCallback1, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 2, 1, 0.5f, &FootstepCallback2, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKeys(0, 3, 2);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 3, 0, 0.166f, &FootstepCallback1, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 3, 1, 0.5f, &FootstepCallback2, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKeys(0, 4, 2);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 4, 0, 0.166f, &FootstepCallback1, &channelIndex);
+		m_pSkinnedAnimationController->SetCallbackKey(0, 4, 1, 0.5f, &FootstepCallback2, &channelIndex);
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 1, pAnimationCallbackHandler);
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 2, pAnimationCallbackHandler);
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 3, pAnimationCallbackHandler);
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(0, 4, pAnimationCallbackHandler);
+	}
 }
 
 void Player::ReleaseShaderVariables()

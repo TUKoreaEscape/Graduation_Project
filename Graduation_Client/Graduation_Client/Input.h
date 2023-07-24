@@ -23,6 +23,8 @@ public:
 	Player*			m_pPlayer=NULL;
 	Time				m_time;
 	POINT				m_ptOldCursorPos{ 0,0 };
+
+	GameObject* m_pTestDoor = nullptr;
 	
 	//ÆÐÅ¶
 	cs_packet_login				m_cs_packet_login{ NULL};

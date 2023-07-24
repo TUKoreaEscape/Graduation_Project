@@ -4,6 +4,7 @@
 #include "Movement.h"
 #include "Network.h"
 #include "Input.h"
+#include "Sound.h"
 
 ID3D12DescriptorHeap* GameScene::m_pd3dCbvSrvDescriptorHeap = NULL;
 
@@ -1381,6 +1382,16 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	if (IsNearItembox == false) m_pPlayer->m_pNearItembox = nullptr;
 	if (IsNearTaggers == false) m_pPlayer->m_pNearTaggers = nullptr;
 	if (IsNearEsacpeLever == false) m_pPlayer->m_pNearEscape = nullptr;
+
+	Sound& sound = *Sound::GetInstance();
+	for (int i = 0; i < 5; ++i) {
+		if (m_ppPlayers[i]) {
+			XMFLOAT3 pos = m_ppPlayers[i]->GetPosition();
+			sound.SetOtherPlayersPos(i, pos);
+		}
+	}
+	sound.SetListenerPos(m_pPlayer->GetPosition(), m_pPlayer->GetLookVector(), m_pPlayer->GetUpVector());
+	sound.Update(elapsedTime);
 }
 
 bool InArea(int startX, int startZ, int width, int length, float x, float z)
@@ -1574,14 +1585,15 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	LoadedModelInfo* pLobbyModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InDDD.bin", nullptr);
 	LoadedModelInfo* pCubeModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/CubeRoom.bin", nullptr);
 	LoadedModelInfo* pCeilModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Ceilling.bin", nullptr);
-	
+
 	for (int i = 0; i < m_nPlayers; ++i) {
 		m_ppPlayers[i]->SetChild(pPlayerModel->m_pModelRootObject, true);
 		m_ppPlayers[i]->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 2, pPlayerModel);
-		m_ppPlayers[i]->SetAnimation(0);
+		m_ppPlayers[i]->SetAnimation(IDLE);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 0);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackEnable(1, false);//m_ppPlayers[i]->SetPosition(XMFLOAT3(i , 0.0f, -5.0f));
+		m_ppPlayers[i]->SetAnimationCallback(i);
 		for (int j = 0; j < 6; ++j)
 			GameObject::SetParts(i + 1, j, 0);
 		m_ppPlayers[i]->PlayerNum = i + 1;
@@ -1592,6 +1604,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_ppPlayers[2]->SetPosition(XMFLOAT3(-3.0f, 0.0f, -5.0f));
 	m_ppPlayers[3]->SetPosition(XMFLOAT3(-6.0f, 0.0f, -5.0f));
 	m_ppPlayers[4]->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
+	m_ppPlayers[0]->SetAnimation(RUN_FWD);
 
 	m_ppPlayers[0]->SetPlayerType(TYPE_ESCAPE_PLAYER);
 	m_ppPlayers[1]->SetPlayerType(TYPE_ESCAPE_PLAYER);
@@ -1599,16 +1612,18 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 	m_pPlayer->SetChild(pPlayerModel->m_pModelRootObject, true);
 	m_pPlayer->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 2, pPlayerModel);
-	m_pPlayer->SetAnimation(0);
+	m_pPlayer->SetAnimation(IDLE);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.0f);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 0);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackEnable(1, false);
+	m_pPlayer->SetAnimationCallback(-1);
+
 	m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -3.0f));
 	for (int j = 0; j < 6; ++j)
 		GameObject::SetParts(0, j, 0);
 	GameObject::SetParts(0, 0, 4);
 	m_pPlayer->PlayerNum = 0;
-
+	
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.3f);
 	m_pSkybox = new SkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
@@ -1828,4 +1843,6 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	send_thread = std::thread{ &Network::Debug_send_thread, m_network };
 #endif
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(1.0f);
+
+	Input::GetInstance()->m_pTestDoor = m_pDoors[0];
 }

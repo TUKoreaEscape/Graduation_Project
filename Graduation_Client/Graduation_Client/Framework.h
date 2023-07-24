@@ -9,6 +9,7 @@
 #include "GameObject.h"
 #include "Game_state.h"
 #include "UI.h"
+#include "Sound.h"
 
 class Framework
 {
@@ -94,6 +95,7 @@ private:
 	TextureToViewportShader* m_pShadowMapToViewport = nullptr;
 
 	Network* network = NULL;
+	Sound* sound = nullptr;
 
 	_TCHAR						m_pszFrameRate[70];
 

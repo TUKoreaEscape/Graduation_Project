@@ -6,18 +6,30 @@ class GameObject;
 #define ANIMATION_TYPE_LOOP			1
 #define ANIMATION_TYPE_PINGPONG		2
 
-#define ANIMATION_CALLBACK_EPSILON 0.015f
+#define ANIMATION_CALLBACK_EPSILON 0.01f
 
 struct CALLBACKKEY
 {
 	float  							m_fTime = 0.0f;
 	void* m_pCallbackData = NULL;
+	void* m_pCallbackData2 = nullptr;
 };
 
 class AnimationCallbackHandler
 {
 public:
-	virtual void HandleCallback(void* pCallbackData) { }
+	virtual void HandleCallback(void* pCallbackData, float fTrackPosition, void* pCallbackData2 = nullptr) { }
+};
+
+class SoundCallbackHandler : public AnimationCallbackHandler
+{
+public:
+	SoundCallbackHandler() { }
+	~SoundCallbackHandler() { }
+
+public:
+	virtual void HandleCallback(void* pCallbackData, float fTrackPosition, void* pCallbackData2 = nullptr );
+
 };
 //#define _WITH_ANIMATION_SRT		//애니메이션 행렬 대신에 SRT 정보를 사용
 #define _WITH_ANIMATION_INTERPOLATION
@@ -69,10 +81,12 @@ public:
 	XMFLOAT4X4 GetSRT(int nBone);
 
 	void SetCallbackKeys(int nCallbackKeys);
-	void SetCallbackKey(int nKeyIndex, float fTime, void* pData);
+	void SetCallbackKey(int nKeyIndex, float fTime, void* pData, void* pData2 = nullptr);
 	void SetAnimationCallbackHandler(AnimationCallbackHandler* pCallbackHandler);
 
 	void* GetCallbackData();
+
+	void HandleCallback(CALLBACKKEY* key);
 };
 
 class AnimationSets
@@ -94,7 +108,7 @@ public:
 
 public:
 	void SetCallbackKeys(int nAnimationSet, int nCallbackKeys);
-	void SetCallbackKey(int nAnimationSet, int nKeyIndex, float fTime, void* pData);
+	void SetCallbackKey(int nAnimationSet, int nKeyIndex, float fTime, void* pData, void* pData2 = nullptr);
 	void SetAnimationCallbackHandler(int nAnimationSet, AnimationCallbackHandler* pCallbackHandler);
 };
 
@@ -171,8 +185,11 @@ public:
 	void SetTrackWeight(int nAnimationTrack, float fWeight);
 
 	void SetCallbackKeys(int nSkinnedMesh, int nAnimationSet, int nCallbackKeys);
-	void SetCallbackKey(int nSkinnedMesh, int nAnimationSet, int nKeyIndex, float fTime, void* pData);
+	void SetCallbackKey(int nSkinnedMesh, int nAnimationSet, int nKeyIndex, float fTime, void* pData, void* pData2 = nullptr);
 	void SetAnimationCallbackHandler(int nSkinnedMesh, int nAnimationSet, AnimationCallbackHandler* pCallbackHandler);
+	
+	int 							m_nCallbackKeys = 0;
+	CALLBACKKEY* m_pCallbackKeys = NULL;
 
 	void AdvanceTime(float fElapsedTime, GameObject* pRootGameObject, int player = -1);
 };

@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "GameObject.h"
 #include "Animation.h"
+#include "Sound.h"
 
 AnimationSet::AnimationSet(float fLength, int nFramesPerSecond, int nKeyFrames, int nSkinningBones, char* pstrName)
 {
@@ -42,12 +43,6 @@ void AnimationSet::SetPosition(float fTrackPosition)
 		break;
 	case ANIMATION_TYPE_PINGPONG:
 		break;
-	}
-
-	if (m_pAnimationCallbackHandler)
-	{
-		void* pCallbackData = GetCallbackData();
-		if (pCallbackData) m_pAnimationCallbackHandler->HandleCallback(pCallbackData);
 	}
 }
 
@@ -105,10 +100,11 @@ void AnimationSet::SetCallbackKeys(int nCallbackKeys)
 	m_pCallbackKeys = new CALLBACKKEY[nCallbackKeys];
 }
 
-void AnimationSet::SetCallbackKey(int nKeyIndex, float fKeyTime, void* pData)
+void AnimationSet::SetCallbackKey(int nKeyIndex, float fKeyTime, void* pData, void* pData2)
 {
 	m_pCallbackKeys[nKeyIndex].m_fTime = fKeyTime;
 	m_pCallbackKeys[nKeyIndex].m_pCallbackData = pData;
+	m_pCallbackKeys[nKeyIndex].m_pCallbackData2 = pData2;
 }
 
 void AnimationSet::SetAnimationCallbackHandler(AnimationCallbackHandler* pCallbackHandler)
@@ -123,6 +119,21 @@ void* AnimationSet::GetCallbackData()
 		if (::IsEqual(m_pCallbackKeys[i].m_fTime, m_fPosition, ANIMATION_CALLBACK_EPSILON)) return(m_pCallbackKeys[i].m_pCallbackData);
 	}
 	return(NULL);
+}
+
+void AnimationSet::HandleCallback(CALLBACKKEY* key)
+{
+	if (m_pAnimationCallbackHandler)
+	{
+		for (int i = 0; i < m_nCallbackKeys; i++)
+		{
+			if (::IsEqual(m_pCallbackKeys[i].m_fTime, m_fPosition, ANIMATION_CALLBACK_EPSILON))
+			{
+				if (m_pCallbackKeys[i].m_pCallbackData) m_pAnimationCallbackHandler->HandleCallback(key[i].m_pCallbackData, m_fPosition, key[i].m_pCallbackData2);
+				break;
+			}
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,10 +156,11 @@ void AnimationSets::SetCallbackKeys(int nAnimationSet, int nCallbackKeys)
 	m_ppAnimationSets[nAnimationSet]->m_pCallbackKeys = new CALLBACKKEY[nCallbackKeys];
 }
 
-void AnimationSets::SetCallbackKey(int nAnimationSet, int nKeyIndex, float fKeyTime, void* pData)
+void AnimationSets::SetCallbackKey(int nAnimationSet, int nKeyIndex, float fKeyTime, void* pData, void* pData2)
 {
 	m_ppAnimationSets[nAnimationSet]->m_pCallbackKeys[nKeyIndex].m_fTime = fKeyTime;
 	m_ppAnimationSets[nAnimationSet]->m_pCallbackKeys[nKeyIndex].m_pCallbackData = pData;
+	m_ppAnimationSets[nAnimationSet]->m_pCallbackKeys[nKeyIndex].m_pCallbackData2 = pData2;
 
 }
 
@@ -280,11 +292,16 @@ void AnimationController::SetTrackWeight(int nAnimationTrack, float fWeight)
 void AnimationController::SetCallbackKeys(int nSkinnedMesh, int nAnimationSet, int nCallbackKeys)
 {
 	if (m_ppAnimationSets && m_ppAnimationSets[nSkinnedMesh]) m_ppAnimationSets[nSkinnedMesh]->SetCallbackKeys(nAnimationSet, nCallbackKeys);
+	m_nCallbackKeys = nCallbackKeys;
+	m_pCallbackKeys = new CALLBACKKEY[nCallbackKeys];
 }
 
-void AnimationController::SetCallbackKey(int nSkinnedMesh, int nAnimationSet, int nKeyIndex, float fKeyTime, void* pData)
+void AnimationController::SetCallbackKey(int nSkinnedMesh, int nAnimationSet, int nKeyIndex, float fKeyTime, void* pData, void* pData2)
 {
-	if (m_ppAnimationSets && m_ppAnimationSets[nSkinnedMesh]) m_ppAnimationSets[nSkinnedMesh]->SetCallbackKey(nAnimationSet, nKeyIndex, fKeyTime, pData);
+	if (m_ppAnimationSets && m_ppAnimationSets[nSkinnedMesh]) m_ppAnimationSets[nSkinnedMesh]->SetCallbackKey(nAnimationSet, nKeyIndex, fKeyTime, pData, pData2);
+	m_pCallbackKeys[nKeyIndex].m_fTime = fKeyTime;
+	m_pCallbackKeys[nKeyIndex].m_pCallbackData = pData;
+	m_pCallbackKeys[nKeyIndex].m_pCallbackData2 = pData2;
 }
 
 void AnimationController::SetAnimationCallbackHandler(int nSkinnedMesh, int nAnimationSet, AnimationCallbackHandler* pCallbackHandler)
@@ -301,7 +318,7 @@ void AnimationController::AdvanceTime(float fTimeElapsed, GameObject* pRootGameO
 
 		for (int i = 0; i < m_nSkinnedMeshes; i++)
 		{
-			bool isNotUpdate = true;
+			/*bool isNotUpdate = true;
 			if (player == 0) {
 				for (const std::string& str : GameObject::PlayerParts) {
 					if (!strcmp(str.c_str(), m_ppSkinnedMeshes[i]->m_pstrMeshName)) {
@@ -319,7 +336,7 @@ void AnimationController::AdvanceTime(float fTimeElapsed, GameObject* pRootGameO
 				}
 			}
 			if (isNotUpdate)
-				continue;
+				continue;*/
 			for (int j = 0; j < m_pnAnimatedBoneFrames[i]; j++)
 			{
 				XMFLOAT4X4 xmf4x4Transform = Matrix4x4::Zero();
@@ -338,6 +355,11 @@ void AnimationController::AdvanceTime(float fTimeElapsed, GameObject* pRootGameO
 		}
 
 		pRootGameObject->UpdateTransform(NULL);
+
+		for (int k = 0; k < 1; k++)
+		{
+			if (m_pAnimationTracks[k].m_bEnable) m_ppAnimationSets[0]->m_ppAnimationSets[m_pAnimationTracks[k].m_nAnimationSet]->HandleCallback(m_pCallbackKeys);
+		}
 	}
 }
 
@@ -352,4 +374,13 @@ LoadedModelInfo::~LoadedModelInfo()
 		if (m_pppAnimatedBoneFrameCaches[i]) delete[] m_pppAnimatedBoneFrameCaches[i];
 	}
 	if (m_pppAnimatedBoneFrameCaches) delete[] m_pppAnimatedBoneFrameCaches;
+}
+
+void SoundCallbackHandler::HandleCallback(void* pCallbackData, float fTrackPosition, void* pCallbackData2)
+{
+	int* SoundIndex = (int*)pCallbackData;
+	int* ChannelIndex = (int*)pCallbackData2;
+	std::cout << "sound Index - " << *SoundIndex << ", Channel - " << *ChannelIndex << " fucking - " << fTrackPosition <<"\n";
+	Sound& sound = *Sound::GetInstance();
+	sound.Play(*SoundIndex, 1.0f, *ChannelIndex);
 }
