@@ -287,7 +287,7 @@ Door::Door() : InteractionObject()
 	}
 	m_nUIType = DOOR_UI;
 
-	m_nDoorSoundIndex = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav");
+	m_nDoorSoundIndex = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
 }
 
 Door::~Door()
@@ -610,14 +610,14 @@ void Door::SetOpen(bool Open)
 		if (Open == false) {
 			IsOpen = false;
 			IsWorking = true;
-			Sound::GetInstance()->PlayObject(m_nDoorSoundIndex, 1.0f, m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
+			Sound::GetInstance()->PlayObjectSound(m_nDoorSoundIndex, 1.0f);
 		}
 	}
 	else {
 		if (Open == true) {
 			IsOpen = true;
 			IsWorking = true;
-			Sound::GetInstance()->PlayObject(m_nDoorSoundIndex, 1.0f, m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
+			Sound::GetInstance()->PlayObjectSound(m_nDoorSoundIndex, 1.0f);
 		}
 	}
 }

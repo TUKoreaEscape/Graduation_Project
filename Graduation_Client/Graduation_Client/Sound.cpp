@@ -102,12 +102,26 @@ int Sound::CreateEffectSound(char* file, float volume)
 	return -1;
 }
 
-int Sound::CreateObjectSound(char* file)
+int Sound::CreateObjectSound(char* file, const XMFLOAT3& position)
 {
 	m_pSystem->createSound(file, FMOD_3D | FMOD_LOOP_OFF | FMOD_3D_LINEARROLLOFF, 0, &m_pSound);
 	m_pSound->set3DMinMaxDistance(10.0f, 50.0f);
 	m_vObjectSounds.push_back(m_pSound);
 	m_vObjectChannels.push_back(nullptr);
+	FMOD_VECTOR v = { position.x, position.y, position.z };
+	m_vObjectPosition.push_back(v);
+	m_nObjects++;
+	return m_nObjects - 1;
+}
+
+int Sound::CreateObjectSound(char* file, float x, float y, float z)
+{
+	m_pSystem->createSound(file, FMOD_3D | FMOD_LOOP_OFF | FMOD_3D_LINEARROLLOFF, 0, &m_pSound);
+	m_pSound->set3DMinMaxDistance(10.0f, 50.0f);
+	m_vObjectSounds.push_back(m_pSound);
+	m_vObjectChannels.push_back(nullptr);
+	FMOD_VECTOR v = { x,y,z };
+	m_vObjectPosition.push_back(v);
 	m_nObjects++;
 	return m_nObjects - 1;
 }
@@ -148,11 +162,11 @@ void Sound::PlayBG(int index)
 	m_pBGChannel->setMute(true);
 }
 
-void Sound::PlayObject(int index, float volume, float x, float y, float z)
+void Sound::PlayObjectSound(int index, float volume)
 {
 	m_pSystem->playSound(m_vObjectSounds[index], nullptr, true, &m_vObjectChannels[index]);
 	m_vObjectChannels[index]->setVolume(volume);
-	SetObjectPos(index, x, y, z);
+	m_vObjectChannels[index]->set3DAttributes(&m_vObjectPosition[index], 0);
 	m_vObjectChannels[index]->setPaused(false);
 }
 
@@ -206,7 +220,6 @@ void Sound::SetOtherPlayersPos(int index, const XMFLOAT3& pos)
 
 void Sound::SetObjectPos(int index, float x, float y, float z)
 {
-	FMOD_VECTOR pos = { x, y, z };
-	m_vObjectChannels[index]->set3DAttributes(&pos, 0);
+	m_vObjectPosition[index] = { x,y,z };
 }
 

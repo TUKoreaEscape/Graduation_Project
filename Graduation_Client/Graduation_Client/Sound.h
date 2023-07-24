@@ -19,12 +19,13 @@ public:
 
 	void StartFMOD();
 	int CreateEffectSound(char* file, float volume);
-	int CreateObjectSound(char* file);
+	int CreateObjectSound(char* file, const XMFLOAT3& position);
+	int CreateObjectSound(char* file, float x, float y, float z);
 	int CreateBGSound(char* file, float volume);
 
 	void Play(int index, float volume, int OtherPlayer = -1);
 	void PlayBG(int index);
-	void PlayObject(int index, float volume, float x, float y, float z);
+	void PlayObjectSound(int index, float volume);
 	void Stop(int index, int OtherPlayer = -1);
 	void StopBG(int index);
 	void StopObject(int index);
@@ -60,6 +61,7 @@ private:
 	int m_nObjects{};
 	std::vector<FMOD::Sound*> m_vObjectSounds;
 	std::vector<FMOD::Channel*> m_vObjectChannels;
+	std::vector<FMOD_VECTOR> m_vObjectPosition;
 
 	FMOD_VECTOR cube[36] = { };
 
