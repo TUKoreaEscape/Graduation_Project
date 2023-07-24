@@ -514,7 +514,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSSkyBox(VS_SKYBOX_CUBEMAP_OUTPUT input, uint 
 
 	output.f4Albedo = cColor;
 
-	output.f4Scene = output.f4Color = output.f4Albedo;
+	output.f4Scene = output.f4Color = output.f4Albedo* gcGlobalAmbientLight;
 
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	output.f4Specular = gMaterial.m_cSpecular;
@@ -1115,7 +1115,7 @@ float4 PSShadowMapShadow(VS_SHADOW_MAP_OUTPUT input) : SV_TARGET
 {
 	float4 cIllumination = Lighting(input.positionW, normalize(input.normalW), true, input.uvs);
 
-	//	cIllumination = saturate(gtxtDepthTextures[3].SampleLevel(gssProjector, f3uvw.xy, 0).r);
+		//cIllumination = saturate(gtxtDepthTextures[3].SampleLevel(gssProjector, f3uvw.xy, 0).r);
 
 		return (cIllumination);
 }
