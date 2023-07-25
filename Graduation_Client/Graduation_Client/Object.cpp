@@ -857,7 +857,7 @@ PowerSwitch::PowerSwitch() : InteractionObject()
 
 	m_nSound = 1;
 	m_pSounds = new int[m_nSound];
-	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
+	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Switch_2_On.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
 }
 
 PowerSwitch::~PowerSwitch()
@@ -1326,6 +1326,7 @@ void PowerSwitch::OperateKnob(int index)
 	if (m_fCooltime < KNOB_OPERATE_COOLTIME) return;
 	m_bOnAndOff[index] = !m_bOnAndOff[index];
 	m_fCooltime = 0;
+	Sound::GetInstance()->PlayObjectSound(m_pSounds[0], 1.0f);
 #if USE_NETWORK
 	Network& network = *Network::GetInstance();
 	cs_packet_request_eletronic_system_switch_control packet;
