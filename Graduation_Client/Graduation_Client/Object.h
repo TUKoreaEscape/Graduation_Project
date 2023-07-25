@@ -93,6 +93,9 @@ public:
 
 	bool m_bIsBlocked = false;
 	bool m_bDoesOtherPlayerActive = false;
+
+	int m_nSound = 0;
+	int* m_pSounds = nullptr;
 public:
 	InteractionObject();
 	virtual ~InteractionObject();
@@ -139,7 +142,8 @@ public:
 
 	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void update(float fElapsedTime) override;
-	virtual void SetPosition(XMFLOAT3 xmf3Position);
+	virtual void SetPosition(XMFLOAT3 xmf3Position) override;
+	virtual void SetPosition(float x, float y, float z) override;
 	virtual void SetRotation(DIR d) override;
 
 	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList);
@@ -207,6 +211,8 @@ public:
 	void Reset();
 
 	bool GetAnswer(int index) const { return m_bAnswers[index]; }
+	virtual void SetPosition(XMFLOAT3 xmf3Position) override;
+	virtual void SetPosition(float x, float y, float z) override;
 private:
 	bool m_bAnswers[10];
 };
@@ -231,6 +237,7 @@ public:
 	void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f) override;
 
 	virtual void SetPosition(XMFLOAT3 xmf3Position) override;
+	virtual void SetPosition(float x, float y, float z) override;
 	virtual void SetRotation(DIR d) override;
 	void Interaction(int playerType) override;
 public:
@@ -275,6 +282,8 @@ public:
 
 	void SetItem(GAME_ITEM::ITEM item);
 	void InitItems(int index, GameObject* item);
+	virtual void SetPosition(XMFLOAT3 xmf3Position) override;
+	virtual void SetPosition(float x, float y, float z) override;
 public:
 	int m_item_box_index = -1;
 	GameObject* m_pItems[6];
@@ -334,7 +343,8 @@ public:
 	void SetOpen(bool open) override;
 
 	virtual void SetRotation(DIR d) override;
-	
+	virtual void SetPosition(XMFLOAT3 xmf3Position) override;
+	virtual void SetPosition(float x, float y, float z) override;
 public:
 	int m_nLifeChips{};
 	bool m_bActivate{};
@@ -366,7 +376,8 @@ public:
 	void SetOpen(bool open) override;
 
 	virtual void SetRotation(DIR d) override;
-
+	virtual void SetPosition(XMFLOAT3 xmf3Position) override;
+	virtual void SetPosition(float x, float y, float z) override;
 public:
 	bool m_bIsReal = false;
 	void SetID(int id) { m_escapeobject_id = id; }

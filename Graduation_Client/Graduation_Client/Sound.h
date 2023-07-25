@@ -1,7 +1,7 @@
 #pragma once
 #include <array>
 
-constexpr int MAX_CHANNEL = 32;
+constexpr int MAX_CHANNEL = 64;
 
 class Sound
 {
@@ -63,10 +63,5 @@ private:
 	std::vector<FMOD::Channel*> m_vObjectChannels;
 	std::vector<FMOD_VECTOR> m_vObjectPosition;
 
-	FMOD_VECTOR cube[36] = { };
-
 	FMOD::Channel* m_pBGChannel;
-	FMOD::Geometry* m_pGeo;
-
-	int m_nWalls[5]{};
 };

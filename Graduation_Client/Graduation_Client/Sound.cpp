@@ -22,72 +22,8 @@ void Sound::StartFMOD()
 
 	m_fvListenerPos = { 0.0f, 0.0f, -1.0f };
 	m_pSystem->set3DListenerAttributes(0, &m_fvListenerPos, 0, 0, 0);
-	fr = m_pSystem->createGeometry(10, 100, &m_pGeo);
-	fr = m_pSystem->setGeometrySettings(200.0f);
 	for (auto& chan : m_arrOtherPlayerChannel)
 		chan = nullptr;
-
-	float fx = 0.5; float fy = 0.5f; float fz = 0.5f;
-	// Front Quad (quads point inward)
-	cube[0] = {-fx, +fx, +fx};
-	cube[1] = {+fx, +fx, +fx};
-	cube[2] = {-fx, -fx, +fx};
-	cube[3] = {-fx, -fx, +fx};
-	cube[4] = {+fx, +fx, +fx};
-	cube[5] = {+fx, -fx, +fx};
-	// Back Quad										
-	cube[6] = {+fx, +fx, -fx};
-	cube[7] = {-fx, +fx, -fx};
-	cube[8] = {+fx, -fx, -fx};
-	cube[9] = {+fx, -fx, -fx};
-	cube[10] = {-fx, +fx, -fx};
-	cube[11] = {-fx, -fx, -fx};
-	// Left Quad										
-	cube[12] = {-fx, +fx, -fx};
-	cube[13] = {-fx, +fx, +fx};
-	cube[14] = {-fx, -fx, -fx};
-	cube[15] = {-fx, -fx, -fx};
-	cube[16] = {-fx, +fx, +fx};
-	cube[17] = {-fx, -fx, +fx};
-	// Right Quad										
-	cube[18] = {+fx, +fx, +fx};
-	cube[19] = {+fx, +fx, -fx};
-	cube[20] = {+fx, -fx, +fx};
-	cube[21] = {+fx, -fx, +fx};
-	cube[22] = {+fx, +fx, -fx};
-	cube[23] = {+fx, -fx, -fx};
-	// Top Quad											
-	cube[24] = {-fx, +fx, -fx};
-	cube[25] = {+fx, +fx, -fx};
-	cube[26] = {-fx, +fx, +fx};
-	cube[27] = {-fx, +fx, +fx};
-	cube[28] = {+fx, +fx, -fx};
-	cube[29] = {+fx, +fx, +fx};
-	// Bottom Quad										
-	cube[30] = {-fx, -fx, +fx};
-	cube[31] = {+fx, -fx, +fx};
-	cube[32] = {-fx, -fx, -fx};
-	cube[33] = {-fx, -fx, -fx};
-	cube[34] = {+fx, -fx, +fx};
-	cube[35] = {+fx, -fx, -fx};
-	
-	fr = m_pGeo->addPolygon(1, 0, true, 36, cube, &m_nWalls[0]);	
-	if (fr != FMOD_OK) {
-		std::cout << "addPolygon error \n";
-	}
-	FMOD_VECTOR scale = { 180.0f, 10.0f, 2.0f };
-	fr = m_pGeo->setScale(&scale);
-	if (fr != FMOD_OK) {
-		std::cout << "setScale error \n";
-	}
-	else {
-		FMOD_VECTOR df;
-		m_pGeo->getScale(&df);
-		std::cout << df.x << ", " << df.y << ", " << df.z << "\n";
-	}
-	FMOD_VECTOR position = { 0.0f, -7.6f, 40.0f };
-	m_pGeo->setPosition(&position);
-	m_pGeo->setActive(true);
 }
 
 int Sound::CreateEffectSound(char* file, float volume)
@@ -167,6 +103,7 @@ void Sound::PlayObjectSound(int index, float volume)
 	m_pSystem->playSound(m_vObjectSounds[index], nullptr, true, &m_vObjectChannels[index]);
 	m_vObjectChannels[index]->setVolume(volume);
 	m_vObjectChannels[index]->set3DAttributes(&m_vObjectPosition[index], 0);
+	std::cout << m_vObjectPosition[index].x << ", " << m_vObjectPosition[index].y << ", " << m_vObjectPosition[index].z << "\n";
 	m_vObjectChannels[index]->setPaused(false);
 }
 

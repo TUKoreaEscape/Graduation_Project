@@ -81,10 +81,15 @@ Vent::Vent() : InteractionObject()
 		m_ppInteractionUIs[i] = nullptr;
 	}
 	m_nUIType = VENT_UI;
+
+	m_nSound = 1;
+	m_pSounds = new int[m_nSound];
+	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
 }
 
 Vent::~Vent()
 {
+	delete[] m_pSounds;
 }
 
 void Vent::Rotate(float fPitch, float fYaw, float fRoll)
@@ -211,6 +216,20 @@ void Vent::SetPosition(XMFLOAT3 xmf3Position)
 {
 	m_xmf3Position = xmf3Position;
 	GameObject::SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
+	Sound& sound = *Sound::GetInstance();
+	for (int i = 0; i < m_nSound; ++i) {
+		sound.SetObjectPos(m_pSounds[i], xmf3Position.x, xmf3Position.y, xmf3Position.z);
+	}
+}
+
+void Vent::SetPosition(float x, float y, float z)
+{
+	m_xmf3Position = XMFLOAT3(x,y,z);
+	GameObject::SetPosition(x,y,z);
+	Sound& sound = *Sound::GetInstance();
+	for (int i = 0; i < m_nSound; ++i) {
+		sound.SetObjectPos(m_pSounds[i], x, y, z);
+	}
 }
 
 void Vent::Interaction(int playerType)
@@ -287,11 +306,17 @@ Door::Door() : InteractionObject()
 	}
 	m_nUIType = DOOR_UI;
 
-	m_nDoorSoundIndex = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
+	LeftDoorPos = XMFLOAT3();
+	RightDoorPos = XMFLOAT3();
+
+	m_nSound = 1;
+	m_pSounds = new int[m_nSound];
+	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
 }
 
 Door::~Door()
 {
+	delete[] m_pSounds;
 }
 
 void Door::Rotate(float fPitch, float fYaw, float fRoll)
@@ -462,7 +487,25 @@ void Door::SetPosition(XMFLOAT3 xmf3Position)
 	RightDoorPos = rightDoor->GetPosition();
 
 	Sound& sound = *Sound::GetInstance();
-	sound.SetObjectPos(m_nDoorSoundIndex, xmf3Position.x, xmf3Position.y, xmf3Position.z);
+	for (int i = 0; i < m_nSound; ++i) {
+		sound.SetObjectPos(m_pSounds[i], xmf3Position.x, xmf3Position.y, xmf3Position.z);
+	}
+}
+
+void Door::SetPosition(float x, float y, float z)
+{
+	GameObject::SetPosition(x, y, z);
+
+	GameObject* leftDoor = FindFrame("Left_Door_Final");
+	GameObject* rightDoor = FindFrame("Right_Door_Final");
+
+	LeftDoorPos = leftDoor->GetPosition();
+	RightDoorPos = rightDoor->GetPosition();
+
+	Sound& sound = *Sound::GetInstance();
+	for (int i = 0; i < m_nSound; ++i) {
+		sound.SetObjectPos(m_pSounds[i], x, y, z);
+	}
 }
 
 void Door::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -610,14 +653,14 @@ void Door::SetOpen(bool Open)
 		if (Open == false) {
 			IsOpen = false;
 			IsWorking = true;
-			Sound::GetInstance()->PlayObjectSound(m_nDoorSoundIndex, 1.0f);
+			Sound::GetInstance()->PlayObjectSound(m_pSounds[0], 1.0f);
 		}
 	}
 	else {
 		if (Open == true) {
 			IsOpen = true;
 			IsWorking = true;
-			Sound::GetInstance()->PlayObjectSound(m_nDoorSoundIndex, 1.0f);
+			Sound::GetInstance()->PlayObjectSound(m_pSounds[0], 1.0f);
 		}
 	}
 }
@@ -811,10 +854,15 @@ PowerSwitch::PowerSwitch() : InteractionObject()
 	}
 	IsOpen = false;
 	m_nUIType = POWER_UI;
+
+	m_nSound = 1;
+	m_pSounds = new int[m_nSound];
+	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
 }
 
 PowerSwitch::~PowerSwitch()
 {
+	delete[] m_pSounds;
 }
 
 void PowerSwitch::Init()
@@ -1316,6 +1364,24 @@ void PowerSwitch::Reset()
 #endif
 }
 
+void PowerSwitch::SetPosition(XMFLOAT3 xmf3Position)
+{
+	Sound& sound = *Sound::GetInstance();
+	GameObject::SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
+	for (int i = 0; i < m_nSound; ++i) {
+		sound.SetObjectPos(m_pSounds[i], xmf3Position.x, xmf3Position.y, xmf3Position.z);
+	}
+}
+
+void PowerSwitch::SetPosition(float x, float y, float z)
+{
+	Sound& sound = *Sound::GetInstance();
+	GameObject::SetPosition(x, y, z);
+	for (int i = 0; i < m_nSound; ++i) {
+		sound.SetObjectPos(m_pSounds[i], x, y, z);
+	}
+}
+
 Item::Item()
 {
 }
@@ -1364,10 +1430,15 @@ ItemBox::ItemBox() : InteractionObject()
 	for (int i = 0; i < 6; ++i) {
 		m_pItems[i] = nullptr;
 	}
+
+	m_nSound = 1;
+	m_pSounds = new int[m_nSound];
+	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
 }
 
 ItemBox::~ItemBox()
 {
+	delete[] m_pSounds;
 }
 
 bool ItemBox::IsPlayerNear(const XMFLOAT3& PlayerPos)
@@ -1681,6 +1752,24 @@ void ItemBox::InitItems(int index, GameObject* item)
 	if (m_pItems[index]) m_pItems[index]->AddRef();
 }
 
+void ItemBox::SetPosition(XMFLOAT3 xmf3Position)
+{
+	Sound& sound = *Sound::GetInstance();
+	GameObject::SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
+	for (int i = 0; i < m_nSound; ++i) {
+		sound.SetObjectPos(m_pSounds[i], xmf3Position.x, xmf3Position.y, xmf3Position.z);
+	}
+}
+
+void ItemBox::SetPosition(float x, float y, float z)
+{
+	Sound& sound = *Sound::GetInstance();
+	GameObject::SetPosition(x, y, z);
+	for (int i = 0; i < m_nSound; ++i) {
+		sound.SetObjectPos(m_pSounds[i], x, y, z);
+	}
+}
+
 void ItemBox::SetRotation(DIR d)
 {
 	GameObject* cap = FindFrame("Object005");
@@ -1814,10 +1903,15 @@ TaggersBox::TaggersBox()
 	for (int i = 0; i < m_nChips; ++i) {
 		m_ppChips[i] = nullptr;
 	}
+
+	m_nSound = 1;
+	m_pSounds = new int[m_nSound];
+	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
 }
 
 TaggersBox::~TaggersBox()
 {
+	delete[] m_pSounds;
 }
 
 bool TaggersBox::IsPlayerNear(const XMFLOAT3& PlayerPos)
@@ -1946,6 +2040,24 @@ void TaggersBox::SetRotation(DIR d)
 {
 }
 
+void TaggersBox::SetPosition(XMFLOAT3 xmf3Position)
+{
+	Sound& sound = *Sound::GetInstance();
+	GameObject::SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
+	for (int i = 0; i < m_nSound; ++i) {
+		sound.SetObjectPos(m_pSounds[i], xmf3Position.x, xmf3Position.y, xmf3Position.z);
+	}
+}
+
+void TaggersBox::SetPosition(float x, float y, float z)
+{
+	Sound& sound = *Sound::GetInstance();
+	GameObject::SetPosition(x, y, z);
+	for (int i = 0; i < m_nSound; ++i) {
+		sound.SetObjectPos(m_pSounds[i], x, y, z);
+	}
+}
+
 void TaggersBox::CollectChip()
 {
 	m_ppChips[m_nLifeChips++]->SetDraw(false);
@@ -1976,10 +2088,15 @@ EscapeObject::EscapeObject()
 		m_ppInteractionUIs[i] = nullptr;
 	}
 	m_nUIType = DOOR_UI;
+
+	m_nSound = 1;
+	m_pSounds = new int[m_nSound];
+	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
 }
 
 EscapeObject::~EscapeObject()
 {
+	delete[] m_pSounds;
 }
 
 void EscapeObject::Init()
@@ -2225,6 +2342,24 @@ void EscapeObject::SetRotation(DIR d)
 		m_dir = DEGREE270;
 		Rotate(0, -90, 0);
 		break;
+	}
+}
+
+void EscapeObject::SetPosition(XMFLOAT3 xmf3Position)
+{
+	Sound& sound = *Sound::GetInstance();
+	GameObject::SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
+	for (int i = 0; i < m_nSound; ++i) {
+		sound.SetObjectPos(m_pSounds[i], xmf3Position.x, xmf3Position.y, xmf3Position.z);
+	}
+}
+
+void EscapeObject::SetPosition(float x, float y, float z)
+{
+	Sound& sound = *Sound::GetInstance();
+	GameObject::SetPosition(x, y, z);
+	for (int i = 0; i < m_nSound; ++i) {
+		sound.SetObjectPos(m_pSounds[i], x, y, z);
 	}
 }
 
