@@ -566,8 +566,6 @@ void Framework::FrameAdvance()
 	hResult = m_ppd3dCommandAllocators[m_nSwapChainBufferIndex]->Reset();
 	hResult = m_pd3dCommandList->Reset(m_ppd3dCommandAllocators[m_nSwapChainBufferIndex], NULL); //명령 할당자와 명령 리스트를 리셋한다.
 
-	if (scene) scene->prerender(m_pd3dCommandList);
-	m_pDepthRenderShader->PrepareShadowMap(m_pd3dCommandList);
 	::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 	input->Update(m_hWnd);
@@ -578,17 +576,19 @@ void Framework::FrameAdvance()
 
 	switch (m_gamestate->GetGameState()) {
 	case LOGIN:
+		if (scene) scene->prerender(m_pd3dCommandList);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		scene->UIrender(m_pd3dCommandList);
 		break;
 	case ROOM_SELECT:
+		if (scene) scene->prerender(m_pd3dCommandList);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		scene->UIrender(m_pd3dCommandList);
 		break;
 	case WAITING_GAME:
-		//if (scene) scene->prerender(m_pd3dCommandList);
+		if (scene) scene->prerender(m_pd3dCommandList);
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 		scene->UIrender(m_pd3dCommandList);
@@ -597,6 +597,7 @@ void Framework::FrameAdvance()
 		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		break;
 	case CUSTOMIZING:
+		if (scene) scene->prerender(m_pd3dCommandList);
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 		scene->UIrender(m_pd3dCommandList);
@@ -606,12 +607,10 @@ void Framework::FrameAdvance()
 		break;
 	case READY_TO_GAME:
 		if (scene) scene->prerender(m_pd3dCommandList);
+		m_pDepthRenderShader->PrepareShadowMap(m_pd3dCommandList);
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
-		//렌더링 코드는 여기에 추가될 것이다.
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 		if (scene) scene->defrender(m_pd3dCommandList);
-		//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
-		//if (scene) scene->forrender(m_pd3dCommandList);
 		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
 		m_pEdgeShader->Render(m_pd3dCommandList);
@@ -619,27 +618,21 @@ void Framework::FrameAdvance()
 		break;
 	case PLAYING_GAME:
 		if (scene) scene->prerender(m_pd3dCommandList);
+		m_pDepthRenderShader->PrepareShadowMap(m_pd3dCommandList);
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 
-		//렌더링 코드는 여기에 추가될 것이다.
-		//m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 		m_pDepthRenderShader->UpdateShaderVariables(m_pd3dCommandList);
 		m_pShadowMapShader->UpdateShaderVariables(m_pd3dCommandList);
 		if (scene) scene->defrender(m_pd3dCommandList);
 
-		//m_pd3dCommandList->RSSetViewports(1, &d3dViewport);
-		//m_pd3dCommandList->RSSetScissorRects(1, &d3dScissorRect);
-		//if (m_pShadowMapToViewport) m_pShadowMapToViewport->Render(m_pd3dCommandList);
-
-		//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
-		//if (scene) scene->forrender(m_pd3dCommandList);
 		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
 		m_pEdgeShader->Render(m_pd3dCommandList);
 		scene->UIrender(m_pd3dCommandList); // Door UI
 		break;
 	case ENDING_GAME:
+		if (scene) scene->prerender(m_pd3dCommandList);
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 		scene->UIrender(m_pd3dCommandList); 
@@ -649,6 +642,7 @@ void Framework::FrameAdvance()
 		break;
 	case SPECTATOR_GAME:
 		if (scene) scene->SpectatorPrerender(m_pd3dCommandList);
+		m_pDepthRenderShader->PrepareShadowMap(m_pd3dCommandList);
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 		if (scene) scene->Spectatorrender(m_pd3dCommandList);
@@ -661,7 +655,6 @@ void Framework::FrameAdvance()
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 		if (scene) scene->defrender(m_pd3dCommandList);
-		//if (scene) scene->Powerrender(m_pd3dCommandList);
 		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
 		m_pEdgeShader->Render(m_pd3dCommandList);
