@@ -63,7 +63,7 @@ void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	//m_pUIShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 	m_pStandardShader = new DeferredObjectsShader();
-	DXGI_FORMAT pdxgiRtvFormats[6] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM,DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
+	DXGI_FORMAT pdxgiRtvFormats[6] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
 	m_pStandardShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 6, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
 	m_pStandardShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
