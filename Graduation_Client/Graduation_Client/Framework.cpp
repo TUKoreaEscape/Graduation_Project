@@ -641,8 +641,9 @@ void Framework::FrameAdvance()
 		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		break;
 	case SPECTATOR_GAME:
-		if (scene) scene->SpectatorPrerender(m_pd3dCommandList);
+		if (scene) scene->prerender(m_pd3dCommandList); 
 		m_pDepthRenderShader->PrepareShadowMap(m_pd3dCommandList);
+		if (scene) scene->SpectatorPrerender(m_pd3dCommandList);
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 		if (scene) scene->Spectatorrender(m_pd3dCommandList);
@@ -674,7 +675,7 @@ void Framework::FrameAdvance()
 	hResult = m_pd3dCommandList->Close(); //명령 리스트를 닫힌 상태로 만든다.
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(_countof(ppd3dCommandLists), ppd3dCommandLists); //명령 리스트를 명령 큐에 추가하여 실행한다.
-	//WaitForGpuComplete(); //GPU가 모든 명령 리스트를 실행할 때 까지 기다린다.
+	WaitForGpuComplete(); //GPU가 모든 명령 리스트를 실행할 때 까지 기다린다.
 	
 	TextRender();//text 렌더
 
