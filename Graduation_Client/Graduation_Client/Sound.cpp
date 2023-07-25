@@ -50,10 +50,15 @@ int Sound::CreateObjectSound(char* file, const XMFLOAT3& position)
 	return m_nObjects - 1;
 }
 
-int Sound::CreateObjectSound(char* file, float x, float y, float z)
+int Sound::CreateObjectSound(char* file, float x, float y, float z, float min, float max, bool loop)
 {
-	m_pSystem->createSound(file, FMOD_3D | FMOD_LOOP_OFF | FMOD_3D_LINEARROLLOFF, 0, &m_pSound);
-	m_pSound->set3DMinMaxDistance(10.0f, 50.0f);
+	if (true == loop) {
+		m_pSystem->createSound(file, FMOD_3D | FMOD_LOOP_NORMAL | FMOD_3D_LINEARROLLOFF, 0, &m_pSound);
+	}
+	else {
+		m_pSystem->createSound(file, FMOD_3D | FMOD_LOOP_OFF | FMOD_3D_LINEARROLLOFF, 0, &m_pSound);
+	}
+	m_pSound->set3DMinMaxDistance(min, max);
 	m_vObjectSounds.push_back(m_pSound);
 	m_vObjectChannels.push_back(nullptr);
 	FMOD_VECTOR v = { x,y,z };
@@ -105,6 +110,7 @@ void Sound::PlayObjectSound(int index, float volume)
 	m_vObjectChannels[index]->set3DAttributes(&m_vObjectPosition[index], 0);
 	std::cout << m_vObjectPosition[index].x << ", " << m_vObjectPosition[index].y << ", " << m_vObjectPosition[index].z << "\n";
 	m_vObjectChannels[index]->setPaused(false);
+	std::cout << index << " start \n";
 }
 
 void Sound::Stop(int index, int OtherPlayer)
@@ -123,9 +129,10 @@ void Sound::StopBG(int index)
 	m_pBGChannel->stop();
 }
 
-void Sound::StopObject(int index)
+void Sound::StopObjectSound(int index)
 {
 	m_vObjectChannels[index]->stop();
+	std::cout << index << " stop \n";
 }
 
 void Sound::Update(float fElapsedTime)
@@ -141,10 +148,10 @@ void Sound::SetListenerPos(const XMFLOAT3& listenerPos, const XMFLOAT3& listener
 	m_pSystem->set3DListenerAttributes(0, &m_fvListenerPos, 0, &m_fvListenerLook, &m_fvListenerUp);
 }
 
-int Sound::CreatePlayersSounds(char* file, int index)
+int Sound::CreatePlayersSounds(char* file, int index, float min, float max)
 {
 	m_pSystem->createSound(file, FMOD_3D | FMOD_LOOP_OFF | FMOD_3D_LINEARROLLOFF, 0, &m_pSound);
-	m_pSound->set3DMinMaxDistance(15.0f, 50.0f);
+	m_pSound->set3DMinMaxDistance(min, max);
 	m_vSounds.push_back(m_pSound);
 	m_nSounds++;
 	return m_nSounds - 1;

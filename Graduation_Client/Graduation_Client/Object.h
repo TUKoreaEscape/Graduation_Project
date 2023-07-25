@@ -122,8 +122,8 @@ public:
 
 	virtual int GetDIR() const;
 
-	void CheckStart() { m_bDoesOtherPlayerActive = true; };
-	void CheckStop() { m_bDoesOtherPlayerActive = false; };
+	virtual void CheckStart() { m_bDoesOtherPlayerActive = true; };
+	virtual void CheckStop() { m_bDoesOtherPlayerActive = false; };
 };
 
 class Door : public InteractionObject
@@ -213,6 +213,9 @@ public:
 	bool GetAnswer(int index) const { return m_bAnswers[index]; }
 	virtual void SetPosition(XMFLOAT3 xmf3Position) override;
 	virtual void SetPosition(float x, float y, float z) override;
+
+	void CheckStart() override;
+	void CheckStop() override;
 private:
 	bool m_bAnswers[10];
 };

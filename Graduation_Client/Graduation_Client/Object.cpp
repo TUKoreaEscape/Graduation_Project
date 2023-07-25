@@ -84,7 +84,7 @@ Vent::Vent() : InteractionObject()
 
 	m_nSound = 1;
 	m_pSounds = new int[m_nSound];
-	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
+	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Vent.mp3", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 20.0f, 50.0f);
 }
 
 Vent::~Vent()
@@ -111,6 +111,7 @@ void Vent::SetOpen(bool open)
 		UpdateTransform(NULL);
 		IsOpen = true;
 		m_fCooltime = 0;
+		Sound::GetInstance()->PlayObjectSound(m_pSounds[0], 1.0f);
 	}
 	else {
 		if (IsOpen == false) return;
@@ -118,6 +119,7 @@ void Vent::SetOpen(bool open)
 		SetPosition(m_xmf3ClosePosition);
 		UpdateTransform(NULL);
 		IsOpen = false;
+		Sound::GetInstance()->PlayObjectSound(m_pSounds[0], 1.0f);
 	}
 }
 
@@ -311,7 +313,7 @@ Door::Door() : InteractionObject()
 
 	m_nSound = 1;
 	m_pSounds = new int[m_nSound];
-	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
+	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 20.0f, 50.0f);
 }
 
 Door::~Door()
@@ -855,9 +857,10 @@ PowerSwitch::PowerSwitch() : InteractionObject()
 	IsOpen = false;
 	m_nUIType = POWER_UI;
 
-	m_nSound = 1;
+	m_nSound = 2;
 	m_pSounds = new int[m_nSound];
-	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Switch_2_On.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
+	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Switch_2_On.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 10.0f, 30.0f);
+	m_pSounds[1] = Sound::GetInstance()->CreateObjectSound("Sound/Lever2.mp3", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 10.0f, 30.0f, true);
 }
 
 PowerSwitch::~PowerSwitch()
@@ -1001,7 +1004,7 @@ void PowerSwitch::update(float fElapsedTime)
 
 			network.send_packet(&packet);
 #endif
-			// 다른 플레이어들에게 CheckStart();
+			Sound::GetInstance()->PlayObjectSound(m_pSounds[1], 1.0f);
 		}
 		m_fCheckCooltime += fElapsedTime;
 		if (m_fCheckCooltime < 2.0f) return;
@@ -1023,6 +1026,7 @@ void PowerSwitch::update(float fElapsedTime)
 
 			network.send_packet(&packet);
 #endif
+			Sound::GetInstance()->StopObjectSound(m_pSounds[1]);
 			return;
 		}
 
@@ -1038,6 +1042,7 @@ void PowerSwitch::update(float fElapsedTime)
 		Network& network = *Network::GetInstance();
 		network.send_packet(&packet);
 #endif
+		Sound::GetInstance()->StopObjectSound(m_pSounds[1]);
 	}
 	else {
 		if (false == IsEqual(m_fCheckCooltime, 0)) {
@@ -1053,6 +1058,7 @@ void PowerSwitch::update(float fElapsedTime)
 
 			network.send_packet(&packet);
 #endif
+			Sound::GetInstance()->StopObjectSound(m_pSounds[1]);
 		}
 		m_fCheckCooltime = 0;
 	}
@@ -1383,6 +1389,18 @@ void PowerSwitch::SetPosition(float x, float y, float z)
 	}
 }
 
+void PowerSwitch::CheckStart()
+{
+	m_bDoesOtherPlayerActive = true;
+	Sound::GetInstance()->PlayObjectSound(m_pSounds[1], 0.9f);
+}
+
+void PowerSwitch::CheckStop()
+{
+	m_bDoesOtherPlayerActive = false;
+	Sound::GetInstance()->StopObjectSound(m_pSounds[1]);
+}
+
 Item::Item()
 {
 }
@@ -1434,7 +1452,7 @@ ItemBox::ItemBox() : InteractionObject()
 
 	m_nSound = 1;
 	m_pSounds = new int[m_nSound];
-	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/car_door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
+	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/car_door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 10.0f, 30.0f);
 }
 
 ItemBox::~ItemBox()
@@ -1556,7 +1574,7 @@ void ItemBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	int playerType = Input::GetInstance()->m_pPlayer->GetType();
 	if (IsNear) {
 		if (true == IsOpen) {
-			if (playerType == TYPE_PLAYER) {
+			if (playerType == TYPE_PLAYER || playerType == TYPE_DEAD_PLAYER) {
 				if (m_item == GAME_ITEM::ITEM_NONE) return;
 				if (m_ppInteractionUIs[2]) {
 					m_ppInteractionUIs[2]->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43);
@@ -1571,7 +1589,7 @@ void ItemBox::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			}
 		}
 		else {
-			if (playerType == TYPE_PLAYER) {
+			if (playerType == TYPE_PLAYER || playerType == TYPE_DEAD_PLAYER) {
 				if (m_ppInteractionUIs[0]) {
 					m_ppInteractionUIs[0]->SetPosition(m_xmf4x4ToParent._41, 0.5f, m_xmf4x4ToParent._43 + 0.5f);
 					m_ppInteractionUIs[0]->BillboardRender(pd3dCommandList, m_dir, m_fGauge * 0.8f, m_nUIType);
@@ -1725,12 +1743,12 @@ void ItemBox::SetOpen(bool open)
 	if (false == open) {
 		if (false == IsOpen) return;
 		IsOpen = false;
-		Sound::GetInstance()->PlayObjectSound(m_pSounds[0], 1.0f);
+		Sound::GetInstance()->PlayObjectSound(m_pSounds[0], 0.5f);
 	}
 	else {
 		if (true == IsOpen) return;
 		IsOpen = true;
-		Sound::GetInstance()->PlayObjectSound(m_pSounds[0], 1.0f);
+		Sound::GetInstance()->PlayObjectSound(m_pSounds[0], 0.5f);
 	}
 }
 
@@ -1909,7 +1927,7 @@ TaggersBox::TaggersBox()
 
 	m_nSound = 1;
 	m_pSounds = new int[m_nSound];
-	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
+	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 30.0f, 80.0f);
 }
 
 TaggersBox::~TaggersBox()
@@ -2094,7 +2112,7 @@ EscapeObject::EscapeObject()
 
 	m_nSound = 1;
 	m_pSounds = new int[m_nSound];
-	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
+	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 10.0f, 30.0f);
 }
 
 EscapeObject::~EscapeObject()

@@ -20,7 +20,7 @@ public:
 	void StartFMOD();
 	int CreateEffectSound(char* file, float volume);
 	int CreateObjectSound(char* file, const XMFLOAT3& position);
-	int CreateObjectSound(char* file, float x, float y, float z);
+	int CreateObjectSound(char* file, float x, float y, float z, float min, float max, bool loop = false);
 	int CreateBGSound(char* file, float volume);
 
 	void Play(int index, float volume, int OtherPlayer = -1);
@@ -28,12 +28,12 @@ public:
 	void PlayObjectSound(int index, float volume);
 	void Stop(int index, int OtherPlayer = -1);
 	void StopBG(int index);
-	void StopObject(int index);
+	void StopObjectSound(int index);
 
 	void Update(float fElapsedTime);
 	void SetListenerPos(const XMFLOAT3& listenerPos, const XMFLOAT3& look, const XMFLOAT3& up);
 
-	int CreatePlayersSounds(char* file, int index);
+	int CreatePlayersSounds(char* file, int index, float min, float max);
 	void SetOtherPlayersPos(int index, const XMFLOAT3& pos);
 	void SetObjectPos(int index, float x, float y, float z);
 private:

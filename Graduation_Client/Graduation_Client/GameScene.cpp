@@ -784,30 +784,11 @@ void GameScene::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList)
 void GameScene::ReleaseUploadBuffers()
 {
 	if (m_pPlayer) m_pPlayer->ReleaseUploadBuffers();
+
 	if (m_ppPlayers) {
 		for (int i = 0; i < m_nPlayers; ++i) {
 			if (m_ppPlayers[i]) m_ppPlayers[i]->ReleaseUploadBuffers();
 		}
-	}
-	if (m_ppWalls) {
-		for (int i = 0; i < m_nWalls; ++i) {
-			if (m_ppWalls[i]) m_ppWalls[i]->ReleaseUploadBuffers();
-		}
-	}
-	if (m_pOak) m_pOak->ReleaseUploadBuffers();
-	if (m_ppBush) {
-		for (int i = 0; i < m_nBush; ++i) {
-			if (m_ppBush[i]) m_ppBush[i]->ReleaseUploadBuffers();
-		}
-	}
-	for (int i = 0; i < NUM_DOOR; ++i) {
-		if (m_pDoors[i]) m_pDoors[i]->ReleaseUploadBuffers();
-	}
-	for (int i = 0; i < NUM_ITEMBOX; ++i) {
-		if (m_pBoxes[i]) m_pBoxes[i]->ReleaseUploadBuffers();
-	}
-	for (int i = 0; i < NUM_POWER; ++i) {
-		if (m_pPowers[i]) m_pPowers[i]->ReleaseUploadBuffers();
 	}
 	if (m_pLight) m_pLight->ReleaseUploadBuffers();
 	if (m_pSkybox) m_pSkybox->ReleaseUploadBuffers();
@@ -818,6 +799,7 @@ void GameScene::ReleaseUploadBuffers()
 	if (m_pClassroomTerrain) m_pClassroomTerrain->ReleaseUploadBuffers();
 	if (m_pForestTerrain) m_pForestTerrain->ReleaseUploadBuffers();
 	if (m_pCubeTerrain) m_pCubeTerrain->ReleaseUploadBuffers();
+	
 	if (m_UILogin) {
 		for (int i = 0; i < m_nLogin; ++i) {
 			if (m_UILogin[i]) m_UILogin[i]->ReleaseUploadBuffers();
@@ -828,8 +810,70 @@ void GameScene::ReleaseUploadBuffers()
 			if (m_UIRoomSelect[i]) m_UIRoomSelect[i]->ReleaseUploadBuffers();
 		}
 	}
+	if (m_UIWaitingRoom) {
+		for (int i = 0; i < m_nWaitingRoom; ++i) {
+			if (m_UIWaitingRoom[i]) m_UIWaitingRoom[i]->ReleaseUploadBuffers();
+		}
+	}
+	if (m_UICustomizing) {
+		for (int i = 0; i < m_nCustomizing; ++i) {
+			if (m_UICustomizing[i]) m_UICustomizing[i]->ReleaseUploadBuffers();
+		}
+	}
+	if (m_UIEnding) {
+		for (int i = 0; i < m_Ending; ++i) {
+			if (m_UIEnding[i]) m_UIEnding[i]->ReleaseUploadBuffers();
+		}
+	}
+	if (m_UIPlay) {
+		for (int i = 0; i < m_nPlay; ++i) {
+			if (m_UIPlay[i]) m_UIPlay[i]->ReleaseUploadBuffers();
+		}
+	}
+	if (m_UIPlayer) {
+		for (int i = 0; i < m_nPlayPlayer; ++i) {
+			if (m_UIPlayer[i]) m_UIPlayer[i]->ReleaseUploadBuffers();
+		}
+	}
+	if (m_UITagger) {
+		for (int i = 0; i < m_nPlayTagger; ++i) {
+			if (m_UITagger[i]) m_UITagger[i]->ReleaseUploadBuffers();
+		}
+	}
+	if (m_UILoading) {
+		for (int i = 0; i < m_nLoading; ++i) {
+			if (m_UILoading[i]) m_UILoading[i]->ReleaseUploadBuffers();
+		}
+	}
+	if (m_pCeilling) m_pCeilling->ReleaseUploadBuffers();
+
+	if (m_ppWalls) {
+		for (int i = 0; i < m_nWalls; ++i) {
+			if (m_ppWalls[i]) m_ppWalls[i]->ReleaseUploadBuffers();
+		}
+	}
+
 	for (int i = 0; i < 6; ++i) {
 		if (m_pPVSObjects[i]) m_pPVSObjects[i]->ReleaseUploadBuffers();
+	}
+	for (int i = 0; i < NUM_VENT; ++i) {
+		if (Vents[i]) Vents[i]->ReleaseUploadBuffers();
+	}
+	if (m_ppBush) {
+		for (int i = 0; i < m_nBush; ++i) {
+			if (m_ppBush[i]) m_ppBush[i]->ReleaseUploadBuffers();
+		}
+	}
+	if (m_pOak) m_pOak->ReleaseUploadBuffers();
+
+	for (int i = 0; i < NUM_DOOR; ++i) {
+		if (m_pDoors[i]) m_pDoors[i]->ReleaseUploadBuffers();
+	}
+	for (int i = 0; i < NUM_ITEMBOX; ++i) {
+		if (m_pBoxes[i]) m_pBoxes[i]->ReleaseUploadBuffers();
+	}
+	for (int i = 0; i < NUM_POWER; ++i) {
+		if (m_pPowers[i]) m_pPowers[i]->ReleaseUploadBuffers();
 	}
 	for (int i = 0; i < 6; ++i) {
 		if (Items[i]) Items[i]->ReleaseUploadBuffers();
@@ -843,6 +887,9 @@ void GameScene::ReleaseUploadBuffers()
 	}
 	for (int i = 0; i < m_nAnswerUI; ++i) {
 		if (m_ppAnswerUIs[i]) m_ppAnswerUIs[i]->ReleaseUploadBuffers();
+	}
+	for (int i = 0; i < m_nObjectsUIs; ++i) {
+		if (m_ppObjectsUIs[i]) m_ppObjectsUIs[i]->ReleaseUploadBuffers();
 	}
 }
 
@@ -1605,10 +1652,6 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_ppPlayers[3]->SetPosition(XMFLOAT3(-6.0f, 0.0f, -5.0f));
 	m_ppPlayers[4]->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
 	
-	m_ppPlayers[0]->SetPlayerType(TYPE_ESCAPE_PLAYER);
-	m_ppPlayers[1]->SetPlayerType(TYPE_ESCAPE_PLAYER);
-	m_ppPlayers[2]->SetPlayerType(TYPE_ESCAPE_PLAYER);
-
 	m_pPlayer->SetChild(pPlayerModel->m_pModelRootObject, true);
 	m_pPlayer->m_pSkinnedAnimationController = new AnimationController(pd3dDevice, pd3dCommandList, 2, pPlayerModel);
 	m_pPlayer->SetAnimation(IDLE);
@@ -1776,7 +1819,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 
 	m_pPlayer->SetPlayerUpdatedContext(m_pTerrain);
-	m_pPlayer->SetPlayerType(TYPE_ESCAPE_PLAYER);
+	m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
 	m_pPlayer->AddComponent<CommonMovement>();
 
 	for (int i = 0; i < m_nPlayers; ++i) {
