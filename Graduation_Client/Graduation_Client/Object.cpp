@@ -1434,7 +1434,7 @@ ItemBox::ItemBox() : InteractionObject()
 
 	m_nSound = 1;
 	m_pSounds = new int[m_nSound];
-	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
+	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/car_door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
 }
 
 ItemBox::~ItemBox()
@@ -1725,10 +1725,12 @@ void ItemBox::SetOpen(bool open)
 	if (false == open) {
 		if (false == IsOpen) return;
 		IsOpen = false;
+		Sound::GetInstance()->PlayObjectSound(m_pSounds[0], 1.0f);
 	}
 	else {
 		if (true == IsOpen) return;
 		IsOpen = true;
+		Sound::GetInstance()->PlayObjectSound(m_pSounds[0], 1.0f);
 	}
 }
 
