@@ -438,6 +438,7 @@ void DataBase::HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETC
 		if (wcsncmp(wszState, L"01004", 5))
 		{
 			fwprintf(stderr, L"[%5.5s] %s (%d) \n", wszState, wszMessage, iError);
+			// 해당부분은 에러처리 필요
 		}
 	}
 }
