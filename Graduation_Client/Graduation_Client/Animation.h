@@ -6,7 +6,7 @@ class GameObject;
 #define ANIMATION_TYPE_LOOP			1
 #define ANIMATION_TYPE_PINGPONG		2
 
-#define ANIMATION_CALLBACK_EPSILON 0.01f
+#define ANIMATION_CALLBACK_EPSILON 0.015f
 
 struct CALLBACKKEY
 {
@@ -18,7 +18,7 @@ struct CALLBACKKEY
 class AnimationCallbackHandler
 {
 public:
-	virtual void HandleCallback(void* pCallbackData, float fTrackPosition, void* pCallbackData2 = nullptr) { }
+	virtual void HandleCallback(void* pCallbackData, float fTrackPosition, void* pCallbackData2 = nullptr, int i = 0) { }
 };
 
 class SoundCallbackHandler : public AnimationCallbackHandler
@@ -28,7 +28,7 @@ public:
 	~SoundCallbackHandler() { }
 
 public:
-	virtual void HandleCallback(void* pCallbackData, float fTrackPosition, void* pCallbackData2 = nullptr );
+	virtual void HandleCallback(void* pCallbackData, float fTrackPosition, void* pCallbackData2 = nullptr, int i = 0 );
 
 };
 //#define _WITH_ANIMATION_SRT		//애니메이션 행렬 대신에 SRT 정보를 사용

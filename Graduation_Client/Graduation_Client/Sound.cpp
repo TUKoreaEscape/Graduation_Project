@@ -22,8 +22,14 @@ void Sound::StartFMOD()
 
 	m_fvListenerPos = { 0.0f, 0.0f, -1.0f };
 	m_pSystem->set3DListenerAttributes(0, &m_fvListenerPos, 0, 0, 0);
-	for (auto& chan : m_arrOtherPlayerChannel)
+	for (auto& chan : m_arrOtherPlayerChannel) {
+		for (auto& ch : chan)
+			ch = nullptr;
+	}
+	for (auto& chan : m_arrPlayerChannel) {
 		chan = nullptr;
+	}
+
 }
 
 int Sound::CreateEffectSound(char* file, float volume)
@@ -79,18 +85,23 @@ int Sound::CreateBGSound(char* file, float volume)
 	return -1;
 }
 
-void Sound::Play(int index, float volume, int otherPlayer)
+void Sound::Play(int index, float volume, int otherPlayer, int i)
 {
 	if (index == -1) return;
 	if (index > m_nSounds) return;
+	bool isPlaying = false;
 	if (otherPlayer != -1) {
-		m_pSystem->playSound(m_vSounds[index], 0, true, &m_arrOtherPlayerChannel[otherPlayer]);
-		m_arrOtherPlayerChannel[otherPlayer]->setVolume(volume);
-		m_arrOtherPlayerChannel[otherPlayer]->set3DAttributes(&m_arrOtherPlayerPos[otherPlayer], 0);
-		m_arrOtherPlayerChannel[otherPlayer]->setPaused(false);
+		m_arrOtherPlayerChannel[otherPlayer][i]->isPlaying(&isPlaying);
+		if (isPlaying) return;
+		m_pSystem->playSound(m_vSounds[index], 0, true, &m_arrOtherPlayerChannel[otherPlayer][i]);
+		m_arrOtherPlayerChannel[otherPlayer][i]->setVolume(volume);
+		m_arrOtherPlayerChannel[otherPlayer][i]->set3DAttributes(&m_arrOtherPlayerPos[otherPlayer], 0);
+		m_arrOtherPlayerChannel[otherPlayer][i]->setPaused(false);
 		return;
 	}
-	m_pSystem->playSound(m_vSounds[index], nullptr, false, &m_pChannel);
+	m_arrPlayerChannel[i]->isPlaying(&isPlaying);
+	if (isPlaying) return;
+	m_pSystem->playSound(m_vSounds[index], nullptr, false, &m_arrPlayerChannel[i]);
 	m_pChannel->setVolume(volume);
 }
 
@@ -108,20 +119,12 @@ void Sound::PlayObjectSound(int index, float volume)
 	m_pSystem->playSound(m_vObjectSounds[index], nullptr, true, &m_vObjectChannels[index]);
 	m_vObjectChannels[index]->setVolume(volume);
 	m_vObjectChannels[index]->set3DAttributes(&m_vObjectPosition[index], 0);
-	std::cout << m_vObjectPosition[index].x << ", " << m_vObjectPosition[index].y << ", " << m_vObjectPosition[index].z << "\n";
 	m_vObjectChannels[index]->setPaused(false);
-	std::cout << index << " start \n";
 }
 
 void Sound::Stop(int index, int OtherPlayer)
 {
-	if (index == -1) return;
-	if (index > m_nSounds) return;
-	if (OtherPlayer != -1) {
-		m_arrOtherPlayerChannel[OtherPlayer]->stop();
-	}
-	else
-		m_pChannel->stop();
+
 }
 
 void Sound::StopBG(int index)
@@ -132,7 +135,6 @@ void Sound::StopBG(int index)
 void Sound::StopObjectSound(int index)
 {
 	m_vObjectChannels[index]->stop();
-	std::cout << index << " stop \n";
 }
 
 void Sound::Update(float fElapsedTime)

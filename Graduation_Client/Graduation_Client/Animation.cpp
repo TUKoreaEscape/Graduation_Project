@@ -129,7 +129,7 @@ void AnimationSet::HandleCallback(CALLBACKKEY* key)
 		{
 			if (::IsEqual(m_pCallbackKeys[i].m_fTime, m_fPosition, ANIMATION_CALLBACK_EPSILON))
 			{
-				if (m_pCallbackKeys[i].m_pCallbackData) m_pAnimationCallbackHandler->HandleCallback(key[i].m_pCallbackData, m_fPosition, key[i].m_pCallbackData2);
+				if (m_pCallbackKeys[i].m_pCallbackData) m_pAnimationCallbackHandler->HandleCallback(key[i].m_pCallbackData, m_fPosition, key[i].m_pCallbackData2, i);
 				break;
 			}
 		}
@@ -376,11 +376,10 @@ LoadedModelInfo::~LoadedModelInfo()
 	if (m_pppAnimatedBoneFrameCaches) delete[] m_pppAnimatedBoneFrameCaches;
 }
 
-void SoundCallbackHandler::HandleCallback(void* pCallbackData, float fTrackPosition, void* pCallbackData2)
+void SoundCallbackHandler::HandleCallback(void* pCallbackData, float fTrackPosition, void* pCallbackData2, int i)
 {
 	int* SoundIndex = (int*)pCallbackData;
 	int* ChannelIndex = (int*)pCallbackData2;
-	std::cout << "sound Index - " << *SoundIndex << ", Channel - " << *ChannelIndex << " fucking - " << fTrackPosition <<"\n";
 	Sound& sound = *Sound::GetInstance();
-	sound.Play(*SoundIndex, 1.0f, *ChannelIndex);
+	sound.Play(*SoundIndex, 1.0f, *ChannelIndex, i);
 }

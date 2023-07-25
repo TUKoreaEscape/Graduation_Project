@@ -582,8 +582,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWall(VS_WALL_OUTPUT input, uint nPrimitiveID
 	float4 cEmissionColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	if (gnTexturesMask & MATERIAL_EMISSION_MAP) cEmissionColor = gtxtEmissionTexture.Sample(gssWrap, input.uv);
 
-	float4 cColor = cAlbedoColor * gMaterial.m_cDiffuse + cSpecularColor * gMaterial.m_cSpecular + cMetallicColor + cEmissionColor * gMaterial.m_cEmissive;
-
+    float4 cColor = cAlbedoColor + cSpecularColor + cMetallicColor + cEmissionColor;
 	float3 normalW = normalize(input.normalW);
 
 	float4 cIllumination = Lighting(input.positionW, normalize(input.normalW), true, input.uvs);

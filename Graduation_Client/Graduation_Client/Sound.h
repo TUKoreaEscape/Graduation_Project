@@ -23,7 +23,7 @@ public:
 	int CreateObjectSound(char* file, float x, float y, float z, float min, float max, bool loop = false);
 	int CreateBGSound(char* file, float volume);
 
-	void Play(int index, float volume, int OtherPlayer = -1);
+	void Play(int index, float volume, int OtherPlayer = -1, int i = 0);
 	void PlayBG(int index);
 	void PlayObjectSound(int index, float volume);
 	void Stop(int index, int OtherPlayer = -1);
@@ -55,8 +55,10 @@ private:
 	int m_nSounds;
 	std::vector<FMOD::Sound*> m_vSounds;
 	std::vector<FMOD::Channel*> m_vChannels;
-	std::array<FMOD::Channel*, 5> m_arrOtherPlayerChannel;
+	std::array<std::array<FMOD::Channel*, 2>, 5> m_arrOtherPlayerChannel;
 	std::array<FMOD_VECTOR, 5> m_arrOtherPlayerPos{};
+
+	std::array<FMOD::Channel*, 2> m_arrPlayerChannel;
 	
 	int m_nObjects{};
 	std::vector<FMOD::Sound*> m_vObjectSounds;

@@ -520,8 +520,8 @@ void Player::SetAnimationCallback(int index)
 	AnimationCallbackHandler* pAnimationCallbackHandler = new SoundCallbackHandler();
 	channelIndex = index;
 	if (m_pSkinnedAnimationController) {
-		FootstepCallback1 = Sound::GetInstance()->CreatePlayersSounds("Sound/Footstep01.wav", index, 10.0f, 35.0f);
-		FootstepCallback2 = Sound::GetInstance()->CreatePlayersSounds("Sound/Footstep02.wav", index, 10.0f, 35.0f);
+		FootstepCallback1 = Sound::GetInstance()->CreatePlayersSounds("Sound/Footstep01.wav", 0, 10.0f, 35.0f);
+		FootstepCallback2 = Sound::GetInstance()->CreatePlayersSounds("Sound/Footstep02.wav", 1, 10.0f, 35.0f);
 		m_pSkinnedAnimationController->SetCallbackKeys(0, 1, 2);
 		m_pSkinnedAnimationController->SetCallbackKey(0, 1, 0, 0.166f, &FootstepCallback1, &channelIndex);
 		m_pSkinnedAnimationController->SetCallbackKey(0, 1, 1, 0.5f, &FootstepCallback2, &channelIndex);
