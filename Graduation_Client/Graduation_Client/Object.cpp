@@ -857,10 +857,11 @@ PowerSwitch::PowerSwitch() : InteractionObject()
 	IsOpen = false;
 	m_nUIType = POWER_UI;
 
-	m_nSound = 2;
+	m_nSound = 3;
 	m_pSounds = new int[m_nSound];
 	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Switch_2_On.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 10.0f, 30.0f);
 	m_pSounds[1] = Sound::GetInstance()->CreateObjectSound("Sound/Lever2.mp3", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 10.0f, 30.0f, true);
+	m_pSounds[2] = Sound::GetInstance()->CreateObjectSound("Sound/Lever3.mp3", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 10.0f, 30.0f);
 }
 
 PowerSwitch::~PowerSwitch()
@@ -1027,6 +1028,7 @@ void PowerSwitch::update(float fElapsedTime)
 			network.send_packet(&packet);
 #endif
 			Sound::GetInstance()->StopObjectSound(m_pSounds[1]);
+			Sound::GetInstance()->PlayObjectSound(m_pSounds[2], 1.0f);
 			return;
 		}
 
@@ -1043,6 +1045,7 @@ void PowerSwitch::update(float fElapsedTime)
 		network.send_packet(&packet);
 #endif
 		Sound::GetInstance()->StopObjectSound(m_pSounds[1]);
+		Sound::GetInstance()->PlayObjectSound(m_pSounds[2], 1.0f);
 	}
 	else {
 		if (false == IsEqual(m_fCheckCooltime, 0)) {
@@ -1059,6 +1062,7 @@ void PowerSwitch::update(float fElapsedTime)
 			network.send_packet(&packet);
 #endif
 			Sound::GetInstance()->StopObjectSound(m_pSounds[1]);
+			Sound::GetInstance()->PlayObjectSound(m_pSounds[2], 1.0f);
 		}
 		m_fCheckCooltime = 0;
 	}
@@ -1399,6 +1403,7 @@ void PowerSwitch::CheckStop()
 {
 	m_bDoesOtherPlayerActive = false;
 	Sound::GetInstance()->StopObjectSound(m_pSounds[1]);
+	Sound::GetInstance()->PlayObjectSound(m_pSounds[2], 1.0f);
 }
 
 Item::Item()
@@ -2110,10 +2115,10 @@ EscapeObject::EscapeObject()
 	}
 	m_nUIType = DOOR_UI;
 
-	m_nSound = 1;
+	m_nSound = 2;
 	m_pSounds = new int[m_nSound];
 	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Lever2.mp3", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 10.0f, 30.0f, true);
-	SetWorking();
+	m_pSounds[1] = Sound::GetInstance()->CreateObjectSound("Sound/Lever3.mp3", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 10.0f, 30.0f);
 }
 
 EscapeObject::~EscapeObject()
@@ -2258,6 +2263,7 @@ void EscapeObject::update(float fElapsedTime)
 				network.send_packet(&packet);
 #endif
 				Sound::GetInstance()->StopObjectSound(m_pSounds[0]);
+				Sound::GetInstance()->PlayObjectSound(m_pSounds[1], 1.0f);
 			}
 			m_fCooltime = 0;
 			IsInteraction = false;
@@ -2278,6 +2284,7 @@ void EscapeObject::update(float fElapsedTime)
 			network.send_packet(&packet);
 #endif
 			Sound::GetInstance()->StopObjectSound(m_pSounds[0]);
+			Sound::GetInstance()->PlayObjectSound(m_pSounds[1], 1.0f);
 		}
 		m_fCooltime = 0;
 		IsInteraction = false;
@@ -2319,6 +2326,7 @@ void EscapeObject::Interaction(int playerType)
 			network.send_packet(&packet);
 #endif
 			Sound::GetInstance()->StopObjectSound(m_pSounds[0]);
+			Sound::GetInstance()->PlayObjectSound(m_pSounds[1], 1.0f);
 			m_fCooltime = 0;
 		}
 		else {
@@ -2336,6 +2344,7 @@ void EscapeObject::Interaction(int playerType)
 				network.send_packet(&packet);
 #endif
 				Sound::GetInstance()->StopObjectSound(m_pSounds[0]);
+				Sound::GetInstance()->PlayObjectSound(m_pSounds[1], 1.0f);
 				m_fCheckCooltime = 0;
 			}
 			m_fCooltime = 0;
