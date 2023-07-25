@@ -2112,7 +2112,8 @@ EscapeObject::EscapeObject()
 
 	m_nSound = 1;
 	m_pSounds = new int[m_nSound];
-	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 10.0f, 30.0f);
+	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Lever2.mp3", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 10.0f, 30.0f, true);
+	SetWorking();
 }
 
 EscapeObject::~EscapeObject()
@@ -2256,7 +2257,7 @@ void EscapeObject::update(float fElapsedTime)
 
 				network.send_packet(&packet);
 #endif
-			
+				Sound::GetInstance()->StopObjectSound(m_pSounds[0]);
 			}
 			m_fCooltime = 0;
 			IsInteraction = false;
@@ -2276,6 +2277,7 @@ void EscapeObject::update(float fElapsedTime)
 
 			network.send_packet(&packet);
 #endif
+			Sound::GetInstance()->StopObjectSound(m_pSounds[0]);
 		}
 		m_fCooltime = 0;
 		IsInteraction = false;
@@ -2303,6 +2305,7 @@ void EscapeObject::Interaction(int playerType)
 
 		network.send_packet(&packet);
 #endif
+		Sound::GetInstance()->PlayObjectSound(m_pSounds[0], 1.0f);
 	}
 	if (m_fCooltime >= PLAYER_ESCAPE_LEVER_COOLTIME) {
 		if (m_bIsReal) {
@@ -2315,6 +2318,7 @@ void EscapeObject::Interaction(int playerType)
 
 			network.send_packet(&packet);
 #endif
+			Sound::GetInstance()->StopObjectSound(m_pSounds[0]);
 			m_fCooltime = 0;
 		}
 		else {
@@ -2331,7 +2335,7 @@ void EscapeObject::Interaction(int playerType)
 
 				network.send_packet(&packet);
 #endif
-				
+				Sound::GetInstance()->StopObjectSound(m_pSounds[0]);
 				m_fCheckCooltime = 0;
 			}
 			m_fCooltime = 0;
