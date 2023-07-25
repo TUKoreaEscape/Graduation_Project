@@ -1837,6 +1837,10 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		m_network->m_EscapeLevers[i] = EscapeLevers[i];
 
 	recv_thread = std::thread{ &Network::listen_thread, m_network };
+
+	m_pPlayer->SetPlayerType(TYPE_PLAYER_YET);
+	for (int i = 0; i < 5; ++i)
+		m_ppPlayers[i]->SetPlayerType(TYPE_PLAYER_YET);
 #endif
 #if USE_CHAT_TEST
 	send_thread = std::thread{ &Network::Debug_send_thread, m_network };
