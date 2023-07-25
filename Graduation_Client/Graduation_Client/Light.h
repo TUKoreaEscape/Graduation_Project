@@ -40,7 +40,7 @@ public:
 	int m_nLights = 0;
 
 	// Directional Light의 회전 각도
-	float rotationAngle = 315.f;
+	float rotationAngle = 330.f;
 
 	// Directional Light의 회전 속도
 	float rotationSpeed = 0.25f;

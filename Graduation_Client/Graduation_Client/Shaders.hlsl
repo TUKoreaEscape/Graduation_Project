@@ -42,8 +42,10 @@ cbuffer cbToLightSpace : register(b6)
 	CB_TOOBJECTSPACE gcbToLightSpaces[MAX_LIGHTS];
 };
 
+Texture2D gtxtInputTextures[6] : register(t14); //Color, NormalW, Texture, Position, NormalV, Depth // 3과 4는 Illumination, ObjectID+zDepth 인데 이거 두개는 쓸모없어서 삭제함
 
-
+static float gfLaplacians[9] = { -1.0f, -1.0f, -1.0f, -1.0f, 8.0f, -1.0f, -1.0f, -1.0f, -1.0f };
+static int2 gnOffsets[9] = { { -1,-1 }, { 0,-1 }, { 1,-1 }, { -1,0 }, { 0,0 }, { 1,0 }, { -1,1 }, { 0,1 }, { 1,1 } };
 
 matrix scaleMatrix = { 1.1f, 0.0f, 0.0f, 0.0f,
 						0.0f, 1.1f, 0.0f, 0.0f,
@@ -77,9 +79,78 @@ Texture2D gtxtDetailNormalTexture : register(t12);
 
 SamplerState gssWrap : register(s0);
 
-//SamplerState gssDefaultSamplerState : register(s0);//추가된 애
+const float random_size = 4096;
+const float g_sample_rad = 1.0f;
+const float g_intensity = 100.0f;
+const float g_scale = 1.8f;
+const float g_bias = 0.000001f;
+const float g_screen_size = 144000;
 
-//Color, NormalW, Texture, Illumination, ObjectID+zDepth, NormalV, Depth 
+struct SSAO_PS_INPUT
+{
+	float2 uv : TEXCOORD0;
+};
+
+struct SSAO_PS_OUTPUT
+{
+	float4 color : COLOR0;
+};
+
+float3 getPosition(float2 uv)
+{
+	return gtxtInputTextures[3].Sample(gssWrap, uv).xyz;
+}
+
+float3 getNormal(float2 uv)
+{
+	return normalize(gtxtInputTextures[1].Sample(gssWrap, uv).xyz * 2.0f - 1.0f);
+}
+
+float2 getRandom(float2 uv)
+{
+	float random_size = 64;
+	float g_sample_rad = 1.0f;
+	float g_intensity = 1.0f;
+	float g_scale = 1.0f;
+	float g_bias = 0.0001f;
+	float g_screen_size = 144000;
+	return normalize(gtxtInputTextures[0].Sample(gssWrap, g_screen_size * uv / random_size).xy * 2.0f - 1.0f);
+}
+
+float doAmbientOcclusion(float2 tcoord, float2 uv, float3 p, float3 cnorm)
+{
+	float random_size = 64;
+	float g_sample_rad = 1.0f;
+	float g_intensity = 1.0f;
+	float g_scale = 1.0f;
+	float g_bias = 0.0001f;
+	float g_screen_size = 144000;
+
+	float3 diff = getPosition(tcoord + uv) - p;
+	//if (diff.z>0) return 1.0f;
+	const float3 v = normalize(diff);
+	const float d = length(diff) * g_scale;
+	return max(0.0, dot(cnorm, v) - g_bias) * (1.0 / (1.0 + d)) * g_intensity;
+}
+
+float3 getPositionBack(in float2 uv)
+{
+	return gtxtInputTextures[3].Sample(gssWrap, uv).xyz;
+}
+
+float doAmbientOcclusionBack(in float2 tcoord, in float2 uv, in float3 p, in float3 cnorm)
+{
+	float random_size = 64;
+	float g_sample_rad = 1.0f;
+	float g_intensity = 1.0f;
+	float g_scale = 1.0f;
+	float g_bias = 0.0001f;
+	float g_screen_size = 144000;
+	float3 diff = getPositionBack(tcoord + uv) - p;
+	const float3 v = normalize(diff);
+	const float d = length(diff) * g_scale;
+	return max(0.0, dot(cnorm, v) - g_bias) * (1.0 / (1.0 + d));
+}
 
 struct VS_STANDARD_INPUT
 {
@@ -110,7 +181,7 @@ struct PS_MULTIPLE_RENDER_TARGETS_OUTPUT
 	float4 f4Color : SV_TARGET1;
 	float4 f4Normal : SV_TARGET2;
 	float4 f4Albedo : SV_TARGET3;
-	float4 f4Specular : SV_TARGET4;
+	float3 f3Position : SV_TARGET4;
 	float4 f4CameraNormal : SV_TARGET5;
 };
 
@@ -207,8 +278,8 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStandard(VS_STANDARD_OUTPUT input, uint nPri
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uv);
 	cSpecularColor = cSpecularColor * gMaterial.m_cSpecular;
-	output.f4Specular = gMaterial.m_cSpecular;
-	//output.f4Position = input.positionW;
+	//output.f4Specular = gMaterial.m_cSpecular;
+	output.f3Position = input.positionW;
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
 
 	//output.f2ObjectIDzDepth.x = (float)1.0f;
@@ -272,8 +343,8 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSAlpha(VS_STANDARD_OUTPUT input, uint nPrimit
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uv);
 	cSpecularColor = cSpecularColor * gMaterial.m_cSpecular;
-	output.f4Specular = gMaterial.m_cSpecular;
-	//output.f4Position = input.positionW;
+	//output.f4Specular = gMaterial.m_cSpecular;
+	output.f3Position = input.positionW;
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
 
 	//output.f2ObjectIDzDepth.x = (float)1.0f;
@@ -453,9 +524,9 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTerrain(VS_TERRAIN_OUTPUT input, uint nPrimi
 	output.f4Albedo = cColor;
 
 	output.f4Scene = output.f4Color = output.f4Albedo * cIllumination;
-
+	output.f3Position = input.positionW;
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
-	output.f4Specular = gMaterial.m_cSpecular;
+	//output.f4Specular = gMaterial.m_cSpecular;
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
 
 	//output.f2ObjectIDzDepth.x = (float)1.0f;
@@ -514,11 +585,11 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSSkyBox(VS_SKYBOX_CUBEMAP_OUTPUT input, uint 
 
 	output.f4Albedo = cColor;
 
-	output.f4Scene = output.f4Color = output.f4Albedo;
+	output.f4Scene = output.f4Color = output.f4Albedo * gcGlobalAmbientLight;
 
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
-	output.f4Specular = gMaterial.m_cSpecular;
-	//output.f4Position = input.position;
+	//output.f4Specular = gMaterial.m_cSpecular;
+	output.f3Position = input.position;
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
 
 	//output.f2ObjectIDzDepth.x = (float)1.0f;
@@ -597,8 +668,8 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWall(VS_WALL_OUTPUT input, uint nPrimitiveID
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uv);
 	cSpecularColor = cSpecularColor * gMaterial.m_cSpecular;
-	output.f4Specular = gMaterial.m_cSpecular;
-	//output.f4Position = input.positionW;
+	//output.f4Specular = gMaterial.m_cSpecular;
+	output.f3Position = input.positionW;
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
 
 	//output.f2ObjectIDzDepth.x = (float)1.0f;
@@ -726,8 +797,8 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uv);
 	cSpecularColor = cSpecularColor * gMaterial.m_cSpecular;
-	output.f4Specular = gMaterial.m_cSpecular;
-	//output.f4Position = input.positionW;
+	//output.f4Specular = gMaterial.m_cSpecular;
+	output.f3Position = input.positionW;
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
 
 	//output.f2ObjectIDzDepth.x = (float)1.0f;
@@ -735,9 +806,8 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 	//output.f4Scene = output.f4Texture;
 	//output.f4Scene = float4(1,1,1,1);
 	output.f4Color.w = gnObjectType / 10.0f;
+
 	return(output);
-
-
 }
 
 struct VS_SCREEN_RECT_TEXTURED_OUTPUT
@@ -784,11 +854,6 @@ float4 GetColorFromDepth(float fDepth)
 	else cColor = float4(fDepth * 1.2, fDepth * 1.2, fDepth * 1.2, 1.0f);
 	return(cColor);
 }
-
-Texture2D gtxtInputTextures[6] : register(t14); //Color, NormalW, Texture, Position, NormalV, Depth // 3과 4는 Illumination, ObjectID+zDepth 인데 이거 두개는 쓸모없어서 삭제함
-
-static float gfLaplacians[9] = { -1.0f, -1.0f, -1.0f, -1.0f, 8.0f, -1.0f, -1.0f, -1.0f, -1.0f };
-static int2 gnOffsets[9] = { { -1,-1 }, { 0,-1 }, { 1,-1 }, { -1,0 }, { 0,0 }, { 1,0 }, { -1,1 }, { 0,1 }, { 1,1 } };
 
 float4 LaplacianEdge(float4 position)
 {
@@ -887,7 +952,41 @@ float4 Outline(VS_SCREEN_RECT_TEXTURED_OUTPUT input)
 	float4 f4EdgeColor = float4(myColor.xyz, myColor.w * fEdge);
 	//float4 f4EdgeColor = float4(1.0f, 0,0,1.0f * fEdge);
 	float4 f4Color = gtxtInputTextures[0].Sample(gssWrap, input.uv);
-	return(AlphaBlend(f4EdgeColor, f4Color));
+
+	SSAO_PS_OUTPUT o = (SSAO_PS_OUTPUT)0;
+
+	o.color.rgb = 1.0f;
+	const float2 vec[4] = { float2(1,0),float2(-1,0), float2(0,1),float2(0,-1) };
+
+	float3 p = gtxtInputTextures[3].Sample(gssWrap, input.uv).xyz;
+	float3 n = getNormal(input.uv);
+	float2 rand = getRandom(input.uv);
+
+	float ao = 0.0f;
+	//float rad =g_sample_rad / p.z;
+	float g_sample_rad = 5.0f;
+	float rad = 0.0005f;
+	//if(rad>0) return float4(p, 0);
+
+	int iterations = 4;
+	for (int j = 0; j < iterations; ++j)
+	{
+		float2 coord1 = reflect(vec[j], rand) * rad;
+		float2 coord2 = float2(coord1.x * 0.707 - coord1.y * 0.707, coord1.x * 0.707 + coord1.y * 0.707);
+
+		ao += doAmbientOcclusion(input.uv, coord1 * 0.25, p, n);
+		ao += doAmbientOcclusion(input.uv, coord2 * 0.5, p, n);
+		ao += doAmbientOcclusion(input.uv, coord1 * 0.75, p, n);
+		ao += doAmbientOcclusion(input.uv, coord2, p, n);
+		ao += doAmbientOcclusionBack(input.uv, coord1 * (0.25 + 0.125), p, n);
+		ao += doAmbientOcclusionBack(input.uv, coord2 * (0.5 + 0.125), p, n);
+		ao += doAmbientOcclusionBack(input.uv, coord1 * (0.75 + 0.125), p, n);
+		ao += doAmbientOcclusionBack(input.uv, coord2 * 1.125, p, n);
+	}
+	ao /= (float)iterations * 4.0;
+	//return  float4(ao, ao, ao, 1);
+	if(ao>0.5) return(AlphaBlend(f4EdgeColor, f4Color)-ao);
+	else return(AlphaBlend(f4EdgeColor, f4Color));
 }
 
 float4 PSScreenRectSamplingTextured(VS_SCREEN_RECT_TEXTURED_OUTPUT input) : SV_Target
@@ -995,8 +1094,8 @@ VS_UI_OUTPUT VSDoorUI(VS_UI_INPUT input)
 	VS_UI_OUTPUT output;
 
 	if (gnUIType == INGAME_UI || gnUIType == PROGRESS_BAR_UI) {
-        output.position = mul(float4(input.position, 1.0f), gmtxGameObject);
-    }
+		output.position = mul(float4(input.position, 1.0f), gmtxGameObject);
+	}
 	else {
 		output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
 	}
@@ -1114,9 +1213,9 @@ float4 PSShadowMapShadow(VS_SHADOW_MAP_OUTPUT input) : SV_TARGET
 {
 	float4 cIllumination = Lighting(input.positionW, normalize(input.normalW), true, input.uvs);
 
-	//	cIllumination = saturate(gtxtDepthTextures[3].SampleLevel(gssProjector, f3uvw.xy, 0).r);
+	//cIllumination = saturate(gtxtDepthTextures[3].SampleLevel(gssProjector, f3uvw.xy, 0).r);
 
-		return (cIllumination);
+	return (cIllumination);
 }
 
 struct PS_DEPTH_OUTPUT
