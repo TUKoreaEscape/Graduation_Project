@@ -257,7 +257,7 @@ bool Room::All_ElectronicSystem_Fixed()
 		else
 			cnt++;
 	}
-	if (cnt >= NUMBER_OF_ELECTRONIC)
+	if (cnt >= ELECTRONIC_DEBUG)
 		return true;
 	return false;
 }
