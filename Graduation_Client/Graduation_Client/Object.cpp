@@ -1030,6 +1030,7 @@ void PowerSwitch::update(float fElapsedTime)
 #endif
 			Sound::GetInstance()->StopObjectSound(m_pSounds[1]);
 			Sound::GetInstance()->PlayObjectSound(m_pSounds[2], 1.0f);
+			Input::GetInstance()->m_pPlayer->SetInfo(FIXFAIL);
 			return;
 		}
 
@@ -1047,6 +1048,7 @@ void PowerSwitch::update(float fElapsedTime)
 #endif
 		Sound::GetInstance()->StopObjectSound(m_pSounds[1]);
 		Sound::GetInstance()->PlayObjectSound(m_pSounds[2], 1.0f);
+		Input::GetInstance()->m_pPlayer->SetInfo(FIXSUCCESS);
 	}
 	else {
 		if (false == IsEqual(m_fCheckCooltime, 0)) {

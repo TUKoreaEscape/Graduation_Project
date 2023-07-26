@@ -25,6 +25,15 @@ enum DIR {
 	DEGREE270
 };
 
+enum INFOUI {
+	NOINFO = -1,
+	FIXSUCCESS = 0,
+	FIXFAIL,
+	ACTIVATE_ESCAPESYSTEM,
+	WORKING_ESCAPESYSTEM,
+	ESCAPE_SUCCESS,
+};
+
 class SkyBox : public GameObject
 {
 public:

@@ -87,6 +87,7 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		}
 		break;
 	case PLAYING_GAME:
+	{
 		for (int i = 0; i < NUM_DOOR; ++i) {
 			reinterpret_cast<Door*>(m_pDoors[i])->UIrender(pd3dCommandList);
 		}
@@ -147,7 +148,17 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			int index = m_pPlayer->GetItem();
 			if (index != -1) m_UIPlayer[1 + index]->render(pd3dCommandList);
 		}
+		int info = m_pPlayer->GetInfo();
+		if (info != -1) {
+			m_ppInfoUIs[info]->render(pd3dCommandList);
+			m_fInfoTime += m_fElapsedTime;
+			if (m_fInfoTime >= 1.5f) {
+				m_fInfoTime = 0;
+				m_pPlayer->SetInfo(NOINFO);
+			}
+		}
 		break;
+	}
 	case ENDING_GAME:
 	{
 		for (int i = 0; i < 5; ++i) {
@@ -170,6 +181,7 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		break;
 	}
 	case INTERACTION_POWER:
+	{
 		if ((m_pPlayer->m_pNearInteractionObejct))
 			reinterpret_cast<PowerSwitch*>(m_pPlayer->m_pNearInteractionObejct)->UIrender(pd3dCommandList);
 		m_UIPlayer[0]->render(pd3dCommandList);
@@ -192,7 +204,17 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			}
 		}
 		m_UIPlayer[6]->render(pd3dCommandList);
+		int info = m_pPlayer->GetInfo();
+		if (info != -1) {
+			m_ppInfoUIs[info]->render(pd3dCommandList);
+			m_fInfoTime += m_fElapsedTime;
+			if (m_fInfoTime >= 1.5f) {
+				m_fInfoTime = 0;
+				m_pPlayer->SetInfo(NOINFO);
+			}
+		}
 		break;
+	}
 	}
 }
 
@@ -354,7 +376,7 @@ void GameScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 250);
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 260);
 
 	Material::PrepareUIShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
@@ -1766,6 +1788,14 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_ppAnswerUIs[8] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, -0.032f, 0.08f, 0.04f);
 	m_ppAnswerUIs[9] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, -0.088f, 0.08f, 0.04f);
 	m_ppAnswerUIs[10] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, -0.144f, 0.08f, 0.04f);
+
+	m_nInfoUI = 5;
+	m_ppInfoUIs = new GameObject * [m_nInfoUI];
+	m_ppInfoUIs[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/FixSuccess.dds", 0.0f, 0.7f, 1.0f, 0.3f);
+	m_ppInfoUIs[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/FixFail.dds", 0.0f, 0.7f, 1.0f, 0.3f);
+	m_ppInfoUIs[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/ActivateEscapeSystem.dds", 0.0f, 0.7f, 1.0f, 0.3f);
+	m_ppInfoUIs[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/WorkingEscapeSystem.dds", 0.0f, 0.7f, 1.0f, 0.3f);
+	m_ppInfoUIs[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/EscapeSuccess.dds", 0.0f, 0.7f, 1.0f, 0.3f);
 
 	LPVOID m_pTerrain[ROOM_COUNT]{ m_pMainTerrain ,m_pPianoTerrain,m_pBroadcastTerrain, m_pCubeTerrain ,m_pForestTerrain,m_pClassroomTerrain };
 

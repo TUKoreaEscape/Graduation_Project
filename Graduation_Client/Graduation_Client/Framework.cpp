@@ -623,8 +623,8 @@ void Framework::FrameAdvance()
 
 		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
-		scene->UIrender(m_pd3dCommandList); // Door UI
 		m_pEdgeShader->Render(m_pd3dCommandList);
+		scene->UIrender(m_pd3dCommandList); // Door UI
 
 		break;
 	case ENDING_GAME:

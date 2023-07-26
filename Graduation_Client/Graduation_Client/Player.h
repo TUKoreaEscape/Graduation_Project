@@ -183,4 +183,8 @@ public:
 	int FootstepCallback1 = -1;
 	int FootstepCallback2 = -1;
 	int channelIndex = -1;
+
+	int m_nInfo{ -1 };
+	int GetInfo() { return m_nInfo; }
+	void SetInfo(int n) { m_nInfo = n; }
 };

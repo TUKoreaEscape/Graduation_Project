@@ -99,6 +99,11 @@ public:
 
 	int m_nAnswerUI{};
 	GameObject** m_ppAnswerUIs = nullptr;
+
+	int m_nInfoUI{};
+	GameObject** m_ppInfoUIs = nullptr;
+
+	float m_fInfoTime{};
 protected:
 	static ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap;
 
