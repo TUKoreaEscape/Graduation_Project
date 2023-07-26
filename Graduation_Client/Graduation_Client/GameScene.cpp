@@ -226,7 +226,8 @@ void GameScene::prerender(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
 	m_pLight->GetComponent<Light>()->SetWaitingLight(false);
 	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
-	if(GameState::GetInstance()->GetTick()) m_pLight->GetComponent<Light>()->Updaterotate();
+	//if(GameState::GetInstance()->GetTick())
+		m_pLight->GetComponent<Light>()->Updaterotate();
 	XMFLOAT3 cameraPos = m_pPlayer->m_pCamera->GetPosition();
 	CheckCameraPos(cameraPos);
 }
@@ -237,7 +238,7 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	m_pSkybox->render(pd3dCommandList);
 
-	m_pCeilling->render(pd3dCommandList);
+	//m_pCeilling->render(pd3dCommandList);
 
 	m_pMainTerrain->render(pd3dCommandList);
 	m_pPianoTerrain->render(pd3dCommandList);

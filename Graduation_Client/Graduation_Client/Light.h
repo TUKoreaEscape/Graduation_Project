@@ -38,12 +38,13 @@ public:
 public:
 	LIGHT* m_pLights = nullptr;
 	int m_nLights = 0;
-
+	float global = 0.7f;
 	// Directional Light의 회전 각도
-	float rotationAngle = 330.f;
+	float rotationAngle = 270.0f;
 
 	// Directional Light의 회전 속도
 	float rotationSpeed = 0.25f;
+	bool dayAndnight = true; //  true일때 낮
 
 	XMFLOAT4 m_xmf4GlobalAmbient;
 
