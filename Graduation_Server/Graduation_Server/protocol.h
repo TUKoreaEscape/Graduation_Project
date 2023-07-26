@@ -770,6 +770,7 @@ struct sc_packet_request_escapesystem_working {
 
 	short			index;
 	short			escape_id;
+	bool			info;
 };
 
 struct sc_packet_activate_altar {

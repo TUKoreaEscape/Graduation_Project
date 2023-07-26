@@ -557,6 +557,7 @@ void Network::Process_Active_EscapeSystem(char* ptr)
 	for (int i = 0; i < NUM_ESCAPE_LEVER; ++i)
 		reinterpret_cast<EscapeObject*>(m_EscapeLevers[i])->SetWorking();
 	reinterpret_cast<EscapeObject*>(m_EscapeLevers[packet->index])->SetReal();
+	m_pPlayer->SetInfo(ACTIVATE_ESCAPESYSTEM);
 }
 
 void Network::Process_EscapeSystem_Lever_Update(char* ptr)
@@ -573,6 +574,13 @@ void Network::Process_EscapeSystem_Update(char* ptr)
 {
 	sc_packet_request_escapesystem_working* packet = reinterpret_cast<sc_packet_request_escapesystem_working*>(ptr);
 	packet->index; // 해당 번호의 탈출장치 working시 뭔가 조작을 할 예정인데 이건 추후 예정
+
+	if (m_pPlayer->GetType() == TYPE_TAGGER)
+		m_pPlayer->SetInfo(ESCAPE_SUCCESS);
+	else {
+		if (packet->info)
+			m_pPlayer->SetInfo(WORKING_ESCAPESYSTEM);
+	}
 
 	if (m_pPlayer->GetID() == packet->escape_id) {
 		m_pPlayer->SetPlayerType(TYPE_ESCAPE_PLAYER); // 이후 ESCAPE_PLAYER로 교체해야함

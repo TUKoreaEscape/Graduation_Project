@@ -1070,16 +1070,17 @@ void cGameServer::Process_EscapeSystem(const int user_id, void* buff)
 	}
 	room.m_escape_system[packet->index].Working_Escape();
 
-	
+	sc_packet_request_escapesystem_working update_packet;
 	for (int i = 0; i < room.in_escape_player.size(); ++i) {
 		if (room.in_escape_player[i] == -1) {
 			room.in_escape_player[i] = user_id;
+			if (i == 0)
+				update_packet.info = true;
+			else
+				update_packet.info = false;
 			break;
 		}
 	}
-
-	sc_packet_request_escapesystem_working update_packet;
-
 	update_packet.size = sizeof(update_packet);
 	update_packet.type = SC_PACKET::SC_PACKET_REQUEST_ESCAPESYSTEM_WORKING;
 	update_packet.index = packet->index;
