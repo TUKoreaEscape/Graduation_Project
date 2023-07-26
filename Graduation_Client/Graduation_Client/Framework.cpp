@@ -170,7 +170,7 @@ void Framework::CreateRtvAndDsvDescriptorHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC d3dDescriptorHeapDesc;
 	::ZeroMemory(&d3dDescriptorHeapDesc, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
-	d3dDescriptorHeapDesc.NumDescriptors = m_nSwapChainBuffers + 5;
+	d3dDescriptorHeapDesc.NumDescriptors = m_nSwapChainBuffers + 6;
 	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	d3dDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	d3dDescriptorHeapDesc.NodeMask = 0;
@@ -428,8 +428,8 @@ void Framework::BuildObjects()
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	d3dRtvCPUDescriptorHandle.ptr += (::gnRtvDescriptorIncrementSize * m_nSwapChainBuffers);
 
-	DXGI_FORMAT pdxgiResourceFormats[6] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32_FLOAT };
-	m_pEdgeShader->CreateResourcesAndViews(m_pd3dDevice, 6, pdxgiResourceFormats, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, d3dRtvCPUDescriptorHandle, 7); //SRV to (Render Targets) + (Depth Buffer)
+	DXGI_FORMAT pdxgiResourceFormats[6] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32_FLOAT };
+	m_pEdgeShader->CreateResourcesAndViews(m_pd3dDevice, 6, pdxgiResourceFormats, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, d3dRtvCPUDescriptorHandle, 6 + 1); //SRV to (Render Targets) + (Depth Buffer)
 
 	DXGI_FORMAT pdxgiDepthSrvFormats[1] = { DXGI_FORMAT_R32_FLOAT };
 	m_pEdgeShader->CreateShaderResourceViews(m_pd3dDevice, 1, &m_pd3dDepthStencilBuffer, pdxgiDepthSrvFormats);
@@ -440,7 +440,7 @@ void Framework::BuildObjects()
 	m_pDepthRenderShader->CreateShader(m_pd3dDevice, scene->GetGraphicsRootSignature(), 1, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
 	m_pDepthRenderShader->BuildObjects(m_pd3dDevice, m_pd3dCommandList, NULL);
 
-	DXGI_FORMAT RtvFormats[6] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM,DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32_FLOAT };
+	DXGI_FORMAT RtvFormats[6] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM,DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32_FLOAT };
 	m_pShadowMapShader = new ShadowMapShader(scene);
 	m_pShadowMapShader->CreateShader(m_pd3dDevice, scene->GetGraphicsRootSignature(), 6, RtvFormats, DXGI_FORMAT_D32_FLOAT);
 	m_pShadowMapShader->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
@@ -574,101 +574,126 @@ void Framework::FrameAdvance()
 	if (input->keyBuffer['1'] & 0xF0) m_nDebugOptions = 85;
 	else m_nDebugOptions = 10;
 
+	float pfClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
+	
+	if (scene) scene->prerender(m_pd3dCommandList);
 	switch (m_gamestate->GetGameState()) {
 	case LOGIN:
-		if (scene) scene->prerender(m_pd3dCommandList);
-		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
-		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
+	{
+		D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * ::gnRtvDescriptorIncrementSize);
+		m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor, 0, NULL);
+		D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+		m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 		scene->UIrender(m_pd3dCommandList);
 		break;
+	}
 	case ROOM_SELECT:
-		if (scene) scene->prerender(m_pd3dCommandList);
-		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
-		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
+	{
+		D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * ::gnRtvDescriptorIncrementSize);
+		m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor, 0, NULL);
+		D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+		m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 		scene->UIrender(m_pd3dCommandList);
 		break;
+	}
 	case WAITING_GAME:
-		if (scene) scene->prerender(m_pd3dCommandList);
-		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
-		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+	{
+		D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * ::gnRtvDescriptorIncrementSize);
+		m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor, 0, NULL);
+		D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+		m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 		scene->UIrender(m_pd3dCommandList);
 		scene->WaitingRoomrender(m_pd3dCommandList);
-		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions); 
-		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		break;
+	}
 	case CUSTOMIZING:
-		if (scene) scene->prerender(m_pd3dCommandList);
-		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
-		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+	{
+		D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * ::gnRtvDescriptorIncrementSize);
+		m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor, 0, NULL);
+		D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+		m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 		scene->UIrender(m_pd3dCommandList);
 		scene->WaitingRoomrender(m_pd3dCommandList);
-		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
-		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		break;
+	}
 	case READY_TO_GAME:
-		if (scene) scene->prerender(m_pd3dCommandList);
+	{
 		m_pDepthRenderShader->PrepareShadowMap(m_pd3dCommandList);
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
-		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 0, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 		if (scene) scene->defrender(m_pd3dCommandList);
 		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
-		m_pEdgeShader->Render(m_pd3dCommandList);
-		scene->UIrender(m_pd3dCommandList); // Door UI
-		break;
-	case PLAYING_GAME:
-		if (scene) scene->prerender(m_pd3dCommandList);
-		m_pDepthRenderShader->PrepareShadowMap(m_pd3dCommandList);
-		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
-		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
-
-		m_pDepthRenderShader->UpdateShaderVariables(m_pd3dCommandList);
-		m_pShadowMapShader->UpdateShaderVariables(m_pd3dCommandList);
-		if (scene) scene->defrender(m_pd3dCommandList);
-
-		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
-		//m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
-		//m_pEdgeShader->Render(m_pd3dCommandList);
-		scene->UIrender(m_pd3dCommandList); // Door UI
-		break;
-	case ENDING_GAME:
-		if (scene) scene->prerender(m_pd3dCommandList);
-		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
-		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
-		scene->UIrender(m_pd3dCommandList); 
-		scene->Endingrender(m_pd3dCommandList);
-		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions); 
-		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
-		break;
-	case SPECTATOR_GAME:
-		if (scene) scene->prerender(m_pd3dCommandList); 
-		m_pDepthRenderShader->PrepareShadowMap(m_pd3dCommandList);
-		if (scene) scene->SpectatorPrerender(m_pd3dCommandList);
-		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
-		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
-		if (scene) scene->Spectatorrender(m_pd3dCommandList);
-		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
-		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
-		m_pEdgeShader->Render(m_pd3dCommandList);
-		break;
-	case INTERACTION_POWER:
-		if (scene) scene->prerender(m_pd3dCommandList); 
-		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
-		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
-		if (scene) scene->defrender(m_pd3dCommandList);
-		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
-		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
+		m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 		m_pEdgeShader->Render(m_pd3dCommandList);
 		scene->UIrender(m_pd3dCommandList); // Door UI
 		break;
 	}
+	case PLAYING_GAME:
+	{
+		m_pDepthRenderShader->PrepareShadowMap(m_pd3dCommandList);
+		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 0, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+		m_pDepthRenderShader->UpdateShaderVariables(m_pd3dCommandList);
+		m_pShadowMapShader->UpdateShaderVariables(m_pd3dCommandList);
+		if (scene) scene->defrender(m_pd3dCommandList);
+		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
+		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
+		m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle); 
+		//m_pEdgeShader->Render(m_pd3dCommandList);
+		scene->UIrender(m_pd3dCommandList); // Door UI
+		break;
+	}
+	case ENDING_GAME:
+	{
+		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 0, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+		scene->UIrender(m_pd3dCommandList);
+		scene->Endingrender(m_pd3dCommandList);
+		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
+		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList); 
+		m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
+		m_pEdgeShader->Render(m_pd3dCommandList);
+
+		break;
+	}
+	case SPECTATOR_GAME:
+	{
+		m_pDepthRenderShader->PrepareShadowMap(m_pd3dCommandList);
+		if (scene) scene->SpectatorPrerender(m_pd3dCommandList);
+		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 0, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+		if (scene) scene->Spectatorrender(m_pd3dCommandList);
+		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
+		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
+		m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
+		m_pEdgeShader->Render(m_pd3dCommandList);
+
+		break;
+	}
+	case INTERACTION_POWER:
+	{
+		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 0, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
+		if (scene) scene->defrender(m_pd3dCommandList);
+		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
+		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
+		m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
+		m_pEdgeShader->Render(m_pd3dCommandList);
+		scene->UIrender(m_pd3dCommandList); // Door UI
+		break;
+	}
+	}
 	//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);
 	//if(Input::GetInstance()->keyBuffer['1'] & 0xF0) m_pEdgeShader->Render(m_pd3dCommandList);
-
-
-	//::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-	/*현재 렌더 타겟에 대한 렌더링이 끝나기를 기다린다. GPU가 렌더 타겟(버퍼)을 더 이상 사용하지 않으면 렌더 타겟
-	의 상태는 프리젠트 상태(D3D12_RESOURCE_STATE_PRESENT)로 바뀔 것이다.*/
 	
 	::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
