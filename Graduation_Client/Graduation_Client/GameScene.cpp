@@ -45,6 +45,7 @@ void GameScene::forrender(ID3D12GraphicsCommandList* pd3dCommandList)
 void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
 
 	switch (GameState::GetInstance()->GetGameState()) {
@@ -307,6 +308,8 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void GameScene::WaitingRoomrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
 	m_pLight->GetComponent<Light>()->SetWaitingLight(true);
 	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
@@ -315,6 +318,8 @@ void GameScene::WaitingRoomrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void GameScene::Endingrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 	m_pPlayer->SetPosition(XMFLOAT3(0.0f, -2.0f, -3.0f));
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
 	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
@@ -990,6 +995,9 @@ void GameScene::Loadingrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void GameScene::SpectatorPrerender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
+
 	int index = m_pPlayer->SpectatorPlayerIndex;
 
 	bool findNew = false;
