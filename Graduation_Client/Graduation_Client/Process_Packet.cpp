@@ -115,7 +115,6 @@ void Network::Process_Game_Start(char* ptr)
 void Network::Process_Game_End(char* ptr)
 {
 	Input::GetInstance()->speed = 60.f;
-	release_capture_mouse();
 	sc_packet_game_end* packet = reinterpret_cast<sc_packet_game_end*>(ptr);
 	m_tagger_win = packet->is_tagger_win;
 

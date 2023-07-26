@@ -157,6 +157,7 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 #if USE_NETWORK
 		Network& network = *Network::GetInstance();
 		if (network.m_tagger_win) {
+			m_UIEnding[2]->render(pd3dCommandList);
 #endif
 #if !USE_NETWORK
 		if (0) { // TAGGER's Win
