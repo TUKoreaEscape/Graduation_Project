@@ -13,49 +13,51 @@ void cGameServer::Timer()
 		if (!timer_queue.empty()) {
 			if (timer_queue.top().event_time <= current_time) {
 				ev = timer_queue.top();
-				if ((ev.event_type == EventType::OPEN_DOOR || ev.event_type == EventType::CLOSE_DOOR) && (m_room_manager->Get_Room_Info(ev.room_number)->GetSecondSkillUse() == true) && (ev.enable_tagger_skill == false)) {
-					TIMER_EVENT new_ev;
-					new_ev.event_type = ev.event_type;
-					new_ev.event_time = ev.event_time + 30s;
-					new_ev.room_number = ev.room_number;
-					new_ev.enable_tagger_skill = true;
-					new_ev.obj_id = ev.obj_id;
+				//if ((ev.event_type == EventType::OPEN_DOOR || ev.event_type == EventType::CLOSE_DOOR) && (m_room_manager->Get_Room_Info(ev.room_number)->GetSecondSkillUse() == true) && (ev.enable_tagger_skill == false)) {
+				//	TIMER_EVENT new_ev;
+				//	new_ev.event_type = ev.event_type;
+				//	new_ev.event_time = ev.event_time + 30s;
+				//	new_ev.room_number = ev.room_number;
+				//	new_ev.enable_tagger_skill = true;
+				//	new_ev.obj_id = ev.obj_id;
 
-					if (ev.event_type == EventType::USE_SECOND_TAGGER_SKILL)
-						cout << "USE_SECOND_TAGGER_SKILL : ";
-					else if (ev.event_type == EventType::OPEN_DOOR)
-						cout << "OPEN_DOOR : ";
-					else if (ev.event_type == EventType::CLOSE_DOOR)
-						cout << "CLOSE_DOOR : ";
-					cout << "도어 30초 추가" << endl;
-					timer_queue.pop();
-					timer_queue.push(new_ev);
-				}
-				else {
-					timer_queue.pop();
-					Process_Event(ev);
-				}
+				//	if (ev.event_type == EventType::USE_SECOND_TAGGER_SKILL)
+				//		cout << "USE_SECOND_TAGGER_SKILL : ";
+				//	else if (ev.event_type == EventType::OPEN_DOOR)
+				//		cout << "OPEN_DOOR : ";
+				//	else if (ev.event_type == EventType::CLOSE_DOOR)
+				//		cout << "CLOSE_DOOR : ";
+				//	cout << "도어 30초 추가" << endl;
+				//	timer_queue.pop();
+				//	timer_queue.push(new_ev);
+				//}
+				//else {
+				//	timer_queue.pop();
+				//	Process_Event(ev);
+				//}
+				timer_queue.pop();
+				Process_Event(ev);
 			}
 			else {
 				ev = timer_queue.top();
-				if ((ev.event_type == EventType::OPEN_DOOR || ev.event_type == EventType::CLOSE_DOOR) && (m_room_manager->Get_Room_Info(ev.room_number)->GetSecondSkillUse() == true) && (ev.enable_tagger_skill == false)) {
-					TIMER_EVENT new_ev;
-					new_ev.event_type = ev.event_type;
-					new_ev.event_time = ev.event_time + 30s;
-					new_ev.room_number = ev.room_number;
-					new_ev.enable_tagger_skill = true;
-					new_ev.obj_id = ev.obj_id;
+				//if ((ev.event_type == EventType::OPEN_DOOR || ev.event_type == EventType::CLOSE_DOOR) && (m_room_manager->Get_Room_Info(ev.room_number)->GetSecondSkillUse() == true) && (ev.enable_tagger_skill == false)) {
+				//	TIMER_EVENT new_ev;
+				//	new_ev.event_type = ev.event_type;
+				//	new_ev.event_time = ev.event_time + 30s;
+				//	new_ev.room_number = ev.room_number;
+				//	new_ev.enable_tagger_skill = true;
+				//	new_ev.obj_id = ev.obj_id;
 
-					if (ev.event_type == EventType::USE_SECOND_TAGGER_SKILL)
-						cout << "USE_SECOND_TAGGER_SKILL : ";
-					else if (ev.event_type == EventType::OPEN_DOOR)
-						cout << "OPEN_DOOR : ";
-					else if (ev.event_type == EventType::CLOSE_DOOR)
-						cout << "CLOSE_DOOR : ";
-					cout << "도어 30초 추가" << endl;
-					timer_queue.pop();
-					timer_queue.push(new_ev);
-				}
+				//	if (ev.event_type == EventType::USE_SECOND_TAGGER_SKILL)
+				//		cout << "USE_SECOND_TAGGER_SKILL : ";
+				//	else if (ev.event_type == EventType::OPEN_DOOR)
+				//		cout << "OPEN_DOOR : ";
+				//	else if (ev.event_type == EventType::CLOSE_DOOR)
+				//		cout << "CLOSE_DOOR : ";
+				//	cout << "도어 30초 추가" << endl;
+				//	timer_queue.pop();
+				//	timer_queue.push(new_ev);
+				//}
 
 				if (ev.event_type == EventType::CHECK_NUM_OF_SERVER_ACCEPT_USER);
 				else if (ev.event_type == EventType::GAME_START);

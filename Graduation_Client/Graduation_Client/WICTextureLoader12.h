@@ -2,7 +2,8 @@
 // File: WICTextureLoader12.h
 //
 // Function for loading a WIC image and creating a Direct3D runtime texture for it
-// (auto-generating mipmaps if possible)
+// (
+// -generating mipmaps if possible)
 //
 // Note: Assumes application has already called CoInitializeEx
 //

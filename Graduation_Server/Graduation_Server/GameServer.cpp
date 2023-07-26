@@ -340,10 +340,15 @@ void cGameServer::WorkerThread()
 			sc_packet_game_end packet;
 			packet.size = sizeof(packet);
 			packet.type = SC_PACKET::SC_PACKET_GAME_END;
-			packet.is_tagger_win = true; // 이건 방에서 누가 이겼는지 조건을 넘겨줘야함
+			if (rl.in_escape_player[0] == -1)
+				packet.is_tagger_win = true; // 이건 방에서 누가 이겼는지 조건을 넘겨줘야함
+			else
+				packet.is_tagger_win = false;
 			
-			for (int i = 0; i < 6; ++i)
-				packet.escape_id[i] = -1;
+			for (int i = 0; i < 6; ++i) {
+				packet.escape_id[i] = rl.in_escape_player[i];
+				rl.in_escape_player[i] = -1;
+			}
 
 			for (auto& player_id : rl.in_player) {
 				if (player_id == -1)
@@ -365,6 +370,8 @@ void cGameServer::WorkerThread()
 
 			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
 			{
+				if (rl.in_player[i] == -1)
+					continue;
 				m_clients[rl.in_player[i]].do_send(sizeof(packet), &packet);
 			}
 
@@ -435,6 +442,8 @@ void cGameServer::WorkerThread()
 
 			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
 			{
+				if (rl.in_player[i] == -1)
+					continue;
 				m_clients[rl.in_player[i]].do_send(sizeof(packet), &packet);
 			}
 

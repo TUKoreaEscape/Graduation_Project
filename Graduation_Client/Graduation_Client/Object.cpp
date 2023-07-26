@@ -413,7 +413,8 @@ void Door::render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Door::update(float fElapsedTime)
 {
-	if (m_bIsBlocked) {
+	if (IsWorking == true && m_bIsBlocked);
+	else if (m_bIsBlocked) {
 		m_fCooltime = 0;
 		return;
 	}

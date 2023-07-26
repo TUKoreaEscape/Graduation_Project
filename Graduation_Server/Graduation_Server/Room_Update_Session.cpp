@@ -249,10 +249,15 @@ void Room::Update_room_time()
 
 bool Room::All_ElectronicSystem_Fixed()
 {
+	int cnt = 0;
 	for (int i = 0; i < m_electrinic_system.size(); ++i)
 	{
-		if (!m_electrinic_system[i].Get_On_Off_Switch_Vaild())
-			return false;
+		if (!m_electrinic_system[i].Get_On_Off_Switch_Vaild());
+			//return false;
+		else
+			cnt++;
 	}
-	return true;
+	if (cnt >= NUMBER_OF_ELECTRONIC)
+		return true;
+	return false;
 }
