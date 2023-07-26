@@ -1093,7 +1093,7 @@ void GameScene::LoadSceneObjectsFromFile(ID3D12Device* pd3dDevice, ID3D12Graphic
 	::fopen_s(&pFile, pstrFileName, "rb");
 	::rewind(pFile);
 	
-	DXGI_FORMAT pdxgiRtvFormats[6] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
+	DXGI_FORMAT pdxgiRtvFormats[6] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32_FLOAT };
 
 	WallShader* pShader = new WallShader();
 	pShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, 6, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
@@ -1644,7 +1644,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		for (int j = 0; j < 6; ++j)
 			GameObject::SetParts(i + 1, j, 0);
 		m_ppPlayers[i]->PlayerNum = i + 1;
-		m_ppPlayers[i]->SetPlayerType(TYPE_PLAYER_YET);
+		m_ppPlayers[i]->SetPlayerType(TYPE_TAGGER);
 	}
 	m_ppPlayers[0]->SetPosition(XMFLOAT3(6.0f, 0.0f, -5.0f));
 	m_ppPlayers[1]->SetPosition(XMFLOAT3(3.0f, 0.0f, -5.0f));
