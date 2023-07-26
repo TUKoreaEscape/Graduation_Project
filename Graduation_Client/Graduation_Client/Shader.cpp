@@ -321,11 +321,8 @@ void Shader::CreateShaderResourceViews(ID3D12Device* pd3dDevice, int nResources,
 			d3dShaderResourceViewDesc.Texture2D.PlaneSlice = 0;
 			d3dShaderResourceViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 			pd3dDevice->CreateShaderResourceView(ppd3dResources[i], &d3dShaderResourceViewDesc, m_d3dSrvCPUDescriptorNextHandle);
-			D3D12_CPU_DESCRIPTOR_HANDLE d3dSrvCPUDescriptorNextHandle = GameScene::GetCPUSrvDescriptorNextHandle();
-			D3D12_GPU_DESCRIPTOR_HANDLE d3dSrvGPUDescriptorNextHandle = GameScene::GetGPUSrvDescriptorNextHandle();
-
-			d3dSrvCPUDescriptorNextHandle.ptr += ::gnCbvSrvDescriptorIncrementSize;
-			d3dSrvGPUDescriptorNextHandle.ptr += ::gnCbvSrvDescriptorIncrementSize;
+			m_d3dSrvCPUDescriptorNextHandle.ptr += ::gnCbvSrvDescriptorIncrementSize;
+			m_d3dSrvGPUDescriptorNextHandle.ptr += ::gnCbvSrvDescriptorIncrementSize;
 		}
 	}
 }
@@ -877,7 +874,7 @@ void PostProcessingShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	Shader::Render(pd3dCommandList);
 
-	//pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
+	pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 
 	if (m_pTexture) m_pTexture->UpdateShaderVariables(pd3dCommandList);
 
@@ -941,7 +938,7 @@ void LaplacianEdgeShader::CreateResourcesAndViews(ID3D12Device* pd3dDevice, UINT
 	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, nShaderResources);
 	CreateShaderVariables(pd3dDevice, NULL);
 #ifdef _WITH_SCENE_ROOT_SIGNATURE
-	GameScene::CreateShaderResourceViews(pd3dDevice, m_pTexture, 0, 15);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 0, 15);
 #else
 	CreateShaderResourceViews(pd3dDevice, m_pTexture, 0, 0);
 #endif

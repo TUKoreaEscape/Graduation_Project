@@ -79,15 +79,14 @@ Texture2D gtxtDetailNormalTexture : register(t12);
 
 SamplerState gssWrap : register(s0);
 
-const float random_size = 4096;
-const float g_sample_rad = 1.0f;
-const float g_intensity = 100.0f;
-const float g_scale = 1.8f;
-const float g_bias = 0.000001f;
-const float g_screen_size = 144000;
+float gSampleRadius = 0.5f;
+float gIntensity = 1.0f;
+float gScale = 1.0f;
+float gBias = 0.025f;
 
 struct SSAO_PS_INPUT
 {
+	float4 position : SV_POSITION;
 	float2 uv : TEXCOORD0;
 };
 
@@ -96,42 +95,93 @@ struct SSAO_PS_OUTPUT
 	float4 color : COLOR0;
 };
 
-float3 getPosition(float2 uv)
+//float3 getPosition(float2 uv)
+//{
+//	return gtxtInputTextures[3].Sample(gssWrap, uv).xyz;
+//}
+
+//float3 getNormal(float2 uv)
+//{
+//	return normalize(gtxtInputTextures[1].Sample(gssWrap, uv).xyz * 2.0f - 1.0f);
+//}
+
+float3 getPosition(in float2 uv)
 {
-	return gtxtInputTextures[3].Sample(gssWrap, uv).xyz;
+	return float3(uv, gtxtInputTextures[5][int2(uv)].r);
 }
 
-float3 getNormal(float2 uv)
+float3 getNormal(in float2 uv)
 {
-	return normalize(gtxtInputTextures[1].Sample(gssWrap, uv).xyz * 2.0f - 1.0f);
+	return normalize(gtxtInputTextures[1][int2(uv)] * 2.0f - 1.0f);
 }
 
-float2 getRandom(float2 uv)
+float3 randomNormal(float2 tex)
 {
-	float random_size = 64;
-	float g_sample_rad = 1.0f;
-	float g_intensity = 1.0f;
-	float g_scale = 1.0f;
-	float g_bias = 0.0001f;
-	float g_screen_size = 144000;
-	return normalize(gtxtInputTextures[0].Sample(gssWrap, g_screen_size * uv / random_size).xy * 2.0f - 1.0f);
+	float noiseX = (frac(sin(dot(tex, float2(12.9898f, 78.233f) * 1.0f)) * 43758.5453f));
+	float noiseY = (frac(sin(dot(tex, float2(94.3225f, 22.817f) * 2.0f)) * 23574.3521f));
+	float noiseZ = (frac(sin(dot(tex, float2(39.129f, 10.311f) * 3.0f)) * 93878.1986f));
+	return normalize(float3(noiseX, noiseY, noiseZ));
 }
 
-float doAmbientOcclusion(float2 tcoord, float2 uv, float3 p, float3 cnorm)
+float2 getRandom(in float2 uv)
 {
-	float random_size = 64;
-	float g_sample_rad = 1.0f;
-	float g_intensity = 1.0f;
-	float g_scale = 1.0f;
-	float g_bias = 0.0001f;
-	float g_screen_size = 144000;
+	float gSampleRadius = 0.01f;
+	return normalize(randomNormal(uv) * 2.0f - 1.0f) * gSampleRadius;
+}
+
+float doAmbientOcclusion(in float2 tcoord, in float2 uv, in float3 p, in float3 cnorm)
+{
+
+	float gSampleRadius = 0.05f;
+	float gIntensity = 0.07f;
+	float gScale = 0.6f;
+	float gBias = 0.005f;
 
 	float3 diff = getPosition(tcoord + uv) - p;
-	//if (diff.z>0) return 1.0f;
-	const float3 v = normalize(diff);
-	const float d = length(diff) * g_scale;
-	return max(0.0, dot(cnorm, v) - g_bias) * (1.0 / (1.0 + d)) * g_intensity;
+	float3 v = normalize(diff);
+	float d = length(diff) * gScale;
+	return max(0.0f, dot(cnorm, v) - gBias) * (1.0f / (1.0f + d)) * gIntensity;
 }
+
+//밝게
+float4 Adjust_Brightness(float4 vColor, float fBrightness)
+{
+	return float4(vColor.rgb += fBrightness, vColor.a);
+}
+// 대비
+float4 Adjust_Contrast(float4 vColor, float fContrast)
+{
+	float t = 0.5f - fContrast * 0.5f;
+	return float4(vColor.rgb * fContrast + t, vColor.a);
+}
+
+
+//float2 getRandom(float2 uv)
+//{
+//	float random_size = 64;
+//	float g_sample_rad = 1.0f;
+//	float g_intensity = 1.0f;
+//	float g_scale = 1.0f;
+//	float g_bias = 0.0001f;
+//	float g_screen_size = 144000;
+//	return normalize(gtxtInputTextures[0].Sample(gssWrap, g_screen_size * uv / random_size).xy * 2.0f - 1.0f);
+//}
+
+//float doAmbientOcclusion(float2 tcoord, float2 uv, float3 p, float3 cnorm)
+//{
+//	float random_size = 64;
+//	float g_sample_rad = 1.0f;
+//	float g_intensity = 1.0f;
+//	float g_scale = 1.0f;
+//	float g_bias = 0.0001f;
+//	float g_screen_size = 144000;
+//
+//	float3 diff = getPosition(tcoord + uv) - p;
+//	//if (diff.z>0) return 1.0f;
+//	const float3 v = normalize(diff);
+//	const float d = length(diff) * g_scale;
+//	return max(0.0, dot(cnorm, v) - g_bias) * (1.0 / (1.0 + d)) * g_intensity;
+//}
 
 float3 getPositionBack(in float2 uv)
 {
@@ -273,7 +323,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStandard(VS_STANDARD_OUTPUT input, uint nPri
 	output.f4Albedo = cAlbedoColor;
 
 	//output.f4Scene = output.f4Color = lerp(output.f4Illumination, output.f4Texture, 0.7f);
-	output.f4Scene = output.f4Color = output.f4Albedo * cIllumination + cEmissionColor;
+	//output.f4Scene = output.f4Color = output.f4Albedo * cIllumination + cEmissionColor;
 
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uv);
@@ -288,6 +338,31 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStandard(VS_STANDARD_OUTPUT input, uint nPri
 	if (cColor.w < 0.524f)
 		discard;
 	output.f4Color.w = gnObjectType / 10.0f;
+
+	SSAO_PS_OUTPUT o = (SSAO_PS_OUTPUT)0;
+
+	o.color.rgb = 1.0f;
+	const float2 vec[4] = { float2(1,0),float2(-1,0), float2(0,1),float2(0,-1) };
+
+	float3 p = getPosition(input.uv);
+	float3 n = getNormal(input.uv);
+	float2 rand = getRandom(input.uv);
+	if (p.x == 0)  output.f4Color = float4(1, 0, 0, 1.0f);
+	if (n.x == 0)  output.f4Color = float4(0, 1, 0, 1.0f);
+	if (rand.x == 0)  output.f4Color = float4(0, 0, 1, 1.0f);
+
+	float ao = 0.0f;
+	int iterations = 4;
+	for (int j = 0; j < iterations; ++j)
+	{
+		ao += doAmbientOcclusion(input.uv, rand * 0.25f, p, n);
+		ao += doAmbientOcclusion(input.uv, rand * 0.5f, p, n);
+		ao += doAmbientOcclusion(input.uv, rand * 0.75f, p, n);
+		ao += doAmbientOcclusion(input.uv, rand, p, n);
+	}
+	ao /= (float)iterations * 4.0f;
+
+	output.f4Scene = output.f4Color = output.f4Albedo * cIllumination - float4(ao, ao, ao, 1.0f) + cEmissionColor;
 
 	return(output);
 }
@@ -523,7 +598,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTerrain(VS_TERRAIN_OUTPUT input, uint nPrimi
 	//float3 uvw = float3(input.uv0, nPrimitiveID / 2);
 	output.f4Albedo = cColor;
 
-	output.f4Scene = output.f4Color = output.f4Albedo * cIllumination;
+	//output.f4Scene = output.f4Color = output.f4Albedo * cIllumination;
 	output.f3Position = input.positionW;
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	//output.f4Specular = gMaterial.m_cSpecular;
@@ -531,6 +606,31 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTerrain(VS_TERRAIN_OUTPUT input, uint nPrimi
 
 	//output.f2ObjectIDzDepth.x = (float)1.0f;
 	//output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
+
+	SSAO_PS_OUTPUT o = (SSAO_PS_OUTPUT)0;
+
+	o.color.rgb = 1.0f;
+	const float2 vec[4] = { float2(1,0),float2(-1,0), float2(0,1),float2(0,-1) };
+
+	float3 p = getPosition(input.uv0);
+	float3 n = getNormal(input.uv0);
+	float2 rand = getRandom(input.uv0);
+	if (p.x == 0)  output.f4Color = float4(1, 0, 0, 1.0f);
+	if (n.x == 0)  output.f4Color = float4(0, 1, 0, 1.0f);
+	if (rand.x == 0)  output.f4Color = float4(0, 0, 1, 1.0f);
+
+	float ao = 0.0f;
+	int iterations = 4;
+	for (int j = 0; j < iterations; ++j)
+	{
+		ao += doAmbientOcclusion(input.uv0, rand * 0.25f, p, n);
+		ao += doAmbientOcclusion(input.uv0, rand * 0.5f, p, n);
+		ao += doAmbientOcclusion(input.uv0, rand * 0.75f, p, n);
+		ao += doAmbientOcclusion(input.uv0, rand, p, n);
+	}
+	ao /= (float)iterations * 4.0f;
+
+	output.f4Scene = output.f4Color = output.f4Albedo * cIllumination - float4(ao, ao, ao, 1.0f);
 	output.f4Color.w = gnObjectType / 10.0f;
 	return(output);
 }
@@ -663,7 +763,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWall(VS_WALL_OUTPUT input, uint nPrimitiveID
 	output.f4Albedo = cColor;
 
 	//output.f4Scene = output.f4Color = lerp(output.f4Illumination, output.f4Texture, 0.7f);
-	output.f4Scene = output.f4Color = output.f4Albedo * cIllumination;
+	//output.f4Scene = output.f4Color = output.f4Albedo * cIllumination;
 
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uv);
@@ -675,6 +775,31 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWall(VS_WALL_OUTPUT input, uint nPrimitiveID
 	//output.f2ObjectIDzDepth.x = (float)1.0f;
 	//output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
 	output.f4Color.w = gnObjectType / 10.0f;
+
+	SSAO_PS_OUTPUT o = (SSAO_PS_OUTPUT)0;
+
+	o.color.rgb = 1.0f;
+	const float2 vec[4] = { float2(1,0),float2(-1,0), float2(0,1),float2(0,-1) };
+
+	float3 p = getPosition(input.uv);
+	float3 n = getNormal(input.uv);
+	float2 rand = getRandom(input.uv);
+	if (p.x == 0)  output.f4Color = float4(1, 0, 0, 1.0f);
+	if (n.x == 0)  output.f4Color = float4(0, 1, 0, 1.0f);
+	if (rand.x == 0)  output.f4Color = float4(0, 0, 1, 1.0f);
+
+	float ao = 0.0f;
+	int iterations = 4;
+	for (int j = 0; j < iterations; ++j)
+	{
+		ao += doAmbientOcclusion(input.uv, rand * 0.25f, p, n);
+		ao += doAmbientOcclusion(input.uv, rand * 0.5f, p, n);
+		ao += doAmbientOcclusion(input.uv, rand * 0.75f, p, n);
+		ao += doAmbientOcclusion(input.uv, rand, p, n);
+	}
+	ao /= (float)iterations * 4.0f;
+
+	output.f4Scene = output.f4Color = output.f4Albedo * cIllumination - float4(ao, ao, ao, 1.0f);
 	return(output);
 }
 
@@ -790,7 +915,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 
 	//output.f4Scene = output.f4Color = output.f4Illumination * output.f4Texture;
 	//output.f4Scene = output.f4Color = lerp(output.f4Illumination, output.f4Texture, 0.7f);
-	output.f4Scene = output.f4Color = output.f4Albedo * cIllumination + cEmissionColor;
+	//output.f4Scene = output.f4Color = output.f4Albedo * cIllumination + cEmissionColor;
 	//output.f4Normal = float4(input.normalW.xyz * 0.5f + 0.5f, input.position.z);
 	//output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
 
@@ -806,6 +931,31 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 	//output.f4Scene = output.f4Texture;
 	//output.f4Scene = float4(1,1,1,1);
 	output.f4Color.w = gnObjectType / 10.0f;
+
+	SSAO_PS_OUTPUT o = (SSAO_PS_OUTPUT)0;
+
+	o.color.rgb = 1.0f;
+	const float2 vec[4] = { float2(1,0),float2(-1,0), float2(0,1),float2(0,-1) };
+
+	float3 p = getPosition(input.uv);
+	float3 n = getNormal(input.uv);
+	float2 rand = getRandom(input.uv);
+	if (p.x == 0)  output.f4Color = float4(1, 0, 0, 1.0f);
+	if (n.x == 0)  output.f4Color = float4(0, 1, 0, 1.0f);
+	if (rand.x == 0)  output.f4Color = float4(0, 0, 1, 1.0f);
+
+	float ao = 0.0f;
+	int iterations = 4;
+	for (int j = 0; j < iterations; ++j)
+	{
+		ao += doAmbientOcclusion(input.uv, rand * 0.25f, p, n);
+		ao += doAmbientOcclusion(input.uv, rand * 0.5f, p, n);
+		ao += doAmbientOcclusion(input.uv, rand * 0.75f, p, n);
+		ao += doAmbientOcclusion(input.uv, rand, p, n);
+	}
+	ao /= (float)iterations * 4.0f;
+
+	output.f4Scene = output.f4Color = output.f4Albedo * cIllumination - float4(ao, ao, ao, 1.0f) + cEmissionColor;
 
 	return(output);
 }
@@ -953,40 +1103,49 @@ float4 Outline(VS_SCREEN_RECT_TEXTURED_OUTPUT input)
 	//float4 f4EdgeColor = float4(1.0f, 0,0,1.0f * fEdge);
 	float4 f4Color = gtxtInputTextures[0].Sample(gssWrap, input.uv);
 
-	SSAO_PS_OUTPUT o = (SSAO_PS_OUTPUT)0;
+	//float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	//float weights[5] = { 0.227027f, 0.1945946f, 0.1216216f, 0.054054f, 0.0162162f };
+	//float texelSize = 0.2f;
+	//float value = 2;
+	//for (int i = -value; i <= value; ++i)
+	//{
+	//	for (int j = -value; j <= value; ++j)
+	//	{
+	//		color += gtxtInputTextures[0].Sample(gssWrap, input.uv + float2(i, j) * texelSize) * weights[i + 2] * weights[j + 2];
+	//	}
+	//}
 
-	o.color.rgb = 1.0f;
-	const float2 vec[4] = { float2(1,0),float2(-1,0), float2(0,1),float2(0,-1) };
+	float3 result = float3(0, 0, 0);
+	float totalWeight = 0;
+	float blurRadius = 0;
+	if(gtxtInputTextures[5].Sample(gssWrap,input.uv).r<0.12f) blurRadius = 0.003;
+	else blurRadius = 0.0002;
+	// 블러의 크기를 설정
+	int blurSize = 6;
 
-	float3 p = gtxtInputTextures[3].Sample(gssWrap, input.uv).xyz;
-	float3 n = getNormal(input.uv);
-	float2 rand = getRandom(input.uv);
+	// 가우시안 블러 마스크 생성
+	float weights[13] = { 0.0561, 0.1353, 0.278, 0.4868, 0.7261, 0.9231,
+	1, 0.9231, 0.7261, 0.4868, 0.278, 0.1353, 0.0561 };
 
-	float ao = 0.0f;
-	//float rad =g_sample_rad / p.z;
-	float g_sample_rad = 5.0f;
-	float rad = 0.0005f;
-	//if(rad>0) return float4(p, 0);
-
-	int iterations = 4;
-	for (int j = 0; j < iterations; ++j)
+	// 블러를 적용할 주변 픽셀들을 순회하며 블러 적용
+	for (int i = -blurSize; i <= blurSize; ++i)
 	{
-		float2 coord1 = reflect(vec[j], rand) * rad;
-		float2 coord2 = float2(coord1.x * 0.707 - coord1.y * 0.707, coord1.x * 0.707 + coord1.y * 0.707);
+		for (int j = -blurSize; j <= blurSize; ++j)
+		{
+			float2 offset = float2(i, j) * blurRadius;
+			float3 color = gtxtInputTextures[0].Sample(gssWrap,input.uv + offset);
 
-		ao += doAmbientOcclusion(input.uv, coord1 * 0.25, p, n);
-		ao += doAmbientOcclusion(input.uv, coord2 * 0.5, p, n);
-		ao += doAmbientOcclusion(input.uv, coord1 * 0.75, p, n);
-		ao += doAmbientOcclusion(input.uv, coord2, p, n);
-		ao += doAmbientOcclusionBack(input.uv, coord1 * (0.25 + 0.125), p, n);
-		ao += doAmbientOcclusionBack(input.uv, coord2 * (0.5 + 0.125), p, n);
-		ao += doAmbientOcclusionBack(input.uv, coord1 * (0.75 + 0.125), p, n);
-		ao += doAmbientOcclusionBack(input.uv, coord2 * 1.125, p, n);
+			float weight = weights[i + blurSize] * weights[j + blurSize];
+			result += color * weight;
+			totalWeight += weight;
+		}
 	}
-	ao /= (float)iterations * 4.0;
-	//return  float4(ao, ao, ao, 1);
-	if(ao>0.5) return(AlphaBlend(f4EdgeColor, f4Color)-ao);
-	else return(AlphaBlend(f4EdgeColor, f4Color));
+
+	// 결과를 가중치로 나누어 정규화
+	result /= totalWeight;
+	float4 color = float4(result, 1.0f);
+	//if(ao>0.5) return(AlphaBlend(f4EdgeColor, f4Color)-ao);
+	return(AlphaBlend(f4EdgeColor, color));
 }
 
 float4 PSScreenRectSamplingTextured(VS_SCREEN_RECT_TEXTURED_OUTPUT input) : SV_Target
@@ -995,7 +1154,14 @@ float4 PSScreenRectSamplingTextured(VS_SCREEN_RECT_TEXTURED_OUTPUT input) : SV_T
 
 	if (gvDebugOptions.x == 10)
 	{
+		float vDepthInfo = GetColorFromDepth(1.0f-gtxtInputTextures[5].Load(uint3((uint)input.position.x, (uint)input.position.y, 0)).r);
+		//cColor = color;
 		cColor = Outline(input);
+		float4 LinkColor = Adjust_Brightness(cColor, -0.1 * (1.f - vDepthInfo));
+		if (vDepthInfo > 0.5f)
+			LinkColor = Adjust_Contrast(LinkColor, 3);
+
+		cColor = lerp(LinkColor, cColor, vDepthInfo);
 	}
 	else
 	{
@@ -1005,7 +1171,6 @@ float4 PSScreenRectSamplingTextured(VS_SCREEN_RECT_TEXTURED_OUTPUT input) : SV_T
 			cColor = GetColorFromDepth(1.0f - fDepth);
 		}
 		else cColor = gtxtInputTextures[input.screenNum][int2(input.position.xy)];
-
 	}
 	//cColor = gtxtInputTextures[3].Sample(gssWrap, input.uv);
 	//cColor = gtxtInputTextures[input.screenNum].Sample(gssWrap, input.uv);

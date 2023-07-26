@@ -8,7 +8,6 @@ void Light::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComma
 	m_pLights = new LIGHT[m_nLights];
 	::ZeroMemory(m_pLights, sizeof(LIGHT) * m_nLights);
 
-	float global = 0.5f;
 	m_xmf4GlobalAmbient = XMFLOAT4(global, global, global, 1.0f);
 
 	m_pLights[0].m_bEnable = true;
@@ -18,7 +17,7 @@ void Light::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComma
 	m_pLights[0].m_xmf4Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_pLights[0].m_xmf4Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
 	m_pLights[0].m_xmf3Direction = XMFLOAT3(0.0f, -1.0f, 0.0f);
-	m_pLights[0].m_xmf3Position = XMFLOAT3(0.0f, 80.f, 0.0f);
+	m_pLights[0].m_xmf3Position = XMFLOAT3(0.0f, 100.f, 0.0f);
 
 	float lightpower = 1.0f;
 	m_pLights[1].m_bEnable = false;
@@ -67,7 +66,7 @@ void Light::Updaterotate()
 		rotationAngle = 330.f;
 		rotationSpeed = 0.25f;
 
-		float global = 0.5f;
+		 global = 0.7f;
 		m_xmf4GlobalAmbient = XMFLOAT4(global, global, global, 1.0f);
 
 		m_pLights[0].m_bEnable = true;
@@ -77,7 +76,7 @@ void Light::Updaterotate()
 		m_pLights[0].m_xmf4Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 		m_pLights[0].m_xmf4Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
 		m_pLights[0].m_xmf3Direction = XMFLOAT3(1.0f, -1.0f, 0.0f);
-		m_pLights[0].m_xmf3Position = XMFLOAT3(0.0f, 80.0f, 0.0f);
+		m_pLights[0].m_xmf3Position = XMFLOAT3(0.0f, 100.0f, 0.0f);
 		GameState::GetInstance()->SetInitLight();
 	}
 	// 회전 각도 업데이트
@@ -92,9 +91,10 @@ void Light::Updaterotate()
 	m_pLights[0].m_xmf3Direction.x = cosAngle;
 	m_pLights[0].m_xmf3Direction.y = sinAngle;
 
-	if (m_pLights[0].m_xmf3Direction.y < 0)
+	if (m_pLights[0].m_xmf3Direction.y < 0 && dayAndnight)
 	{
-		float global = m_pLights[0].m_xmf3Direction.y * -0.5 + 0.2f;
+
+		 global = m_pLights[0].m_xmf3Direction.y * -0.5 + 0.3f;
 		m_xmf4GlobalAmbient = XMFLOAT4(global, global, global, 1.0f);
 
 		float diffuse = m_pLights[0].m_xmf3Direction.y * -1.0f;
@@ -104,20 +104,33 @@ void Light::Updaterotate()
 		float ambient = m_pLights[0].m_xmf3Direction.y * -1.0;
 		m_pLights[0].m_xmf4Ambient = XMFLOAT4(ambient, ambient, ambient, 1.0f);
 	}
-	else
+	else if(m_pLights[0].m_xmf3Direction.y < 0 && !dayAndnight)
 	{
-		float ambient = 0.1;
+		global = m_pLights[0].m_xmf3Direction.y * -0.2;
+		if (global < 0.2f) global = 0.2f;
+		m_xmf4GlobalAmbient = XMFLOAT4(global, global, global, 1.0f);
+
+		float diffuse = m_pLights[0].m_xmf3Direction.y * -1.0f;
+		if (diffuse > 0.1f) diffuse = 0.1;
+		m_pLights[0].m_xmf4Diffuse = XMFLOAT4(diffuse, diffuse, diffuse, 1.0f);
+
+		float ambient = m_pLights[0].m_xmf3Direction.y * -1.0;
+		if (ambient > 0.4f) ambient = 0.4f;
 		m_pLights[0].m_xmf4Ambient = XMFLOAT4(ambient, ambient, ambient, 1.0f);
 	}
-	if (m_pLights[0].m_xmf3Direction.x == 1)// 밤이되는 시점 x값이 점점 작아짐 // x가 1일때 밤9시 y가 -1일때
+	if (m_pLights[0].m_xmf3Direction.x == 1 && dayAndnight)// 밤이되는 시점 x값이 점점 작아짐 // x가 1일때 밤9시 y가 -1일때
 	{
-		float global = 0.2f;
-		m_xmf4GlobalAmbient = XMFLOAT4(global, global, global, 1.0f);
-		m_pLights[0].m_xmf4Diffuse = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-		m_pLights[0].m_xmf4Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+		rotationAngle = 180.0f;
+		dayAndnight = !dayAndnight;
+		//global = 0.4f;
+		//m_xmf4GlobalAmbient = XMFLOAT4(global, global, global, 1.0f);
+		//m_pLights[0].m_xmf4Diffuse = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+		//m_pLights[0].m_xmf4Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
 	}
-	else if (m_pLights[0].m_xmf3Direction.x == -1)// 낮이되는 시점 x값이 점점 커짐
+	else if (m_pLights[0].m_xmf3Direction.x == 1 && !dayAndnight)// 낮이되는 시점 x값이 점점 커짐
 	{
+		dayAndnight = !dayAndnight;
+		rotationAngle = 180.0f;
 		m_pLights[0].m_xmf4Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
 	}
 	//x가 1이후는 밤, y가 -1이후는 낮
