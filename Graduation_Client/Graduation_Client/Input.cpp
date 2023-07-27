@@ -14,6 +14,19 @@ void Input::Update(HWND hWnd)
 
 	float cxDelta = 0.0f, cyDelta = 0.0f;
 	POINT ptCursorPos;
+
+	if (!GetcursorState() && (GameState::GetInstance()->GetGameState() == READY_TO_GAME || GameState::GetInstance()->GetGameState() == PLAYING_GAME
+		|| GameState::GetInstance()->GetGameState() == SPECTATOR_GAME) )
+	{
+		CaptureOn(hWnd);
+	}
+	else if(GetcursorState() && !(GameState::GetInstance()->GetGameState() == READY_TO_GAME || GameState::GetInstance()->GetGameState() == PLAYING_GAME
+		|| GameState::GetInstance()->GetGameState() == SPECTATOR_GAME))
+	{
+		CaptureOff();
+	}
+
+
 	if (GetCapture() == hWnd)
 	{
 		SetCursor(NULL);
@@ -60,16 +73,9 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		case VK_F1:
-			GetCursorPos(&ptMouse);
-			if (ptMouse.x != ptCenter.x || ptMouse.y != ptCenter.y) {
-				SetCursorPos(ptCenter.x, ptCenter.y);
-			}
-			::SetCapture(hWnd);
-			::GetCursorPos(&m_ptOldCursorPos);
 			//std::cout << "마우스 캡차 동작" << std::endl;
 			break;
 		case VK_F2:
-			::ReleaseCapture();
 			//std::cout << "마우스 캡차 릴리즈" << std::endl;
 			break;
 		case VK_F4:
@@ -109,7 +115,7 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			break;
 		case VK_ESCAPE:
 		{
-			//::PostQuitMessage(0);
+			::PostQuitMessage(0);
 			break;
 		}
 		case VK_RETURN:
@@ -181,12 +187,27 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 
 void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
+	RECT rcClient;
+	GetClientRect(hWnd, &rcClient);
+	POINT ptCenter = { (rcClient.right - rcClient.left) / 2, (rcClient.bottom - rcClient.top) / 2 };
 	int xPos = LOWORD(lParam);
 	int yPos = HIWORD(lParam);
 	switch (nMessageID)
 	{
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:
+		if (!GetcursorState())
+		{
+			SetClickState(true);
+
+			// 1600x900 화면의 크기를 (1, 1)로 정규화합니다
+			float normalizedX = (xPos - ptCenter.x) / ptCenter.x;
+			float normalizedY = -(yPos - ptCenter.y) / ptCenter.y;
+
+			// 보간된 마우스 좌표를 얻습니다 (-1부터 1까지의 범위)
+			m_MouseX = normalizedX;
+			m_MouseY = normalizedY;
+		}
 		if (!m_pPlayer->IsAttack() && m_gamestate->GetGameState() == PLAYING_GAME)
 		{
 #if USE_NETWORK
@@ -495,6 +516,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:
+		SetClickState(false);
 		break;
 	case WM_MOUSEMOVE:
 		break;
@@ -691,6 +713,28 @@ LRESULT Input::OnImeComposition(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		}
 	}
 	return 1;
+}
+
+void Input::CaptureOn(HWND hWnd)
+{
+	float cxDelta = 0.0f, cyDelta = 0.0f;
+	POINT ptCursorPos;
+	RECT rcClient;
+	GetClientRect(hWnd, &rcClient);
+	POINT ptCenter = { (rcClient.right - rcClient.left) / 2, (rcClient.bottom - rcClient.top) / 2 };
+	GetCursorPos(&ptCursorPos);
+	if (ptCursorPos.x != ptCenter.x || ptCursorPos.y != ptCenter.y) {
+		SetCursorPos(ptCenter.x, ptCenter.y);
+	}
+	::SetCapture(hWnd);
+	::GetCursorPos(&m_ptOldCursorPos);
+	SetcursorState();
+}
+
+void Input::CaptureOff()
+{
+	::ReleaseCapture();
+	SetcursorState();
 }
 
 LRESULT Input::OnImeChar(HWND hWnd, WPARAM wParam, LPARAM lParam)

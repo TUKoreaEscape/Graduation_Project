@@ -288,24 +288,32 @@ void Framework::CreateDirect2DDevice()
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF(0x9ACD32, 1.0f)), &m_pd2dbrBorder);
 
 	hResult = m_pdWriteFactory->CreateTextFormat(L"나눔스퀘어 ExtraBold", NULL, DWRITE_FONT_WEIGHT_DEMI_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 30.0f, L"en-US", &m_pdLoginFont);
-	hResult = m_pdWriteFactory->CreateTextFormat(L"굴림체", NULL, DWRITE_FONT_WEIGHT_EXTRA_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 20.0f, L"en-US", &m_pdRoomTitleFont);
+	hResult = m_pdWriteFactory->CreateTextFormat(L"HY목각파임B", NULL, DWRITE_FONT_WEIGHT_EXTRA_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 20.0f, L"en-US", &m_pdRoomTitleFont);
+	hResult = m_pdWriteFactory->CreateTextFormat(L"HY얕은샘물M", NULL, DWRITE_FONT_WEIGHT_EXTRA_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 16.0f, L"en-US", &m_pdWaitingRoomFont);
 	hResult = m_pdWriteFactory->CreateTextFormat(L"굴림체", NULL, DWRITE_FONT_WEIGHT_EXTRA_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 50.0f, L"en-US", &m_pdReadytoStartFont);
-	hResult = m_pdWriteFactory->CreateTextFormat(L"굴림체", NULL, DWRITE_FONT_WEIGHT_LIGHT, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 15.0f, L"en-US", &m_pdRoomOtherFont);
+	hResult = m_pdWriteFactory->CreateTextFormat(L"Microsoft GothicNeo", NULL, DWRITE_FONT_WEIGHT_LIGHT, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 15.0f, L"en-US", &m_pdRoomOtherFont);
+	hResult = m_pdWriteFactory->CreateTextFormat(L"HY엽서L", NULL, DWRITE_FONT_WEIGHT_LIGHT, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 15.0f, L"en-US", &m_pdRoomNumberFont);
 	hResult = m_pdWriteFactory->CreateTextFormat(L"굴림체", NULL, DWRITE_FONT_WEIGHT_LIGHT, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 20.0f, L"ko-KR", &m_pdChatFont);
 	hResult = m_pdLoginFont->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 	hResult = m_pdLoginFont->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 	hResult = m_pdRoomTitleFont->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-	hResult = m_pdRoomTitleFont->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	hResult = m_pdRoomTitleFont->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);	
+	hResult = m_pdWaitingRoomFont->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+	hResult = m_pdWaitingRoomFont->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Purple, 1.0f), &m_pd2dpurpleText);
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::LightSalmon, 1.0f), &m_pd2dlightsalmonText);
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black, 1.0f), &m_pd2dblackText);
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::CadetBlue, 1.0f), &m_pd2dCadetBlueText);
+
 	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdLoginFont, 4096.0f, 4096.0f, &m_pdwTextLayout);
 	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdRoomTitleFont, 4096.0f, 4096.0f, &m_pdRoomTitleFLayout);
-	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdReadytoStartFont, 4096.0f, 4096.0f, &m_pdRoomTitleFLayout);
+	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdWaitingRoomFont, 4096.0f, 4096.0f, &m_pdwWaitingRoomLayout);
+	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdReadytoStartFont, 4096.0f, 4096.0f, &m_pdReadytoStartLayout);
 	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdRoomOtherFont, 4096.0f, 4096.0f, &m_pdRoomOtherLayout);
+	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdRoomNumberFont, 4096.0f, 4096.0f, &m_pdRoomNumberFLayout);
+	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdChatFont, 4096.0f, 4096.0f, &m_pdCharLayout);
 
 	float fDpi = (float)GetDpiForWindow(m_hWnd);
 	D2D1_BITMAP_PROPERTIES1 d2dBitmapProperties = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW, D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED), fDpi, fDpi);
@@ -762,7 +770,7 @@ void Framework::TextRender()
 			}
 			array[size] = '\0';
 			D2D1_RECT_F rcLowerText = D2D1::RectF(idRect.left, idRect.top, idRect.right, idRect.bottom);
-			m_pd2dDeviceContext->DrawTextW(array, (UINT32)wcslen(array), m_pdLoginFont, &rcLowerText, m_pd2dpurpleText);
+			m_pd2dDeviceContext->DrawTextW(array, (UINT32)wcslen(array), m_pdwTextLayout, &rcLowerText, m_pd2dblackText);
 			delete[] array;
 		}
 
@@ -775,7 +783,7 @@ void Framework::TextRender()
 			}
 			array[size] = '\0';
 			D2D1_RECT_F rcLowerText = D2D1::RectF(passwordRect.left, passwordRect.top, passwordRect.right, passwordRect.bottom);
-			m_pd2dDeviceContext->DrawTextW(array, (UINT32)wcslen(array), m_pdLoginFont, &rcLowerText, m_pd2dlightsalmonText);
+			m_pd2dDeviceContext->DrawTextW(array, (UINT32)wcslen(array), m_pdwTextLayout, &rcLowerText, m_pd2dblackText);
 			delete[] array;
 		}
 
@@ -806,47 +814,47 @@ void Framework::TextRender()
 			}
 			array[size] = '\0';
 			D2D1_RECT_F rcLowerText = D2D1::RectF(roominfoRect[i].left+10, roominfoRect[i].top + 30, roominfoRect[i].right+10, roominfoRect[i].bottom + 30);
-			m_pd2dDeviceContext->DrawTextW(array, (UINT32)wcslen(array), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
+			m_pd2dDeviceContext->DrawTextW(array, (UINT32)wcslen(array), m_pdRoomTitleFLayout, &rcLowerText, m_pd2dblackText);
 
 			rcLowerText = D2D1::RectF(roominfoRect[i].left, roominfoRect[i].top + 0, roominfoRect[i].right, roominfoRect[i].bottom + 0);
-			m_pd2dDeviceContext->DrawTextW(L"방 제목", (UINT32)wcslen(L"방 제목"), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
+			m_pd2dDeviceContext->DrawTextW(L"방 제목", (UINT32)wcslen(L"방 제목"), m_pdRoomTitleFLayout, &rcLowerText, m_pd2dblackText);
 
 			std::wstring num = std::to_wstring(input->m_Roominfo[i].room_number);
 			rcLowerText = D2D1::RectF(roominfoRect[i].left+10, roominfoRect[i].top+30, roominfoRect[i].right+10, roominfoRect[i].bottom+30);
-			m_pd2dDeviceContext->DrawTextW(num.c_str(), (UINT32)wcslen(num.c_str()), m_pdRoomOtherFont, &rcLowerText, m_pd2dblackText);
+			m_pd2dDeviceContext->DrawTextW(num.c_str(), (UINT32)wcslen(num.c_str()), m_pdRoomOtherLayout, &rcLowerText, m_pd2dblackText);
 
 			rcLowerText = D2D1::RectF(roominfoRect[i].left + 10, roominfoRect[i].top + 10, roominfoRect[i].right + 10, roominfoRect[i].bottom + 10);
-			m_pd2dDeviceContext->DrawTextW(L"방 번호", (UINT32)wcslen(L"방 번호"), m_pdRoomOtherFont, &rcLowerText, m_pd2dblackText);
+			m_pd2dDeviceContext->DrawTextW(L"방 번호", (UINT32)wcslen(L"방 번호"), m_pdRoomOtherLayout, &rcLowerText, m_pd2dblackText);
 
 			std::wstring joinnum = std::to_wstring(input->m_Roominfo[i].join_member);
 			rcLowerText = D2D1::RectF(roominfoRect[i].left + 300, roominfoRect[i].top+30, roominfoRect[i].right + 300, roominfoRect[i].bottom+30);
-			m_pd2dDeviceContext->DrawTextW(joinnum.c_str(), (UINT32)wcslen(joinnum.c_str()), m_pdRoomOtherFont, &rcLowerText, m_pd2dblackText);
+			m_pd2dDeviceContext->DrawTextW(joinnum.c_str(), (UINT32)wcslen(joinnum.c_str()), m_pdRoomNumberFLayout, &rcLowerText, m_pd2dblackText);
 
 			rcLowerText = D2D1::RectF(roominfoRect[i].left + 300, roominfoRect[i].top + 10, roominfoRect[i].right + 300, roominfoRect[i].bottom + 10);
-			m_pd2dDeviceContext->DrawTextW(L"방 인원", (UINT32)wcslen(L"방 인원"), m_pdRoomOtherFont, &rcLowerText, m_pd2dblackText);
+			m_pd2dDeviceContext->DrawTextW(L"방 인원", (UINT32)wcslen(L"방 인원"), m_pdRoomOtherLayout, &rcLowerText, m_pd2dblackText);
 
-			rcLowerText = D2D1::RectF(roominfoRect[i].left + 350, roominfoRect[i].top + 30, roominfoRect[i].right + 350, roominfoRect[i].bottom + 30);
-			m_pd2dDeviceContext->DrawTextW(L"6", (UINT32)wcslen(L"6"), m_pdRoomOtherFont, &rcLowerText, m_pd2dblackText);
+			rcLowerText = D2D1::RectF(roominfoRect[i].left + 340, roominfoRect[i].top + 30, roominfoRect[i].right + 340, roominfoRect[i].bottom + 30);
+			m_pd2dDeviceContext->DrawTextW(L"/   6", (UINT32)wcslen(L"/   6"), m_pdRoomNumberFLayout, &rcLowerText, m_pd2dblackText);
 
 			rcLowerText = D2D1::RectF(roominfoRect[i].left + 340, roominfoRect[i].top + 80, roominfoRect[i].right + 340, roominfoRect[i].bottom + 80);
-			m_pd2dDeviceContext->DrawTextW(L"방 상태", (UINT32)wcslen(L"방 상태"), m_pdRoomOtherFont, &rcLowerText, m_pd2dblackText);
+			m_pd2dDeviceContext->DrawTextW(L"방 상태", (UINT32)wcslen(L"방 상태"), m_pdRoomOtherLayout, &rcLowerText, m_pd2dblackText);
 
 			switch (input->m_Roominfo[i].state) {
 			case GAME_ROOM_STATE::FREE:
 				rcLowerText = D2D1::RectF(roominfoRect[i].left + 350, roominfoRect[i].top + 100, roominfoRect[i].right + 350, roominfoRect[i].bottom + 100);
-				m_pd2dDeviceContext->DrawTextW(L"FREE", (UINT32)wcslen(L"FREE"), m_pdRoomOtherFont, &rcLowerText, m_pd2dblackText);
+				m_pd2dDeviceContext->DrawTextW(L"FREE", (UINT32)wcslen(L"FREE"), m_pdRoomOtherLayout, &rcLowerText, m_pd2dblackText);
 				break;
 			case GAME_ROOM_STATE::READY:
 				rcLowerText = D2D1::RectF(roominfoRect[i].left +  350, roominfoRect[i].top + 100, roominfoRect[i].right + 350, roominfoRect[i].bottom + 100);
-				m_pd2dDeviceContext->DrawTextW(L"READY", (UINT32)wcslen(L"READY"), m_pdRoomOtherFont, &rcLowerText, m_pd2dblackText);
+				m_pd2dDeviceContext->DrawTextW(L"READY", (UINT32)wcslen(L"READY"), m_pdRoomOtherLayout, &rcLowerText, m_pd2dblackText);
 				break;
 			case GAME_ROOM_STATE::PLAYING:
 				rcLowerText = D2D1::RectF(roominfoRect[i].left + 350, roominfoRect[i].top + 100, roominfoRect[i].right + 350, roominfoRect[i].bottom + 100);
-				m_pd2dDeviceContext->DrawTextW(L"PLAYING", (UINT32)wcslen(L"PLAYING"), m_pdRoomOtherFont, &rcLowerText, m_pd2dblackText);
+				m_pd2dDeviceContext->DrawTextW(L"PLAYING", (UINT32)wcslen(L"PLAYING"), m_pdRoomOtherLayout, &rcLowerText, m_pd2dblackText);
 				break;
 			case GAME_ROOM_STATE::END:
 				rcLowerText = D2D1::RectF(roominfoRect[i].left + 350, roominfoRect[i].top + 100, roominfoRect[i].right + 350, roominfoRect[i].bottom + 100);
-				m_pd2dDeviceContext->DrawTextW(L"END", (UINT32)wcslen(L"END"), m_pdRoomOtherFont, &rcLowerText, m_pd2dblackText);
+				m_pd2dDeviceContext->DrawTextW(L"END", (UINT32)wcslen(L"END"), m_pdRoomOtherLayout, &rcLowerText, m_pd2dblackText);
 				break;
 			}
 			delete[] array;
@@ -854,7 +862,7 @@ void Framework::TextRender()
 
 		std::wstring num = std::to_wstring(input->m_PageNum);
 		D2D1_RECT_F rcLowerText = D2D1::RectF(pageNumRect.left, pageNumRect.top, pageNumRect.right, pageNumRect.bottom);
-		m_pd2dDeviceContext->DrawTextW(num.c_str(), (UINT32)wcslen(num.c_str()), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
+		m_pd2dDeviceContext->DrawTextW(num.c_str(), (UINT32)wcslen(num.c_str()), m_pdRoomTitleFLayout, &rcLowerText, m_pd2dblackText);
 
 		m_pd2dDeviceContext->EndDraw();
 
@@ -877,10 +885,10 @@ void Framework::TextRender()
 		for (int i = 0; i < 3; ++i)
 		{
 			D2D1_RECT_F rcLowerText = D2D1::RectF(waitingRoomRect[i].left, waitingRoomRect[i].top, waitingRoomRect[i].right, waitingRoomRect[i].bottom);
-			if (i == 0 && !input->m_cs_packet_ready.ready_type) m_pd2dDeviceContext->DrawTextW(L"READY", (UINT32)wcslen(L"READY"), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
-			else if (i == 0 && input->m_cs_packet_ready.ready_type) m_pd2dDeviceContext->DrawTextW(L"READY OK", (UINT32)wcslen(L"READY OK"), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
-			else if (i == 1) m_pd2dDeviceContext->DrawTextW(L"QUIT", (UINT32)wcslen(L"QUIT"), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
-			else if (i == 2) m_pd2dDeviceContext->DrawTextW(L"CUSTOMIZING", (UINT32)wcslen(L"CUSTOMIZING"), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
+			if (i == 0 && !input->m_cs_packet_ready.ready_type) m_pd2dDeviceContext->DrawTextW(L"READY", (UINT32)wcslen(L"READY"), m_pdwWaitingRoomLayout, &rcLowerText, m_pd2dblackText);
+			else if (i == 0 && input->m_cs_packet_ready.ready_type) m_pd2dDeviceContext->DrawTextW(L"READY OK", (UINT32)wcslen(L"READY OK"), m_pdwWaitingRoomLayout, &rcLowerText, m_pd2dblackText);
+			else if (i == 1) m_pd2dDeviceContext->DrawTextW(L"QUIT", (UINT32)wcslen(L"QUIT"), m_pdwWaitingRoomLayout, &rcLowerText, m_pd2dblackText);
+			else if (i == 2) m_pd2dDeviceContext->DrawTextW(L"CUSTOMIZING", (UINT32)wcslen(L"CUSTOMIZING"), m_pdwWaitingRoomLayout, &rcLowerText, m_pd2dblackText);
 		}
 
 		m_pd2dDeviceContext->EndDraw();
@@ -904,8 +912,8 @@ void Framework::TextRender()
 		for (int i = 0; i < 2; ++i)
 		{
 			D2D1_RECT_F rcLowerText = D2D1::RectF(customizingRect[i].left, customizingRect[i].top, customizingRect[i].right, customizingRect[i].bottom);
-			if (i == 0 ) m_pd2dDeviceContext->DrawTextW(L"SAVE", (UINT32)wcslen(L"SAVE"), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
-			else if (i == 1) m_pd2dDeviceContext->DrawTextW(L"QUIT", (UINT32)wcslen(L"QUIT"), m_pdRoomTitleFont, &rcLowerText, m_pd2dblackText);
+			if (i == 0 ) m_pd2dDeviceContext->DrawTextW(L"SAVE", (UINT32)wcslen(L"SAVE"), m_pdwWaitingRoomLayout, &rcLowerText, m_pd2dblackText);
+			else if (i == 1) m_pd2dDeviceContext->DrawTextW(L"QUIT", (UINT32)wcslen(L"QUIT"), m_pdwWaitingRoomLayout, &rcLowerText, m_pd2dblackText);
 		}
 
 		m_pd2dDeviceContext->EndDraw();
@@ -931,27 +939,27 @@ void Framework::TextRender()
 			D2D1_RECT_F rcLowerText = D2D1::RectF(m_nWndClientWidth / 10, m_nWndClientHeight / 2 + 200, m_nWndClientWidth / 3, m_nWndClientHeight + 200);
 			switch(m_gamestate->LoadingCount()){
 			case 0:
-				m_pd2dDeviceContext->DrawTextW(L"Loading", (UINT32)wcslen(L"Loading"), m_pdReadytoStartFont, &rcLowerText, m_pd2dCadetBlueText);
+				m_pd2dDeviceContext->DrawTextW(L"Loading", (UINT32)wcslen(L"Loading"), m_pdReadytoStartLayout, &rcLowerText, m_pd2dCadetBlueText);
 				break;
 			case 1:
-				m_pd2dDeviceContext->DrawTextW(L"Loading.", (UINT32)wcslen(L"Loading."), m_pdReadytoStartFont, &rcLowerText, m_pd2dCadetBlueText);
+				m_pd2dDeviceContext->DrawTextW(L"Loading.", (UINT32)wcslen(L"Loading."), m_pdReadytoStartLayout, &rcLowerText, m_pd2dCadetBlueText);
 				break;
 			case 2:
-				m_pd2dDeviceContext->DrawTextW(L"Loading..", (UINT32)wcslen(L"Loading.."), m_pdReadytoStartFont, &rcLowerText, m_pd2dCadetBlueText);
+				m_pd2dDeviceContext->DrawTextW(L"Loading..", (UINT32)wcslen(L"Loading.."), m_pdReadytoStartLayout, &rcLowerText, m_pd2dCadetBlueText);
 				break;
 			case 3:
-				m_pd2dDeviceContext->DrawTextW(L"Loading...", (UINT32)wcslen(L"Loading..."), m_pdReadytoStartFont, &rcLowerText, m_pd2dCadetBlueText);
+				m_pd2dDeviceContext->DrawTextW(L"Loading...", (UINT32)wcslen(L"Loading..."), m_pdReadytoStartLayout, &rcLowerText, m_pd2dCadetBlueText);
 				break;
 			}
 		}
 		else
 		{
 			D2D1_RECT_F rcLowerText = D2D1::RectF(m_nWndClientWidth / 2 - 250, m_nWndClientHeight / 2 - 300, m_nWndClientWidth / 2 + 500, m_nWndClientHeight + 200);
-			m_pd2dDeviceContext->DrawTextW(L"곧 술래가 정해집니다.", (UINT32)wcslen(L"곧 술래가 정해집니다."), m_pdReadytoStartFont, &rcLowerText, m_pd2dblackText);
+			m_pd2dDeviceContext->DrawTextW(L"곧 술래가 정해집니다.", (UINT32)wcslen(L"곧 술래가 정해집니다."), m_pdReadytoStartLayout, &rcLowerText, m_pd2dblackText);
 
 			std::wstring num = std::to_wstring(m_gamestate->GetTaggerTime());
 			rcLowerText = D2D1::RectF(m_nWndClientWidth / 2 - 25, m_nWndClientHeight / 2 - 250, m_nWndClientWidth / 2 + 500, m_nWndClientHeight + 250);
-			m_pd2dDeviceContext->DrawTextW(num.c_str(), (UINT32)wcslen(num.c_str()), m_pdReadytoStartFont, &rcLowerText, m_pd2dlightsalmonText);
+			m_pd2dDeviceContext->DrawTextW(num.c_str(), (UINT32)wcslen(num.c_str()), m_pdReadytoStartLayout, &rcLowerText, m_pd2dlightsalmonText);
 		}
 
 		m_pd2dDeviceContext->EndDraw();
@@ -988,7 +996,7 @@ void Framework::TextRender()
 				mbstowcs(array, input->m_cs_packet_chat.message, size);
 				array[size] = '\0';
 				D2D1_RECT_F rcLowerText = D2D1::RectF(chatBoxRect.left, chatBoxRect.top, chatBoxRect.right, chatBoxRect.bottom);
-				m_pd2dDeviceContext->DrawTextW(array, (UINT32)wcslen(array), m_pdChatFont, &rcLowerText, m_pd2dpurpleText);
+				m_pd2dDeviceContext->DrawTextW(array, (UINT32)wcslen(array), m_pdCharLayout, &rcLowerText, m_pd2dpurpleText);
 				delete[] array;
 				//setlocale(LC_CTYPE, "en-US");
 			}
@@ -1005,7 +1013,7 @@ void Framework::TextRender()
 					mbstowcs(array, input->m_chatlist[i], size);
 					array[size] = '\0';
 					D2D1_RECT_F rcLowerText = D2D1::RectF(chatBoxRect.left, chatBoxRect.top - i * 40 - 55, chatBoxRect.right, chatBoxRect.bottom - i * 40 - 55);
-					m_pd2dDeviceContext->DrawTextW(array, (UINT32)wcslen(array), m_pdChatFont, &rcLowerText, m_pd2dpurpleText);
+					m_pd2dDeviceContext->DrawTextW(array, (UINT32)wcslen(array), m_pdCharLayout, &rcLowerText, m_pd2dpurpleText);
 					delete[] array;
 					//setlocale(LC_CTYPE, "en-US");
 				}
@@ -1031,7 +1039,7 @@ void Framework::TextRender()
 		D2D1_SIZE_F szRenderTarget = m_ppd2dRenderTargets[m_nSwapChainBufferIndex]->GetSize();
 
 		D2D1_RECT_F rcLowerText = D2D1::RectF(endingRect.left, endingRect.top, endingRect.right, endingRect.bottom);
-		m_pd2dDeviceContext->DrawTextW(L"QUIT", (UINT32)wcslen(L"QUIT"), m_pdRoomOtherLayout, &rcLowerText, m_pd2dblackText);
+		m_pd2dDeviceContext->DrawTextW(L"QUIT", (UINT32)wcslen(L"QUIT"), m_pdwWaitingRoomLayout, &rcLowerText, m_pd2dblackText);
 		m_pd2dDeviceContext->EndDraw();
 
 		m_pd3d11On12Device->ReleaseWrappedResources(ppd3dResources, _countof(ppd3dResources));
