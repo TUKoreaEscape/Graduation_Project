@@ -60,6 +60,7 @@ void Scene::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	for (auto& object : gameObjects) {
 		object->OnPrepareRender();
+		object->Animate(0, object->PlayerNum);
 		//object->Animate(m_fElapsedTime, object->PlayerNum);
 		if (object->GetType() != TYPE_ESCAPE_PLAYER)
 			object->Depthrender(pd3dCommandList);
