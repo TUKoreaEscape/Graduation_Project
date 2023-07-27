@@ -119,12 +119,14 @@ void GameState::ChangeSameLevelState()
 		case READY_TO_GAME:
 			break;
 		case PLAYING_GAME:
+			m_pLight[3].m_bEnable = true;
 			m_GameState = INTERACTION_POWER;
 			break;
 		case ENDING_GAME:
 			break;
 		case INTERACTION_POWER:
 			player->SetShown(false);
+			m_pLight[3].m_bEnable = false;
 			m_GameState = PLAYING_GAME;
 			break;
 		case SPECTATOR_GAME:

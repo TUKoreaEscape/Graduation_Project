@@ -4,7 +4,7 @@
 
 void Light::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	m_nLights = 3;
+	m_nLights = 4;
 	m_pLights = new LIGHT[m_nLights];
 	::ZeroMemory(m_pLights, sizeof(LIGHT) * m_nLights);
 
@@ -42,6 +42,19 @@ void Light::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComma
 	m_pLights[2].m_fFalloff = 2.0f;
 	m_pLights[2].m_fPhi = (float)cos(XMConvertToRadians(60.0f));
 	m_pLights[2].m_fTheta = (float)cos(XMConvertToRadians(30.0f));
+
+	m_pLights[3].m_bEnable = false;
+	m_pLights[3].m_nType = SPOT_LIGHT;
+	m_pLights[3].m_fRange = 10.0f;
+	m_pLights[3].m_xmf4Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
+	m_pLights[3].m_xmf4Diffuse = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
+	m_pLights[3].m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_pLights[3].m_xmf4Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 0.0f);
+	m_pLights[3].m_xmf3Direction = XMFLOAT3(0.0f, 0.0f, 1.0f);
+	m_pLights[3].m_xmf3Attenuation = XMFLOAT3(1.0f, 0.01f, 0.0001f);
+	m_pLights[3].m_fFalloff = 2.0f;
+	m_pLights[3].m_fPhi = (float)cos(XMConvertToRadians(60.0f));
+	m_pLights[3].m_fTheta = (float)cos(XMConvertToRadians(30.0f));
 
 	UINT ncbElementBytes = ((sizeof(LIGHTS) + 255) & ~255);
 	m_pd3dcbLights = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);

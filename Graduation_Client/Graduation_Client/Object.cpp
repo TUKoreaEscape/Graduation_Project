@@ -888,28 +888,28 @@ bool PowerSwitch::IsPlayerNear(const XMFLOAT3& PlayerPos)
 	float minx, maxx, minz, maxz;
 	switch (m_dir) {
 	case DEGREE0:
-		minx = m_xmf4x4ToParent._41 - 0.3f;
-		maxx = m_xmf4x4ToParent._41 + 0.3f;
-		minz = m_xmf4x4ToParent._43 + 0.7f;
-		maxz = m_xmf4x4ToParent._43 + 1.5f;
+		minx = m_xmf4x4ToParent._41 - 0.5f;
+		maxx = m_xmf4x4ToParent._41 + 0.5f;
+		minz = m_xmf4x4ToParent._43 + 1.0f;
+		maxz = m_xmf4x4ToParent._43 + 2.0f;
 		break;
 	case DEGREE90:
-		minx = m_xmf4x4ToParent._41 - 1.5f;
-		maxx = m_xmf4x4ToParent._41 - 0.7f;
-		minz = m_xmf4x4ToParent._43 - 0.4f;
-		maxz = m_xmf4x4ToParent._43 + 0.4f;
+		minx = m_xmf4x4ToParent._41 - 2.0f;
+		maxx = m_xmf4x4ToParent._41 - 1.0f;
+		minz = m_xmf4x4ToParent._43 - 0.5f;
+		maxz = m_xmf4x4ToParent._43 + 0.5f;
 		break;
 	case DEGREE180:
-		minx = m_xmf4x4ToParent._41 - 0.3f;
-		maxx = m_xmf4x4ToParent._41 + 0.3f;
-		minz = m_xmf4x4ToParent._43 - 1.5f;
-		maxz = m_xmf4x4ToParent._43 - 0.7f;
+		minx = m_xmf4x4ToParent._41 - 0.5f;
+		maxx = m_xmf4x4ToParent._41 + 0.5f;
+		minz = m_xmf4x4ToParent._43 - 2.0f;
+		maxz = m_xmf4x4ToParent._43 - 1.0f;
 		break;
 	default:
-		minx = m_xmf4x4ToParent._41 - 1.5f;
-		maxx = m_xmf4x4ToParent._41 - 0.7f;
-		minz = m_xmf4x4ToParent._43 - 0.3f;
-		maxz = m_xmf4x4ToParent._43 + 0.3f;
+		minx = m_xmf4x4ToParent._41 - 2.0f;
+		maxx = m_xmf4x4ToParent._41 - 1.0f;
+		minz = m_xmf4x4ToParent._43 - 0.5f;
+		maxz = m_xmf4x4ToParent._43 + 0.5f;
 		break;
 	}
 	if (PlayerPos.x > maxx) {

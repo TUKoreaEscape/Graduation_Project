@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include "Light.h"
 
 enum GAME_STATE {
 	LOGIN = 0, //  ·Î±×ÀÎ
@@ -41,6 +42,8 @@ private:
 	int m_nWaitingBG = -1;
 	int m_nGameBG = -1;
 	int m_nEndingBG = -1;
+
+	LIGHT* m_pLight;
 public:
 	static GameState* GetInstance() {
 		if (GameStateInstance == NULL) {
@@ -69,4 +72,5 @@ public:
 	void ChangeMinimapState() { m_MinimapOn = !m_MinimapOn; };
 	bool GetMinimapState() { return m_MinimapOn; };
 	void SetBG();
+	void SetLights(LIGHT* light) { m_pLight = light; }
 };

@@ -87,7 +87,7 @@ using Microsoft::WRL::ComPtr;
 #define POINT_LIGHT				1
 #define SPOT_LIGHT				2
 #define DIRECTIONAL_LIGHT		3
-#define MAX_LIGHTS				3
+#define MAX_LIGHTS				4
 #define MAX_DEPTH_TEXTURES		MAX_LIGHTS
 #define _DEPTH_BUFFER_WIDTH		(FRAME_BUFFER_WIDTH * 8)
 #define _DEPTH_BUFFER_HEIGHT		(FRAME_BUFFER_HEIGHT * 8)

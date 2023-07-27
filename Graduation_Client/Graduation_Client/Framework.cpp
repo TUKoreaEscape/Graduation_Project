@@ -435,6 +435,7 @@ void Framework::BuildObjects()
 	m_pEdgeShader->CreateShaderResourceViews(m_pd3dDevice, 1, &m_pd3dDepthStencilBuffer, pdxgiDepthSrvFormats, scene);
 
 	LIGHT* lights = (LIGHT*)reinterpret_cast<Light*>(scene->m_pLight->GetComponent<Light>())->m_pLights;
+	m_gamestate->SetLights(lights);
 	m_pDepthRenderShader = new DepthRenderShader(lights,scene);
 	DXGI_FORMAT pdxgiRtvFormats[1] = { DXGI_FORMAT_R32_FLOAT };
 	m_pDepthRenderShader->CreateShader(m_pd3dDevice, scene->GetGraphicsRootSignature(), 1, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
@@ -617,6 +618,7 @@ void Framework::FrameAdvance()
 		scene->UIrender(m_pd3dCommandList); // Door UI
 		break;
 	case PLAYING_GAME:
+	case INTERACTION_POWER:
 		if (scene) scene->prerender(m_pd3dCommandList);
 		m_pDepthRenderShader->PrepareShadowMap(m_pd3dCommandList);
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
@@ -651,16 +653,6 @@ void Framework::FrameAdvance()
 		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
 		m_pEdgeShader->Render(m_pd3dCommandList);
 		::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-		break;
-	case INTERACTION_POWER:
-		if (scene) scene->prerender(m_pd3dCommandList); 
-		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
-		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
-		if (scene) scene->defrender(m_pd3dCommandList);
-		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
-		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
-		m_pEdgeShader->Render(m_pd3dCommandList);
-		scene->UIrender(m_pd3dCommandList); // Door UI
 		break;
 	}
 	//m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &m_d3dDsvDescriptorCPUHandle);

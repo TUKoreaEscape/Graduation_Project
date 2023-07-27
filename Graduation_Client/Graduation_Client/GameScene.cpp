@@ -226,7 +226,7 @@ void GameScene::prerender(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
 	m_pLight->GetComponent<Light>()->SetWaitingLight(false);
 	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
-	//if(GameState::GetInstance()->GetTick())
+	if (GameState::GetInstance()->GetTick() && GameState::GetInstance()->GetGameState() == PLAYING_GAME) 
 		m_pLight->GetComponent<Light>()->Updaterotate();
 	XMFLOAT3 cameraPos = m_pPlayer->m_pCamera->GetPosition();
 	CheckCameraPos(cameraPos);
@@ -1463,6 +1463,15 @@ void GameScene::update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12Graphi
 	}
 	sound.SetListenerPos(m_pPlayer->GetPosition(), m_pPlayer->GetLookVector(), m_pPlayer->GetUpVector());
 	sound.Update(elapsedTime);
+
+	if (m_pLight) {
+		XMFLOAT3 pos = m_pPlayer->GetPosition();
+		XMFLOAT3 look = m_pPlayer->GetLookVector();
+		pos = Vector3::Subtract(pos, Vector3::ScalarProduct(look, 2.0f, false));
+		pos.y = 1.5f;
+		m_pLight->GetComponent<Light>()->m_pLights[3].m_xmf3Position = pos;
+		m_pLight->GetComponent<Light>()->m_pLights[3].m_xmf3Direction = look;
+	}
 }
 
 bool InArea(int startX, int startZ, int width, int length, float x, float z)
