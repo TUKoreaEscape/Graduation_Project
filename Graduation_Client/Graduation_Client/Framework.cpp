@@ -420,7 +420,7 @@ void Framework::BuildObjects()
 	input->m_gamestate = m_gamestate;
 	scene = new GameScene();
 	scene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
-
+	
 	m_pEdgeShader = new LaplacianEdgeShader();
 	m_pEdgeShader->CreateShader(m_pd3dDevice, scene->GetGraphicsRootSignature(), 1, NULL, DXGI_FORMAT_D32_FLOAT);
 	//m_pEdgeShader->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
@@ -429,10 +429,10 @@ void Framework::BuildObjects()
 	d3dRtvCPUDescriptorHandle.ptr += (::gnRtvDescriptorIncrementSize * m_nSwapChainBuffers);
 
 	DXGI_FORMAT pdxgiResourceFormats[5] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32_FLOAT };
-	m_pEdgeShader->CreateResourcesAndViews(m_pd3dDevice, 5, pdxgiResourceFormats, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, d3dRtvCPUDescriptorHandle, 5 + 1); //SRV to (Render Targets) + (Depth Buffer)
+	m_pEdgeShader->CreateResourcesAndViews(m_pd3dDevice, 5, pdxgiResourceFormats, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, d3dRtvCPUDescriptorHandle, 5 + 1, scene); //SRV to (Render Targets) + (Depth Buffer)
 
 	DXGI_FORMAT pdxgiDepthSrvFormats[1] = { DXGI_FORMAT_R32_FLOAT };
-	m_pEdgeShader->CreateShaderResourceViews(m_pd3dDevice, 1, &m_pd3dDepthStencilBuffer, pdxgiDepthSrvFormats);
+	m_pEdgeShader->CreateShaderResourceViews(m_pd3dDevice, 1, &m_pd3dDepthStencilBuffer, pdxgiDepthSrvFormats, scene);
 
 	LIGHT* lights = (LIGHT*)reinterpret_cast<Light*>(scene->m_pLight->GetComponent<Light>())->m_pLights;
 	m_pDepthRenderShader = new DepthRenderShader(lights,scene);
@@ -650,6 +650,7 @@ void Framework::FrameAdvance()
 		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		m_pEdgeShader->UpdateShaderVariables(m_pd3dCommandList, &m_nDebugOptions);
 		m_pEdgeShader->Render(m_pd3dCommandList);
+		::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		break;
 	case INTERACTION_POWER:
 		if (scene) scene->prerender(m_pd3dCommandList); 
@@ -666,11 +667,10 @@ void Framework::FrameAdvance()
 	//if(Input::GetInstance()->keyBuffer['1'] & 0xF0) m_pEdgeShader->Render(m_pd3dCommandList);
 
 
-	//::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 	/*현재 렌더 타겟에 대한 렌더링이 끝나기를 기다린다. GPU가 렌더 타겟(버퍼)을 더 이상 사용하지 않으면 렌더 타겟
 	의 상태는 프리젠트 상태(D3D12_RESOURCE_STATE_PRESENT)로 바뀔 것이다.*/
 	
-	::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+	//::SynchronizeResourceTransition(m_pd3dCommandList, m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
 	hResult = m_pd3dCommandList->Close(); //명령 리스트를 닫힌 상태로 만든다.
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
