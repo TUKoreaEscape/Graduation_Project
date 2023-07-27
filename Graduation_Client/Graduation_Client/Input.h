@@ -24,6 +24,9 @@ public:
 	Time				m_time;
 	POINT				m_ptOldCursorPos{ 0,0 };
 
+	float					m_MouseX = 0;
+	float					m_MouseY = 0;
+
 	GameObject* m_pTestDoor = nullptr;
 	
 	//패킷
@@ -43,6 +46,8 @@ public:
 	int								m_errorState = 0;
 	int								m_SuccessState = 0;
 	bool							m_debuglight = false;
+	bool							m_curstateon = false;
+	bool							m_ClickState = false;
 
 	TCHAR tmp[100]{NULL}; //입력받는 문자열을 담을 버퍼
 	bool bComposite; //입력 중이라 문자 조합 중인지 아닌지 판별하기 위한 변수
@@ -70,6 +75,12 @@ public:
 	void Receive(char* chat, char* name); //Receive 채팅과 이름을 보내주면 됨
 	LRESULT OnImeComposition(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	LRESULT OnImeChar(HWND hWnd, WPARAM wParam, LPARAM lParam);
+	bool GetcursorState() { return m_curstateon; };
+	void SetcursorState() { m_curstateon = !m_curstateon; };
+	void CaptureOn(HWND hWnd);
+	void CaptureOff();
+	bool GetClickState() { return m_ClickState; };
+	void SetClickState(bool value) { m_ClickState = value; };
 };
 
 //input 클래스는 입력을 처리하기 위한 클래스입니다.

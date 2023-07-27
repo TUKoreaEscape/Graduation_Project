@@ -67,14 +67,22 @@ private:
 
 	ID2D1SolidColorBrush* m_pd2dbrBackground = NULL;
 	ID2D1SolidColorBrush* m_pd2dbrBorder = NULL;
+
 	IDWriteTextFormat* m_pdLoginFont = NULL;
 	IDWriteTextFormat* m_pdRoomTitleFont = NULL;
 	IDWriteTextFormat* m_pdRoomOtherFont = NULL;
+	IDWriteTextFormat* m_pdRoomNumberFont = NULL;
 	IDWriteTextFormat* m_pdReadytoStartFont = NULL;
+	IDWriteTextFormat* m_pdWaitingRoomFont = NULL;
 	IDWriteTextFormat* m_pdChatFont = NULL;
+
 	IDWriteTextLayout* m_pdwTextLayout = NULL;
-	IDWriteTextLayout* m_pdRoomTitleFLayout = NULL;
+	IDWriteTextLayout* m_pdwWaitingRoomLayout = NULL;
+	IDWriteTextLayout* m_pdReadytoStartLayout = NULL;
 	IDWriteTextLayout* m_pdRoomOtherLayout = NULL;
+	IDWriteTextLayout* m_pdRoomNumberFLayout = NULL;
+	IDWriteTextLayout* m_pdRoomTitleFLayout = NULL;
+	IDWriteTextLayout* m_pdCharLayout = NULL;
 
 	ID2D1SolidColorBrush* m_pd2dpurpleText = NULL;
 	ID2D1SolidColorBrush* m_pd2dlightsalmonText = NULL;
