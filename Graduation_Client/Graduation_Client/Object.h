@@ -285,6 +285,7 @@ public:
 	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
 	virtual void UIrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
 	virtual void update(float fElapsedTime) override;
+	virtual void Depthrender(ID3D12GraphicsCommandList* pd3dCommandList) override;
 
 	void Interaction(int playerType) override;
 	void SetOpen(bool open) override;

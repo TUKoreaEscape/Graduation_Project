@@ -1655,6 +1655,66 @@ void ItemBox::update(float fElapsedTime)
 	m_fGauge = m_fCooltime / BOX_OPEN_COOLTIME;
 }
 
+void ItemBox::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (false == IsOpen)
+	{
+		GameObject* cap = FindFrame("Object005");
+		cap->m_xmf4x4ToParent = m_xmf4x4CapMatrix;
+		UpdateTransform(nullptr);
+		GameObject::Depthrender(pd3dCommandList);
+		return;
+	}
+	GameObject* cap = FindFrame("Object005");
+	cap->m_xmf4x4ToParent = m_xmf4x4CapOpenMatrix;
+	UpdateTransform(nullptr);
+	GameObject::Depthrender(pd3dCommandList);
+	if (m_bShownItem) {
+		// Item Render
+		switch (m_item) {
+		case GAME_ITEM::ITEM_HAMMER:
+			if (m_pItems[0]) {
+				m_pItems[0]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
+				m_pItems[0]->Depthrender(pd3dCommandList);
+			}
+			break;
+		case GAME_ITEM::ITEM_DRILL:
+			if (m_pItems[1]) {
+				m_pItems[1]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
+				m_pItems[1]->Depthrender(pd3dCommandList);
+			}
+			break;
+		case GAME_ITEM::ITEM_WRENCH:
+			if (m_pItems[2]) {
+				m_pItems[2]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
+				m_pItems[2]->Depthrender(pd3dCommandList);
+			}
+			break;
+		case GAME_ITEM::ITEM_PLIERS:
+			if (m_pItems[3]) {
+				m_pItems[3]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
+				m_pItems[3]->Depthrender(pd3dCommandList);
+			}
+			break;
+		case GAME_ITEM::ITEM_DRIVER:
+			if (m_pItems[4]) {
+				m_pItems[4]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
+				m_pItems[4]->Depthrender(pd3dCommandList);
+			}
+			break;
+		case GAME_ITEM::ITEM_LIFECHIP:
+			if (m_pItems[5]) {
+				m_pItems[5]->SetPosition(m_xmf4x4ToParent._41, 0, m_xmf4x4ToParent._43);
+				m_pItems[5]->Depthrender(pd3dCommandList);
+			}
+			break;
+		default:
+			// NONE
+			break;
+		}
+	}
+}
+
 void ItemBox::Interaction(int playerType)
 {
 	IsInteraction = true;

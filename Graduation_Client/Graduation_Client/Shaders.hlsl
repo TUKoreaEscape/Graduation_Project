@@ -337,8 +337,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStandard(VS_STANDARD_OUTPUT input, uint nPri
 
 	if (cColor.w < 0.524f)
 		discard;
-	output.f4Color.w = gnObjectType / 10.0f;
-
+	
 	SSAO_PS_OUTPUT o = (SSAO_PS_OUTPUT)0;
 
 	o.color.rgb = 1.0f;
@@ -363,6 +362,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStandard(VS_STANDARD_OUTPUT input, uint nPri
 	ao /= (float)iterations * 4.0f;
 
 	output.f4Scene = output.f4Color = output.f4Albedo * cIllumination - float4(ao, ao, ao, 1.0f) + cEmissionColor;
+    output.f4Color.w = gnObjectType / 10.0f;
 
 	return(output);
 }
@@ -774,8 +774,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWall(VS_WALL_OUTPUT input, uint nPrimitiveID
 
 	//output.f2ObjectIDzDepth.x = (float)1.0f;
 	//output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
-	output.f4Color.w = gnObjectType / 10.0f;
-
+	
 	SSAO_PS_OUTPUT o = (SSAO_PS_OUTPUT)0;
 
 	o.color.rgb = 1.0f;
@@ -799,8 +798,9 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWall(VS_WALL_OUTPUT input, uint nPrimitiveID
 	}
 	ao /= (float)iterations * 4.0f;
 
-	output.f4Scene = output.f4Color = output.f4Albedo * cIllumination - float4(ao, ao, ao, 1.0f);
-	return(output);
+    output.f4Scene = output.f4Color = output.f4Albedo * cIllumination - float4(ao, ao, ao, 1.0f);
+    output.f4Color.w = gnObjectType / 10.0f;
+    return (output);
 }
 
 struct VS_TEXTURED_LIGHTING_INPUT
@@ -930,8 +930,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 	//output.f2ObjectIDzDepth.y = 1.0f - input.position.z;
 	//output.f4Scene = output.f4Texture;
 	//output.f4Scene = float4(1,1,1,1);
-	output.f4Color.w = gnObjectType / 10.0f;
-
+	
 	SSAO_PS_OUTPUT o = (SSAO_PS_OUTPUT)0;
 
 	o.color.rgb = 1.0f;
@@ -956,6 +955,13 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 	ao /= (float)iterations * 4.0f;
 
 	output.f4Scene = output.f4Color = output.f4Albedo * cIllumination - float4(ao, ao, ao, 1.0f) + cEmissionColor;
+    if (gnObjectType == 10)
+    {
+        output.f4Scene = output.f4Color = output.f4Albedo;
+        output.f4Color.w = 0;
+    }
+	else 
+		output.f4Color.w = gnObjectType / 10.0f;
 
 	return(output);
 }

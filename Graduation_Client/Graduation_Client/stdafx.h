@@ -109,6 +109,7 @@ constexpr int TYPE_PLAYER = 2;
 constexpr int TYPE_TAGGER = 4;
 constexpr int TYPE_DEAD_PLAYER = 8;
 constexpr int TYPE_ESCAPE_PLAYER = 9;
+constexpr int TYPE_ITEM = 10;
 
 constexpr int NUM_VENT = 8;
 constexpr int NUM_DOOR = 6;

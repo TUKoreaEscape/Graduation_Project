@@ -1522,16 +1522,22 @@ void GameScene::MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 	Items[0] = new GameObject();
 	Items[0]->SetChild(pHammerModel->m_pModelRootObject, true);
+	Items[0]->SetType(TYPE_ITEM);
 	Items[1] = new GameObject();
 	Items[1]->SetChild(pDrillModel->m_pModelRootObject, true);
+	Items[1]->SetType(TYPE_ITEM);
 	Items[2] = new GameObject();
 	Items[2]->SetChild(pWrenchModel->m_pModelRootObject, true);
+	Items[2]->SetType(TYPE_ITEM);
 	Items[3] = new GameObject();
 	Items[3]->SetChild(pPliersModel->m_pModelRootObject, true);
+	Items[3]->SetType(TYPE_ITEM);
 	Items[4] = new GameObject();
 	Items[4]->SetChild(pDriverModel->m_pModelRootObject, true);
+	Items[4]->SetType(TYPE_ITEM);
 	Items[5] = new GameObject();
 	Items[5]->SetChild(pChipModel->m_pModelRootObject, true);
+	Items[5]->SetType(TYPE_ITEM);
 
 	for (int i = 0; i < NUM_ITEMBOX; ++i) {
 		m_pBoxes[i] = new ItemBox();
