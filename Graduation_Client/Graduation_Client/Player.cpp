@@ -201,7 +201,7 @@ void Player::Rotate(float x, float y, float z)
 	if (x != 0.0f)
 	{
 		m_fPitch += x;
-		if (m_fPitch > +89.0f) { x -= (m_fPitch - 89.0f); m_fPitch = +89.0f; }
+		if (m_fPitch > +40.0f) { x -= (m_fPitch - 40.0f); m_fPitch = +40.0f; }
 		if (m_fPitch < -89.0f) { x -= (m_fPitch + 89.0f); m_fPitch = -89.0f; }
 	}
 	if (y != 0.0f)
