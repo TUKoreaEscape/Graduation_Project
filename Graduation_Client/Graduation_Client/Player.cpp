@@ -414,13 +414,13 @@ void Player::render(ID3D12GraphicsCommandList* pd3dCommandList)
 		if (m_pChild) m_pChild->render(pd3dCommandList);
 	}
 }
-	void Player::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList)
-	{
-		renderer->Depthrender(pd3dCommandList);
-		if (m_pSibling) m_pSibling->Depthrender(pd3dCommandList);
-		if (m_pChild) m_pChild->Depthrender(pd3dCommandList);
-	}
 
+void Player::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	renderer->Depthrender(pd3dCommandList);
+	if (m_pSibling) m_pSibling->Depthrender(pd3dCommandList);
+	if (m_pChild) m_pChild->Depthrender(pd3dCommandList);
+}
 
 void Player::SetLookAt(XMFLOAT3& xmf3Target, XMFLOAT3& xmf3Up)
 {

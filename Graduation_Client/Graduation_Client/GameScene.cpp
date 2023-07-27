@@ -314,6 +314,7 @@ void GameScene::WaitingRoomrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
 	m_pLight->GetComponent<Light>()->SetWaitingLight(true);
 	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
+	
 	Scene::render(pd3dCommandList);
 }
 
@@ -340,11 +341,11 @@ void GameScene::Endingrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		}
 		else {
 			for (int i = 0; i < 5; ++i) {
-				m_ppPlayers[i]->OnPrepareRender();
-				m_ppPlayers[i]->Animate(m_fElapsedTime, m_ppPlayers[i]->PlayerNum);
 				if (m_ppPlayers[i]->GetType() == TYPE_TAGGER) {
+					m_ppPlayers[i]->SetPosition(XMFLOAT3(0, -2.0f, -3.0f));	
+					m_ppPlayers[i]->OnPrepareRender();
+					m_ppPlayers[i]->Animate(m_fElapsedTime, m_ppPlayers[i]->PlayerNum);
 					m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 10);
-					m_ppPlayers[i]->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 					m_ppPlayers[i]->render(pd3dCommandList);
 				}
 			}
