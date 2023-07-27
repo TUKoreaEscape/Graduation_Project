@@ -231,7 +231,7 @@ struct PS_MULTIPLE_RENDER_TARGETS_OUTPUT
 	float4 f4Color : SV_TARGET1;
 	float4 f4Normal : SV_TARGET2;
 	float4 f4Albedo : SV_TARGET3;
-	float3 f3Position : SV_TARGET4;
+	float4 f4Position : SV_TARGET4;
 	float4 f4CameraNormal : SV_TARGET5;
 };
 
@@ -329,7 +329,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStandard(VS_STANDARD_OUTPUT input, uint nPri
 	cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uv);
 	cSpecularColor = cSpecularColor * gMaterial.m_cSpecular;
 	//output.f4Specular = gMaterial.m_cSpecular;
-	output.f3Position = input.positionW;
+    output.f4Position = (input.positionW, 1.0f);
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
 
 	//output.f2ObjectIDzDepth.x = (float)1.0f;
@@ -419,7 +419,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSAlpha(VS_STANDARD_OUTPUT input, uint nPrimit
 	cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uv);
 	cSpecularColor = cSpecularColor * gMaterial.m_cSpecular;
 	//output.f4Specular = gMaterial.m_cSpecular;
-	output.f3Position = input.positionW;
+    output.f4Position = (input.positionW, 1.0f);
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
 
 	//output.f2ObjectIDzDepth.x = (float)1.0f;
@@ -599,7 +599,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTerrain(VS_TERRAIN_OUTPUT input, uint nPrimi
 	output.f4Albedo = cColor;
 
 	//output.f4Scene = output.f4Color = output.f4Albedo * cIllumination;
-	output.f3Position = input.positionW;
+    output.f4Position = (input.positionW, 1.0f);
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	//output.f4Specular = gMaterial.m_cSpecular;
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
@@ -689,7 +689,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSSkyBox(VS_SKYBOX_CUBEMAP_OUTPUT input, uint 
 
 	output.f4Normal = float4(normalW.xyz * 0.5f + 0.5f, input.position.z);
 	//output.f4Specular = gMaterial.m_cSpecular;
-	output.f3Position = input.position;
+    output.f4Position = (input.position, 1.0f);
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
 
 	//output.f2ObjectIDzDepth.x = (float)1.0f;
@@ -769,7 +769,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWall(VS_WALL_OUTPUT input, uint nPrimitiveID
 	cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uv);
 	cSpecularColor = cSpecularColor * gMaterial.m_cSpecular;
 	//output.f4Specular = gMaterial.m_cSpecular;
-	output.f3Position = input.positionW;
+    output.f4Position = (input.positionW, 1.0f);
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
 
 	//output.f2ObjectIDzDepth.x = (float)1.0f;
@@ -923,7 +923,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTexturedLightingToMultipleRTs(VS_TEXTURED_LI
 	cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uv);
 	cSpecularColor = cSpecularColor * gMaterial.m_cSpecular;
 	//output.f4Specular = gMaterial.m_cSpecular;
-	output.f3Position = input.positionW;
+    output.f4Position = (input.positionW, 1.0f);
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
 
 	//output.f2ObjectIDzDepth.x = (float)1.0f;
