@@ -31,6 +31,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	m_clients[user_id].set_isjump(packet->is_jump);
 	Room& join_room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
 
+	m_clients[user_id]._pos_lock.lock();
 	XMFLOAT3 current_player_position = m_clients[user_id].get_user_position();
 
 	XMFLOAT3 current_shift = packet->xmf3Shift;
@@ -108,6 +109,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 	m_clients[user_id].set_user_position(calculate_player_position);
 	m_clients[user_id].update_bounding_box_pos(calculate_player_position);
 	m_clients[user_id].set_collied_up_face(collision_up_face);
+	m_clients[user_id]._pos_lock.unlock();
 
 	send_calculate_move_packet(user_id); // -> 이동에 대한걸 처리하여 클라에게 보내줌
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());

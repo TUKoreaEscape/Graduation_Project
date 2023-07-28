@@ -98,6 +98,7 @@ void cGameServer::send_game_start_packet(const unsigned int id)
 
 void cGameServer::send_move_packet(const unsigned int id, const unsigned int moved_id)
 {
+	m_clients[id]._pos_lock.lock();
 	sc_packet_move move_packet;
 	move_packet.size = sizeof(move_packet);
 	move_packet.type = SC_PACKET::SC_PACKET_MOVE;
@@ -117,7 +118,7 @@ void cGameServer::send_move_packet(const unsigned int id, const unsigned int mov
 	move_packet.data.is_victim = m_clients[moved_id].get_user_victim_animation();
 	move_packet.data.is_collision_up_face = m_clients[moved_id].get_user_collied_up_face();
 	move_packet.data.active = m_clients[moved_id].get_life_chip();
-
+	m_clients[id]._pos_lock.unlock();
 	m_clients[id].do_send(sizeof(move_packet), &move_packet);
 }
 

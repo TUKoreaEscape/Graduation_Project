@@ -17,8 +17,10 @@ void Network::send_packet(void* packet)
 	int ret = WSASend(m_socket, &over->m_wsa_buf, 1, 0, 0, &over->m_wsa_over, NULL);
 	if (0 != ret) {
 		int err_no = WSAGetLastError();
-		if (WSA_IO_PENDING != err_no)
+		if (WSA_IO_PENDING != err_no) {
+			disconnect_client();
 			exit(0);
+		}
 	}
 }
 
