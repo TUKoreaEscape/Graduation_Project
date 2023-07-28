@@ -296,16 +296,24 @@ void Player::update(float fTimeElapsed)
 	if (fDeceleration > fLength) fDeceleration = fLength;
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
 
-	if (m_bIsBlending) {
-		m_pSkinnedAnimationController->SetTrackEnable(1, true);
-		if (m_fBlendingTime > 0.33f) {
-			m_nPrevAnimation = m_nNextAnimation;
-			m_bIsBlending = false;
-		}
+	if (IsAttack()) {
+		m_pSkinnedAnimationController->SetTrackEnable(2, true);
+		m_pSkinnedAnimationController->SetTrackEnable(1, false);
+		m_pSkinnedAnimationController->SetTrackWeight(0, 0);
 	}
 	else {
-		m_pSkinnedAnimationController->SetTrackEnable(1, false);
-		m_pSkinnedAnimationController->SetTrackWeight(0, 1.0f);
+		m_pSkinnedAnimationController->SetTrackEnable(2, false);
+		if (m_bIsBlending) {
+			m_pSkinnedAnimationController->SetTrackEnable(1, true);
+			if (m_fBlendingTime > 0.33f) {
+				m_nPrevAnimation = m_nNextAnimation;
+				m_bIsBlending = false;
+			}
+		}
+		else {
+			m_pSkinnedAnimationController->SetTrackEnable(1, false);
+			m_pSkinnedAnimationController->SetTrackWeight(0, 1.0f);
+		}
 	}
 }
 
@@ -503,7 +511,18 @@ void Player::SetAnimation(int index)
 	m_pSkinnedAnimationController->SetTrackAnimationSet(0, index);
 	m_pSkinnedAnimationController->SetTrackWeight(0, 0.3f);
 	if (m_nPrevAnimation == index) return;
-	else if (index > RUN_RIGHT) return;
+	else if (index == ATTACK && m_nPrevAnimation == IDLE) {
+		m_pSkinnedAnimationController->SetTrackPosition(0, 0);
+		m_pSkinnedAnimationController->SetTrackWeight(1, 0.0f);
+		m_pSkinnedAnimationController->SetTrackWeight(0, 1.0f);
+		m_nPrevAnimation = m_nNextAnimation;
+	}
+	else if (m_nPrevAnimation == ATTACK && m_nPrevAnimation == IDLE) {
+		m_pSkinnedAnimationController->SetTrackPosition(1, 0);
+		m_pSkinnedAnimationController->SetTrackWeight(1, 0.0f);
+		m_pSkinnedAnimationController->SetTrackWeight(0, 1.0f);
+		m_nPrevAnimation = m_nNextAnimation;
+	}
 	else {
 		if (!m_bIsBlending)	m_fBlendingTime = 0;
 		m_bIsBlending = true;

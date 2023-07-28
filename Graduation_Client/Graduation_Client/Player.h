@@ -62,7 +62,7 @@ public:
 
 	bool IsAttack() { return m_AttackElapsedTime < m_Attack; }
 	void PlayAttack(float elapsedTime) { m_AttackElapsedTime += elapsedTime; }
-	void SetAttackZeroTime() { m_AttackElapsedTime = 0.0f; }
+	void SetAttackZeroTime() { m_AttackElapsedTime = 0.0f; if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->SetTrackPosition(2, 0); }
 
 	void ChangeCamera(GAME_STATE prev, GAME_STATE p);
 
@@ -163,6 +163,7 @@ public:
 	virtual void SetAnimation(int index) override;
 
 	float m_fBlendingTime{};
+	float m_fBlendingWeight{};
 
 	XMFLOAT3						m_xmf3PrevRight = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3						m_xmf3PrevUp = XMFLOAT3(0.0f, 0.0f, 0.0f);
