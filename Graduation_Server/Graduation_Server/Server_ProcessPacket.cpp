@@ -566,7 +566,7 @@ void cGameServer::Process_Attack(const int user_id)
 		m_clients[user_id].set_attack_animation(true);
 
 		TIMER_EVENT ev;
-		ev.event_time = chrono::system_clock::now() + 499ms;
+		ev.event_time = chrono::system_clock::now() + 100ms;
 		ev.event_type = EventType::PLAYER_ATTACK;
 		ev.room_number = m_clients[user_id].get_join_room_number();
 		ev.obj_id = user_id;
@@ -587,7 +587,7 @@ void cGameServer::Process_Attack(const int user_id)
 				m_clients[other_player_id].set_victim_animation(true);
 
 				TIMER_EVENT ev;
-				ev.event_time = chrono::system_clock::now() + 499ms;
+				ev.event_time = chrono::system_clock::now() + 260ms;
 				ev.event_type = EventType::PLAYER_VICTIM;
 				ev.room_number = m_clients[other_player_id].get_join_room_number();
 				ev.obj_id = other_player_id;
