@@ -354,7 +354,7 @@ void Network::Process_Other_Player_Move(char* ptr)
 				if (packet->data[i].is_jump == true)
 				{
 					m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-					m_ppOther[j]->SetTrackAnimationSet(0, 6);
+					//m_ppOther[j]->SetTrackAnimationSet(0, 6);
 				}
 
 				if (packet->data[i].is_victim == true)

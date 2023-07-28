@@ -126,7 +126,7 @@ protected:
 	float							m_Jumpping = 0.3f;
 	float							m_JumpElapsedTime = 0.f;
 
-	float							m_Attack = 0.5f;
+	float							m_Attack = 0.33f;
 	float							m_AttackElapsedTime = 1.f;
 
 

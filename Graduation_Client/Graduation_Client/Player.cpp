@@ -511,18 +511,7 @@ void Player::SetAnimation(int index)
 	m_pSkinnedAnimationController->SetTrackAnimationSet(0, index);
 	m_pSkinnedAnimationController->SetTrackWeight(0, 0.3f);
 	if (m_nPrevAnimation == index) return;
-	else if (index == ATTACK && m_nPrevAnimation == IDLE) {
-		m_pSkinnedAnimationController->SetTrackPosition(0, 0);
-		m_pSkinnedAnimationController->SetTrackWeight(1, 0.0f);
-		m_pSkinnedAnimationController->SetTrackWeight(0, 1.0f);
-		m_nPrevAnimation = m_nNextAnimation;
-	}
-	else if (m_nPrevAnimation == ATTACK && m_nPrevAnimation == IDLE) {
-		m_pSkinnedAnimationController->SetTrackPosition(1, 0);
-		m_pSkinnedAnimationController->SetTrackWeight(1, 0.0f);
-		m_pSkinnedAnimationController->SetTrackWeight(0, 1.0f);
-		m_nPrevAnimation = m_nNextAnimation;
-	}
+	if (index > RUN_RIGHT) return;
 	else {
 		if (!m_bIsBlending)	m_fBlendingTime = 0;
 		m_bIsBlending = true;
