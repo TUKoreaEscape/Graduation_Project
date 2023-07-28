@@ -61,6 +61,7 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		case VK_F1:
+			CaptureOn(hWnd);
 			//std::cout << "마우스 캡차 동작" << std::endl;
 			break;
 		case VK_F2:
