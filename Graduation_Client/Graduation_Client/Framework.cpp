@@ -424,6 +424,7 @@ void Framework::BuildObjects()
 	network = Network::GetInstance();
 	sound = Sound::GetInstance();
 	sound->StartFMOD();
+	input->m_nClickSound = sound->CreateEffectSound("Sound/Button.mp3", 0);
 	m_gamestate->SetBG();
 	input->m_gamestate = m_gamestate;
 	scene = new GameScene();

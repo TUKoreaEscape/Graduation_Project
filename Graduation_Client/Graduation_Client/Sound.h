@@ -26,6 +26,7 @@ public:
 	void Play(int index, float volume, int OtherPlayer = -1, int i = 0);
 	void PlayBG(int index);
 	void PlayObjectSound(int index, float volume);
+	void PlayEffectSound(int index, float volume);
 	void Stop(int index, int OtherPlayer = -1);
 	void StopBG(int index);
 	void StopObjectSound(int index);
@@ -66,4 +67,5 @@ private:
 	std::vector<FMOD_VECTOR> m_vObjectPosition;
 
 	FMOD::Channel* m_pBGChannel;
+	FMOD::Channel* m_pEffectChannel;
 };

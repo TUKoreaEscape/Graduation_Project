@@ -194,6 +194,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 	{
 		CaptureOff();
 	}
+	Sound& sound = *Sound::GetInstance();
 	switch (nMessageID)
 	{
 	case WM_LBUTTONDOWN:
@@ -247,6 +248,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 
 				network.send_packet(&m_cs_packet_login);
 #endif
+				sound.PlayEffectSound(m_nClickSound, 0);
 			}
 			else if (xPos >= logininfoRect[1].left && xPos <= logininfoRect[1].right && yPos >= logininfoRect[1].top && yPos <= logininfoRect[1].bottom) //Create ID
 			{
@@ -260,6 +262,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 				
 				network.send_packet(&packet);
 #endif
+				sound.PlayEffectSound(m_nClickSound, 0);
 			}
 			else if (xPos >= logininfoRect[2].left && xPos <= logininfoRect[2].right && yPos >= logininfoRect[2].top && yPos <= logininfoRect[2].bottom)//Login fail
 			{
@@ -299,6 +302,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 					network.m_join_room_number = 6 * (m_PageNum - 1) + i;
 					network.m_page_num = m_PageNum - 1;
 #endif
+					sound.PlayEffectSound(m_nClickSound, 0);
 				}
 			}
 			for (int i = 0; i < 2; ++i)
@@ -313,6 +317,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 						Network& network = *Network::GetInstance();
 						network.Send_Request_Room_Info(m_PageNum - 1);
 #endif
+						sound.PlayEffectSound(m_nClickSound, 0);
 					}
 					else {
 						PageUp();
@@ -320,6 +325,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 						Network& network = *Network::GetInstance();
 						network.Send_Request_Room_Info(m_PageNum - 1);
 #endif
+						sound.PlayEffectSound(m_nClickSound, 0);
 					}
 				}
 			}
@@ -353,6 +359,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 							m_cs_packet_ready.ready_type = false;
 						}
 #endif
+						sound.PlayEffectSound(m_nClickSound, 0);
 					}
 					else if (i == 1)
 					{
@@ -362,6 +369,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 #endif
 						m_gamestate->ChangePrevState();//QUIT클릭
 						m_cs_packet_ready.ready_type = false;
+						sound.PlayEffectSound(m_nClickSound, 0);
 					}
 					else if (i == 2)
 					{
@@ -374,6 +382,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 						network.Send_Ready_Packet(false);
 #endif
 						m_cs_packet_ready.ready_type = false;
+						sound.PlayEffectSound(m_nClickSound, 0);
 					}
 				}
 			}
@@ -449,6 +458,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 						int n = m_pPlayer->FindPlayerPart(m_nCosIndex);
 						m_pPlayer->ChangePlayerPart(m_nCosIndex, n, false);
 					}
+					sound.PlayEffectSound(m_nClickSound, 0);
 				}
 			}
 			//InputRoomInfo();
@@ -482,6 +492,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 #endif
 				m_cs_packet_ready.ready_type = false;
 				m_gamestate->ChangeNextState();//QUIT클릭
+				sound.PlayEffectSound(m_nClickSound, 0);
 			}
 			//InputRoomInfo();
 		}

@@ -35,7 +35,7 @@ void Sound::StartFMOD()
 int Sound::CreateEffectSound(char* file, float volume)
 {
 	if (m_pSystem) {
-		if (m_pSystem->createSound(file, FMOD_3D | FMOD_LOOP_OFF, 0, &m_pSound) == FMOD_OK) {
+		if (m_pSystem->createSound(file, FMOD_LOOP_OFF, 0, &m_pSound) == FMOD_OK) {
 			m_vSounds.push_back(m_pSound);
 			m_nSounds++;
 			return m_nSounds - 1;
@@ -120,6 +120,11 @@ void Sound::PlayObjectSound(int index, float volume)
 	m_vObjectChannels[index]->setVolume(volume);
 	m_vObjectChannels[index]->set3DAttributes(&m_vObjectPosition[index], 0);
 	m_vObjectChannels[index]->setPaused(false);
+}
+
+void Sound::PlayEffectSound(int index, float volume)
+{
+	m_pSystem->playSound(m_vSounds[index], nullptr, false, &m_pEffectChannel);
 }
 
 void Sound::Stop(int index, int OtherPlayer)

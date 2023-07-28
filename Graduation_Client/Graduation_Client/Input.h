@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "protocol.h"
 #include "Game_state.h"
+#include "Sound.h"
 
 class Input
 {
@@ -48,6 +49,8 @@ public:
 	bool							m_debuglight = false;
 	bool							m_curstateon = false;
 	bool							m_ClickState = false;
+
+	int								m_nClickSound = -1;
 
 	TCHAR tmp[100]{NULL}; //입력받는 문자열을 담을 버퍼
 	bool bComposite; //입력 중이라 문자 조합 중인지 아닌지 판별하기 위한 변수
