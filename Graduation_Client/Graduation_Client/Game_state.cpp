@@ -18,13 +18,11 @@ void GameState::ChangeNextState()
 		case LOGIN:
 			m_GameState = ROOM_SELECT;
 			sound.StopBG(m_nLoginBG);
-			sound.PlayBG(m_nSelectBG);
+			sound.PlayBG(m_nWaitingBG);
 			break;
 		case ROOM_SELECT:
 			player->ChangeCamera(ROOM_SELECT, WAITING_GAME);
 			m_GameState = WAITING_GAME;
-			sound.StopBG(m_nSelectBG);
-			sound.PlayBG(m_nWaitingBG);
 			break;
 		case WAITING_GAME:
 			player->ChangeCamera(WAITING_GAME, READY_TO_GAME);
@@ -102,6 +100,7 @@ void GameState::ChangeSameLevelState()
 {
 	Player* player = Input::GetInstance()->m_pPlayer;
 	//std::cout << m_GameState << " -> ";
+	Sound& sound = *Sound::GetInstance();
 	switch (m_GameState) {
 		case GAME_LOADING:
 		case LOGIN:
@@ -111,10 +110,14 @@ void GameState::ChangeSameLevelState()
 		case WAITING_GAME:
 			player->ChangeCamera(WAITING_GAME, CUSTOMIZING);
 			m_GameState = CUSTOMIZING;
+			sound.StopBG(m_nWaitingBG);
+			sound.PlayBG(m_nCustomBG);
 			break;
 		case CUSTOMIZING:
 			player->ChangeCamera(CUSTOMIZING, WAITING_GAME);
-			m_GameState = WAITING_GAME;
+			m_GameState = WAITING_GAME;			
+			sound.StopBG(m_nCustomBG);
+			sound.PlayBG(m_nWaitingBG);
 			break;
 		case READY_TO_GAME:
 			break;
@@ -162,9 +165,10 @@ int GameState::GetTaggerTime()
 
 void GameState::SetBG()
 {
-	m_nLoginBG = Sound::GetInstance()->CreateBGSound("Sound/Aquarium.mp3", 0);
-	m_nSelectBG = Sound::GetInstance()->CreateBGSound("Sound/Unwelcome_School.mp3", 0);
-	m_nWaitingBG = Sound::GetInstance()->CreateBGSound("Sound/Aquarium.mp3", 0);
+	m_nLoginBG = Sound::GetInstance()->CreateBGSound("Sound/LoginBGM.mp3", 0);
+	m_nSelectBG = Sound::GetInstance()->CreateBGSound("Sound/RoomSelect_WaitingRoomBGM.mp3", 0);
+	m_nWaitingBG = Sound::GetInstance()->CreateBGSound("Sound/RoomSelect_WaitingRoomBGM.mp3", 0);
 	m_nGameBG = Sound::GetInstance()->CreateBGSound("Sound/Unwelcome_School.mp3", 0);
 	m_nEndingBG = Sound::GetInstance()->CreateBGSound("Sound/Aquarium.mp3", 0);
+	m_nCustomBG = Sound::GetInstance()->CreateBGSound("Sound/CustomizingBGM.mp3", 0);
 }

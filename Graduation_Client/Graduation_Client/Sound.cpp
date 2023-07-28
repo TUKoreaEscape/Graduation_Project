@@ -111,7 +111,7 @@ void Sound::PlayBG(int index)
 	if (index > m_nSounds) return;
 	m_pSystem->playSound(m_vSounds[index], nullptr, false, &m_pBGChannel);
 	m_pBGChannel->setVolume(0.05f);
-	m_pBGChannel->setMute(true);
+	//m_pBGChannel->setMute(true);
 }
 
 void Sound::PlayObjectSound(int index, float volume)

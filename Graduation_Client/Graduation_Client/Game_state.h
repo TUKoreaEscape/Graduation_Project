@@ -40,6 +40,7 @@ private:
 	int m_nLoginBG = -1;
 	int m_nSelectBG = -1;
 	int m_nWaitingBG = -1;
+	int m_nCustomBG = -1;
 	int m_nGameBG = -1;
 	int m_nEndingBG = -1;
 
