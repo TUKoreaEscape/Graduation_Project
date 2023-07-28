@@ -36,7 +36,7 @@ private:
 
 private:
 	SOCKET				m_socket;
-	const char*			SERVER_ADDR = "220.120.240.202";
+	const char*			SERVER_ADDR = "127.0.0.1";
 	Server_Timer		m_server_counter;
 	Custom				data;
 

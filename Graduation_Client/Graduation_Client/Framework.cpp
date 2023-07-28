@@ -506,18 +506,20 @@ void Framework::UpdateObjects()
 		//std::cout << packet.right.x << ", " << packet.right.y << ", " << packet.right.z << std::endl;
 		if (Input::GetInstance()->m_pPlayer->GetType() != TYPE_ESCAPE_PLAYER) {
 			network->send_packet(&packet);
-			network->pos_lock.lock();
+
+			//while (!network.m_recv_move);
+			//network->pos_lock.lock();
 			input->m_pPlayer->SetPosition(network->m_pPlayer_Pos);
-			network->pos_lock.unlock();
 		}
+		//network->pos_lock.unlock();
 
 		for (int i = 0; i < 5; ++i)
 		{
 			if (network->m_ppOther[i]->GetID() != -1)
 			{
-				network->Other_Player_Pos[i].pos_lock.lock();
+				//network->Other_Player_Pos[i].pos_lock.lock();
 				network->m_ppOther[i]->SetPosition(network->Other_Player_Pos[i].Other_Pos);
-				network->Other_Player_Pos[i].pos_lock.unlock();
+				//network->Other_Player_Pos[i].pos_lock.unlock();
 			}
 		}
 	}
