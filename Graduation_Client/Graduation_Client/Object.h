@@ -403,3 +403,16 @@ public:
 	GameObject* m_pArm = nullptr;
 	XMFLOAT4X4 m_xmf4x4ArmParent;
 };
+
+class PvsRoom : public GameObject
+{
+public:
+	PvsRoom();
+	virtual ~PvsRoom();
+
+public:
+	int m_nPvs{};
+	void SetPvsNum(int num) { m_nPvs = num; }
+	GameObject** m_ppPvs = nullptr;
+	void SetPvs(int num);
+};

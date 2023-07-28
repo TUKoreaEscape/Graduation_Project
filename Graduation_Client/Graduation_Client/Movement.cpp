@@ -66,7 +66,7 @@ void CommonMovement::update(float elapsedTime)
 	{
 		gameObject->m_pSkinnedAnimationController->SetTrackSpeed(0, 0.33f);
 
-		gameObject->SetAnimation(JUMP_END);
+		//gameObject->SetAnimation(JUMP_END);
 	}
 
 	if (keyBuffer['f'] & 0xF0 || keyBuffer['F'] & 0xF0)
@@ -134,6 +134,8 @@ void CommonMovement::update(float elapsedTime)
 			Input::GetInstance()->m_pPlayer->UseTaggerSkill(1);
 		}
 #endif
+		if (false == Input::GetInstance()->m_pPlayer->IsAttack())
+			Input::GetInstance()->m_pPlayer->SetAttackZeroTime();
 	}
 
 	if (keyBuffer['3'] & 0xF0)
@@ -162,7 +164,7 @@ void CommonMovement::update(float elapsedTime)
 	if (Input::GetInstance()->m_pPlayer->IsAttack())
 	{
 		Input::GetInstance()->m_pPlayer->PlayAttack(elapsedTime);
-		gameObject->SetAnimation(ATTACK);
+		//gameObject->SetAnimation(ATTACK);
 
 	}
 	else if (m_emptyKey && !Input::GetInstance()->m_pPlayer->GetIsFalling())
