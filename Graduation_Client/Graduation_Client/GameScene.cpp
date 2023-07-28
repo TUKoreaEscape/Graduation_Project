@@ -1680,6 +1680,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 0);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackEnable(1, false);
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackSpeed(1, 1.0f);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(2, ATTACK);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackEnable(2, false);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackSpeed(2, 1.0f);
@@ -1701,6 +1702,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.0f);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 0);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackEnable(1, false);
+	m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(1, 1.0f);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(2, ATTACK);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackSpeed(2, 1.0f);
 	m_pPlayer->m_pSkinnedAnimationController->SetTrackEnable(2, false);

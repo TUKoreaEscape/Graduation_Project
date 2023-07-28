@@ -304,12 +304,12 @@ void Player::update(float fTimeElapsed)
 	}
 	else {
 		m_pSkinnedAnimationController->SetTrackEnable(2, false);
-		if (m_bIsBlending) {
+		if (m_fBlendingTime < 0.33f) {
+			m_fBlendingWeight = m_fBlendingTime * 3;				
 			m_pSkinnedAnimationController->SetTrackEnable(1, true);
-			if (m_fBlendingTime > 0.33f) {
-				m_nPrevAnimation = m_nNextAnimation;
-				m_bIsBlending = false;
-			}
+			m_pSkinnedAnimationController->SetTrackWeight(1, 1 - m_fBlendingWeight);
+			m_pSkinnedAnimationController->SetTrackWeight(0, m_fBlendingWeight);
+			
 		}
 		else {
 			m_pSkinnedAnimationController->SetTrackEnable(1, false);
@@ -506,17 +506,36 @@ bool Player::UseTaggerSkill(int index)
 void Player::SetAnimation(int index)
 {
 	m_nNextAnimation = index;
-	m_pSkinnedAnimationController->SetTrackAnimationSet(1, m_nPrevAnimation);
-	m_pSkinnedAnimationController->SetTrackWeight(1, 0.7f);
-	m_pSkinnedAnimationController->SetTrackSpeed(1, 1.0f);
-	m_pSkinnedAnimationController->SetTrackAnimationSet(0, index);
-	m_pSkinnedAnimationController->SetTrackWeight(0, 0.3f);
-	if (m_nPrevAnimation == index) return;
-	if (index > RUN_RIGHT) return;
-	else {
-		if (!m_bIsBlending)	m_fBlendingTime = 0;
-		m_bIsBlending = true;
+	if (m_nPrevAnimation == m_nNextAnimation) return;
+	
+	m_pSkinnedAnimationController->SetTrackAnimationSet(1, m_nPrevAnimation); 
+	m_pSkinnedAnimationController->SetTrackAnimationSet(0, m_nNextAnimation);
+
+	if (index > RUN_RIGHT) {
+		m_pSkinnedAnimationController->SetTrackEnable(1, false);
+		m_nPrevAnimation = index;
+		return;
 	}
+
+	if (index == IDLE) {
+		if (m_nPrevAnimation > RUN_RIGHT) {
+			m_pSkinnedAnimationController->SetTrackEnable(1, false);
+		}
+		else {
+			m_fBlendingWeight = 0;
+			m_fBlendingTime = 0;
+		}
+	}
+	else if (index <= RUN_RIGHT) {
+		if (m_nPrevAnimation == IDLE) {
+			m_fBlendingWeight = 0;
+			m_fBlendingTime = 0;
+		}
+		else {
+			m_pSkinnedAnimationController->SetTrackEnable(1, false);
+		}
+	}
+	m_nPrevAnimation = index;
 }
 
 void Player::ChangeSpectator()
