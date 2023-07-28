@@ -105,6 +105,7 @@ public:
 	~Network();
 
 	void init_network();
+	void disconnect_client();
 	void set_capture_mouse();
 	void release_capture_mouse();
 

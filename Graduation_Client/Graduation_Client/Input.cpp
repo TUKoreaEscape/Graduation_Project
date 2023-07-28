@@ -104,6 +104,8 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			break;
 		case VK_ESCAPE:
 		{
+			Network& network = *Network::GetInstance();
+			network.disconnect_client();
 			::PostQuitMessage(0);
 			break;
 		}

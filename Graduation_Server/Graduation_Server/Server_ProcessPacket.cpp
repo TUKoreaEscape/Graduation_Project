@@ -23,11 +23,8 @@ void cGameServer::Process_Create_ID(int c_id, void* buff) // 요청받은 ID생성패킷
 
 void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터 이동을 처리
 {
-	auto start_time = chrono::steady_clock::now();
 	cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(buff);
 	m_clients[user_id].set_user_velocity(packet->velocity);
-	//m_clients[user_id].set_user_yaw(packet->yaw);
-	//m_clients[user_id].update_rotation(packet->yaw);
 	m_clients[user_id].set_look(packet->look);
 	m_clients[user_id].set_right(packet->right);
 	m_clients[user_id].set_inputKey(packet->input_key);
@@ -114,20 +111,24 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 
 	send_calculate_move_packet(user_id); // -> 이동에 대한걸 처리하여 클라에게 보내줌
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
-	//if (m_clients[user_id].m_befor_send_move == false)
-	//{
-	//	m_clients[user_id].m_befor_send_move = true;
-	//	for (auto p : room.in_player)
-	//	{
-	//		if (p == user_id)
-	//			continue;
-	//		if (p == -1)
-	//			continue;
-	//		send_move_packet(p, user_id);
-	//	}
-	//}
-	//else
-	//	m_clients[user_id].m_befor_send_move = false;
+
+#if !DEMO
+	if (m_clients[user_id].m_befor_send_move == false)
+	{
+		m_clients[user_id].m_befor_send_move = true;
+		for (auto p : room.in_player)
+		{
+			if (p == user_id)
+				continue;
+			if (p == -1)
+				continue;
+			send_move_packet(p, user_id);
+		}
+	}
+	else
+		m_clients[user_id].m_befor_send_move = false;
+#endif
+#if DEMO
 	for (auto p : room.in_player)
 	{
 		if (p == user_id)
@@ -136,10 +137,7 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 			continue;
 		send_move_packet(p, user_id);
 	}
-	auto end_time = chrono::steady_clock::now();
-
-
-	//cout << chrono::duration_cast<chrono::milliseconds>(end_time - start_time).count() << "ms" << endl;
+#endif
 }
 
 void cGameServer::Process_Chat(const int user_id, void* buff)
@@ -1070,7 +1068,6 @@ void cGameServer::Process_EscapeSystem(const int user_id, void* buff)
 
 
 	if (room.m_escape_system[packet->index].Is_Working_Escape() == false) {
-		cout << "게임 end 타이머 작동" << endl;
 		TIMER_EVENT ev;
 		ev.event_type = EventType::WORKING_ESCAPE_SYSTEM;
 		ev.event_time = chrono::system_clock::now() + 120s; // 탈출장치 작동 후 2분간 시간 부여 만약 end시간이 더 가까운 경우 end시간을 우선시함

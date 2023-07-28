@@ -11,10 +11,15 @@ Network::Network()
 
 Network::~Network()
 {
-	m_shutdown = true;
-	TerminateProcess(info.hProcess, 1);
+	
 }
 
+void Network::disconnect_client()
+{
+	m_shutdown = true;
+	closesocket(m_socket);
+	TerminateProcess(info.hProcess, 1);
+}
 
 void Network::Debug_send_thread()
 {
@@ -104,6 +109,7 @@ void Network::listen_thread()
 			int error_number = WSAGetLastError();
 			if (error_number != WSA_IO_PENDING) {
 				std::cout << "RecvSizeType" << std::endl;
+				disconnect_client();
 				exit(0);
 			}
 		}
