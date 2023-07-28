@@ -114,21 +114,30 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 
 	send_calculate_move_packet(user_id); // -> 이동에 대한걸 처리하여 클라에게 보내줌
 	Room& room = *m_room_manager->Get_Room_Info(m_clients[user_id].get_join_room_number());
-	if (m_clients[user_id].m_befor_send_move == false)
+	//if (m_clients[user_id].m_befor_send_move == false)
+	//{
+	//	m_clients[user_id].m_befor_send_move = true;
+	//	for (auto p : room.in_player)
+	//	{
+	//		if (p == user_id)
+	//			continue;
+	//		if (p == -1)
+	//			continue;
+	//		send_move_packet(p, user_id);
+	//	}
+	//}
+	//else
+	//	m_clients[user_id].m_befor_send_move = false;
+	for (auto p : room.in_player)
 	{
-		m_clients[user_id].m_befor_send_move = true;
-		for (auto p : room.in_player)
-		{
-			if (p == user_id)
-				continue;
-			if (p == -1)
-				continue;
-			send_move_packet(p, user_id);
-		}
+		if (p == user_id)
+			continue;
+		if (p == -1)
+			continue;
+		send_move_packet(p, user_id);
 	}
-	else
-		m_clients[user_id].m_befor_send_move = false;
 	auto end_time = chrono::steady_clock::now();
+
 
 	//cout << chrono::duration_cast<chrono::milliseconds>(end_time - start_time).count() << "ms" << endl;
 }
