@@ -2465,3 +2465,15 @@ void EscapeObject::SetWorking()
 	// 전력장치가 모두 수리 완료되었을 때 호출
 	IsWorking = true; 
 }
+
+void PvsRoom::SetPvs(int num)
+{
+	m_nPvs = num;
+	
+	m_ppPvs = new GameObject*[m_nPvs];
+	for (int i = 0; i < m_nPvs; ++i) {
+		std::string str = "pvs";
+		str += std::to_string(i);
+		m_ppPvs[i] = FindFrame(str.c_str());
+	}
+}
