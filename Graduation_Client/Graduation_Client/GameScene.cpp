@@ -1682,6 +1682,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackEnable(1, false);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(2, ATTACK);
 		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackEnable(2, false);
+		m_ppPlayers[i]->m_pSkinnedAnimationController->SetTrackSpeed(2, 1.0f);
 		m_ppPlayers[i]->SetAnimationCallback(i);
 		for (int j = 0; j < 6; ++j)
 			GameObject::SetParts(i + 1, j, 0);

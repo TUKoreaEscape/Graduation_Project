@@ -161,7 +161,7 @@ void CommonMovement::update(float elapsedTime)
 
 	if (Input::GetInstance()->m_pPlayer->IsAttack())
 	{
-		Input::GetInstance()->m_pPlayer->PlayAttack(elapsedTime);
+		return;
 		//gameObject->SetAnimation(ATTACK);
 
 	}

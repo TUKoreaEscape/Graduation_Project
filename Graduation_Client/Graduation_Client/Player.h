@@ -60,9 +60,18 @@ public:
 	bool GetIsColledUpFace() { return m_collision_up_face; }
 	void SetIsColledUpFace(bool state) { m_collision_up_face = state; }
 
-	bool IsAttack() { return m_AttackElapsedTime < m_Attack; }
+	bool IsAttack() { 
+		m_bAttack = m_AttackElapsedTime < m_Attack;
+		return m_bAttack;
+	}
 	void PlayAttack(float elapsedTime) { m_AttackElapsedTime += elapsedTime; }
-	void SetAttackZeroTime() { m_AttackElapsedTime = 0.0f; if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->SetTrackPosition(2, 0); }
+	void SetAttackZeroTime() { 
+		if (false == m_bAttack) {
+			m_AttackElapsedTime = 0.0f;
+			if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->SetTrackPosition(2, 0);
+			m_bAttack = true;
+		}
+	}
 
 	void ChangeCamera(GAME_STATE prev, GAME_STATE p);
 
@@ -128,7 +137,7 @@ protected:
 
 	float							m_Attack = 0.33f;
 	float							m_AttackElapsedTime = 1.f;
-
+	bool							m_bAttack = false;
 
 	bool							m_Isfalling = false;
 	bool							m_collision_up_face = false;

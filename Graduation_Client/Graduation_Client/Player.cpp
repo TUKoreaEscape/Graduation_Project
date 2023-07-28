@@ -300,6 +300,7 @@ void Player::update(float fTimeElapsed)
 		m_pSkinnedAnimationController->SetTrackEnable(2, true);
 		m_pSkinnedAnimationController->SetTrackEnable(1, false);
 		m_pSkinnedAnimationController->SetTrackWeight(0, 0);
+		PlayAttack(fTimeElapsed);
 	}
 	else {
 		m_pSkinnedAnimationController->SetTrackEnable(2, false);
