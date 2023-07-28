@@ -366,7 +366,7 @@ void Network::Process_Other_Player_Move(char* ptr)
 				if (packet->data[i].is_attack == true)
 				{
 					m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-					m_ppOther[j]->SetTrackAnimationSet(0, 7);
+					m_ppOther[j]->SetAttackZeroTime();
 				}
 			}
 		}

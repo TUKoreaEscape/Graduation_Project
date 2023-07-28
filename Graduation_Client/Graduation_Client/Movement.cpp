@@ -134,8 +134,6 @@ void CommonMovement::update(float elapsedTime)
 			Input::GetInstance()->m_pPlayer->UseTaggerSkill(1);
 		}
 #endif
-		if (false == Input::GetInstance()->m_pPlayer->IsAttack())
-			Input::GetInstance()->m_pPlayer->SetAttackZeroTime();
 	}
 
 	if (keyBuffer['3'] & 0xF0)
