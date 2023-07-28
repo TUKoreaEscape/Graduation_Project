@@ -81,6 +81,7 @@ public:
 	void CaptureOff();
 	bool GetClickState() { return m_ClickState; };
 	void SetClickState(bool value) { m_ClickState = value; };
+	bool IsWindowCaptured(HWND hWnd, int x, int y);
 };
 
 //input 클래스는 입력을 처리하기 위한 클래스입니다.

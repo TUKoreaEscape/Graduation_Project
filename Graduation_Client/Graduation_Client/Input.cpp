@@ -15,18 +15,6 @@ void Input::Update(HWND hWnd)
 	float cxDelta = 0.0f, cyDelta = 0.0f;
 	POINT ptCursorPos;
 
-	if (!GetcursorState() && (GameState::GetInstance()->GetGameState() == READY_TO_GAME || GameState::GetInstance()->GetGameState() == PLAYING_GAME
-		|| GameState::GetInstance()->GetGameState() == SPECTATOR_GAME) )
-	{
-		CaptureOn(hWnd);
-	}
-	else if(GetcursorState() && !(GameState::GetInstance()->GetGameState() == READY_TO_GAME || GameState::GetInstance()->GetGameState() == PLAYING_GAME
-		|| GameState::GetInstance()->GetGameState() == SPECTATOR_GAME))
-	{
-		CaptureOff();
-	}
-
-
 	if (GetCapture() == hWnd)
 	{
 		SetCursor(NULL);
@@ -192,6 +180,17 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 	POINT ptCenter = { (rcClient.right - rcClient.left) / 2, (rcClient.bottom - rcClient.top) / 2 };
 	int xPos = LOWORD(lParam);
 	int yPos = HIWORD(lParam);
+	IsWindowCaptured(hWnd, xPos, yPos);
+	if (!GetcursorState() && (GameState::GetInstance()->GetGameState() == READY_TO_GAME || GameState::GetInstance()->GetGameState() == PLAYING_GAME
+		|| GameState::GetInstance()->GetGameState() == SPECTATOR_GAME || GameState::GetInstance()->GetGameState() == INTERACTION_POWER))
+	{
+		CaptureOn(hWnd);
+	}
+	else if (GetcursorState() && !(GameState::GetInstance()->GetGameState() == READY_TO_GAME || GameState::GetInstance()->GetGameState() == PLAYING_GAME
+		|| GameState::GetInstance()->GetGameState() == SPECTATOR_GAME || GameState::GetInstance()->GetGameState() == INTERACTION_POWER))
+	{
+		CaptureOff();
+	}
 	switch (nMessageID)
 	{
 	case WM_LBUTTONDOWN:
@@ -789,4 +788,20 @@ void Input::InputRoomInfo()
 	strcpy_s(m_Roominfo[5].room_name, "plz\0");
 	m_Roominfo[5].join_member = 1;
 	m_Roominfo[5].state = GAME_ROOM_STATE::END;
+}
+
+bool Input::IsWindowCaptured(HWND hWnd, int x, int y)
+{
+	RECT rcClient;
+	GetClientRect(hWnd, &rcClient);
+	POINT ptCenter = { (rcClient.right - rcClient.left) / 2, (rcClient.bottom - rcClient.top) / 2 };
+	//std::cout << x << std::endl;
+	//std::cout << y << std::endl;
+
+	if (rcClient.left < x && rcClient.right > x && rcClient.top< y && rcClient.bottom> y)
+	{
+		return true;
+	}
+	SetcursorState();
+	return false;
 }
