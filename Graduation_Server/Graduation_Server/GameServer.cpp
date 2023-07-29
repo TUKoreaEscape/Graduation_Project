@@ -177,10 +177,14 @@ void cGameServer::WorkerThread()
 			packet.second_skill = false;
 			packet.third_skill = false;
 
-			m_clients[tagger_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, false);
+			if(tagger_id != -1)
+				m_clients[tagger_id].set_item_own(GAME_ITEM::ITEM_LIFECHIP, false);
 
-			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
+			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i) {
+				if (rl.in_player[i] == -1)
+					continue;
 				m_clients[rl.in_player[i]].do_send(sizeof(packet), &packet);
+			}
 			delete exp_over;
 
 			sc_packet_life_chip_update life_packet;

@@ -131,14 +131,20 @@ void cGameServer::Process_Move(const int user_id, void* buff) // 요청받은 캐릭터
 		m_clients[user_id].m_befor_send_move = false;
 #endif
 #if DEMO
-	for (auto p : room.in_player)
+	if (m_clients[user_id].m_befor_send_move == false)
 	{
-		if (p == user_id)
-			continue;
-		if (p == -1)
-			continue;
-		send_move_packet(p, user_id);
+		m_clients[user_id].m_befor_send_move = true;
+		for (auto p : room.in_player)
+		{
+			if (p == user_id)
+				continue;
+			if (p == -1)
+				continue;
+			send_move_packet(p, user_id);
+		}
 	}
+	else
+		m_clients[user_id].m_befor_send_move = false;
 #endif
 }
 
