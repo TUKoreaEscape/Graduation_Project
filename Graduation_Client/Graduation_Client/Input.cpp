@@ -216,7 +216,7 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 #if USE_NETWORK
 			Network& network = *Network::GetInstance();
 			network.Send_Attack_Packet();
-			m_pPlayer->SetAttackZeroTime();
+			m_pPlayer->SetAttackZeroTime(5);
 #endif
 		}
 		if (m_gamestate->GetGameState() == LOGIN)

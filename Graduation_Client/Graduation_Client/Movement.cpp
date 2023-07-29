@@ -51,6 +51,7 @@ void CommonMovement::update(float elapsedTime)
 	{
 		//std::cout << "스페이스바" << std::endl;
 		Input::GetInstance()->m_pPlayer->SetIsFalling(true);
+		Sound::GetInstance()->PlayPlayerEffectSound(Input::GetInstance()->m_pPlayer->m_nJumpSound, 5, 1.0f);
 	}
 
 	if ((Input::GetInstance()->m_pPlayer->IsJump() && Input::GetInstance()->m_pPlayer->GetIsFalling()))

@@ -7,7 +7,6 @@
 #include "Object.h"
 #include "Network.h"
 #include "Game_state.h"
-#include "Sound.h"
 
 Player::Player() : GameObject()
 {
@@ -547,6 +546,9 @@ void Player::SetAnimationCallback(int index)
 {
 	AnimationCallbackHandler* pAnimationCallbackHandler = new SoundCallbackHandler();
 	channelIndex = index;
+	m_nJumpSound = Sound::GetInstance()->CreatePlayerEffectSound("Sound/Jump.wav", 10.0f, 35.0f);
+	m_nAttackSound = Sound::GetInstance()->CreatePlayerEffectSound("Sound/Attack.mp3", 10.0f, 35.0f);
+	m_nHitSound = Sound::GetInstance()->CreatePlayerEffectSound("Sound/Hit.mp3", 10.0f, 35.0f);
 	if (m_pSkinnedAnimationController) {
 		FootstepCallback1 = Sound::GetInstance()->CreatePlayersSounds("Sound/Footstep01.wav", 0, 10.0f, 35.0f);
 		FootstepCallback2 = Sound::GetInstance()->CreatePlayersSounds("Sound/Footstep02.wav", 1, 10.0f, 35.0f);

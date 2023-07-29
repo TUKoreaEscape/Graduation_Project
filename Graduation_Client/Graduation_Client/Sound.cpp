@@ -29,7 +29,9 @@ void Sound::StartFMOD()
 	for (auto& chan : m_arrPlayerChannel) {
 		chan = nullptr;
 	}
-
+	for (auto& cha : m_arrPlayerChannel) {
+		cha = nullptr;
+	}
 }
 
 int Sound::CreateEffectSound(char* file, float volume)
@@ -85,6 +87,19 @@ int Sound::CreateBGSound(char* file, float volume)
 	return -1;
 }
 
+int Sound::CreatePlayerEffectSound(char* file, float min, float max)
+{
+	if (m_pSystem) {
+		if (m_pSystem->createSound(file, FMOD_3D | FMOD_LOOP_OFF | FMOD_3D_LINEARROLLOFF, 0, &m_pSound) == FMOD_OK) {
+			m_pSound->set3DMinMaxDistance(min, max);
+			m_vSounds.push_back(m_pSound);
+			m_nSounds++;
+			return m_nSounds - 1;
+		}
+	}
+	return -1;
+}
+
 void Sound::Play(int index, float volume, int otherPlayer, int i)
 {
 	if (index == -1) return;
@@ -127,6 +142,26 @@ void Sound::PlayEffectSound(int index, float volume)
 {
 	if (index == -1) return;
 	m_pSystem->playSound(m_vSounds[index], nullptr, false, &m_pEffectChannel);
+}
+
+void Sound::PlayPlayerEffectSound(int index, int playerIndex, float volume)
+{
+	if (index == -1) return;
+	if (playerIndex < 5) {
+		m_pSystem->playSound(m_vSounds[index], nullptr, true, &m_arrPlayersEffectChannel[playerIndex]);
+		m_arrPlayersEffectChannel[playerIndex]->setVolume(volume);
+		m_arrPlayersEffectChannel[playerIndex]->set3DAttributes(&m_vObjectPosition[playerIndex], 0);
+		m_arrPlayersEffectChannel[playerIndex]->setPaused(false);
+	}
+	else if (playerIndex == 5) {
+		m_pSystem->playSound(m_vSounds[index], nullptr, true, &m_arrPlayersEffectChannel[playerIndex]);
+		m_arrPlayersEffectChannel[playerIndex]->setVolume(volume);
+		m_arrPlayersEffectChannel[playerIndex]->set3DAttributes(&m_fvListenerPos, 0);
+		m_arrPlayersEffectChannel[playerIndex]->setPaused(false);
+	}
+	else {
+		return;
+	}
 }
 
 void Sound::Stop(int index, int OtherPlayer)

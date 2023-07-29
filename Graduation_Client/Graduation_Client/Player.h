@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "Game_state.h"
 #include "protocol.h"
+#include "Sound.h"
 
 #define DIR_FORWARD					0x01
 #define DIR_BACKWARD				0x02
@@ -65,11 +66,12 @@ public:
 		return m_bAttack;
 	}
 	void PlayAttack(float elapsedTime) { m_AttackElapsedTime += elapsedTime; }
-	void SetAttackZeroTime() { 
+	void SetAttackZeroTime(int index) { 
 		if (false == m_bAttack) {
 			m_AttackElapsedTime = 0.0f;
 			if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->SetTrackPosition(2, 0);
 			m_bAttack = true;
+			Sound::GetInstance()->PlayPlayerEffectSound(m_nAttackSound, index, 1.0f);
 		}
 	}
 
@@ -193,6 +195,10 @@ public:
 	int FootstepCallback1 = -1;
 	int FootstepCallback2 = -1;
 	int channelIndex = -1;
+
+	int m_nJumpSound = -1;
+	int m_nAttackSound = -1;
+	int m_nHitSound = -1;
 
 	int m_nInfo{ -1 };
 	int GetInfo() { return m_nInfo; }

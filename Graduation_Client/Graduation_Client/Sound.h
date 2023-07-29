@@ -22,11 +22,13 @@ public:
 	int CreateObjectSound(char* file, const XMFLOAT3& position);
 	int CreateObjectSound(char* file, float x, float y, float z, float min, float max, bool loop = false);
 	int CreateBGSound(char* file, float volume);
+	int CreatePlayerEffectSound(char* file, float min, float max);
 
 	void Play(int index, float volume, int OtherPlayer = -1, int i = 0);
 	void PlayBG(int index);
 	void PlayObjectSound(int index, float volume);
 	void PlayEffectSound(int index, float volume);
+	void PlayPlayerEffectSound(int index, int playerIndex, float volume);
 	void Stop(int index, int OtherPlayer = -1);
 	void StopBG(int index);
 	void StopObjectSound(int index);
@@ -68,4 +70,6 @@ private:
 
 	FMOD::Channel* m_pBGChannel;
 	FMOD::Channel* m_pEffectChannel;
+
+	std::array<FMOD::Channel*, 6> m_arrPlayersEffectChannel;
 };
