@@ -247,9 +247,11 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pForestTerrain->render(pd3dCommandList);
 	m_pClassroomTerrain->render(pd3dCommandList);
 
-	for (int i = 0; i < m_nWalls; ++i)
-	{
-		if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
+	if (false == m_pPlayer->GetPvsDebugDemo()) {
+		for (int i = 0; i < m_nWalls; ++i)
+		{
+			if (m_ppWalls[i]) m_ppWalls[i]->render(pd3dCommandList);
+		}
 	}
 
 	Scene::render(pd3dCommandList);
@@ -1945,6 +1947,4 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	send_thread = std::thread{ &Network::Debug_send_thread, m_network };
 #endif
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(1.0f);
-
-	Input::GetInstance()->m_pTestDoor = m_pDoors[0];
 }

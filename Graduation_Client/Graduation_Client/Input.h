@@ -27,8 +27,6 @@ public:
 
 	float					m_MouseX = 0;
 	float					m_MouseY = 0;
-
-	GameObject* m_pTestDoor = nullptr;
 	
 	//ÆÐÅ¶
 	cs_packet_login				m_cs_packet_login{ NULL};

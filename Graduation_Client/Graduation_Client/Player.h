@@ -197,4 +197,8 @@ public:
 	int m_nInfo{ -1 };
 	int GetInfo() { return m_nInfo; }
 	void SetInfo(int n) { m_nInfo = n; }
+
+	bool m_bPvsDebugDemo = false;
+	void SetPvsDebugDemo(bool debug) { m_bPvsDebugDemo = debug; }
+	bool GetPvsDebugDemo() const { return m_bPvsDebugDemo; }
 };

@@ -164,11 +164,11 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 				m_pPlayer->SetShown(true);
 			}
 		}
-		if (wParam == 'T' || wParam == 't') {
-			if (m_pTestDoor) m_pTestDoor->SetOpen(true);
-		}
-		if (wParam == 'c' || wParam == 'C') {
-			if (m_pTestDoor) m_pTestDoor->SetOpen(false);
+		if (wParam == 'n' || wParam == 'N') {
+			if (m_pPlayer) { 
+				bool debug = m_pPlayer->GetPvsDebugDemo();
+				m_pPlayer->SetPvsDebugDemo(!debug); 
+			}
 		}
 		break;
 	default:
