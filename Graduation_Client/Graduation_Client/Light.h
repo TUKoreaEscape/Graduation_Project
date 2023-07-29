@@ -38,7 +38,7 @@ public:
 public:
 	LIGHT* m_pLights = nullptr;
 	int m_nLights = 0;
-	float global = 0.7f;
+	float global = 0.8f;
 	// Directional Light의 회전 각도
 	float rotationAngle = 270.0f;
 
