@@ -649,7 +649,59 @@ CollisionInfo Room::is_collision_player_to_object(const int& player_id, const XM
 
 CollisionInfo Room::is_collision_player_to_player(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift)
 {
+	cGameServer& server = *cGameServer::GetInstance();
+	CLIENT& client = *server.get_client_info(player_id);
 	CollisionInfo return_data;
+	return_data.is_collision = false;
+	return_data.CollisionNormal = XMFLOAT3(0, 0, 0);
+	return_data.SlidingVector = XMFLOAT3(0, 0, 0);
+	BoundingOrientedBox player_bounding_box = client.get_bounding_box();
+	XMFLOAT3 MotionVector = xmf3shift;
+	XMFLOAT3 tmp_position = current_position;
+	BoundingOrientedBox check_box = client.get_bounding_box();
+	for (auto& other_id : in_player) // 모든벽을 체크 후 값을 더해주는 방식이 좋아보임!
+	{
+		if (other_id == -1)
+			continue;
+		if (other_id == player_id)
+			continue;
+		if (false == Is_near(current_position, server.m_clients[other_id].get_user_position(), 10))
+			continue;
+
+		if (check_box.Intersects(server.m_clients[other_id].get_bounding_box()))
+		{
+			client.set_user_position(tmp_position);
+			client.update_bounding_box_pos(tmp_position);
+			CollisionInfo collision_data = server.GetCollisionInfo(server.m_clients[other_id].get_bounding_box(), player_bounding_box);
+			XMFLOAT3 SlidingVector = XMFLOAT3(0.0f, 0.0f, 0.0f);
+			XMFLOAT3 current_player_position = tmp_position;
+
+
+			float DotProduct = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&MotionVector), XMLoadFloat3(&collision_data.CollisionNormal)));
+
+			if (DotProduct < 0.0f)
+			{
+				XMFLOAT3 RejectionVector = XMFLOAT3(-DotProduct * collision_data.CollisionNormal.x, -DotProduct * collision_data.CollisionNormal.y, -DotProduct * collision_data.CollisionNormal.z);
+				SlidingVector = XMFLOAT3(MotionVector.x + RejectionVector.x, MotionVector.y + RejectionVector.y, MotionVector.z + RejectionVector.z);
+			}
+			else
+			{
+				SlidingVector = MotionVector;
+			}
+
+			return_data.is_collision = true;
+			return_data.SlidingVector = SlidingVector;
+			return_data.CollisionNormal = collision_data.CollisionNormal;
+			MotionVector = SlidingVector;
+			tmp_position = Add(tmp_position, SlidingVector);
+
+			client.set_user_position(current_position);
+			client.update_bounding_box_pos(current_position);
+			check_box.Center = tmp_position;
+		}
+	}
+	return return_data;
+	/*CollisionInfo return_data;
 
 	int collied_id = -1;
 	cGameServer& server = *cGameServer::GetInstance();
@@ -708,7 +760,7 @@ CollisionInfo Room::is_collision_player_to_player(const int& player_id, const XM
 		return_data.SlidingVector = XMFLOAT3(0, 0, 0);
 		return_data.CollisionNormal = XMFLOAT3(0, 0, 0);
 	}
-	return return_data;
+	return return_data;*/
 }
 
 CollisionInfo Room::is_collision_wall_to_player(const int& player_id, const XMFLOAT3& current_position, const XMFLOAT3& xmf3shift)
