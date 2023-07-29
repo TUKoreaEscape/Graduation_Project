@@ -588,7 +588,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSTerrain(VS_TERRAIN_OUTPUT input, uint nPrimi
 	//	float4 cColor = saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
 	//float4 cColor = input.color * saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
 
-	float4 cColor = input.color * cBaseTexColor;
+	float4 cColor = cBaseTexColor;
 
 	float3 normalW = normalize(input.normalW);
 

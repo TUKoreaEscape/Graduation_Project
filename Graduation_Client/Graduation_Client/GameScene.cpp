@@ -19,12 +19,13 @@ D3D12_CPU_DESCRIPTOR_HANDLE	GameScene::m_d3dSrvCPUDescriptorNextHandle;
 D3D12_GPU_DESCRIPTOR_HANDLE	GameScene::m_d3dSrvGPUDescriptorNextHandle;
 GameScene::GameScene() : Scene()
 {
-	m_sPVS[static_cast<int>(PVSROOM::CLASS_ROOM)] = std::set<PVSROOM>{ PVSROOM::CLASS_ROOM, PVSROOM::PIANO_ROOM, PVSROOM::LOBBY_ROOM, PVSROOM::FOREST };
-	m_sPVS[static_cast<int>(PVSROOM::PIANO_ROOM)] = std::set<PVSROOM>{ PVSROOM::CLASS_ROOM, PVSROOM::PIANO_ROOM, PVSROOM::LOBBY_ROOM, PVSROOM::BROADCASTING_ROOM };
-	m_sPVS[static_cast<int>(PVSROOM::BROADCASTING_ROOM)] = std::set<PVSROOM>{ PVSROOM::LOBBY_ROOM, PVSROOM::PIANO_ROOM, PVSROOM::CUBE_ROOM, PVSROOM::BROADCASTING_ROOM };
-	m_sPVS[static_cast<int>(PVSROOM::LOBBY_ROOM)] = std::set<PVSROOM>{ PVSROOM::CLASS_ROOM, PVSROOM::PIANO_ROOM, PVSROOM::LOBBY_ROOM, PVSROOM::FOREST, PVSROOM::CUBE_ROOM, PVSROOM::BROADCASTING_ROOM };
-	m_sPVS[static_cast<int>(PVSROOM::FOREST)] = std::set<PVSROOM>{ PVSROOM::CLASS_ROOM, PVSROOM::BROADCASTING_ROOM, PVSROOM::LOBBY_ROOM, PVSROOM::FOREST };
-	m_sPVS[static_cast<int>(PVSROOM::CUBE_ROOM)] = std::set<PVSROOM>{ PVSROOM::LOBBY_ROOM, PVSROOM::CUBE_ROOM, PVSROOM::BROADCASTING_ROOM };
+	m_nPVSRooms = static_cast<int>(ROOM_INFO::TOTAL_ROOM);
+	m_sPVS[static_cast<int>(PVSROOM::CLASS_ROOM)] = std::set<ROOM_INFO>{ ROOM_INFO::CLASS_ROOM0, ROOM_INFO::CLASS_ROOM1, ROOM_INFO::PIANO_ROOM0, ROOM_INFO::LOBBY_ROOM0, ROOM_INFO::FOREST0, ROOM_INFO::FOREST1 };
+	m_sPVS[static_cast<int>(PVSROOM::PIANO_ROOM)] = std::set<ROOM_INFO>{ ROOM_INFO::CLASS_ROOM0, ROOM_INFO::PIANO_ROOM0, ROOM_INFO::PIANO_ROOM1, ROOM_INFO::LOBBY_ROOM0, ROOM_INFO::BROADCASTING_ROOM4 };
+	m_sPVS[static_cast<int>(PVSROOM::BROADCASTING_ROOM)] = std::set<ROOM_INFO>{ ROOM_INFO::LOBBY_ROOM1, ROOM_INFO::PIANO_ROOM0, ROOM_INFO::CUBE_ROOM, ROOM_INFO::BROADCASTING_ROOM0, ROOM_INFO::BROADCASTING_ROOM1, ROOM_INFO::BROADCASTING_ROOM2, ROOM_INFO::BROADCASTING_ROOM3, ROOM_INFO::BROADCASTING_ROOM4, ROOM_INFO::FOREST1 };
+	m_sPVS[static_cast<int>(PVSROOM::LOBBY_ROOM)] = std::set<ROOM_INFO>{ ROOM_INFO::CLASS_ROOM0, ROOM_INFO::PIANO_ROOM0, ROOM_INFO::LOBBY_ROOM0, ROOM_INFO::LOBBY_ROOM1, ROOM_INFO::FOREST0, ROOM_INFO::CUBE_ROOM, ROOM_INFO::BROADCASTING_ROOM2 };
+	m_sPVS[static_cast<int>(PVSROOM::FOREST)] = std::set<ROOM_INFO>{ ROOM_INFO::CLASS_ROOM0, ROOM_INFO::CLASS_ROOM1, ROOM_INFO::BROADCASTING_ROOM0, ROOM_INFO::LOBBY_ROOM1, ROOM_INFO::FOREST0, ROOM_INFO::FOREST1 };
+	m_sPVS[static_cast<int>(PVSROOM::CUBE_ROOM)] = std::set<ROOM_INFO>{ ROOM_INFO::LOBBY_ROOM0, ROOM_INFO::LOBBY_ROOM1, ROOM_INFO::CUBE_ROOM, ROOM_INFO::BROADCASTING_ROOM0, ROOM_INFO::FOREST1 };
 
 	m_pvsCamera = PVSROOM::LOBBY_ROOM;
 }
@@ -297,7 +298,7 @@ void GameScene::defrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		Taggers->UpdateTransform(nullptr);
 		reinterpret_cast<TaggersBox*>(Taggers)->render(pd3dCommandList);
 	}
-	if (m_sPVS[static_cast<int>(m_pvsCamera)].count(PVSROOM::FOREST) != 0) {
+	if ((m_sPVS[static_cast<int>(m_pvsCamera)].count(ROOM_INFO::FOREST0) != 0) || (m_sPVS[static_cast<int>(m_pvsCamera)].count(ROOM_INFO::FOREST1) != 0)) {
 		m_pOak->render(pd3dCommandList);
 		for (int i = 0; i < m_nBush; ++i)
 		{
@@ -799,7 +800,7 @@ void GameScene::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		Taggers->UpdateTransform(nullptr);
 		reinterpret_cast<TaggersBox*>(Taggers)->Depthrender(pd3dCommandList);
 	}
-	if (m_sPVS[static_cast<int>(m_pvsCamera)].count(PVSROOM::FOREST) != 0) {
+	if ((m_sPVS[static_cast<int>(m_pvsCamera)].count(ROOM_INFO::FOREST0) != 0) || (m_sPVS[static_cast<int>(m_pvsCamera)].count(ROOM_INFO::FOREST1) != 0)) {
 		m_pOak->Depthrender(pd3dCommandList);
 		for (int i = 0; i < m_nBush; ++i)
 		{
@@ -1105,7 +1106,7 @@ void GameScene::Spectatorrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		Taggers->UpdateTransform(nullptr);
 		reinterpret_cast<TaggersBox*>(Taggers)->render(pd3dCommandList);
 	}
-	if (m_sPVS[static_cast<int>(m_pvsCamera)].count(PVSROOM::FOREST) != 0) {
+	if ((m_sPVS[static_cast<int>(m_pvsCamera)].count(ROOM_INFO::FOREST0) != 0) || (m_sPVS[static_cast<int>(m_pvsCamera)].count(ROOM_INFO::FOREST1) != 0)) {
 		m_pOak->render(pd3dCommandList);
 		for (int i = 0; i < m_nBush; ++i)
 		{
@@ -1667,11 +1668,11 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.2f);
 	LoadedModelInfo* pPlayerModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/C720.bin", nullptr);
-	LoadedModelInfo* pClassModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InClassObject.bin", nullptr);
-	LoadedModelInfo* pPianoModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPianoRoom.bin", nullptr);
-	LoadedModelInfo* pBroadcastModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InBroadcast.bin", nullptr);
-	LoadedModelInfo* pHouseModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPorest.bin", nullptr);
-	LoadedModelInfo* pLobbyModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InDDD.bin", nullptr);
+	LoadedModelInfo* pClassModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InClassObjectPVS.bin", nullptr);
+	LoadedModelInfo* pPianoModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPianoRoomPVS.bin", nullptr);
+	LoadedModelInfo* pBroadcastModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InBroadcastPVS.bin", nullptr);
+	LoadedModelInfo* pHouseModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InPorestPVS.bin", nullptr);
+	LoadedModelInfo* pLobbyModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InLobbyPVS.bin", nullptr);
 	LoadedModelInfo* pCubeModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/CubeRoomTe.bin", nullptr);
 	LoadedModelInfo* pCeilModel = GameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Ceilling.bin", nullptr);
 
@@ -1840,39 +1841,85 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_pCeilling->UpdateTransform(nullptr);
 	LoadSceneObjectsFromFile(pd3dDevice, pd3dCommandList, (char*)"Walls/Scene0621.bin");
 
+	m_pPVSObjects = new GameObject * [m_nPVSRooms];
+	GameObject* pGameObject = nullptr;
+	pGameObject = pClassModel->m_pModelRootObject->FindFrame("pvs0");
 	m_pPVSObjects[0] = new GameObject();
-	m_pPVSObjects[0]->SetChild(pClassModel->m_pModelRootObject, true);
+	m_pPVSObjects[0]->SetChild(pGameObject, true);
+	m_pPVSObjects[0]->m_xmf4x4ToParent = pClassModel->m_pModelRootObject->m_xmf4x4ToParent;
 	m_pPVSObjects[0]->UpdateTransform(nullptr);
+	pGameObject = pClassModel->m_pModelRootObject->FindFrame("pvs1");
 	m_pPVSObjects[1] = new GameObject();
-	m_pPVSObjects[1]->SetChild(pPianoModel->m_pModelRootObject, true);
+	m_pPVSObjects[1]->SetChild(pGameObject, true);
+	m_pPVSObjects[1]->m_xmf4x4ToParent = pClassModel->m_pModelRootObject->m_xmf4x4ToParent; 
 	m_pPVSObjects[1]->UpdateTransform(nullptr);
+	if (m_pPVSObjects[1]->m_pChild->m_pSibling) m_pPVSObjects[1]->m_pChild->m_pSibling = nullptr;
+	if (m_pPVSObjects[0]->m_pChild->m_pSibling) m_pPVSObjects[0]->m_pChild->m_pSibling = nullptr;
+
+	pGameObject = pPianoModel->m_pModelRootObject->FindFrame("pvs0");
 	m_pPVSObjects[2] = new GameObject();
-	m_pPVSObjects[2]->SetChild(pBroadcastModel->m_pModelRootObject, true);
+	m_pPVSObjects[2]->SetChild(pGameObject, true);
+	m_pPVSObjects[2]->m_xmf4x4ToParent = pPianoModel->m_pModelRootObject->m_xmf4x4ToParent;
 	m_pPVSObjects[2]->UpdateTransform(nullptr);
+	pGameObject = pPianoModel->m_pModelRootObject->FindFrame("pvs1");
 	m_pPVSObjects[3] = new GameObject();
-	m_pPVSObjects[3]->SetChild(pLobbyModel->m_pModelRootObject, true);
+	m_pPVSObjects[3]->SetChild(pGameObject, true);
+	m_pPVSObjects[3]->m_xmf4x4ToParent = pPianoModel->m_pModelRootObject->m_xmf4x4ToParent;
 	m_pPVSObjects[3]->UpdateTransform(nullptr);
+	if (m_pPVSObjects[2]->m_pChild->m_pSibling) m_pPVSObjects[2]->m_pChild->m_pSibling = nullptr;
+	if (m_pPVSObjects[3]->m_pChild->m_pSibling) m_pPVSObjects[3]->m_pChild->m_pSibling = nullptr;
+
+	pGameObject = pBroadcastModel->m_pModelRootObject->FindFrame("pvs0");
 	m_pPVSObjects[4] = new GameObject();
-	m_pPVSObjects[4]->SetChild(pHouseModel->m_pModelRootObject, true);
+	m_pPVSObjects[4]->SetChild(pGameObject, true);
 	m_pPVSObjects[4]->UpdateTransform(nullptr);
+	pGameObject = pBroadcastModel->m_pModelRootObject->FindFrame("pvs1");
 	m_pPVSObjects[5] = new GameObject();
-	m_pPVSObjects[5]->SetChild(pCubeModel->m_pModelRootObject, true);
+	m_pPVSObjects[5]->SetChild(pGameObject, true);
 	m_pPVSObjects[5]->UpdateTransform(nullptr);
-	/*	m_pClass = new GameObject();
-	m_pClass->SetChild(pClassModel->m_pModelRootObject, true);
-	m_pClass->UpdateTransform(nullptr);
-	m_pPiano = new GameObject();
-	m_pPiano->SetChild(pPianoModel->m_pModelRootObject, true);
-	m_pPiano->UpdateTransform(nullptr);
-	m_pBroadcast = new GameObject();
-	m_pBroadcast->SetChild(pBroadcastModel->m_pModelRootObject, true);
-	m_pBroadcast->UpdateTransform(nullptr);
-	m_pLobby = new GameObject();
-	m_pLobby->SetChild(pLobbyModel->m_pModelRootObject, true);
-	m_pLobby->UpdateTransform(nullptr);
-	m_pPorest = new GameObject();
-	m_pPorest->SetChild(pHouseModel->m_pModelRootObject, true);
-	m_pPorest->UpdateTransform(nullptr);*/
+	pGameObject = pBroadcastModel->m_pModelRootObject->FindFrame("pvs2");
+	m_pPVSObjects[6] = new GameObject();
+	m_pPVSObjects[6]->SetChild(pGameObject, true);
+	m_pPVSObjects[6]->UpdateTransform(nullptr);
+	pGameObject = pBroadcastModel->m_pModelRootObject->FindFrame("pvs3");
+	m_pPVSObjects[7] = new GameObject();
+	m_pPVSObjects[7]->SetChild(pGameObject, true);
+	m_pPVSObjects[7]->UpdateTransform(nullptr);
+	pGameObject = pBroadcastModel->m_pModelRootObject->FindFrame("pvs4");
+	m_pPVSObjects[8] = new GameObject();
+	m_pPVSObjects[8]->SetChild(pGameObject, true);
+	m_pPVSObjects[8]->UpdateTransform(nullptr);
+	if (m_pPVSObjects[4]->m_pChild->m_pSibling) m_pPVSObjects[4]->m_pChild->m_pSibling = nullptr;
+	if (m_pPVSObjects[5]->m_pChild->m_pSibling) m_pPVSObjects[5]->m_pChild->m_pSibling = nullptr;
+	if (m_pPVSObjects[6]->m_pChild->m_pSibling) m_pPVSObjects[6]->m_pChild->m_pSibling = nullptr;
+	if (m_pPVSObjects[7]->m_pChild->m_pSibling) m_pPVSObjects[7]->m_pChild->m_pSibling = nullptr;
+	if (m_pPVSObjects[8]->m_pChild->m_pSibling) m_pPVSObjects[8]->m_pChild->m_pSibling = nullptr;
+
+	pGameObject = pLobbyModel->m_pModelRootObject->FindFrame("pvs0");
+	m_pPVSObjects[9] = new GameObject();
+	m_pPVSObjects[9]->SetChild(pGameObject, true);
+	m_pPVSObjects[9]->UpdateTransform(nullptr);
+	pGameObject = pLobbyModel->m_pModelRootObject->FindFrame("pvs1");
+	m_pPVSObjects[10] = new GameObject();
+	m_pPVSObjects[10]->SetChild(pGameObject, true);
+	m_pPVSObjects[10]->UpdateTransform(nullptr);
+	if (m_pPVSObjects[9]->m_pChild->m_pSibling) m_pPVSObjects[9]->m_pChild->m_pSibling = nullptr;
+	if (m_pPVSObjects[10]->m_pChild->m_pSibling) m_pPVSObjects[10]->m_pChild->m_pSibling = nullptr;
+
+	pGameObject = pHouseModel->m_pModelRootObject->FindFrame("pvs0");
+	m_pPVSObjects[11] = new GameObject();
+	m_pPVSObjects[11]->SetChild(pGameObject, true);
+	m_pPVSObjects[11]->UpdateTransform(nullptr);
+	pGameObject = pHouseModel->m_pModelRootObject->FindFrame("pvs1");
+	m_pPVSObjects[12] = new GameObject();
+	m_pPVSObjects[12]->SetChild(pGameObject, true);
+	m_pPVSObjects[12]->UpdateTransform(nullptr);
+	if (m_pPVSObjects[11]->m_pChild->m_pSibling) m_pPVSObjects[11]->m_pChild->m_pSibling = nullptr;
+	if (m_pPVSObjects[12]->m_pChild->m_pSibling) m_pPVSObjects[12]->m_pChild->m_pSibling = nullptr;
+
+	m_pPVSObjects[13] = new GameObject();
+	m_pPVSObjects[13]->SetChild(pCubeModel->m_pModelRootObject, true);
+	m_pPVSObjects[13]->UpdateTransform(nullptr);
 
 	LoadSceneBushFromFile(pd3dDevice, pd3dCommandList, (char*)"Model/Bush.bin");
 
@@ -1893,6 +1940,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	if (pLobbyModel) delete pLobbyModel;
 	if (pCeilModel) delete pCeilModel;
 	if (pCubeModel) delete pCubeModel;
+	if (pGameObject) delete pGameObject;
 
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.8f);
 	m_nObjectsUIs = 9;

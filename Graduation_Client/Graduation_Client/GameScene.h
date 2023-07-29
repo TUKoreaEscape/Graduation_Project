@@ -8,7 +8,26 @@
 #include "Network.h"
 #include "Game_state.h"
 
-enum class PVSROOM {
+enum class ROOM_INFO {
+	CLASS_ROOM0 = 0,
+	CLASS_ROOM1,
+	PIANO_ROOM0,
+	PIANO_ROOM1,
+	BROADCASTING_ROOM0,
+	BROADCASTING_ROOM1,
+	BROADCASTING_ROOM2,
+	BROADCASTING_ROOM3,
+	BROADCASTING_ROOM4,
+	LOBBY_ROOM0,
+	LOBBY_ROOM1,
+	FOREST0,
+	FOREST1,
+	CUBE_ROOM,
+	TOTAL_ROOM
+};
+
+enum class PVSROOM
+{
 	CLASS_ROOM = 0,
 	PIANO_ROOM,
 	BROADCASTING_ROOM,
@@ -68,8 +87,6 @@ public:
 	int m_nWalls;
 	GameObject** m_ppWalls;
 	
-	GameObject* m_pPVSObjects[6];
-
 	GameObject* Vents[NUM_VENT];
 
 	int m_nBush;
@@ -87,8 +104,10 @@ public:
 	InteractionObject* Taggers = nullptr;
 	InteractionObject* EscapeLevers[NUM_ESCAPE_LEVER];
 
-	std::set<PVSROOM> m_sPVS[6];
+	std::set<ROOM_INFO> m_sPVS[6];
 	PVSROOM m_pvsCamera;
+	int m_nPVSRooms;
+	GameObject** m_pPVSObjects;
 
 	GameObject* Items[NUM_ITEMS];
 
@@ -164,7 +183,7 @@ public:
 	void MakeBoxes(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void MakeTaggers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void MakeEscapeLevers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-
+	
 	virtual void update(float elapsedTime, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void CheckCameraPos(const XMFLOAT3 camera);
