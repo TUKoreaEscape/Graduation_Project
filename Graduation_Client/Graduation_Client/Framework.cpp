@@ -650,9 +650,8 @@ void Framework::FrameAdvance()
 		m_pEdgeShader->OnPostRenderTarget(m_pd3dCommandList);
 		break;
 	case SPECTATOR_GAME:
-		if (scene) scene->prerender(m_pd3dCommandList); 
-		m_pDepthRenderShader->PrepareShadowMap(m_pd3dCommandList);
 		if (scene) scene->SpectatorPrerender(m_pd3dCommandList);
+		m_pDepthRenderShader->PrepareShadowMap(m_pd3dCommandList);
 		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 		m_pEdgeShader->OnPrepareRenderTarget(m_pd3dCommandList, 1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 		if (scene) scene->Spectatorrender(m_pd3dCommandList);

@@ -468,7 +468,7 @@ void OtherPlayerCamera::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
 	m_pPlayer = reinterpret_cast<Player*>(this->gameObject);
 	SetOffset(XMFLOAT3(0.0f, 1.5f, 0.0f));
-	GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
+	GenerateProjectionMatrix(0.2f, 5000.0f, ASPECT_RATIO, 60.0f);
 	SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 	SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
 
