@@ -39,6 +39,7 @@ public:
 	virtual void render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Depthrender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void OnPrepareRender() {}
+	virtual void OnPostRender() {}
 
 	template<typename T>
 	T* AddComponent();

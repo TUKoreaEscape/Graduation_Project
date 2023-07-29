@@ -46,6 +46,7 @@ public:
 	virtual void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4X4* pxmf4x4World) { }
 
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList, int nPipelineState) {}
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void ReleaseUploadBuffers() { }
@@ -58,8 +59,8 @@ public:
 protected:
 	ID3DBlob* m_pd3dVertexShaderBlob = NULL;
 	ID3DBlob* m_pd3dPixelShaderBlob = NULL;
+	ID3DBlob* m_pd3dGeometryShaderBlob = NULL;
 
-	//ID3D12PipelineState** m_ppd3dPipelineStates = NULL;
 	ID3D12PipelineState* m_ppd3dPipelineState = NULL;
 
 	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;
@@ -450,4 +451,36 @@ public:
 
 protected:
 	Texture* m_pDepthTexture = NULL;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+class ParticleShader : public Shader
+{
+public:
+	ParticleShader();
+	virtual ~ParticleShader();
+
+	virtual D3D12_PRIMITIVE_TOPOLOGY_TYPE GetPrimitiveTopologyType(int nPipelineState = 0);
+	virtual UINT GetNumRenderTargets(int nPipelineState = 0);
+	virtual DXGI_FORMAT GetRTVFormat(int nPipelineState, int nRenderTarget);
+	virtual DXGI_FORMAT GetDSVFormat(int nPipelineState = 0);
+
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int nPipelineState = 0);
+	
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(int nPipelineState = 0);
+	virtual D3D12_SHADER_BYTECODE CreateGeometryShader(int nPipelineState = 0);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(int nPipelineState = 0);
+
+	virtual D3D12_RASTERIZER_DESC CreateRasterizerState(int nPipelineState = 0);
+	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout(int nPipelineState = 0);
+	virtual D3D12_STREAM_OUTPUT_DESC CreateStreamOuputState(int nPipelineState = 0);
+	virtual D3D12_BLEND_DESC CreateBlendState(int nPipelineState = 0);
+	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState(int nPipelineState = 0);
+
+	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList, int nPipelineState);
+
+protected:
+	ID3D12PipelineState** m_ppd3dPipelineStates = NULL;
+	int									m_nPipelineStates = 0;
 };

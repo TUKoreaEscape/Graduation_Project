@@ -176,6 +176,11 @@ void Camera::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 	::memcpy(&m_pcbMappedCamera->m_xmf3Position, &m_xmf3Position, sizeof(XMFLOAT3));
 	::memcpy(&m_pcbMappedCamera->m_xmf3Direction, &m_xmf3Look, sizeof(XMFLOAT3));
 
+	XMFLOAT4X4 xmf4x4Inverse;
+	XMStoreFloat4x4(&xmf4x4Inverse, XMMatrixTranspose(XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4View))));
+	::memcpy(&m_pcbMappedCamera->m_xmf4x4InverseView, &xmf4x4Inverse, sizeof(XMFLOAT4X4));
+
+
 	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbCamera->GetGPUVirtualAddress();
 	pd3dCommandList->SetGraphicsRootConstantBufferView(0, d3dGpuVirtualAddress);
 }
