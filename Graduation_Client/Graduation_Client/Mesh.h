@@ -337,7 +337,7 @@ public:
 #define PARTICLE_TYPE_FLARE02		3
 #define PARTICLE_TYPE_FLARE03		4
 
-#define MAX_PARTICLES				300000
+#define MAX_PARTICLES				100000
 
 //#define _WITH_QUERY_DATA_SO_STATISTICS
 class ParticleVertex

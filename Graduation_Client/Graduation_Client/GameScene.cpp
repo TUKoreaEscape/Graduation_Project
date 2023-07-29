@@ -460,13 +460,20 @@ void GameScene::ReleaseObjects()
 
 	for (int i = 0; i < 8; ++i) if (Vents[i]) Vents[i]->Release();
 	if(m_pOak) m_pOak->Release();
+
+
+	if (m_ppParticleObjects)
+	{
+		for (int i = 0; i < m_nParticleObjects; i++) delete m_ppParticleObjects[i];
+		delete[] m_ppParticleObjects;
+	}
 }
 
 ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
 {
 	ID3D12RootSignature* pd3dGraphicsRootSignature = NULL;
 
-	D3D12_DESCRIPTOR_RANGE pd3dDescriptorRanges[13];
+	D3D12_DESCRIPTOR_RANGE pd3dDescriptorRanges[16];
 
 	pd3dDescriptorRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	pd3dDescriptorRanges[0].NumDescriptors = 1;
@@ -536,7 +543,7 @@ ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDe
 
 	pd3dDescriptorRanges[11].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	pd3dDescriptorRanges[11].NumDescriptors = 1;
-	pd3dDescriptorRanges[11].BaseShaderRegister = 21; 
+	pd3dDescriptorRanges[11].BaseShaderRegister = 21; // UI 
 	pd3dDescriptorRanges[11].RegisterSpace = 0;
 	pd3dDescriptorRanges[11].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
@@ -546,8 +553,25 @@ ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDe
 	pd3dDescriptorRanges[12].RegisterSpace = 0;
 	pd3dDescriptorRanges[12].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
+	pd3dDescriptorRanges[13].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	pd3dDescriptorRanges[13].NumDescriptors = 1;
+	pd3dDescriptorRanges[13].BaseShaderRegister = 31; // particle
+	pd3dDescriptorRanges[13].RegisterSpace = 0;
+	pd3dDescriptorRanges[13].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	D3D12_ROOT_PARAMETER pd3dRootParameters[21];
+	pd3dDescriptorRanges[14].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	pd3dDescriptorRanges[14].NumDescriptors = 1;
+	pd3dDescriptorRanges[14].BaseShaderRegister = 32;
+	pd3dDescriptorRanges[14].RegisterSpace = 0;
+	pd3dDescriptorRanges[14].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	pd3dDescriptorRanges[15].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	pd3dDescriptorRanges[15].NumDescriptors = 1;
+	pd3dDescriptorRanges[15].BaseShaderRegister = 33;
+	pd3dDescriptorRanges[15].RegisterSpace = 0;
+	pd3dDescriptorRanges[15].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	D3D12_ROOT_PARAMETER pd3dRootParameters[24];
 
 	pd3dRootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	pd3dRootParameters[0].Descriptor.ShaderRegister = 1; //Camera
@@ -631,7 +655,7 @@ ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDe
 	pd3dRootParameters[15].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
 	pd3dRootParameters[16].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	pd3dRootParameters[16].Descriptor.ShaderRegister = 2; //DrawOptions
+	pd3dRootParameters[16].Descriptor.ShaderRegister = 9;
 	pd3dRootParameters[16].Descriptor.RegisterSpace = 0;
 	pd3dRootParameters[16].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
@@ -656,8 +680,23 @@ ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDe
 	pd3dRootParameters[20].DescriptorTable.pDescriptorRanges = &pd3dDescriptorRanges[12]; //Depth Buffer//
 	pd3dRootParameters[20].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
+	pd3dRootParameters[21].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	pd3dRootParameters[21].DescriptorTable.NumDescriptorRanges = 1;
+	pd3dRootParameters[21].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[13]);
+	pd3dRootParameters[21].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
-	D3D12_STATIC_SAMPLER_DESC pd3dSamplerDescs[4];
+	pd3dRootParameters[22].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	pd3dRootParameters[22].DescriptorTable.NumDescriptorRanges = 1;
+	pd3dRootParameters[22].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[14]);
+	pd3dRootParameters[22].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+	pd3dRootParameters[23].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	pd3dRootParameters[23].DescriptorTable.NumDescriptorRanges = 1;
+	pd3dRootParameters[23].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[15]);
+	pd3dRootParameters[23].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+
+	D3D12_STATIC_SAMPLER_DESC pd3dSamplerDescs[6];
 
 	pd3dSamplerDescs[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
 	pd3dSamplerDescs[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
@@ -713,11 +752,37 @@ ID3D12RootSignature* GameScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDe
 	pd3dSamplerDescs[3].RegisterSpace = 0;
 	pd3dSamplerDescs[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
+	pd3dSamplerDescs[4].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	pd3dSamplerDescs[4].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	pd3dSamplerDescs[4].AddressV = D3D12_TEXTURE_ADDRESS_MODE_MIRROR;
+	pd3dSamplerDescs[4].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	pd3dSamplerDescs[4].MipLODBias = 0;
+	pd3dSamplerDescs[4].MaxAnisotropy = 1;
+	pd3dSamplerDescs[4].ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	pd3dSamplerDescs[4].MinLOD = 0;
+	pd3dSamplerDescs[4].MaxLOD = D3D12_FLOAT32_MAX;
+	pd3dSamplerDescs[4].ShaderRegister = 4;
+	pd3dSamplerDescs[4].RegisterSpace = 0;
+	pd3dSamplerDescs[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+	pd3dSamplerDescs[5].Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+	pd3dSamplerDescs[5].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	pd3dSamplerDescs[5].AddressV = D3D12_TEXTURE_ADDRESS_MODE_MIRROR;
+	pd3dSamplerDescs[5].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	pd3dSamplerDescs[5].MipLODBias = 0;
+	pd3dSamplerDescs[5].MaxAnisotropy = 1;
+	pd3dSamplerDescs[5].ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	pd3dSamplerDescs[5].MinLOD = 0;
+	pd3dSamplerDescs[5].MaxLOD = D3D12_FLOAT32_MAX;
+	pd3dSamplerDescs[5].ShaderRegister = 5;
+	pd3dSamplerDescs[5].RegisterSpace = 0;
+	pd3dSamplerDescs[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
 	D3D12_ROOT_SIGNATURE_FLAGS d3dRootSignatureFlags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_STREAM_OUTPUT |
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS;
 	D3D12_ROOT_SIGNATURE_DESC d3dRootSignatureDesc;
 	::ZeroMemory(&d3dRootSignatureDesc, sizeof(D3D12_ROOT_SIGNATURE_DESC));
 	d3dRootSignatureDesc.NumParameters = _countof(pd3dRootParameters);
@@ -919,6 +984,7 @@ void GameScene::ReleaseUploadBuffers()
 	for (int i = 0; i < m_nObjectsUIs; ++i) {
 		if (m_ppObjectsUIs[i]) m_ppObjectsUIs[i]->ReleaseUploadBuffers();
 	}
+	for (int i = 0; i < m_nParticleObjects; i++) m_ppParticleObjects[i]->ReleaseUploadBuffers();
 }
 
 void GameScene::CreateCbvSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nConstantBufferViews, int nShaderResourceViews)
@@ -1668,6 +1734,12 @@ void GameScene::MakeEscapeLevers(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.0f);
+
+	m_nParticleObjects = 1;
+	m_ppParticleObjects = new ParticleObject * [m_nParticleObjects];
+
+	m_ppParticleObjects[0] = new ParticleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, XMFLOAT3(0.0f, -100.0f, -50.0f), XMFLOAT3(0.0f, 50.0f, 0.0f), 0.0f, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f), MAX_PARTICLES);
+
 	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.2f);
@@ -1695,7 +1767,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		for (int j = 0; j < 6; ++j)
 			GameObject::SetParts(i + 1, j, 0);
 		m_ppPlayers[i]->PlayerNum = i + 1;
-		m_ppPlayers[i]->SetPlayerType(TYPE_PLAYER_YET);
+		m_ppPlayers[i]->SetPlayerType(TYPE_ESCAPE_PLAYER);
 	}
 	m_ppPlayers[0]->SetPosition(XMFLOAT3(6.0f, 0.0f, -5.0f));
 	m_ppPlayers[1]->SetPosition(XMFLOAT3(3.0f, 0.0f, -5.0f));
@@ -1964,6 +2036,8 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_ppObjectsUIs[7] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fEscape.dds");
 	m_ppObjectsUIs[8] = new InteractionUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/fActivate.dds");
 
+	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.9f);
+
 	MakeVents(pd3dDevice, pd3dCommandList);
 	MakeDoors(pd3dDevice, pd3dCommandList);
 	MakePowers(pd3dDevice, pd3dCommandList);
@@ -2004,4 +2078,14 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	send_thread = std::thread{ &Network::Debug_send_thread, m_network };
 #endif
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(1.0f);
+}
+
+void GameScene::RenderParticle(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	for (int i = 0; i < m_nParticleObjects; i++) m_ppParticleObjects[i]->Render(pd3dCommandList);
+}
+
+void GameScene::OnPostRenderParticle()
+{
+	for (int i = 0; i < m_nParticleObjects; i++) m_ppParticleObjects[i]->OnPostRender();
 }

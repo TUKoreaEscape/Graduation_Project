@@ -2486,11 +2486,13 @@ ParticleObject::ParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	renderer = new StandardRenderer();
 	renderer = static_cast<StandardRenderer*>(renderer);
 	renderer->gameObject = this;
-
+	renderer->m_nMaterials = 1;
+	renderer->m_ppMaterials = new Material * [renderer->m_nMaterials];
+	renderer->m_ppMaterials[0] = new Material(0);
 	SetPosition(xmf3Position);
 
 	Texture* pParticleTexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pParticleTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/RoundSoftParticle.dds", RESOURCE_TEXTURE2D, 0);
+	pParticleTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Texture/RoundSoftParticle.dds", RESOURCE_TEXTURE2D, 0);
 
 	Material* pMaterial = new Material(1);
 	pMaterial->SetTexture(pParticleTexture);
@@ -2511,9 +2513,9 @@ ParticleObject::ParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	pShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, 2);
 	pShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	
-	GameScene::CreateShaderResourceViews(pd3dDevice, pParticleTexture, 0, 18);
-	GameScene::CreateShaderResourceViews(pd3dDevice, m_pRandowmValueTexture, 0, 19);
-	GameScene::CreateShaderResourceViews(pd3dDevice, m_pRandowmValueOnSphereTexture, 0, 20);
+	GameScene::CreateShaderResourceViews(pd3dDevice, pParticleTexture, 0, 21);
+	GameScene::CreateShaderResourceViews(pd3dDevice, m_pRandowmValueTexture, 0, 22);
+	GameScene::CreateShaderResourceViews(pd3dDevice, m_pRandowmValueOnSphereTexture, 0, 23);
 
 	//SetCbvGPUDescriptorHandle(pShader->GetGPUCbvDescriptorStartHandle());
 

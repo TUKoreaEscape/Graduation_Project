@@ -1972,8 +1972,6 @@ void ParticleShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 	m_nPipelineStates = nPipelineState;
 	m_ppd3dPipelineStates = new ID3D12PipelineState * [m_nPipelineStates];
 
-	Shader::CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature); //Stream Output Pipeline State
-	
 	::ZeroMemory(&m_d3dPipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 
 	m_d3dPipelineStateDesc.pRootSignature = pd3dGraphicsRootSignature;
@@ -1994,6 +1992,8 @@ void ParticleShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 	m_d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
 	HRESULT hResult = pd3dDevice->CreateGraphicsPipelineState(&m_d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_ppd3dPipelineStates[0]);
+
+	::ZeroMemory(&m_d3dPipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 
 	m_d3dPipelineStateDesc.pRootSignature = pd3dGraphicsRootSignature;
 	m_d3dPipelineStateDesc.VS = CreateVertexShader(1);

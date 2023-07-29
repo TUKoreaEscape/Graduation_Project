@@ -40,6 +40,7 @@ enum class PVSROOM
 class InteractionUI;
 class InteractionObject;
 class ItemBox;
+class ParticleObject;
 //GameScene과 Scene을 분리해놓은 이유
 //GameScene에서 게임내의 플레이어 생성, 오브젝트 배치, 상태 등을 따로 관리하기 위해.
 class GameScene : public Scene
@@ -193,4 +194,11 @@ public:
 
 	friend class Framework;
 	friend class LaplacianEdgeShader;
+
+public:
+	ParticleObject** m_ppParticleObjects = NULL;
+	int							m_nParticleObjects = 0;
+
+	void RenderParticle(ID3D12GraphicsCommandList* pd3dCommandList);
+	void OnPostRenderParticle();
 };

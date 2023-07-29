@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Mesh.h"
 #include "GameObject.h"
+#include "Game_state.h"
 
 Mesh::Mesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
@@ -1142,8 +1143,18 @@ void ParticleMesh::Render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipel
 		D3D12_STREAM_OUTPUT_BUFFER_VIEW pStreamOutputBufferViews[1] = { m_d3dStreamOutputBufferView };
 		pd3dCommandList->SOSetTargets(0, 1, pStreamOutputBufferViews);
 
+		pd3dCommandList->IASetPrimitiveTopology(m_d3dPrimitiveTopology);
+		pd3dCommandList->IASetVertexBuffers(m_nSlot, 1, &m_d3dVertexBufferView);
 
-		Mesh::Render(pd3dCommandList); //Stream Output to m_pd3dStreamOutputBuffer
+		if ((m_nSubMeshes > 0) && (0 < m_nSubMeshes))
+		{
+			pd3dCommandList->IASetIndexBuffer(&(m_pd3dSubSetIndexBufferViews[0]));
+			pd3dCommandList->DrawIndexedInstanced(m_pnSubSetIndices[0], 1, 0, 0, 0);
+		}
+		else
+		{
+			pd3dCommandList->DrawInstanced(m_nVertices, 1, m_nOffset, 0);
+		}
 
 		::SynchronizeResourceTransition(pd3dCommandList, m_pd3dDefaultBufferFilledSize, D3D12_RESOURCE_STATE_STREAM_OUT, D3D12_RESOURCE_STATE_COPY_SOURCE);
 		pd3dCommandList->CopyResource(m_pd3dReadBackBufferFilledSize, m_pd3dDefaultBufferFilledSize);
@@ -1153,7 +1164,18 @@ void ParticleMesh::Render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipel
 	{
 		pd3dCommandList->SOSetTargets(0, 1, NULL);
 
-		Mesh::Render(pd3dCommandList); //Render m_pd3dDrawBuffer 
+		pd3dCommandList->IASetPrimitiveTopology(m_d3dPrimitiveTopology);
+		pd3dCommandList->IASetVertexBuffers(m_nSlot, 1, &m_d3dVertexBufferView);
+
+		if ((m_nSubMeshes > 0) && (0 < m_nSubMeshes))
+		{
+			pd3dCommandList->IASetIndexBuffer(&(m_pd3dSubSetIndexBufferViews[0]));
+			pd3dCommandList->DrawIndexedInstanced(m_pnSubSetIndices[0], 1, 0, 0, 0);
+		}
+		else
+		{
+			pd3dCommandList->DrawInstanced(m_nVertices, 1, m_nOffset, 0);
+		}
 	}
 }
 
@@ -1170,6 +1192,11 @@ void ParticleMesh::OnPostRender(int nPipelineState)
 		m_nVertices = UINT(*pnReadBackBufferFilledSize) / m_nStride;
 		m_pd3dReadBackBufferFilledSize->Unmap(0, NULL);
 
-		if ((m_nVertices == 0) || (m_nVertices >= MAX_PARTICLES)) m_bStart = true;
+		if ((m_nVertices == 0) || (m_nVertices >= MAX_PARTICLES)) {
+				m_bStart = true;
+		}
+		if (GameState::GetInstance()->GetGameState() != ENDING_GAME) {
+			m_bStart = true;
+		}
 	}
 }

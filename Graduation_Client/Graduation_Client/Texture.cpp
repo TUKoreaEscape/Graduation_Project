@@ -24,6 +24,8 @@ Texture::Texture(int nTextures, UINT nTextureType, int nSamplers, int nRootParam
 		for (int i = 0; i < m_nTextures; i++) m_pnResourceTypes[i] = DXGI_FORMAT_UNKNOWN;
 		m_pnBufferElements = new int[m_nTextures];
 		for (int i = 0; i < m_nTextures; i++) m_pnBufferElements[i] = 0;
+		m_pnBufferStrides = new int[m_nTextures];
+		for (int i = 0; i < m_nTextures; i++) m_pnBufferStrides[i] = 0;
 	}
 	m_nRootParameters = nRootParameters;
 	if (nRootParameters > 0) m_pnRootParameterIndices = new int[nRootParameters];

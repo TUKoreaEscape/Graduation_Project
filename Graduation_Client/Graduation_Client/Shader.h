@@ -480,7 +480,7 @@ public:
 
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList, int nPipelineState);
 
-private:
+protected:
 	ID3D12PipelineState** m_ppd3dPipelineStates = NULL;
 	int									m_nPipelineStates = 0;
 };
