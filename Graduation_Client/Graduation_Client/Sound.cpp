@@ -116,6 +116,7 @@ void Sound::PlayBG(int index)
 
 void Sound::PlayObjectSound(int index, float volume)
 {
+	if (index == -1) return;
 	m_pSystem->playSound(m_vObjectSounds[index], nullptr, true, &m_vObjectChannels[index]);
 	m_vObjectChannels[index]->setVolume(volume);
 	m_vObjectChannels[index]->set3DAttributes(&m_vObjectPosition[index], 0);
@@ -124,6 +125,7 @@ void Sound::PlayObjectSound(int index, float volume)
 
 void Sound::PlayEffectSound(int index, float volume)
 {
+	if (index == -1) return;
 	m_pSystem->playSound(m_vSounds[index], nullptr, false, &m_pEffectChannel);
 }
 
@@ -134,11 +136,13 @@ void Sound::Stop(int index, int OtherPlayer)
 
 void Sound::StopBG(int index)
 {
+	if (index == -1) return;
 	m_pBGChannel->stop();
 }
 
 void Sound::StopObjectSound(int index)
 {
+	if (index == -1) return;
 	m_vObjectChannels[index]->stop();
 }
 
