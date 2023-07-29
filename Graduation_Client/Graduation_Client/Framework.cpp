@@ -306,6 +306,7 @@ void Framework::CreateDirect2DDevice()
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::LightSalmon, 1.0f), &m_pd2dlightsalmonText);
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black, 1.0f), &m_pd2dblackText);
 	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::CadetBlue, 1.0f), &m_pd2dCadetBlueText);
+	m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White, 1.0f), &m_pd2dWhiteText);
 
 	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdLoginFont, 4096.0f, 4096.0f, &m_pdwTextLayout);
 	hResult = m_pdWriteFactory->CreateTextLayout(L"텍스트 레이아웃", 8, m_pdRoomTitleFont, 4096.0f, 4096.0f, &m_pdRoomTitleFLayout);
@@ -1011,6 +1012,15 @@ void Framework::TextRender()
 				}
 			}
 		}
+
+		if (m_gamestate->IsTexting())
+		{
+			std::wstring num = L"민감도 : " + std::to_wstring(Input::GetInstance()->GetSensitivity());
+			D2D1_RECT_F rcLowerText = D2D1::RectF(customizingRect[0].left, customizingRect[0].top, customizingRect[0].right, customizingRect[0].bottom);
+			m_pd2dDeviceContext->DrawTextW(num.c_str(), (UINT32)wcslen(num.c_str()), m_pdwWaitingRoomLayout, &rcLowerText, m_pd2dWhiteText);
+		}
+
+		m_gamestate->UpdateTexting(time.GetTimeElapsed());
 
 		m_pd2dDeviceContext->EndDraw();
 

@@ -98,6 +98,7 @@ private:
 	ID2D1SolidColorBrush* m_pd2dlightsalmonText = NULL;
 	ID2D1SolidColorBrush* m_pd2dblackText = NULL;
 	ID2D1SolidColorBrush* m_pd2dCadetBlueText = NULL;
+	ID2D1SolidColorBrush* m_pd2dWhiteText = NULL;
 	
 	Input*			input;
 	GameScene*		scene;

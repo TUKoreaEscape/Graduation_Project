@@ -33,6 +33,10 @@ private:
 	float				m_Loading = 0.0f;
 	int					m_LoadingCount = 0;
 	bool				m_MinimapOn = false;
+
+	float				m_totalTexting = 1.0f;
+	float				m_Texting = 0.0f;
+	int					m_TextingCount = 0;
 	GameState() {}
 	GameState(const GameState& other);
 	~GameState() {}
@@ -61,6 +65,9 @@ public:
 	void UpdateLoading(float time) { m_Loading += time, m_LoadingCount = (m_LoadingCount + 1) % 4; };
 	void SetLoading(float time) { m_totalLoading = time, m_Loading = 0.0f, m_LoadingCount = 0; };
 	int LoadingCount() { return m_LoadingCount; };
+	bool IsTexting() { return m_totalTexting > m_Texting; }; //로딩중이면 true
+	void UpdateTexting(float time) { m_Texting += time; };
+	void SetTexting(float time) { m_totalTexting = time, m_Texting = 0.0f; };
 	GAME_STATE GetGameState() { return m_GameState; };
 	bool GetTick();
 	bool GetInitLight() { return initLight; };

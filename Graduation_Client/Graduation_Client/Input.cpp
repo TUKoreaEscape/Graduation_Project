@@ -19,8 +19,8 @@ void Input::Update(HWND hWnd)
 	{
 		SetCursor(NULL);
 		GetCursorPos(&ptCursorPos);
-		cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 5.0f;
-		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 5.0f;
+		cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / m_Sensitivity;
+		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / m_Sensitivity;
 		SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
 	}
 
@@ -169,6 +169,18 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 				bool debug = m_pPlayer->GetPvsDebugDemo();
 				m_pPlayer->SetPvsDebugDemo(!debug); 
 			}
+		}
+		if (wParam == '9' && !m_gamestate->GetChatState())
+		{
+			m_Sensitivity += 1;
+			GameState::GetInstance()->SetTexting(1.0f);
+			//std::cout << m_Sensitivity << std::endl;
+		}
+		else if (wParam == '0' && !m_gamestate->GetChatState() && m_Sensitivity>1)
+		{
+			m_Sensitivity -= 1;
+			GameState::GetInstance()->SetTexting(1.0f);
+			//std::cout << m_Sensitivity << std::endl;
 		}
 		break;
 	default:

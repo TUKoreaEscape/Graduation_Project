@@ -48,6 +48,8 @@ public:
 	bool							m_curstateon = false;
 	bool							m_ClickState = false;
 
+	float							m_Sensitivity = 5.0f;
+
 	int								m_nClickSound = -1;
 
 	TCHAR tmp[100]{NULL}; //입력받는 문자열을 담을 버퍼
@@ -83,6 +85,7 @@ public:
 	bool GetClickState() { return m_ClickState; };
 	void SetClickState(bool value) { m_ClickState = value; };
 	bool IsWindowCaptured(HWND hWnd, int x, int y);
+	float GetSensitivity() { return m_Sensitivity; };
 };
 
 //input 클래스는 입력을 처리하기 위한 클래스입니다.
