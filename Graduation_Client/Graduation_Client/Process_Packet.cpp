@@ -128,6 +128,9 @@ void Network::Process_Game_End(char* ptr)
     for (int i = 0; i < 5; ++i)
         m_other_player_ready[i] = false;
 
+    for (int i = 0; i < NUM_ESCAPE_LEVER; ++i)
+        reinterpret_cast<EscapeObject*>(m_EscapeLevers[i])->Init_By_GameEnd();
+
     reinterpret_cast<TaggersBox*>(m_Taggers_Box)->Reset();
 
     GameState& game_state = *GameState::GetInstance();

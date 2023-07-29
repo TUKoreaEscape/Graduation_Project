@@ -267,6 +267,8 @@ void cGameServer::WorkerThread()
 				return;
 
 			m_clients[rl.Get_Tagger_ID()].set_third_skill_enable();
+			if (m_clients[rl.Get_Tagger_ID()].get_second_skill_enable() == false)
+				m_clients[rl.Get_Tagger_ID()].set_second_skill_enable();
 
 			sc_packet_tagger_skill packet;
 			packet.size = sizeof(packet);
@@ -276,6 +278,12 @@ void cGameServer::WorkerThread()
 			packet.third_skill = m_clients[rl.Get_Tagger_ID()].get_third_skill_enable();
 
 			m_clients[rl.Get_Tagger_ID()].do_send(sizeof(packet), &packet);
+
+			TIMER_EVENT next_ev;
+			next_ev.room_number = static_cast<int>(iocp_key);
+			next_ev.event_time = chrono::system_clock::now() + static_cast<chrono::seconds>(GAME_END_SECOND);
+			next_ev.event_type = EventType::GAME_END;
+			m_timer_queue.push(next_ev);
 			delete exp_over;
 			break;
 		}

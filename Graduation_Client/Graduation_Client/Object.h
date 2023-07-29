@@ -396,6 +396,7 @@ public:
 	void SetID(int id) { m_escapeobject_id = id; }
 	int	 GetID() { return m_escapeobject_id; }
 	void SetReal() { m_bIsReal = true; };
+	void Init_By_GameEnd() { m_bIsReal = false; IsWorking = false; }
 	
 	void SetWorking();
 

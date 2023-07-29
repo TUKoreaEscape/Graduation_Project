@@ -56,12 +56,8 @@ void Room::Start_Game()
 	auto start_time = chrono::system_clock::now();
 	TIMER_EVENT ev;
 	ev.room_number = room_number;
-	ev.event_type = EventType::GAME_END;
-	ev.event_time = start_time + static_cast<chrono::seconds>(GAME_END_SECOND);
-	server.m_timer_queue.push(ev);
-
 	ev.event_type = EventType::SELECT_TAGGER;
-	ev.event_time = start_time + 5s;
+	ev.event_time = start_time + static_cast<chrono::seconds>(SELECT_TAGGER_SECOND);
 	server.m_timer_queue.push(ev);
 
 	Set_Electronic_System_ONOFF();

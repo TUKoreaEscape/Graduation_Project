@@ -9,6 +9,7 @@
 #define  DIR_NO 100
 #define  USE_NETWORK 1
 #define	 USE_VOICE 0
+#define	 DEMO 1
 
 class Door;
 class ItemBox;

@@ -1,4 +1,5 @@
 #pragma once
+#include "Network.h"
 #include "Game_state.h"
 #include "Input.h"
 #include "Camera.h"
@@ -28,7 +29,11 @@ void GameState::ChangeNextState()
 			player->ChangeCamera(WAITING_GAME, READY_TO_GAME);
 			m_GameState = READY_TO_GAME;
 			taggerTime = std::chrono::steady_clock::now();
+#if DEMO	
+			taggercountdown = 10;
+#else
 			taggercountdown = 60;
+#endif
 			SetLoading(2.0f);
 			sound.StopBG(m_nWaitingBG);
 			sound.PlayBG(m_nGameBG);
