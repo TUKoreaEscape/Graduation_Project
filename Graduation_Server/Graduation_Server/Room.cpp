@@ -658,9 +658,9 @@ CollisionInfo Room::is_collision_player_to_player(const int& player_id, const XM
 	BoundingOrientedBox player_bounding_box = client.get_bounding_box();
 	for (int i = 0; i < Number_of_users; ++i)
 	{
-		if (in_player[i] == player_id)
-			continue;
 		if (in_player[i] == -1)
+			continue;
+		if (in_player[i] == player_id)
 			continue;
 		if (true == server.m_clients[in_player[i]].get_escape_state())
 			continue;
