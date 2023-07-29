@@ -2477,3 +2477,90 @@ void PvsRoom::SetPvs(int num)
 		m_ppPvs[i] = FindFrame(str.c_str());
 	}
 }
+
+ParticleObject::ParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Velocity, float fLifetime, XMFLOAT3 xmf3Acceleration, XMFLOAT3 xmf3Color, XMFLOAT2 xmf2Size, UINT nMaxParticles)
+{
+	ParticleMesh* pMesh = new ParticleMesh(pd3dDevice, pd3dCommandList, xmf3Position, xmf3Velocity, fLifetime, xmf3Acceleration, xmf3Color, xmf2Size, nMaxParticles);
+	SetMesh(pMesh);
+
+	renderer = new StandardRenderer();
+	renderer = static_cast<StandardRenderer*>(renderer);
+	renderer->gameObject = this;
+
+	SetPosition(xmf3Position);
+
+	Texture* pParticleTexture = new Texture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pParticleTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/RoundSoftParticle.dds", RESOURCE_TEXTURE2D, 0);
+
+	Material* pMaterial = new Material(1);
+	pMaterial->SetTexture(pParticleTexture);
+
+	srand((unsigned)time(NULL));
+
+	XMFLOAT4* pxmf4RandomValues = new XMFLOAT4[1024];
+	for (int i = 0; i < 1024; i++) { pxmf4RandomValues[i].x = float((rand() % 10000) - 5000) / 5000.0f; pxmf4RandomValues[i].y = float((rand() % 10000) - 5000) / 5000.0f; pxmf4RandomValues[i].z = float((rand() % 10000) - 5000) / 5000.0f; pxmf4RandomValues[i].w = float((rand() % 10000) - 5000) / 5000.0f; }
+
+	//	m_pRandowmValueTexture = new CTexture(1, RESOURCE_TEXTURE1D, 0, 1);
+	m_pRandowmValueTexture = new Texture(1, RESOURCE_BUFFER, 0, 1);
+	m_pRandowmValueTexture->CreateBuffer(pd3dDevice, pd3dCommandList, pxmf4RandomValues, 1024, sizeof(XMFLOAT4), DXGI_FORMAT_R32G32B32A32_FLOAT, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_GENERIC_READ, 0);
+
+	m_pRandowmValueOnSphereTexture = new Texture(1, RESOURCE_TEXTURE1D, 0, 1);
+	m_pRandowmValueOnSphereTexture->CreateBuffer(pd3dDevice, pd3dCommandList, pxmf4RandomValues, 256, sizeof(XMFLOAT4), DXGI_FORMAT_R32G32B32A32_FLOAT, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_GENERIC_READ, 0);
+
+	ParticleShader* pShader = new ParticleShader();
+	pShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, 2);
+	pShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	
+	GameScene::CreateShaderResourceViews(pd3dDevice, pParticleTexture, 0, 18);
+	GameScene::CreateShaderResourceViews(pd3dDevice, m_pRandowmValueTexture, 0, 19);
+	GameScene::CreateShaderResourceViews(pd3dDevice, m_pRandowmValueOnSphereTexture, 0, 20);
+
+	//SetCbvGPUDescriptorHandle(pShader->GetGPUCbvDescriptorStartHandle());
+
+	pMaterial->SetShader(pShader);
+	renderer->SetMaterial(0, pMaterial);
+}
+
+ParticleObject::~ParticleObject()
+{
+	if (m_pRandowmValueTexture) m_pRandowmValueTexture->Release();
+	if (m_pRandowmValueOnSphereTexture) m_pRandowmValueOnSphereTexture->Release();
+}
+
+void ParticleObject::ReleaseUploadBuffers()
+{
+	if (m_pRandowmValueTexture) m_pRandowmValueTexture->ReleaseUploadBuffers();
+	if (m_pRandowmValueOnSphereTexture) m_pRandowmValueOnSphereTexture->ReleaseUploadBuffers();
+
+	GameObject::ReleaseUploadBuffers();
+}
+
+void ParticleObject::Render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	OnPrepareRender();
+	
+	for (int i = 0; i < renderer->m_nMaterials; ++i) {
+		if (renderer->m_ppMaterials[i]) {
+			if (renderer->m_ppMaterials[i]->m_pShader) renderer->m_ppMaterials[i]->m_pShader->OnPrepareRender(pd3dCommandList, 0);
+			if (renderer->m_ppMaterials[i]) renderer->m_ppMaterials[i]->UpdateShaderVariables(pd3dCommandList);
+		}
+		if (m_pRandowmValueTexture) m_pRandowmValueTexture->UpdateShaderVariables(pd3dCommandList);
+		if (m_pRandowmValueOnSphereTexture) m_pRandowmValueOnSphereTexture->UpdateShaderVariables(pd3dCommandList);
+	}
+
+	renderer->UpdateShaderVariable(pd3dCommandList, &m_xmf4x4World);
+
+	if (m_pMesh) m_pMesh->PreRender(pd3dCommandList, 0); //Stream Output
+	if (m_pMesh) m_pMesh->Render(pd3dCommandList, 0); //Stream Output
+	if (m_pMesh) m_pMesh->PostRender(pd3dCommandList, 0); //Stream Output
+
+	if (renderer->m_ppMaterials[0] && renderer->m_ppMaterials[0]->m_pShader) renderer->m_ppMaterials[0]->m_pShader->OnPrepareRender(pd3dCommandList, 1);
+
+	if (m_pMesh) m_pMesh->PreRender(pd3dCommandList, 1); //Draw
+	if (m_pMesh) m_pMesh->Render(pd3dCommandList, 1); //Draw
+}
+
+void ParticleObject::OnPostRender()
+{
+	if (m_pMesh) m_pMesh->OnPostRender(0); //Read Stream Output Buffer Filled Size
+}

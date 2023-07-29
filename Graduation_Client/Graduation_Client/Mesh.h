@@ -88,6 +88,11 @@ public:
 	virtual void OnPostRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
 
 	virtual void LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName) {}
+
+	virtual void PreRender(ID3D12GraphicsCommandList* pd3dCommandList, int nPipelineState) { }
+	virtual void PostRender(ID3D12GraphicsCommandList* pd3dCommandList, int nPipelineState) { }
+
+	virtual void OnPostRender(int nPipelineState) { }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
