@@ -600,6 +600,14 @@ void cGameServer::Process_Attack(const int user_id)
 
 				m_timer_queue.push(ev);
 
+				sc_packet_attack attack_packet;
+				attack_packet.size = sizeof(attack_packet);
+				attack_packet.type = SC_PACKET::SC_PACKET_ATTACK;
+				attack_packet.attacker_id = user_id;
+				attack_packet.victim_id = other_player_id;
+
+				m_clients[other_player_id].do_send(sizeof(attack_packet), &attack_packet);
+
 				if (m_clients[other_player_id].get_life_chip() && room.Get_Tagger_ID() == user_id && room.Is_Tagger_Get_Life_Chip() == false && room.m_altar->Get_Valid() == true)
 				{
 					room.Tagger_Get_Life_Chip(true);

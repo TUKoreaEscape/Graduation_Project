@@ -79,7 +79,7 @@ void Light::Updaterotate()
 		rotationAngle = 270.0f;
 		rotationSpeed = 0.25f;
 
-		 global = 0.7f;
+		 global = 0.8f;
 		m_xmf4GlobalAmbient = XMFLOAT4(global, global, global, 1.0f);
 
 		m_pLights[0].m_bEnable = true;
@@ -107,7 +107,7 @@ void Light::Updaterotate()
 	if (m_pLights[0].m_xmf3Direction.y < 0 && dayAndnight)
 	{
 
-		 global = m_pLights[0].m_xmf3Direction.y * -0.5 + 0.3f;
+		 global = m_pLights[0].m_xmf3Direction.y * -0.5 + 0.4f;
 		m_xmf4GlobalAmbient = XMFLOAT4(global, global, global, 1.0f);
 
 		float diffuse = m_pLights[0].m_xmf3Direction.y * -1.0f;
