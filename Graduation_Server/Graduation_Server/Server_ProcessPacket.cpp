@@ -1084,6 +1084,7 @@ void cGameServer::Process_EscapeSystem(const int user_id, void* buff)
 	}
 	room.m_escape_system[packet->index].Working_Escape();
 
+
 	sc_packet_request_escapesystem_working update_packet;
 	for (int i = 0; i < room.in_escape_player.size(); ++i) {
 		if (room.in_escape_player[i] == -1) {
@@ -1095,6 +1096,22 @@ void cGameServer::Process_EscapeSystem(const int user_id, void* buff)
 			break;
 		}
 	}
+
+	int total_check = 0;
+	bool all_player_escape = true;
+	for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i) {
+		if (room.in_player[i] == -1)
+			continue;
+		total_check++;
+	}
+
+	for (int i = 0; i < total_check; ++i) {
+		if (room.in_escape_player[i] == -1) {
+			all_player_escape = false;
+			break;
+		}
+	}
+
 	update_packet.size = sizeof(update_packet);
 	update_packet.type = SC_PACKET::SC_PACKET_REQUEST_ESCAPESYSTEM_WORKING;
 	update_packet.index = packet->index;
@@ -1104,6 +1121,12 @@ void cGameServer::Process_EscapeSystem(const int user_id, void* buff)
 		if (player_id == -1)
 			continue;
 		m_clients[player_id].do_send(sizeof(update_packet), &update_packet);
+	}
+
+	if (all_player_escape == true) {
+		EXP_OVER* over = new EXP_OVER;
+		over->m_comp_op = OP_TYPE::OP_GAME_END_BY_ESCAPE_SYSTEM;
+		PostQueuedCompletionStatus(C_IOCP::m_h_iocp, 1, m_clients[user_id].get_join_room_number(), &over->m_wsa_over);
 	}
 
 	// 밑의 코드는 탈출장치를 한번 가동시 랜덤으로 또 지정해주기 위해 작성해둔 코드입니다. 아직은 미사용
