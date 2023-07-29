@@ -438,6 +438,8 @@ void cGameServer::WorkerThread()
 			packet.is_tagger_win = false; // 이건 방에서 누가 이겼는지 조건을 넘겨줘야함
 
 			for (auto& player_id : rl.in_player) {
+				if (player_id == -1)
+					continue;
 				m_clients[player_id].Add_Total_Play();
 				if (player_id == rl.Get_Tagger_ID())
 					m_clients[player_id].Add_Tagger_Play();
