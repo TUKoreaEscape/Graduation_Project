@@ -359,12 +359,15 @@ public:
 
 	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
 	virtual D3D12_RASTERIZER_DESC CreateRasterizerState();
+	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout(int pipeline);
 
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(int pipeline);
 
 	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void ReleaseShaderVariables();
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nRenderTargets, DXGI_FORMAT* pdxgiRtvFormats, DXGI_FORMAT dxgiDsvFormat);
 
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
 	virtual void ReleaseObjects();
@@ -399,6 +402,9 @@ protected:
 
 	ID3D12Resource* m_pd3dcbToLightSpaces = NULL;
 	TOLIGHTSPACES* m_pcbMappedToLightSpaces = NULL;
+
+	ID3D12PipelineState** m_ppd3dPipelineStates = NULL;
+	int									m_nPipelineStates = 0;
 };
 
 class ShadowMapShader : public DeferredObjectsShader
