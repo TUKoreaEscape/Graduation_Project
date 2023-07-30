@@ -618,6 +618,7 @@ void Network::Process_Active_Altar(char* ptr)
     sc_packet_activate_altar* packet = reinterpret_cast<sc_packet_activate_altar*>(ptr);
     // 여기서 술래 재단을 활성화 해야함.
     m_Taggers_Box;
+    m_pPlayer->SetInfo(ACTIVATE_ALTAR);
     std::cout << "술래가 재단을 활성화 하였습니다" << std::endl;
 }
 

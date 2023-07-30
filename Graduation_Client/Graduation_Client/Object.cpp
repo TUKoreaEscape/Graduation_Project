@@ -2001,9 +2001,10 @@ TaggersBox::TaggersBox()
 		m_ppChips[i] = nullptr;
 	}
 
-	m_nSound = 1;
+	m_nSound = 2;
 	m_pSounds = new int[m_nSound];
-	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Door.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 30.0f, 80.0f);
+	m_pSounds[0] = Sound::GetInstance()->CreateObjectSound("Sound/Activate.wav", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 50.0f, 100.0f);
+	m_pSounds[1] = Sound::GetInstance()->CreateObjectSound("Sound/CollectChip.mp3", m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43, 30.0f, 80.0f);
 }
 
 TaggersBox::~TaggersBox()
@@ -2125,6 +2126,7 @@ void TaggersBox::Interaction(int playerType)
 			m_fCooltime = 0;
 			m_bActivate = true;
 			IsInteraction = false;
+			Sound::GetInstance()->PlayObjectSound(m_pSounds[0], 1.0f);
 		}
 	}
 }
@@ -2158,6 +2160,8 @@ void TaggersBox::SetPosition(float x, float y, float z)
 void TaggersBox::CollectChip()
 {
 	m_ppChips[m_nLifeChips++]->SetDraw(false);
+	Sound& sound = *Sound::GetInstance();
+	sound.PlayObjectSound(m_pSounds[1], 1.0f);
 }
 
 void TaggersBox::Reset()

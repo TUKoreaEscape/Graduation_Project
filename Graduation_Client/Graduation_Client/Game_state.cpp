@@ -175,7 +175,7 @@ void GameState::SetBG()
 	m_nLoginBG = Sound::GetInstance()->CreateBGSound("Sound/LoginBGM.mp3", 0);
 	m_nSelectBG = Sound::GetInstance()->CreateBGSound("Sound/RoomSelect_WaitingRoomBGM.mp3", 0);
 	m_nWaitingBG = Sound::GetInstance()->CreateBGSound("Sound/RoomSelect_WaitingRoomBGM.mp3", 0);
-	m_nGameBG = Sound::GetInstance()->CreateBGSound("Sound/Unwelcome_School.mp3", 0);
-	m_nEndingBG = Sound::GetInstance()->CreateBGSound("Sound/Aquarium.mp3", 0);
+	m_nGameBG = Sound::GetInstance()->CreateBGSound("Sound/InGameBGM.mp3", 0);
+	m_nEndingBG = Sound::GetInstance()->CreateBGSound("Sound/EndingBGM.mp3", 0);
 	m_nCustomBG = Sound::GetInstance()->CreateBGSound("Sound/CustomizingBGM.mp3", 0);
 }

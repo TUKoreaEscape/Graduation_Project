@@ -1886,7 +1886,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_UIPlay[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/ChatBox.dds", -0.1f, -0.7f, 0.6f, 0.6f);//chatBox
 	m_UIPlay[5] = new MinimapUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Minimap2.dds", 0.0f, 0.0f, 1.0f, 1.0f);//Minimap
 	m_UIPlay[6] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SpectatorMode.dds", 0.0f, -0.9f, 0.4f, 0.4f);//관전표시
-	m_UIPlay[7] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Command.dds", 0.5f, 0.3f, 1.2f, 1.2f);//관전표시
+	m_UIPlay[7] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Command.dds", 0.0f, 0.0f, 1.5f, 1.5f);//조작법
 
 
 	m_nPlayPlayer = 1 + 5 + 1;
@@ -1922,7 +1922,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_ppAnswerUIs[9] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, -0.088f, 0.08f, 0.04f);
 	m_ppAnswerUIs[10] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, -0.144f, 0.08f, 0.04f);
 
-	m_nInfoUI = 6;
+	m_nInfoUI = 7;
 	m_ppInfoUIs = new GameObject * [m_nInfoUI];
 	m_ppInfoUIs[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/FixSuccess.dds", 0.0f, 0.7f, 1.0f, 0.3f);
 	m_ppInfoUIs[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/FixFail.dds", 0.0f, 0.7f, 1.0f, 0.3f);
@@ -1930,6 +1930,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_ppInfoUIs[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/WorkingEscapeSystem.dds", 0.0f, 0.7f, 1.0f, 0.3f);
 	m_ppInfoUIs[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/EscapeSuccess.dds", 0.0f, 0.7f, 1.0f, 0.3f);
 	m_ppInfoUIs[5] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SelectTagger.dds", 0.0f, 0.7f, 1.0f, 0.3f);
+	m_ppInfoUIs[6] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/ActivateTagger.dds", 0.0f, 0.7f, 1.0f, 0.3f);
 
 	LPVOID m_pTerrain[ROOM_COUNT]{ m_pMainTerrain ,m_pPianoTerrain,m_pBroadcastTerrain, m_pCubeTerrain ,m_pForestTerrain,m_pClassroomTerrain };
 
