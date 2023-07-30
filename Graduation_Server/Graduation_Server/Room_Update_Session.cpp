@@ -128,8 +128,9 @@ void Room::End_Game(bool is_tagger_win)
 
 	for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
 	{
-		if (in_player[i] != -1)
-			server.send_put_player_data(in_player[i]);
+		if (in_player[i] == -1)
+			continue;
+		server.send_put_player_data(in_player[i]);
 		for (int idx = 0; idx < JOIN_ROOM_MAX_USER; ++idx)
 		{
 			if (in_player[idx] == -1)

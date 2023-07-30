@@ -418,8 +418,6 @@ void cGameServer::WorkerThread()
 						continue;
 					if (rl.in_player[i] == rl.in_player[idx])
 						continue;
-					if (rl.in_player[idx] == -1)
-						continue;
 					send_put_other_player(rl.in_player[i], rl.in_player[idx]);
 				}
 			}
@@ -485,15 +483,14 @@ void cGameServer::WorkerThread()
 
 			for (int i = 0; i < JOIN_ROOM_MAX_USER; ++i)
 			{
-				if (rl.in_player[i] != -1)
-					send_put_player_data(rl.in_player[i]);
+				if (rl.in_player[i] == -1)
+					continue;
+				send_put_player_data(rl.in_player[i]);
 				for (int idx = 0; idx < JOIN_ROOM_MAX_USER; ++idx)
 				{
 					if (rl.in_player[idx] == -1)
 						continue;
 					if (rl.in_player[i] == rl.in_player[idx])
-						continue;
-					if (rl.in_player[idx] == -1)
 						continue;
 					send_put_other_player(rl.in_player[i], rl.in_player[idx]);
 				}
