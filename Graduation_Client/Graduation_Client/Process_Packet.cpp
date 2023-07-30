@@ -136,7 +136,7 @@ void Network::Process_Game_End(char* ptr)
 
     GameState& game_state = *GameState::GetInstance();
 
-    if (game_state.GetGameState() == SPECTATOR_GAME)
+    if (game_state.GetGameState() == SPECTATOR_GAME || game_state.GetGameState() == INTERACTION_POWER)
         game_state.ChangeNextState();
     else { // 탈출을 못하여 PLAYING GAME 상태이거나 술래가 승리한 경우 STATE를 2번 바꿔야 GAME_END로 넘어가짐
         for (int i = 0; i < 2; ++i)
