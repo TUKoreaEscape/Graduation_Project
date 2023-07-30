@@ -428,9 +428,16 @@ void Player::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList, int pipelin
 	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->UpdateShaderVariables(pd3dCommandList, PlayerNum);
 
 	if (pipeline == 0) {
-		SetDraw(true);
-		GameObject* pGameObject = FindFrame("head");
-		if (pGameObject) pGameObject->SetDraw(false);
+		GameObject* pGameObject = FindFrame("Bodies");
+		if (pGameObject) pGameObject->SetDraw(true);
+		pGameObject = FindFrame("Bodyparts");
+		if (pGameObject) pGameObject->SetDraw(true);
+		pGameObject = FindFrame("Eyes");
+		if (pGameObject) pGameObject->SetDraw(true);
+		pGameObject = FindFrame("Gloves");
+		if (pGameObject) pGameObject->SetDraw(true);
+		pGameObject = FindFrame("MouthandNoses");
+		if (pGameObject) pGameObject->SetDraw(true);
 	}
 	else {
 		GameObject* pGameObject = FindFrame("head");

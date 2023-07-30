@@ -1920,13 +1920,14 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_ppAnswerUIs[9] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, -0.088f, 0.08f, 0.04f);
 	m_ppAnswerUIs[10] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/node.dds", -0.46f, -0.144f, 0.08f, 0.04f);
 
-	m_nInfoUI = 5;
+	m_nInfoUI = 6;
 	m_ppInfoUIs = new GameObject * [m_nInfoUI];
 	m_ppInfoUIs[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/FixSuccess.dds", 0.0f, 0.7f, 1.0f, 0.3f);
 	m_ppInfoUIs[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/FixFail.dds", 0.0f, 0.7f, 1.0f, 0.3f);
 	m_ppInfoUIs[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/ActivateEscapeSystem.dds", 0.0f, 0.7f, 1.0f, 0.3f);
 	m_ppInfoUIs[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/WorkingEscapeSystem.dds", 0.0f, 0.7f, 1.0f, 0.3f);
 	m_ppInfoUIs[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/EscapeSuccess.dds", 0.0f, 0.7f, 1.0f, 0.3f);
+	m_ppInfoUIs[5] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SelectTagger.dds", 0.0f, 0.7f, 1.0f, 0.3f);
 
 	LPVOID m_pTerrain[ROOM_COUNT]{ m_pMainTerrain ,m_pPianoTerrain,m_pBroadcastTerrain, m_pCubeTerrain ,m_pForestTerrain,m_pClassroomTerrain };
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "Network.h"
+#include "Object.h"
 #include "Game_state.h"
 #include "Input.h"
 Network* Network::NetworkInstance = nullptr;
@@ -277,6 +278,7 @@ void Network::ProcessPacket(char* ptr)
 			m_pPlayer->SetPlayerType(TYPE_TAGGER);
 			m_before_player_type = TYPE_TAGGER;
 			Input::GetInstance()->speed *= 1.1f;
+			m_pPlayer->SetInfo(SELECT_TAGGER);
 		}
 		else {
 			m_pPlayer->SetPlayerType(TYPE_PLAYER);
