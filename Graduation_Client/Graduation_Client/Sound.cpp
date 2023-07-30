@@ -147,13 +147,20 @@ void Sound::PlayEffectSound(int index, float volume)
 void Sound::PlayPlayerEffectSound(int index, int playerIndex, float volume)
 {
 	if (index == -1) return;
+
 	if (playerIndex < 5) {
+		bool isPlaying = false;
+		m_arrPlayersEffectChannel[playerIndex]->isPlaying(&isPlaying);
+		if (isPlaying) return;
 		m_pSystem->playSound(m_vSounds[index], nullptr, true, &m_arrPlayersEffectChannel[playerIndex]);
 		m_arrPlayersEffectChannel[playerIndex]->setVolume(volume);
 		m_arrPlayersEffectChannel[playerIndex]->set3DAttributes(&m_vObjectPosition[playerIndex], 0);
 		m_arrPlayersEffectChannel[playerIndex]->setPaused(false);
 	}
 	else if (playerIndex == 5) {
+		bool isPlaying = false;
+		m_arrPlayersEffectChannel[playerIndex]->isPlaying(&isPlaying);
+		if (isPlaying) return;
 		m_pSystem->playSound(m_vSounds[index], nullptr, true, &m_arrPlayersEffectChannel[playerIndex]);
 		m_arrPlayersEffectChannel[playerIndex]->setVolume(volume);
 		m_arrPlayersEffectChannel[playerIndex]->set3DAttributes(&m_fvListenerPos, 0);
