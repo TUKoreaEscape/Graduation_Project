@@ -56,6 +56,7 @@ void GameState::ChangeNextState()
 			break;
 		case INTERACTION_POWER:
 			player->ChangeCamera(PLAYING_GAME, ENDING_GAME);
+			m_pLight[3].m_bEnable = false;
 			m_GameState = ENDING_GAME;
 			break;
 		case SPECTATOR_GAME:
