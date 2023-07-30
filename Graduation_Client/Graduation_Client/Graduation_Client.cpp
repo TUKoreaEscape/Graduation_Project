@@ -6,7 +6,7 @@
 #include "Graduation_Client.h"
 #include "Input.h"
 
-#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+//#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
 
 #define MAX_LOADSTRING 100
 
