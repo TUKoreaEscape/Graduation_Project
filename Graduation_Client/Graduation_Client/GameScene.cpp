@@ -20,9 +20,9 @@ D3D12_GPU_DESCRIPTOR_HANDLE	GameScene::m_d3dSrvGPUDescriptorNextHandle;
 GameScene::GameScene() : Scene()
 {
 	m_nPVSRooms = static_cast<int>(ROOM_INFO::TOTAL_ROOM);
-	m_sPVS[static_cast<int>(PVSROOM::CLASS_ROOM)] = std::set<ROOM_INFO>{ ROOM_INFO::CLASS_ROOM0, ROOM_INFO::CLASS_ROOM1, ROOM_INFO::PIANO_ROOM0, ROOM_INFO::LOBBY_ROOM0, ROOM_INFO::LOBBY_ROOM2, ROOM_INFO::FOREST0, ROOM_INFO::FOREST1 };
+	m_sPVS[static_cast<int>(PVSROOM::CLASS_ROOM)] = std::set<ROOM_INFO>{ ROOM_INFO::CLASS_ROOM0, ROOM_INFO::CLASS_ROOM1, ROOM_INFO::PIANO_ROOM0, ROOM_INFO::LOBBY_ROOM0, ROOM_INFO::LOBBY_ROOM2, ROOM_INFO::FOREST0, ROOM_INFO::FOREST1 }; 
 	m_sPVS[static_cast<int>(PVSROOM::PIANO_ROOM)] = std::set<ROOM_INFO>{ ROOM_INFO::CLASS_ROOM0, ROOM_INFO::PIANO_ROOM0, ROOM_INFO::PIANO_ROOM1, ROOM_INFO::LOBBY_ROOM0, ROOM_INFO::BROADCASTING_ROOM4 };
-	m_sPVS[static_cast<int>(PVSROOM::BROADCASTING_ROOM)] = std::set<ROOM_INFO>{ ROOM_INFO::LOBBY_ROOM1, ROOM_INFO::PIANO_ROOM0, ROOM_INFO::CUBE_ROOM, ROOM_INFO::BROADCASTING_ROOM0, ROOM_INFO::BROADCASTING_ROOM1, ROOM_INFO::BROADCASTING_ROOM2, ROOM_INFO::BROADCASTING_ROOM3, ROOM_INFO::BROADCASTING_ROOM4, ROOM_INFO::FOREST1 };
+	m_sPVS[static_cast<int>(PVSROOM::BROADCASTING_ROOM)] = std::set<ROOM_INFO>{ ROOM_INFO::LOBBY_ROOM1, ROOM_INFO::PIANO_ROOM0, ROOM_INFO::CUBE_ROOM, ROOM_INFO::BROADCASTING_ROOM0, ROOM_INFO::BROADCASTING_ROOM1, ROOM_INFO::BROADCASTING_ROOM2, ROOM_INFO::BROADCASTING_ROOM3, ROOM_INFO::BROADCASTING_ROOM4, ROOM_INFO::FOREST };
 	m_sPVS[static_cast<int>(PVSROOM::LOBBY_ROOM)] = std::set<ROOM_INFO>{ ROOM_INFO::CLASS_ROOM0, ROOM_INFO::PIANO_ROOM0, ROOM_INFO::LOBBY_ROOM0, ROOM_INFO::LOBBY_ROOM1, ROOM_INFO::LOBBY_ROOM2, ROOM_INFO::FOREST0, ROOM_INFO::CUBE_ROOM, ROOM_INFO::BROADCASTING_ROOM2 };
 	m_sPVS[static_cast<int>(PVSROOM::FOREST)] = std::set<ROOM_INFO>{ ROOM_INFO::CLASS_ROOM0, ROOM_INFO::CLASS_ROOM1, ROOM_INFO::BROADCASTING_ROOM0, ROOM_INFO::LOBBY_ROOM1, ROOM_INFO::LOBBY_ROOM2, ROOM_INFO::FOREST0, ROOM_INFO::FOREST1 };
 	m_sPVS[static_cast<int>(PVSROOM::CUBE_ROOM)] = std::set<ROOM_INFO>{ ROOM_INFO::LOBBY_ROOM0, ROOM_INFO::LOBBY_ROOM1, ROOM_INFO::LOBBY_ROOM2, ROOM_INFO::CUBE_ROOM, ROOM_INFO::BROADCASTING_ROOM0, ROOM_INFO::FOREST1 };
@@ -831,6 +831,8 @@ void GameScene::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList, int pipe
 			m_pPVSObjects[static_cast<int>(p)]->Depthrender(pd3dCommandList);
 		}
 
+		Scene::Depthrender(pd3dCommandList);
+
 		for (int i = 0; i < NUM_VENT; ++i)
 		{
 			if (Vents[i]) {
@@ -877,9 +879,17 @@ void GameScene::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList, int pipe
 		}
 	}
 	else {
-		Scene::Depthrender(pd3dCommandList);
+		for (int i = 0; i < 5; ++i) {
+			m_ppPlayers[i]->OnPrepareRender();
+			m_ppPlayers[i]->Animate(0, m_ppPlayers[i]->PlayerNum);
+			if (m_ppPlayers[i]->GetType() != TYPE_ESCAPE_PLAYER)
+				m_ppPlayers[i]->Depthrender(pd3dCommandList, 1);
+		}
+		m_pPlayer->OnPrepareRender();
+		m_pPlayer->Animate(0, m_pPlayer->PlayerNum);
+		if (m_pPlayer->GetType() != TYPE_ESCAPE_PLAYER)
+			m_pPlayer->Depthrender(pd3dCommandList, 1);
 	}
-
 }
 
 void GameScene::ReleaseUploadBuffers()
@@ -2030,7 +2040,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	if (pLobbyModel) delete pLobbyModel;
 	if (pCeilModel) delete pCeilModel;
 	if (pCubeModel) delete pCubeModel;
-	if (pGameObject) delete pGameObject;
+	//if (pGameObject) delete pGameObject;
 
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.8f);
 	m_nObjectsUIs = 9;

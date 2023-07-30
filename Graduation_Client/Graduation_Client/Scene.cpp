@@ -63,7 +63,7 @@ void Scene::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		object->Animate(0, object->PlayerNum);
 		//object->Animate(m_fElapsedTime, object->PlayerNum);
 		if (object->GetType() != TYPE_ESCAPE_PLAYER)
-			object->Depthrender(pd3dCommandList);
+			object->Depthrender(pd3dCommandList, 0);
 	}
 }
 

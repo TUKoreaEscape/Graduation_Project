@@ -423,9 +423,19 @@ void Player::render(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 }
 
-void Player::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList)
+void Player::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList, int pipeline)
 {
 	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->UpdateShaderVariables(pd3dCommandList, PlayerNum);
+
+	if (pipeline == 0) {
+		SetDraw(true);
+		GameObject* pGameObject = FindFrame("head");
+		if (pGameObject) pGameObject->SetDraw(false);
+	}
+	else {
+		GameObject* pGameObject = FindFrame("head");
+		if (pGameObject) pGameObject->SetDraw(true);
+	}
 
 	renderer->Depthrender(pd3dCommandList);
 	if (m_pSibling) m_pSibling->Depthrender(pd3dCommandList);
