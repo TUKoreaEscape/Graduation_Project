@@ -366,7 +366,7 @@ void Network::Process_Other_Move(char* ptr)
             if (packet->data.is_attack == true)
             {
                 m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-                m_ppOther[j]->SetAttackZeroTime();
+                m_ppOther[j]->SetAttackZeroTime(j);
             }
         }
     }
@@ -438,7 +438,7 @@ void Network::Process_Other_Player_Move(char* ptr)
                 if (packet->data[i].is_attack == true)
                 {
                     m_ppOther[j]->m_pSkinnedAnimationController->SetTrackSpeed(0, 1.f);
-                    m_ppOther[j]->SetAttackZeroTime();
+                    m_ppOther[j]->SetAttackZeroTime(j);
                 }
             }
         }

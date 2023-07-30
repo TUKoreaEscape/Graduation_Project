@@ -205,9 +205,10 @@ void Network::ProcessPacket(char* ptr)
 	}
 
 	case SC_PACKET::SC_PACKET_ATTACK:
-
+	{
+		Sound::GetInstance()->PlayEffectSound(m_pPlayer->m_nHitSound, 1.0f);
 		break;
-
+	}
 	case SC_PACKET::SC_PACKET_OTHER_PLAYER_DISCONNECT:
 	{
 		sc_other_player_disconnect* packet = reinterpret_cast<sc_other_player_disconnect*>(ptr);
