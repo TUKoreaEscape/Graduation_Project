@@ -2126,7 +2126,6 @@ void TaggersBox::Interaction(int playerType)
 			m_fCooltime = 0;
 			m_bActivate = true;
 			IsInteraction = false;
-			Sound::GetInstance()->PlayObjectSound(m_pSounds[0], 1.0f);
 		}
 	}
 }

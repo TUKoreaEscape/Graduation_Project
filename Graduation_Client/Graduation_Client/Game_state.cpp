@@ -58,12 +58,16 @@ void GameState::ChangeNextState()
 			player->ChangeCamera(PLAYING_GAME, ENDING_GAME);
 			m_pLight[3].m_bEnable = false;
 			m_GameState = ENDING_GAME;
+			initLight = true;
+			startTime = std::chrono::steady_clock::now();
 			break;
 		case SPECTATOR_GAME:
 			player->ChangeCamera(PLAYING_GAME, ENDING_GAME);
 			m_GameState = ENDING_GAME;
 			sound.StopBG(m_nGameBG);
 			sound.PlayBG(m_nEndingBG);
+			initLight = true;
+			startTime = std::chrono::steady_clock::now();
 			break;
 	}
 	//std::cout << m_GameState << std::endl;

@@ -619,6 +619,7 @@ void Network::Process_Active_Altar(char* ptr)
     // 여기서 술래 재단을 활성화 해야함.
     m_Taggers_Box;
     m_pPlayer->SetInfo(ACTIVATE_ALTAR);
+    Sound::GetInstance()->PlayObjectSound(m_Taggers_Box->m_pSounds[0], 1.0f);
     std::cout << "술래가 재단을 활성화 하였습니다" << std::endl;
 }
 
