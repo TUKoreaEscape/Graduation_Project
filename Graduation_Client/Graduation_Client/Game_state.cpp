@@ -37,12 +37,12 @@ void GameState::ChangeNextState()
 			SetLoading(2.0f);
 			sound.StopBG(m_nWaitingBG);
 			sound.PlayBG(m_nGameBG);
+			initLight = true;
+			startTime = std::chrono::steady_clock::now();
 			break;
 		case CUSTOMIZING:
 			break;
 		case READY_TO_GAME:
-			initLight = true;
-			startTime = std::chrono::steady_clock::now();
 			m_GameState = PLAYING_GAME;
 			break;
 		case PLAYING_GAME:
