@@ -51,7 +51,6 @@ void Network::init_network()
 	int dscpValue = 46; // Change this value to your desired DSCP value
 	int result = setsockopt(m_socket, IPPROTO_IP, IP_TOS, (const char*)&dscpValue, sizeof(dscpValue));
 	if (result == SOCKET_ERROR) {
-		std::cout << "Failed DSCP Value" << std::endl;
 	}
 	SOCKADDR_IN server_addr;
 	ZeroMemory(&server_addr, sizeof(server_addr));
@@ -109,7 +108,6 @@ void Network::listen_thread()
 		if (ret == SOCKET_ERROR && WSAGetLastError() != WSAEWOULDBLOCK) {
 			int error_number = WSAGetLastError();
 			if (error_number != WSA_IO_PENDING) {
-				std::cout << "RecvSizeType" << std::endl;
 				disconnect_client();
 				exit(0);
 			}
@@ -137,7 +135,6 @@ void Network::ProcessPacket(char* ptr)
 
 	case SC_PACKET::SC_PACKET_LOGINOK:
 	{
-		//std::cout << "recv login ok" << std::endl;
 		sc_packet_login_ok* recv_packet = reinterpret_cast<sc_packet_login_ok*>(ptr);
 		m_pPlayer->SetID(recv_packet->id);
 
@@ -538,14 +535,12 @@ void Network::on_voice_talk()
 {
 	m_is_use_voice_talk = true;
 	join_voice_talk();
-	//std::cout << "voice on" << std::endl;
 }
 
 void Network::off_voice_talk()
 {
 	exit_voice_talk();
 	m_is_use_voice_talk = false;
-	//std::cout << "voice off" << std::endl;
 }
 
 void Network::join_voice_talk()
@@ -560,8 +555,6 @@ void Network::join_voice_talk()
 		std::wstring option_parameter = L" -audio yes";
 
 		std::wstring result_parameter = parameter + room_parameter + room_parameter2 + option_parameter;
-
-		std::wcout << result_parameter << std::endl;
 		info.cbSize = sizeof(SHELLEXECUTEINFO);
 		info.fMask = SEE_MASK_NOCLOSEPROCESS;
 		info.hwnd = NULL;
