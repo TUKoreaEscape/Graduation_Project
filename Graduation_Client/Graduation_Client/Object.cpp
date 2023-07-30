@@ -1652,7 +1652,15 @@ void ItemBox::update(float fElapsedTime)
 			m_fCooltime = 0;
 		}
 	}
-	m_fGauge = m_fCooltime / BOX_OPEN_COOLTIME;
+	if (Input::GetInstance()->m_pPlayer->m_Type == TYPE_PLAYER) {
+		m_fGauge = m_fCooltime / BOX_OPEN_COOLTIME;
+	}
+	else if (Input::GetInstance()->m_pPlayer->m_Type == TYPE_DEAD_PLAYER) {
+		m_fGauge = m_fCooltime / BOX_OPEN_DEAD_COOLTIME;
+	}
+	else if (Input::GetInstance()->m_pPlayer->m_Type == TYPE_TAGGER) {
+		m_fGauge = m_fCooltime / BOX_CLOSE_COOLTIME;
+	}
 }
 
 void ItemBox::Depthrender(ID3D12GraphicsCommandList* pd3dCommandList)
