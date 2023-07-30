@@ -34,6 +34,8 @@ private:
 	int					m_LoadingCount = 0;
 	bool				m_MinimapOn = false;
 
+	bool				m_manualOn = false;
+
 	float				m_totalTexting = 1.0f;
 	float				m_Texting = 0.0f;
 	int					m_TextingCount = 0;
@@ -79,6 +81,8 @@ public:
 	bool GetChatState() { return chat_state; };
 	void ChangeMinimapState() { m_MinimapOn = !m_MinimapOn; };
 	bool GetMinimapState() { return m_MinimapOn; };
+	void ChangeManualState() { m_manualOn = !m_manualOn; };
+	bool GetManualState() { return m_manualOn; };
 	void SetBG();
 	void SetLights(LIGHT* light) { m_pLight = light; }
 };

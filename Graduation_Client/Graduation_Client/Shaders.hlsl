@@ -1098,7 +1098,7 @@ float4 Outline(VS_SCREEN_RECT_TEXTURED_OUTPUT input)
 		myColor = float4(0.6f, 0, 0, 1);
 	else
 		myColor = float4(0.2, 0.2, 0.2, 1);
-	float4 f4EdgeColor = float4(myColor.xyz, myColor.w * fEdge);
+	float4 f4EdgeColor = float4(myColor.xyz, myColor.w * fEdge * 3.0);
 	//float4 f4EdgeColor = float4(1.0f, 0,0,1.0f * fEdge);
 	float4 f4Color = gtxtInputTextures[0].Sample(gssWrap, input.uv);
 

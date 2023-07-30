@@ -106,7 +106,7 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			EscapeLevers[i]->UIrender(pd3dCommandList);
 		}
 		reinterpret_cast<TaggersBox*>(Taggers)->UIrender(pd3dCommandList);
-		for (int i = 1; i < m_nPlay - 1; ++i) // 생명칩 프레임(0) 그리지 않음
+		for (int i = 1; i < m_nPlay - 2; ++i) // 생명칩 프레임(0) 그리지 않음
 		{
 			if (i >= 1 && i <= 3) continue;
 			if (i == 4 && !GameState::GetInstance()->GetChatState()) continue;
@@ -121,6 +121,7 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		{
 			m_UIPlay[3]->render(pd3dCommandList);
 		}
+		if(GameState::GetInstance()->GetManualState()) m_UIPlay[7]->render(pd3dCommandList);
 
 		if (m_pPlayer->GetType() == TYPE_PLAYER)reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(1.0f);
 		else {
@@ -1875,7 +1876,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_UIEnding[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SurvivorWin.dds", 0.0f, 0.0f, 2.0f, 2.0f);
 	m_UIEnding[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/TaggerWin.dds", 0.0f, 0.0f, 2.0f, 2.0f);
 
-	m_nPlay = 7;
+	m_nPlay = 8;
 	m_UIPlay = new GameObject * [m_nPlay];
 	m_UIPlay[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.8f, -0.75f, 0.3f, 0.4f);
 	//m_UIPlay[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.0f, 0.75f, 0.6f, 0.4f); 시계
@@ -1885,6 +1886,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_UIPlay[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/ChatBox.dds", -0.1f, -0.7f, 0.6f, 0.6f);//chatBox
 	m_UIPlay[5] = new MinimapUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Minimap2.dds", 0.0f, 0.0f, 1.0f, 1.0f);//Minimap
 	m_UIPlay[6] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SpectatorMode.dds", 0.0f, -0.9f, 0.4f, 0.4f);//관전표시
+	m_UIPlay[7] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Command.dds", 0.5f, 0.3f, 1.2f, 1.2f);//관전표시
 
 
 	m_nPlayPlayer = 1 + 5 + 1;

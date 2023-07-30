@@ -61,8 +61,7 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		case VK_F1:
-			//CaptureOn(hWnd);
-			//std::cout << "마우스 캡차 동작" << std::endl;
+			if (m_gamestate->GetManualState()) m_gamestate->ChangeManualState();
 			break;
 		case VK_F2:
 			//std::cout << "마우스 캡차 릴리즈" << std::endl;
@@ -154,6 +153,7 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			}
 		}
 		if( wParam  ==VK_TAB && m_gamestate->GetGameState() == PLAYING_GAME && !m_gamestate->GetMinimapState()) m_gamestate->ChangeMinimapState();
+		if( wParam  ==VK_F1 && m_gamestate->GetGameState() == PLAYING_GAME && !m_gamestate->GetManualState()) m_gamestate->ChangeManualState();
 		if (m_gamestate->GetGameState() == SPECTATOR_GAME) {
 			if (wParam == VK_SPACE) {
 				m_pPlayer->SpectatorPlayerIndex = (m_pPlayer->SpectatorPlayerIndex + 1) % 5;
@@ -170,13 +170,13 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 				m_pPlayer->SetPvsDebugDemo(!debug); 
 			}
 		}
-		if (wParam == '9' && !m_gamestate->GetChatState())
+		if ((wParam == 'o' || wParam == 'O') && !m_gamestate->GetChatState())
 		{
 			m_Sensitivity += 1;
 			GameState::GetInstance()->SetTexting(1.0f);
 			//std::cout << m_Sensitivity << std::endl;
 		}
-		else if (wParam == '0' && !m_gamestate->GetChatState() && m_Sensitivity>1)
+		else if ((wParam == 'p' || wParam == 'P') && !m_gamestate->GetChatState() && m_Sensitivity>1)
 		{
 			m_Sensitivity -= 1;
 			GameState::GetInstance()->SetTexting(1.0f);
