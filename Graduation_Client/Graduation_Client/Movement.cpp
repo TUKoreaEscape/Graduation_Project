@@ -12,6 +12,7 @@ void CommonMovement::start(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 void CommonMovement::update(float elapsedTime)
 {
 	if (GameState::GetInstance()->GetChatState()) return;
+	if (GameState::GetInstance()->GetGameState() == SPECTATOR_GAME) return;
 	UCHAR keyBuffer[256];
 	DWORD dwDirection = 0;
 	bool		m_emptyKey = false;

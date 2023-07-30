@@ -106,7 +106,7 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			EscapeLevers[i]->UIrender(pd3dCommandList);
 		}
 		reinterpret_cast<TaggersBox*>(Taggers)->UIrender(pd3dCommandList);
-		for (int i = 1; i < m_nPlay; ++i) // 생명칩 프레임(0) 그리지 않음
+		for (int i = 1; i < m_nPlay - 1; ++i) // 생명칩 프레임(0) 그리지 않음
 		{
 			if (i >= 1 && i <= 3) continue;
 			if (i == 4 && !GameState::GetInstance()->GetChatState()) continue;
@@ -217,6 +217,9 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		}
 		break;
 	}
+	case SPECTATOR_GAME:
+		if (m_UIPlay[6]) m_UIPlay[6]->render(pd3dCommandList);
+		break;
 	}
 }
 
@@ -1768,7 +1771,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		for (int j = 0; j < 6; ++j)
 			GameObject::SetParts(i + 1, j, 0);
 		m_ppPlayers[i]->PlayerNum = i + 1;
-		m_ppPlayers[i]->SetPlayerType(TYPE_ESCAPE_PLAYER);
+		m_ppPlayers[i]->SetPlayerType(TYPE_PLAYER_YET);
 	}
 	m_ppPlayers[0]->SetPosition(XMFLOAT3(6.0f, 0.0f, -5.0f));
 	m_ppPlayers[1]->SetPosition(XMFLOAT3(3.0f, 0.0f, -5.0f));
@@ -1858,7 +1861,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_UIEnding[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SurvivorWin.dds", 0.0f, 0.0f, 2.0f, 2.0f);
 	m_UIEnding[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/TaggerWin.dds", 0.0f, 0.0f, 2.0f, 2.0f);
 
-	m_nPlay = 6;
+	m_nPlay = 7;
 	m_UIPlay = new GameObject * [m_nPlay];
 	m_UIPlay[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.8f, -0.75f, 0.3f, 0.4f);
 	//m_UIPlay[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.0f, 0.75f, 0.6f, 0.4f); 시계
@@ -1867,6 +1870,7 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_UIPlay[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Mic-off.dds", 0.5f, -0.85f, 0.07f, 0.15f);//mic-off
 	m_UIPlay[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/ChatBox.dds", -0.1f, -0.7f, 0.6f, 0.6f);//chatBox
 	m_UIPlay[5] = new MinimapUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Minimap2.dds", 0.0f, 0.0f, 1.0f, 1.0f);//Minimap
+	m_UIPlay[6] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SpectatorMode.dds", 0.0f, -0.9f, 0.4f, 0.4f);//관전표시
 
 
 	m_nPlayPlayer = 1 + 5 + 1;
