@@ -231,9 +231,10 @@ void GameScene::prerender(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pPlayer->m_pCamera->update(pd3dCommandList);
 	m_pLight->GetComponent<Light>()->SetWaitingLight(false);
 	m_pLight->GetComponent<Light>()->update(pd3dCommandList);
-	if (GameState::GetInstance()->GetTick() && (GameState::GetInstance()->GetGameState() == PLAYING_GAME
-		|| GameState::GetInstance()->GetGameState() == SPECTATOR_GAME || GameState::GetInstance()->GetGameState() == READY_TO_GAME))
-		m_pLight->GetComponent<Light>()->Updaterotate();
+	if (GameState::GetInstance()->GetGameState() == PLAYING_GAME || GameState::GetInstance()->GetGameState() == SPECTATOR_GAME || GameState::GetInstance()->GetGameState() == READY_TO_GAME) {
+		if (GameState::GetInstance()->GetTick())
+			m_pLight->GetComponent<Light>()->Updaterotate();
+	}
 	else if(GameState::GetInstance()->GetInitLight()) m_pLight->GetComponent<Light>()->Updaterotate();
 	XMFLOAT3 cameraPos = m_pPlayer->m_pCamera->GetPosition();
 	CheckCameraPos(cameraPos);
