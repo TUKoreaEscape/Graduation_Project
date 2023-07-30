@@ -55,6 +55,7 @@ void GameState::ChangeNextState()
 			sound.PlayBG(m_nWaitingBG);
 			break;
 		case INTERACTION_POWER:
+			player->ChangeCamera(PLAYING_GAME, ENDING_GAME);
 			m_GameState = ENDING_GAME;
 			break;
 		case SPECTATOR_GAME:
