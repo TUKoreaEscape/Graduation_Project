@@ -434,6 +434,8 @@ void cGameServer::Process_Game_Start(const int room_number)
 	Room& room = *m_room_manager->Get_Room_Info(room_number);
 	 
 	for (auto player_index : room.in_player) {
+		if (player_index == -1)
+			continue;
 		send_game_start_packet(player_index);
 		m_clients[player_index]._state_lock.lock();
 		m_clients[player_index].set_state(CLIENT_STATE::ST_INGAME);

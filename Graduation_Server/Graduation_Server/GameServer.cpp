@@ -418,6 +418,8 @@ void cGameServer::WorkerThread()
 						continue;
 					if (rl.in_player[i] == rl.in_player[idx])
 						continue;
+					if (rl.in_player[idx] == -1)
+						continue;
 					send_put_other_player(rl.in_player[i], rl.in_player[idx]);
 				}
 			}
@@ -490,6 +492,8 @@ void cGameServer::WorkerThread()
 					if (rl.in_player[idx] == -1)
 						continue;
 					if (rl.in_player[i] == rl.in_player[idx])
+						continue;
+					if (rl.in_player[idx] == -1)
 						continue;
 					send_put_other_player(rl.in_player[i], rl.in_player[idx]);
 				}
@@ -896,7 +900,8 @@ void cGameServer::ProcessPacket(const unsigned int user_id, unsigned char* p) //
 
 	case CS_PACKET::CS_PACKET_ATTACK:
 	{
-		Process_Attack(user_id);
+		if(m_clients[user_id].get_state() == CLIENT_STATE::ST_INGAME || m_clients[user_id].get_state() == CLIENT_STATE::ST_GAMEROOM)
+			Process_Attack(user_id);
 		break;
 	}
 

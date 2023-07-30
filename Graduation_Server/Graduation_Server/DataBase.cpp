@@ -110,7 +110,6 @@ int DataBase::create_id(std::wstring user_id, std::wstring user_pw)
 		SQLCancel(hstmt);
 	}
 
-	//std::cout << "ID가 없는것을 확인! 삽입을 시도합니다." << std::endl;
 	std::wstring insert_query{};
 	Custom init_data;
 	init_data.body = MAINBODY01;
@@ -139,6 +138,16 @@ int DataBase::create_id(std::wstring user_id, std::wstring user_pw)
 	insert_query += std::to_wstring(init_data.gloves);
 	insert_query += L", ";
 	insert_query += std::to_wstring(init_data.mouthandnoses);
+	insert_query += L", ";
+	insert_query += std::to_wstring(0);
+	insert_query += L", ";
+	insert_query += std::to_wstring(0);
+	insert_query += L", ";
+	insert_query += std::to_wstring(0);
+	insert_query += L", ";
+	insert_query += std::to_wstring(0);
+	insert_query += L", ";
+	insert_query += std::to_wstring(0);
 	insert_query += L", ";
 	insert_query += std::to_wstring(0);
 
@@ -340,7 +349,7 @@ void DataBase::DataBaseThread()
 				cGameServer& server = *cGameServer::GetInstance();
 				int reason = 0;
 				reason = create_id(request.request_name, request.request_pw);
-
+				cout << reason << endl;
 				if (reason == 1) // id 생성 성공
 				{
 					Custom init_data;

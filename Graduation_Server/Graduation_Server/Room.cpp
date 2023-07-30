@@ -665,6 +665,8 @@ CollisionInfo Room::is_collision_player_to_player(const int& player_id, const XM
 			continue;
 		if (other_id == player_id)
 			continue;
+		if (true == server.m_clients[other_id].get_escape_state())
+			continue;
 		if (false == Is_near(current_position, server.m_clients[other_id].get_user_position(), 10))
 			continue;
 
@@ -692,6 +694,7 @@ CollisionInfo Room::is_collision_player_to_player(const int& player_id, const XM
 			return_data.is_collision = true;
 			return_data.SlidingVector = SlidingVector;
 			return_data.CollisionNormal = collision_data.CollisionNormal;
+			return_data.collision_face_num = collision_data.collision_face_num;
 			MotionVector = SlidingVector;
 			tmp_position = Add(tmp_position, SlidingVector);
 

@@ -37,6 +37,8 @@ void CLIENT::do_recv()
 void CLIENT::do_send(int num_byte, void* mess)
 {
 	EXP_OVER* ex_over = new EXP_OVER(OP_SEND, num_byte, mess);
+	if (_socket == -1)
+		return;
 	int ret = WSASend(_socket, &ex_over->m_wsa_buf, 1, 0, 0, &ex_over->m_wsa_over, NULL);
 
 	if (SOCKET_ERROR == ret)
