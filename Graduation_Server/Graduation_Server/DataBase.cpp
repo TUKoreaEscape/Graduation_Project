@@ -349,7 +349,6 @@ void DataBase::DataBaseThread()
 				cGameServer& server = *cGameServer::GetInstance();
 				int reason = 0;
 				reason = create_id(request.request_name, request.request_pw);
-				cout << reason << endl;
 				if (reason == 1) // id 생성 성공
 				{
 					Custom init_data;
