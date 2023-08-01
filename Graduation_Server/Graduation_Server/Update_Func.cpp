@@ -6,7 +6,7 @@ void cGameServer::Update_OtherPlayer(int room_number, float elaspeTime)
 	Room& room = *m_room_manager->Get_Room_Info(room_number);
 
 	int index = 0;
-	for (int k = 0; k < 6; ++k)
+	for (int k = 0; k < JOIN_ROOM_MAX_USER; ++k)
 	{
 		if (room.Get_Join_Member(k) != -1)
 		{
