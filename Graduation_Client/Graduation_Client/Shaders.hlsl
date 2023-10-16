@@ -70,6 +70,12 @@ matrix scaleMatrix = { 1.1f, 0.0f, 0.0f, 0.0f,
 #define MATERIAL_DETAIL_ALBEDO_MAP	0x20
 #define MATERIAL_DETAIL_NORMAL_MAP	0x40
 
+#define Color_INDEX 0
+#define NormalW_INDEX 1
+#define Texture_INDEX 2
+#define NormalV_INDEX 3
+#define Depth_INDEX 4
+
 #define TYPE_OBJECT 0
 #define TYPE_PLAYER 2;
 #define TYPE_TAGGER 4;
@@ -1116,34 +1122,29 @@ float4 Outline(VS_SCREEN_RECT_TEXTURED_OUTPUT input)
 
 	float3 result = float3(0, 0, 0);
 	float totalWeight = 0;
-	float blurRadius = 0;
-	if(gtxtInputTextures[5].Sample(gssWrap,input.uv).r<0.12f) blurRadius = 0.003;
-	else blurRadius = 0.0002;
-	// 블러의 크기를 설정
-	int blurSize = 6;
-
-	// 가우시안 블러 마스크 생성
-	float weights[13] = { 0.0561, 0.1353, 0.278, 0.4868, 0.7261, 0.9231,
-	1, 0.9231, 0.7261, 0.4868, 0.278, 0.1353, 0.0561 };
-
-	// 블러를 적용할 주변 픽셀들을 순회하며 블러 적용
+    float blurRadius = gtxtInputTextures[Depth_INDEX].Sample(gssWrap, input.uv).r * 0.0003;
+	
+	int blurSize = 5;
+	
+    float weights[11] = { 0.05f, 0.05f, 0.1f, 0.1f, 0.1f, 0.2f, 0.1f, 0.1f, 0.1f, 0.05f, 0.05f };
+    //float weights[11] = { 0.09f, 0.09f, 0.09f, 0.09f, 0.09f, 0.09f, 0.09f, 0.09f, 0.09f, 0.09f, 0.09f };
+    //float weights[13] = { 0.0561, 0.1353, 0.278, 0.4868, 0.7261, 0.9231, 1, 0.9231, 0.7261, 0.4868, 0.278, 0.1353, 0.0561 };
+	
 	for (int i = -blurSize; i <= blurSize; ++i)
 	{
 		for (int j = -blurSize; j <= blurSize; ++j)
 		{
 			float2 offset = float2(i, j) * blurRadius;
-			float3 color = gtxtInputTextures[0].Sample(gssWrap,input.uv + offset);
+            float3 color = gtxtInputTextures[Color_INDEX].Sample(gssWrap, input.uv + offset);
 
 			float weight = weights[i + blurSize] * weights[j + blurSize];
 			result += color * weight;
 			totalWeight += weight;
 		}
 	}
-
-	// 결과를 가중치로 나누어 정규화
+	
 	result /= totalWeight;
 	float4 color = float4(result, 1.0f);
-	//if(ao>0.5) return(AlphaBlend(f4EdgeColor, f4Color)-ao);
 	return(AlphaBlend(f4EdgeColor, color));
 }
 

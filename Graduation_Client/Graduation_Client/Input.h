@@ -5,6 +5,18 @@
 #include "Game_state.h"
 #include "Sound.h"
 
+enum InputState {
+	none = 0,
+	EnterID,
+	EnterPW
+};
+
+enum ErrorState {
+	None = 0,
+	Loginfail,
+	IDfail,
+};
+
 class Input
 {
 private:
@@ -35,7 +47,7 @@ public:
 	cs_packet_chat				m_cs_packet_chat{ NULL };
 	char								m_chatlist[5][120]{ ""};
 	int									m_PageNum = 1;
-	int									m_Limitchatlength = 38;
+	const int									m_chatlength = 38;
 
 	int								m_idNum = 0;
 	int								m_passwordNum = 0;
@@ -52,8 +64,8 @@ public:
 
 	int								m_nClickSound = -1;
 
-	TCHAR tmp[100]{NULL}; //입력받는 문자열을 담을 버퍼
-	bool bComposite; //입력 중이라 문자 조합 중인지 아닌지 판별하기 위한 변수
+	TCHAR						m_tmp[100]{NULL}; //입력받는 문자열을 담을 버퍼
+	bool							m_bCombination;
 
 	float speed = 60.0f;
 

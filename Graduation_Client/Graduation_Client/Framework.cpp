@@ -236,9 +236,6 @@ void Framework::CreateDirect3DDevice()
 void Framework::CreateDirect2DDevice()
 {
 	UINT nD3D11DeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
-#if defined(_DEBUG) || defined(DBG)
-	nD3D11DeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
 
 	ID3D11Device* pd3d11Device = NULL;
 	ID3D12CommandQueue* ppd3dCommandQueues[] = { m_pd3dCommandQueue };
@@ -247,31 +244,6 @@ void Framework::CreateDirect2DDevice()
 	if (pd3d11Device) pd3d11Device->Release();
 
 	D2D1_FACTORY_OPTIONS nD2DFactoryOptions = { D2D1_DEBUG_LEVEL_NONE };
-#if defined(_DEBUG) || defined(DBG)
-	nD2DFactoryOptions.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
-	ID3D12InfoQueue* pd3dInfoQueue = NULL;
-	if (SUCCEEDED(m_pd3dDevice->QueryInterface(IID_PPV_ARGS(&pd3dInfoQueue))))
-	{
-		D3D12_MESSAGE_SEVERITY pd3dSeverities[] =
-		{
-			D3D12_MESSAGE_SEVERITY_INFO,
-		};
-
-		D3D12_MESSAGE_ID pd3dDenyIds[] =
-		{
-			D3D12_MESSAGE_ID_INVALID_DESCRIPTOR_HANDLE,
-		};
-
-		D3D12_INFO_QUEUE_FILTER d3dInforQueueFilter = { };
-		d3dInforQueueFilter.DenyList.NumSeverities = _countof(pd3dSeverities);
-		d3dInforQueueFilter.DenyList.pSeverityList = pd3dSeverities;
-		d3dInforQueueFilter.DenyList.NumIDs = _countof(pd3dDenyIds);
-		d3dInforQueueFilter.DenyList.pIDList = pd3dDenyIds;
-
-		pd3dInfoQueue->PushStorageFilter(&d3dInforQueueFilter);
-	}
-	pd3dInfoQueue->Release();
-#endif
 
 	hResult = ::D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory3), &nD2DFactoryOptions, (void**)&m_pd2dFactory);
 
@@ -328,6 +300,7 @@ void Framework::CreateDirect2DDevice()
 		m_pd2dDeviceContext->CreateBitmapFromDxgiSurface(pdxgiSurface, &d2dBitmapProperties, &m_ppd2dRenderTargets[i]);
 		if (pdxgiSurface) pdxgiSurface->Release();
 	}
+	setlocale(LC_CTYPE, "");
 }
 
 void Framework::CreateCommandQueueAndList()
@@ -978,38 +951,27 @@ void Framework::TextRender()
 
 		if(m_gamestate->GetChatState())
 		{
-			//내가 지금 입력하고있는 문자열 출력해야함
 			int size = strlen(input->m_cs_packet_chat.message);
 			if (size > 0)
 			{
 				wchar_t* array = new wchar_t[size + 1];
-				//for (int j = 0; j < size; j++) {
-				//	array[j] = static_cast<wchar_t>(input->m_cs_packet_chat.message[j]);
-				//}
-				setlocale(LC_CTYPE, "ko-KR");
 				mbstowcs(array, input->m_cs_packet_chat.message, size);
 				array[size] = '\0';
 				D2D1_RECT_F rcLowerText = D2D1::RectF(chatBoxRect.left, chatBoxRect.top, chatBoxRect.right, chatBoxRect.bottom);
 				m_pd2dDeviceContext->DrawTextW(array, (UINT32)wcslen(array), m_pdCharLayout, &rcLowerText, m_pd2dpurpleText);
 				delete[] array;
-				//setlocale(LC_CTYPE, "en-US");
 			}
-			for (int i = 0; i < 5; ++i)
+			for (int i = 0; i < MAX_TEXT_SIZE; ++i)
 			{
 				int size = strlen(input->m_chatlist[i]);
 				if (size > 0)
 				{
 					wchar_t* array = new wchar_t[size + 1];
-					//for (int j = 0; j < size; j++) {
-					//	array[j] = static_cast<wchar_t>(input->m_chatlist[i][j]);
-					//}
-					setlocale(LC_CTYPE, "ko-KR");
 					mbstowcs(array, input->m_chatlist[i], size);
 					array[size] = '\0';
 					D2D1_RECT_F rcLowerText = D2D1::RectF(chatBoxRect.left, chatBoxRect.top - i * 40 - 55, chatBoxRect.right, chatBoxRect.bottom - i * 40 - 55);
 					m_pd2dDeviceContext->DrawTextW(array, (UINT32)wcslen(array), m_pdCharLayout, &rcLowerText, m_pd2dpurpleText);
 					delete[] array;
-					//setlocale(LC_CTYPE, "en-US");
 				}
 			}
 		}

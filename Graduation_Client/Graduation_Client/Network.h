@@ -7,9 +7,9 @@
 #include "Server_Timer.h"
 
 #define  DIR_NO 100
-#define  USE_NETWORK 1
+#define  USE_NETWORK 0
 #define	 USE_VOICE 0
-#define	 DEMO 1
+#define	 DEMO 0
 
 class Door;
 class ItemBox;
@@ -37,7 +37,7 @@ private:
 
 private:
 	SOCKET				m_socket;
-	const char*			SERVER_ADDR = "127.0.0.1";
+	const char*			SERVER_ADDR = "220.121.55.78";
 	Server_Timer		m_server_counter;
 	Custom				data;
 
@@ -88,7 +88,7 @@ public:
 public: // 클라이언트 오브젝트와 연결하는 용도
 	Player*				m_pPlayer = nullptr;;
 	Player**			m_ppOther = nullptr;
-	GameObject**		m_UIPlay = nullptr;
+	std::vector<GameObject*> m_UIPlay;
 	Door*				m_pDoors[6];
 	InteractionObject*	m_pPowers[5];
 	ItemBox*			m_pBoxes[MAX_INGAME_ITEM];

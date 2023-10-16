@@ -46,7 +46,6 @@ void GameState::ChangeNextState()
 			m_GameState = PLAYING_GAME;
 			break;
 		case PLAYING_GAME:
-			//player->ChangeCamera(PLAYING_GAME, ENDING_GAME);
 			m_GameState = SPECTATOR_GAME;
 			break;
 		case ENDING_GAME:

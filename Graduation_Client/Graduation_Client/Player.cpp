@@ -42,7 +42,7 @@ Player::Player() : GameObject()
 	}
 }
 
-void Player::ChangeCamera(GAME_STATE prev, GAME_STATE p)
+void Player::ChangeCamera(GAME_STATE prev, GAME_STATE change)
 {
 	m_xmf3PrevRight = m_xmf3Right;
 	m_xmf3PrevUp = m_xmf3Up;
@@ -60,7 +60,7 @@ void Player::ChangeCamera(GAME_STATE prev, GAME_STATE p)
 	m_fPitch = 0.0f;
 	m_fRoll = 0.0f;
 	m_fYaw = 0.0f;
-	switch (p) {
+	switch (change) {
 	case LOGIN:
 		break;
 	case ROOM_SELECT:
@@ -80,22 +80,19 @@ void Player::ChangeCamera(GAME_STATE prev, GAME_STATE p)
 		break;
 	case CUSTOMIZING:
 		DeleteComponent<ThirdPersonCamera>();
-		AddComponent<CustomizingCamera>();
-		m_pCamera = GetComponent<CustomizingCamera>();
+		m_pCamera = AddComponent<CustomizingCamera>();
 		m_pCamera->m_pPlayer = this;
 		break;
 	case READY_TO_GAME:
 		DeleteComponent<ThirdPersonCamera>();
-		AddComponent<FirstPersonCamera>();
-		m_pCamera = GetComponent<FirstPersonCamera>();
+		m_pCamera = AddComponent<FirstPersonCamera>();
 		m_pCamera->m_pPlayer = this;
 		break;
 	case PLAYING_GAME:
 		break;
 	case ENDING_GAME:
 		DeleteComponent<FirstPersonCamera>();
-		AddComponent<ThirdPersonCamera>();
-		m_pCamera = GetComponent<ThirdPersonCamera>();
+		m_pCamera = AddComponent<ThirdPersonCamera>();
 		m_pCamera->m_pPlayer = this;
 		break;
 	case INTERACTION_POWER:

@@ -75,7 +75,7 @@ public:
 		}
 	}
 
-	void ChangeCamera(GAME_STATE prev, GAME_STATE p);
+	void ChangeCamera(GAME_STATE prev, GAME_STATE change);
 
 	void Move(DWORD nDirection, float fDistance, bool bVelocity = false);
 	void Move(const XMFLOAT3& xmf3Shift, bool bVelocity = false);

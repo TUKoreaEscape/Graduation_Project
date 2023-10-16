@@ -137,19 +137,19 @@ void Input::KeyBoard(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 		if (m_gamestate->GetGameState() == LOGIN)
 		{
 			if (wParam == VK_BACK) {
-				if (m_inputState == 1) DeleteIdAndPassword(m_cs_packet_login.id, m_idNum);//id 삭제
-				else if (m_inputState == 2) DeleteIdAndPassword(m_cs_packet_login.pass_word, m_passwordNum); //password 삭제
+				if (m_inputState == EnterID) DeleteIdAndPassword(m_cs_packet_login.id, m_idNum);//id 삭제
+				else if (m_inputState == EnterPW) DeleteIdAndPassword(m_cs_packet_login.pass_word, m_passwordNum); //password 삭제
 			}
 			else if (wParam >= VK_NUMPAD0 && wParam <= VK_NUMPAD9) {
 				char number = wParam - VK_NUMPAD0 + '0';
-				if (m_inputState == 1) InputIdAndPassword(number, m_cs_packet_login.id, m_idNum);//id입력
-				else if (m_inputState == 2) InputIdAndPassword(number, m_cs_packet_login.pass_word, m_passwordNum); //password입력
+				if (m_inputState == EnterID) InputIdAndPassword(number, m_cs_packet_login.id, m_idNum);//id입력
+				else if (m_inputState == EnterPW) InputIdAndPassword(number, m_cs_packet_login.pass_word, m_passwordNum); //password입력
 			}
 			else if (wParam == VK_TAB) { ChangeInputState(); }
-			else if ((wParam >= 'A' && wParam <= 'Z') || (wParam >= 'a' && wParam <= 'z') || (wParam >= '0' && wParam <= '9'))
+			else if (isalpha(wParam) || (wParam >= '0' && wParam <= '9'))
 			{
-				if (m_inputState == 1) InputIdAndPassword(wParam, m_cs_packet_login.id, m_idNum);//id입력
-				else if (m_inputState == 2) InputIdAndPassword(wParam, m_cs_packet_login.pass_word, m_passwordNum); //password입력
+				if (m_inputState == EnterID) InputIdAndPassword(wParam, m_cs_packet_login.id, m_idNum);//id입력
+				else if (m_inputState == EnterPW) InputIdAndPassword(wParam, m_cs_packet_login.pass_word, m_passwordNum); //password입력
 			}
 		}
 		if( wParam  ==VK_TAB && m_gamestate->GetGameState() == PLAYING_GAME && !m_gamestate->GetMinimapState()) m_gamestate->ChangeMinimapState();
@@ -215,11 +215,11 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 		{
 			SetClickState(true);
 
-			// 1600x900 화면의 크기를 (1, 1)로 정규화합니다
+			// 1600x900 화면의 크기를 (1, 1)로 정규화
 			float normalizedX = (xPos - ptCenter.x) / ptCenter.x;
 			float normalizedY = -(yPos - ptCenter.y) / ptCenter.y;
 
-			// 보간된 마우스 좌표를 얻습니다 (-1부터 1까지의 범위)
+			// 보간된 마우스 좌표(-1부터 1까지의 범위)
 			m_MouseX = normalizedX;
 			m_MouseY = normalizedY;
 		}
@@ -237,19 +237,13 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			int xPos = LOWORD(lParam);
 			int yPos = HIWORD(lParam);
 
-			//std::cout << idInputRect.left << " " << idInputRect.top << " " << idInputRect.right << " " << idInputRect.bottom << std::endl;
-			//std::cout << passwordInputRect.left << " " << passwordInputRect.top << " " << passwordInputRect.right << " " << passwordInputRect.bottom << std::endl;
-			//std::cout << xPos << " " << yPos << std::endl;
-			//아이디
 			if (xPos >= idRect.left && xPos <= idRect.right && yPos >= idRect.top && yPos <= idRect.bottom)
 			{
-				// 입력란을 활성화하고 입력을 받을 수 있는 상태로 전환합니다.
-				m_inputState = 1;
+				m_inputState = EnterID;
 			}
-			//비밀번호
 			else if (xPos >= passwordRect.left && xPos <= passwordRect.right && yPos >= passwordRect.top && yPos <= passwordRect.bottom)
 			{
-				m_inputState = 2;
+				m_inputState = EnterPW;
 			}
 			else if (xPos >= logininfoRect[0].left && xPos <= logininfoRect[0].right && yPos >= logininfoRect[0].top && yPos <= logininfoRect[0].bottom) //Login
 			{
@@ -276,24 +270,24 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 #endif
 				sound.PlayEffectSound(m_nClickSound, 0);
 			}
-			else if (xPos >= logininfoRect[2].left && xPos <= logininfoRect[2].right && yPos >= logininfoRect[2].top && yPos <= logininfoRect[2].bottom)//Login fail
-			{
-				m_errorState = 0;
-				m_SuccessState = 0;
-			}
-			else if (xPos >= logininfoRect[3].left && xPos <= logininfoRect[3].right && yPos >= logininfoRect[3].top && yPos <= logininfoRect[3].bottom)//Same ID
-			{
-				m_errorState = 0;
-				m_SuccessState = 0;
-			}
-			else if (xPos >= logininfoRect[4].left && xPos <= logininfoRect[4].right && yPos >= logininfoRect[4].top && yPos <= logininfoRect[4].bottom)//SuccessfullycreatedID
-			{
-				m_SuccessState = 0;
-				m_errorState = 0;
-			}
+			//else if (xPos >= logininfoRect[2].left && xPos <= logininfoRect[2].right && yPos >= logininfoRect[2].top && yPos <= logininfoRect[2].bottom)//Login fail
+			//{
+			//	m_errorState = 0;
+			//	m_SuccessState = 0;
+			//}
+			//else if (xPos >= logininfoRect[3].left && xPos <= logininfoRect[3].right && yPos >= logininfoRect[3].top && yPos <= logininfoRect[3].bottom)//Same ID
+			//{
+			//	m_errorState = 0;
+			//	m_SuccessState = 0;
+			//}
+			//else if (xPos >= logininfoRect[4].left && xPos <= logininfoRect[4].right && yPos >= logininfoRect[4].top && yPos <= logininfoRect[4].bottom)//SuccessfullycreatedID
+			//{
+			//	m_SuccessState = 0;
+			//	m_errorState = 0;
+			//}
 			else
 			{
-				m_inputState = 0;
+				m_inputState = none;
 				m_SuccessState = 0;
 				m_errorState = 0;
 			}
@@ -321,8 +315,6 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			{
 				if (xPos >= roomPageRect[i].left && xPos <= roomPageRect[i].right && yPos >= roomPageRect[i].top && yPos <= roomPageRect[i].bottom)
 				{
-					//페이지 업 다운 판단, 0일때 왼쪽 화살표,1일때 오른쪽 화살표
-					// input에 PageNum이 있음 김우빈
 					if (i == 0) {
 						PageDown();
 #if USE_NETWORK
@@ -341,7 +333,6 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 					}
 				}
 			}
-			//InputRoomInfo();
 		}
 		else if (m_gamestate->GetGameState() == WAITING_GAME)
 		{
@@ -353,11 +344,10 @@ void Input::Mouse(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 			{
 				if (xPos >= waitingRoomRect[i].left && xPos <= waitingRoomRect[i].right && yPos >= waitingRoomRect[i].top && yPos <= waitingRoomRect[i].bottom) //어떤 방을 클릭했는지 판단하는 코드
 				{
-					//std::cout << i+1  << " 방 클릭!" << std::endl;
 					if (i == 0)
 					{
 #if !USE_NETWORK
-						m_gamestate->ChangeNextState();//READY클릭 김우빈 여기수정
+						m_gamestate->ChangeNextState();
 #endif
 #if USE_NETWORK
 						if (m_cs_packet_ready.ready_type == false) {
@@ -581,7 +571,7 @@ LRESULT Input::ProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam
 
 void Input::InputIdAndPassword(char input_char, char* str, int& num)
 {
-	if (isalpha(char(input_char)))
+	if (isalpha(input_char))
 	{
 		if (GetKeyState(VK_SHIFT) < 0) // Shift 키가 눌린 상태인지 확인
 		{
@@ -649,47 +639,39 @@ LRESULT Input::OnImeComposition(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 	inChar[0] = wParam;
 	inChar[1] = 0;
 	HIMC hImc;
-	int pos = lstrlen(tmp);
+	int pos = lstrlen(m_tmp);
 	int messagelen = strlen(m_cs_packet_chat.message);
 	std::string str;
 	int bufferSize = 0;
 	if (m_gamestate->GetGameState() == PLAYING_GAME && m_gamestate->GetChatState())
 	{
 		switch (msg) {
-		case WM_IME_COMPOSITION:   //글씨조합중
-			if (messagelen < m_Limitchatlength)
+		case WM_IME_COMPOSITION:
+			if (messagelen < m_chatlength)
 			{
-				//std::cout << "컴포짓" << std::endl;
-				if (lParam & GCS_COMPSTR) //조립중이라면
+				if (lParam & GCS_COMPSTR)
 				{
-					if (bComposite) pos--;
+					if (m_bCombination) pos--;
 
-					hImc = ImmGetContext(hWnd);	//IME 사용
-					int lenIMM = ImmGetCompositionString(hImc, GCS_COMPSTR, NULL, 0); //조합 중인 문자에 길이를 받습니다.
-					ImmReleaseContext(hWnd, hImc); //IME 자원 해제
-					//조합중에 backspace를 누르는 경우 길이가 0일 수 있습니다. 
-					//이런 경우가 없다면 ImmGetContext를 사용 안해도 될 것 같습니다.
+					hImc = ImmGetContext(hWnd);
+					int lenIMM = ImmGetCompositionString(hImc, GCS_COMPSTR, NULL, 0);
+					ImmReleaseContext(hWnd, hImc);
 					if (0 == lenIMM)
 					{
 						pos--;
-						bComposite = false;
+						m_bCombination = false;
 					}
 					else
 					{
-						bComposite = true;
+						m_bCombination = true;
 					}
-					memcpy(tmp + pos, inChar, (lstrlen(inChar) + 1) * sizeof(TCHAR));
+					memcpy(m_tmp + pos, inChar, (lstrlen(inChar) + 1) * sizeof(TCHAR));
 				}
-				bufferSize = WideCharToMultiByte(NULL, 0, tmp, -1, NULL, 0, NULL, NULL);
-				WideCharToMultiByte(NULL, 0, tmp, -1, m_cs_packet_chat.message, bufferSize, NULL, NULL);
-				//std::cout << "컴포지션-";
-				//std::cout << str;
-				//std::cout << "--" << pos << std::endl;
+				bufferSize = WideCharToMultiByte(NULL, 0, m_tmp, -1, NULL, 0, NULL, NULL);
+				WideCharToMultiByte(NULL, 0, m_tmp, -1, m_cs_packet_chat.message, bufferSize, NULL, NULL);
 			}
-			//std::cout << "--" << strlen(m_cs_packet_chat.message) << std::endl;
-			//std::cout << "--" << pos << std::endl;
 			break;
-		case WM_CHAR:            // 문자 넘어오기
+		case WM_CHAR:
 			if (wParam == VK_RETURN)
 			{
 				//메시지 보내기
@@ -702,38 +684,30 @@ LRESULT Input::OnImeComposition(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 				//std::cout << "send : " << m_cs_packet_chat.message << std::endl;
 #endif
 				memset(m_cs_packet_chat.message, 0, 50);
-				memset(tmp, 0, 100);
+				memset(m_tmp, 0, 100);
 				m_chatNum = 0;
 			}
 			else if (wParam == VK_ESCAPE) m_gamestate->ChangeChatState();
-			else if (wParam == VK_BACK) {      // 만약 백스페이스라면
+			else if (wParam == VK_BACK) {
+				if (lstrlen(m_tmp) > 0) {
 
-				if (lstrlen(tmp) > 0) {
-
-					if (lstrlen(tmp) < 0) {
-						tmp[lstrlen(tmp) - 1] = 0;
+					if (lstrlen(m_tmp) < 0) {
+						m_tmp[lstrlen(m_tmp) - 1] = 0;
 					}
-					tmp[lstrlen(tmp) - 1] = 0;
-					//총 두바이트를 지운다.
+					m_tmp[lstrlen(m_tmp) - 1] = 0;
 				}
 			}
-			else {  // 빽스페이스가 아니면
-				if (messagelen < m_Limitchatlength)
+			else {
+				if (messagelen < m_chatlength)
 				{
-					//std::cout << "캐릭터" << std::endl;
-					pos = lstrlen(tmp);
-					tmp[pos] = wParam & 0xff;   //  넘어온 문자를 문자열에 
+					pos = lstrlen(m_tmp);
+					m_tmp[pos] = wParam & 0xff;
 					pos++;
-					tmp[pos] = 0;
+					m_tmp[pos] = 0;
 				}
 			}
-			bufferSize = WideCharToMultiByte(NULL, 0, tmp, -1, NULL, 0, NULL, NULL);
-			WideCharToMultiByte(NULL, 0, tmp, -1, m_cs_packet_chat.message, bufferSize, NULL, NULL);
-			//std::cout << "캐릭터-";
-			//std::wcout << tmp;
-			//std::cout << "--" << pos << std::endl;
-			//std::cout << "--" << strlen(m_cs_packet_chat.message) << std::endl;
-			//std::cout << "--" << pos << std::endl;
+			bufferSize = WideCharToMultiByte(NULL, 0, m_tmp, -1, NULL, 0, NULL, NULL);
+			WideCharToMultiByte(NULL, 0, m_tmp, -1, m_cs_packet_chat.message, bufferSize, NULL, NULL);
 			break;
 		}
 	}
@@ -765,20 +739,17 @@ void Input::CaptureOff()
 LRESULT Input::OnImeChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	int messagelen = strlen(m_cs_packet_chat.message);
-	if (messagelen < m_Limitchatlength)
+	if (messagelen < m_chatlength)
 	{
-		//std::cout << "완성캐릭터" << std::endl;
-		int pos = lstrlen(tmp);
-		if (bComposite) pos--;
+		int pos = lstrlen(m_tmp);
+		if (m_bCombination) pos--;
 
-		TCHAR szChar[2];
-		szChar[0] = wParam;
-		szChar[1] = 0;
+		TCHAR inputchar[2];
+		inputchar[0] = wParam;
+		inputchar[1] = 0;
 
-		memcpy(tmp + pos, szChar, (lstrlen(szChar) + 1) * sizeof(TCHAR));
-		bComposite = false;
-		//std::cout << "캐릭터";
-		//std::wcout << tmp << std::endl;
+		memcpy(m_tmp + pos, inputchar, (lstrlen(inputchar) + 1) * sizeof(TCHAR));
+		m_bCombination = false;
 	}
 	return 0;
 }

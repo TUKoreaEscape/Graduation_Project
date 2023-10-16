@@ -1,5 +1,7 @@
 #pragma once
 #include <thread>
+#include <vector>
+#include <algorithm>
 #include "Scene.h"
 #include "GameObject.h"
 #include "Player.h"
@@ -64,22 +66,16 @@ public:
 	GameObject* m_pForestTerrain = nullptr;
 	GameObject* m_pCubeTerrain = nullptr;
 
-	int m_nLogin;
-	int m_nRoomSelect;
-	int m_nWaitingRoom;
-	int m_nCustomizing;
-	int m_Ending;
-	int m_nPlay;
 	int m_nPlayPlayer;
 	int m_nPlayTagger;
 	int m_nLoading;
 
-	GameObject** m_UILogin = nullptr;
-	GameObject** m_UIRoomSelect = nullptr;
-	GameObject** m_UIWaitingRoom = nullptr;
-	GameObject** m_UICustomizing = nullptr;
-	GameObject** m_UIEnding = nullptr;
-	GameObject** m_UIPlay = nullptr;
+	std::vector<GameObject*> m_UILogin; //Login, LoginButton, CreateID, Loginfail, SameID, SuccessfullycreatedID
+	std::vector<GameObject*> m_UIRoomSelect;
+	std::vector<GameObject*> m_UIWaitingRoom;
+	std::vector<GameObject*> m_UICustomizing;
+	std::vector<GameObject*> m_UIEnding;
+	std::vector<GameObject*> m_UIPlay; //Frame, life , Mic-on , Mic-off, ChatBox, Minimap, SpectatorMode, Command
 	GameObject** m_UIPlayer = nullptr;
 	GameObject** m_UITagger = nullptr;
 	GameObject** m_UILoading = nullptr;

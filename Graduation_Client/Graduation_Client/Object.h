@@ -172,9 +172,13 @@ public:
 
 class UIObject : public GameObject
 {
+private:
+	std::string filename;
 public:
 	UIObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName, float x = 0.0f, float y = 0.0f, float width = 1.0f, float height = 1.0f);
 	virtual ~UIObject();
+	void SetUIname(std::string name) { filename = name; }
+	std::string GetUIname() { return filename; }
 };
 
 class PowerSwitch : public InteractionObject
@@ -314,6 +318,7 @@ public:
 
 class IngameUI : public GameObject
 {
+	std::string filename;
 public:
 	int m_UIType = INGAME_UI;
 	float m_fGauge{1};
@@ -329,10 +334,13 @@ public:
 	void SetUIType(int type) { m_UIType = type; };
 
 	void SetAnswer(bool on);
+	void SetUIname(std::string name) { filename = name; }
+	std::string GetUIname() { return filename; }
 };
 
 class MinimapUI : public GameObject
 {
+	std::string filename;
 public:
 	MinimapUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* m_pd3dGraphicsRootSignature, wchar_t* pstrFileName, float x = 0.0f, float y = 0.0f, float width = 1.0f, float height = 1.0f);
 	virtual ~MinimapUI();
@@ -340,6 +348,8 @@ public:
 	void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList);
 	void render(ID3D12GraphicsCommandList* pd3dCommandList) override;
 	void UIrender(ID3D12GraphicsCommandList* pd3dCommandList);
+	void SetUIname(std::string name) { filename = name; }
+	std::string GetUIname() { return filename; }
 };
 
 class TaggersBox : public InteractionObject

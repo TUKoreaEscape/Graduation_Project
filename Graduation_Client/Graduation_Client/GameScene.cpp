@@ -51,21 +51,22 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	switch (GameState::GetInstance()->GetGameState()) {
 	case LOGIN:
-		for (int i = 0; i < m_nLogin; ++i)
+		(*std::find_if(m_UILogin.begin(), m_UILogin.end(), [](GameObject* ui) { return static_cast<UIObject*>(ui)->GetUIname() == "Login"; }))->render(pd3dCommandList);
+		(*std::find_if(m_UILogin.begin(), m_UILogin.end(), [](GameObject* ui) { return static_cast<UIObject*>(ui)->GetUIname() == "LoginButton"; }))->render(pd3dCommandList);
+		(*std::find_if(m_UILogin.begin(), m_UILogin.end(), [](GameObject* ui) { return static_cast<UIObject*>(ui)->GetUIname() == "CreateID"; }))->render(pd3dCommandList);
+
+		if (Input::GetInstance()->m_errorState != None)
 		{
-			if (i > 2) break;
-			m_UILogin[i]->render(pd3dCommandList);
-		}
-		if (Input::GetInstance()->m_errorState != 0)
-		{
-			if (Input::GetInstance()->m_errorState == 1) m_UILogin[3]->render(pd3dCommandList);
-			else if (Input::GetInstance()->m_errorState == 2) m_UILogin[4]->render(pd3dCommandList);
+			if (Input::GetInstance()->m_errorState == Loginfail) (*std::find_if(m_UILogin.begin(), m_UILogin.end(), [](GameObject* ui) { return static_cast<UIObject*>(ui)->GetUIname() == "Loginfail"; }))->render(pd3dCommandList);
+			else if (Input::GetInstance()->m_errorState == IDfail) (*std::find_if(m_UILogin.begin(), m_UILogin.end(), [](GameObject* ui) { return static_cast<UIObject*>(ui)->GetUIname() == "SameID"; }))->render(pd3dCommandList);
 
 		}
-		if (Input::GetInstance()->m_SuccessState) m_UILogin[5]->render(pd3dCommandList);
+		if (Input::GetInstance()->m_SuccessState) (*std::find_if(m_UILogin.begin(), m_UILogin.end(), [](GameObject* ui) { return static_cast<UIObject*>(ui)->GetUIname() == "SuccessfullycreatedID"; }))->render(pd3dCommandList);
 		break;
 	case ROOM_SELECT:
-		for (int i = 0; i < m_nRoomSelect; ++i) m_UIRoomSelect[i]->render(pd3dCommandList);
+		for (GameObject*& ui : m_UIRoomSelect) {
+			ui->render(pd3dCommandList);
+		}
 		break;
 	case WAITING_GAME:
 		for (int i = 0; i < 5; ++i) {
@@ -77,10 +78,14 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		m_ppPlayers[3]->SetPosition(XMFLOAT3(-6.0f, 0.0f, -5.0f));
 		m_ppPlayers[4]->SetPosition(XMFLOAT3(0.0f, 0.0f, -5.0f));
 		m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -3.0f));
-		for (int i = 0; i < m_nWaitingRoom; ++i) m_UIWaitingRoom[i]->render(pd3dCommandList);
+		for (GameObject*& ui : m_UIWaitingRoom) {
+			ui->render(pd3dCommandList);
+		}
 		break;
 	case CUSTOMIZING:
-		for (int i = 0; i < m_nCustomizing; ++i) m_UICustomizing[i]->render(pd3dCommandList);
+		for (GameObject*& ui : m_UICustomizing) {
+			ui->render(pd3dCommandList);
+		}
 		break;
 	case READY_TO_GAME:
 		if (GameState::GetInstance()->IsLoading()) m_UILoading[3]->render(pd3dCommandList);
@@ -106,7 +111,7 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 			EscapeLevers[i]->UIrender(pd3dCommandList);
 		}
 		reinterpret_cast<TaggersBox*>(Taggers)->UIrender(pd3dCommandList);
-		for (int i = 1; i < m_nPlay - 2; ++i) // 생명칩 프레임(0) 그리지 않음
+		for (int i = 1; i < m_UIPlay.size() - 2; ++i) // 생명칩 프레임(0) 그리지 않음
 		{
 			if (i >= 1 && i <= 3) continue;
 			if (i == 4 && !GameState::GetInstance()->GetChatState()) continue;
@@ -115,13 +120,13 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 		}
 		if (GameState::GetInstance()->GetMicState())
 		{
-			m_UIPlay[2]->render(pd3dCommandList);
+			(*std::find_if(m_UIPlay.begin(), m_UIPlay.end(), [](GameObject* ui) { return static_cast<IngameUI*>(ui)->GetUIname() == "Mic-on"; }))->render(pd3dCommandList);
 		}
 		else
 		{
-			m_UIPlay[3]->render(pd3dCommandList);
+			(*std::find_if(m_UIPlay.begin(), m_UIPlay.end(), [](GameObject* ui) { return static_cast<IngameUI*>(ui)->GetUIname() == "Mic-off"; }))->render(pd3dCommandList);
 		}
-		if(GameState::GetInstance()->GetManualState()) m_UIPlay[7]->render(pd3dCommandList);
+		if(GameState::GetInstance()->GetManualState()) (*std::find_if(m_UIPlay.begin(), m_UIPlay.end(), [](GameObject* ui) { return static_cast<IngameUI*>(ui)->GetUIname() == "Command"; }))->render(pd3dCommandList);
 
 		if (m_pPlayer->GetType() == TYPE_PLAYER)reinterpret_cast<IngameUI*>(m_UIPlay[1])->SetGuage(1.0f);
 		else {
@@ -442,18 +447,30 @@ void GameScene::ReleaseObjects()
 	if (m_pClassroomTerrain) m_pClassroomTerrain->Release();
 	if (m_pForestTerrain) m_pForestTerrain->Release();
 	if (m_pCubeTerrain) m_pCubeTerrain->Release();
-	if (m_UILogin) {
-		for (int i = 0; i < m_nLogin; ++i) {
-			if (m_UILogin[i]) m_UILogin[i]->Release();
-		}
-		delete[] m_UILogin;
+	for (GameObject*& ui : m_UILogin) {
+		ui->Release();
 	}
-	if (m_UIRoomSelect) {
-		for (int i = 0; i < m_nRoomSelect; ++i) {
-			if (m_UIRoomSelect[i]) m_UIRoomSelect[i]->Release();
-		}
-		delete[] m_UIRoomSelect;
+
+	for (GameObject*& ui : m_UIRoomSelect) {
+		ui->Release();
 	}
+
+	for (GameObject*& ui : m_UIWaitingRoom) {
+		ui->Release();
+	}
+
+	for (GameObject*& ui : m_UICustomizing) {
+		ui->Release();
+	}
+
+	for (GameObject*& ui : m_UIEnding) {
+		ui->Release();
+	}
+
+	for (GameObject*& ui : m_UIPlay) {
+		ui->Release();
+	}
+
 	if (m_pPVSObjects)
 		for (int i = 0; i < 6; ++i) {
 			if (m_pPVSObjects[i]) m_pPVSObjects[i]->Release();
@@ -914,36 +931,30 @@ void GameScene::ReleaseUploadBuffers()
 	if (m_pForestTerrain) m_pForestTerrain->ReleaseUploadBuffers();
 	if (m_pCubeTerrain) m_pCubeTerrain->ReleaseUploadBuffers();
 	
-	if (m_UILogin) {
-		for (int i = 0; i < m_nLogin; ++i) {
-			if (m_UILogin[i]) m_UILogin[i]->ReleaseUploadBuffers();
-		}
+	for (GameObject*& ui : m_UILogin) {
+		ui->ReleaseUploadBuffers();
 	}
-	if (m_UIRoomSelect) {
-		for (int i = 0; i < m_nRoomSelect; ++i) {
-			if (m_UIRoomSelect[i]) m_UIRoomSelect[i]->ReleaseUploadBuffers();
-		}
+
+	for (GameObject*& ui : m_UIRoomSelect) {
+		ui->ReleaseUploadBuffers();
 	}
-	if (m_UIWaitingRoom) {
-		for (int i = 0; i < m_nWaitingRoom; ++i) {
-			if (m_UIWaitingRoom[i]) m_UIWaitingRoom[i]->ReleaseUploadBuffers();
-		}
+
+	for (GameObject*& ui : m_UIWaitingRoom) {
+		ui->ReleaseUploadBuffers();
 	}
-	if (m_UICustomizing) {
-		for (int i = 0; i < m_nCustomizing; ++i) {
-			if (m_UICustomizing[i]) m_UICustomizing[i]->ReleaseUploadBuffers();
-		}
+
+	for (GameObject*& ui : m_UICustomizing) {
+		ui->ReleaseUploadBuffers();
 	}
-	if (m_UIEnding) {
-		for (int i = 0; i < m_Ending; ++i) {
-			if (m_UIEnding[i]) m_UIEnding[i]->ReleaseUploadBuffers();
-		}
+
+	for (GameObject*& ui : m_UIEnding) {
+		ui->ReleaseUploadBuffers();
 	}
-	if (m_UIPlay) {
-		for (int i = 0; i < m_nPlay; ++i) {
-			if (m_UIPlay[i]) m_UIPlay[i]->ReleaseUploadBuffers();
-		}
+
+	for (GameObject*& ui : m_UIPlay) {
+		ui->ReleaseUploadBuffers();
 	}
+
 	if (m_UIPlayer) {
 		for (int i = 0; i < m_nPlayPlayer; ++i) {
 			if (m_UIPlayer[i]) m_UIPlayer[i]->ReleaseUploadBuffers();
@@ -1829,67 +1840,65 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 	reinterpret_cast<IngameUI*>(m_UILoading[2])->SetGuage(0.5f);
 	//UI생성 영역 dds파일 다음 x,y,width,height가 순서대로 들어간다. 아무것도 넣지않으면 화면중앙에 1x1사이즈로 나온다.
-	m_nLogin = 6;
-	m_UILogin = new GameObject * [m_nLogin];
-	m_UILogin[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Login.dds", 0.0f, 0.0f, 2.0f, 2.0f);
-	m_UILogin[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/LoginButton.dds", -0.67f, -0.55f, 0.2f, 0.14f);
-	m_UILogin[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/CreateID.dds", -0.38f, -0.55f, 0.2f, 0.14f);
-	m_UILogin[3] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Loginfail.dds", 0.0f, -0.2f, 0.8f, 0.35f);
-	m_UILogin[4] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SameID.dds", 0.0f, -0.2f, 0.8f, 0.35f);
-	m_UILogin[5] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SuccessfullycreatedID.dds", 0.0f, -0.2f, 0.8f, 0.35f);
 
-	m_nRoomSelect = 9;
-	m_UIRoomSelect = new GameObject * [m_nRoomSelect];
-	m_UIRoomSelect[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/RoomSelect.dds", 0.0f, 0.0f, 2.0f, 2.0f);
-	m_UIRoomSelect[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/LArrow.dds", -0.2f, -0.9f, 0.2f, 0.2f);
-	m_UIRoomSelect[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/RArrow.dds", 0.2f, -0.9f, 0.2f, 0.2f);
+	m_UILogin.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Login.dds", 0.0f, 0.0f, 2.0f, 2.0f));
+	static_cast<UIObject*>(m_UILogin.back())->SetUIname("Login");
+	m_UILogin.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/LoginButton.dds", -0.67f, -0.55f, 0.2f, 0.14f));
+	static_cast<UIObject*>(m_UILogin.back())->SetUIname("LoginButton");
+	m_UILogin.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/CreateID.dds", -0.38f, -0.55f, 0.2f, 0.14f));
+	static_cast<UIObject*>(m_UILogin.back())->SetUIname("CreateID");
+	m_UILogin.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Loginfail.dds", 0.0f, -0.2f, 0.8f, 0.35f));
+	static_cast<UIObject*>(m_UILogin.back())->SetUIname("Loginfail");
+	m_UILogin.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SameID.dds", 0.0f, -0.2f, 0.8f, 0.35f));
+	static_cast<UIObject*>(m_UILogin.back())->SetUIname("SameID");
+	m_UILogin.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SuccessfullycreatedID.dds", 0.0f, -0.2f, 0.8f, 0.35f));
+	static_cast<UIObject*>(m_UILogin.back())->SetUIname("SuccessfullycreatedID");
 
-	m_UIRoomSelect[3] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", 0.4f, 0.7f, 0.5f, 0.4f);
-	m_UIRoomSelect[4] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", 0.4f, 0.1f, 0.5f, 0.4f);
-	m_UIRoomSelect[5] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", 0.4f, -0.5f, 0.5f, 0.4f);
-	m_UIRoomSelect[6] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", -0.4f, 0.7f, 0.5f, 0.4f);
-	m_UIRoomSelect[7] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", -0.4f, 0.1f, 0.5f, 0.4f);
-	m_UIRoomSelect[8] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", -0.4f, -0.5f, 0.5f, 0.4f);
+	
+	m_UIRoomSelect.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/RoomSelect.dds", 0.0f, 0.0f, 2.0f, 2.0f));
+	m_UIRoomSelect.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/LArrow.dds", -0.2f, -0.9f, 0.2f, 0.2f));
+	m_UIRoomSelect.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/RArrow.dds", 0.2f, -0.9f, 0.2f, 0.2f));
 
-	m_nWaitingRoom = 4;
-	m_UIWaitingRoom = new GameObject * [m_nWaitingRoom];
-	m_UIWaitingRoom[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/WaitingRoom.dds", 0.0f, 0.0f, 2.0f, 2.0f);
-	m_UIWaitingRoom[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Ready.dds", 0.4f, -0.8f, 0.15f, 0.1f);
-	m_UIWaitingRoom[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.6f, -0.8f, 0.15f, 0.1f);
-	m_UIWaitingRoom[3] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Customizing.dds", 0.8f, -0.8f, 0.15f, 0.1f);
+	m_UIRoomSelect.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", 0.4f, 0.7f, 0.5f, 0.4f));
+	m_UIRoomSelect.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", 0.4f, 0.1f, 0.5f, 0.4f));
+	m_UIRoomSelect.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", 0.4f, -0.5f, 0.5f, 0.4f));
+	m_UIRoomSelect.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", -0.4f, 0.7f, 0.5f, 0.4f));
+	m_UIRoomSelect.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", -0.4f, 0.1f, 0.5f, 0.4f));
+	m_UIRoomSelect.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/blank.dds", -0.4f, -0.5f, 0.5f, 0.4f));
 
-	m_nCustomizing = 11;
-	m_UICustomizing = new GameObject * [m_nCustomizing];
-	m_UICustomizing[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/CustomizingRoom.dds", 0.0f, 0.0f, 2.0f, 2.0f);
-	m_UICustomizing[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Ready.dds", 0.6f, -0.8f, 0.15f, 0.1f);
-	m_UICustomizing[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.8f, -0.8f, 0.15f, 0.1f);
-	m_UICustomizing[3] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/HEAD.dds", -0.8f, 0.6f, 0.1f, 0.15f);
-	m_UICustomizing[4] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Eyes.dds", -0.8f, 0.4f, 0.1f, 0.15f);
-	m_UICustomizing[5] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Mouthandnoses.dds", -0.8f, 0.2f, 0.1f, 0.15f);
-	m_UICustomizing[6] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Body.dds", -0.8f, 0.f, 0.1f, 0.15f);
-	m_UICustomizing[7] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/BodyParts.dds", -0.8f, -0.2f, 0.1f, 0.15f);
-	m_UICustomizing[8] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Gloves.dds", -0.8f, -0.4f, 0.1f, 0.15f);
-	m_UICustomizing[9] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/CustomizingRArrow.dds", 0.5f, 0.f, 0.1f, 0.15f);
-	m_UICustomizing[10] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/CustomizingLArrow.dds", -0.5f, 0.f, 0.1f, 0.15f);
+	m_UIWaitingRoom.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/WaitingRoom.dds", 0.0f, 0.0f, 2.0f, 2.0f));
+	m_UIWaitingRoom.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Ready.dds", 0.4f, -0.8f, 0.15f, 0.1f));
+	m_UIWaitingRoom.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.6f, -0.8f, 0.15f, 0.1f));
+	m_UIWaitingRoom.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Customizing.dds", 0.8f, -0.8f, 0.15f, 0.1f));
 
-	m_Ending = 3;
-	m_UIEnding = new GameObject * [m_Ending];
-	m_UIEnding[0] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.8f, -0.8f, 0.15f, 0.1f);
-	m_UIEnding[1] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SurvivorWin.dds", 0.0f, 0.0f, 2.0f, 2.0f);
-	m_UIEnding[2] = new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/TaggerWin.dds", 0.0f, 0.0f, 2.0f, 2.0f);
+	m_UICustomizing.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/CustomizingRoom.dds", 0.0f, 0.0f, 2.0f, 2.0f));
+	m_UICustomizing.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Ready.dds", 0.6f, -0.8f, 0.15f, 0.1f));
+	m_UICustomizing.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.8f, -0.8f, 0.15f, 0.1f));
+	m_UICustomizing.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/HEAD.dds", -0.8f, 0.6f, 0.1f, 0.15f));
+	m_UICustomizing.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Eyes.dds", -0.8f, 0.4f, 0.1f, 0.15f));
+	m_UICustomizing.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Mouthandnoses.dds", -0.8f, 0.2f, 0.1f, 0.15f));
+	m_UICustomizing.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Body.dds", -0.8f, 0.f, 0.1f, 0.15f));
+	m_UICustomizing.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/BodyParts.dds", -0.8f, -0.2f, 0.1f, 0.15f));
+	m_UICustomizing.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Gloves.dds", -0.8f, -0.4f, 0.1f, 0.15f));
+	m_UICustomizing.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/CustomizingRArrow.dds", 0.5f, 0.f, 0.1f, 0.15f));
+	m_UICustomizing.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/CustomizingLArrow.dds", -0.5f, 0.f, 0.1f, 0.15f));
 
-	m_nPlay = 8;
-	m_UIPlay = new GameObject * [m_nPlay];
-	m_UIPlay[0] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.8f, -0.75f, 0.3f, 0.4f);
-	//m_UIPlay[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.0f, 0.75f, 0.6f, 0.4f); 시계
-	m_UIPlay[1] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/life2.dds", 0.8f, -0.75f, 0.3f, 0.4f);
-	m_UIPlay[2] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Mic-on.dds", 0.5f, -0.85f, 0.07f, 0.15f);//mic-on
-	m_UIPlay[3] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Mic-off.dds", 0.5f, -0.85f, 0.07f, 0.15f);//mic-off
-	m_UIPlay[4] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/ChatBox.dds", -0.1f, -0.7f, 0.6f, 0.6f);//chatBox
-	m_UIPlay[5] = new MinimapUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Minimap2.dds", 0.0f, 0.0f, 1.0f, 1.0f);//Minimap
-	m_UIPlay[6] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SpectatorMode.dds", 0.0f, -0.9f, 0.4f, 0.4f);//관전표시
-	m_UIPlay[7] = new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Command.dds", 0.0f, 0.0f, 1.5f, 1.5f);//조작법
+	m_UIEnding.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Quit.dds", 0.8f, -0.8f, 0.15f, 0.1f));
+	m_UIEnding.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SurvivorWin.dds", 0.0f, 0.0f, 2.0f, 2.0f));
+	m_UIEnding.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/TaggerWin.dds", 0.0f, 0.0f, 2.0f, 2.0f));
 
+
+	m_UIPlay.emplace_back(new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Frame.dds", 0.8f, -0.75f, 0.3f, 0.4f));
+	m_UIPlay.emplace_back(new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/life2.dds", 0.8f, -0.75f, 0.3f, 0.4f));
+	m_UIPlay.emplace_back(new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Mic-on.dds", 0.5f, -0.85f, 0.07f, 0.15f));//mic-on
+	static_cast<IngameUI*>(m_UIPlay.back())->SetUIname("Mic-on");
+	m_UIPlay.emplace_back(new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Mic-off.dds", 0.5f, -0.85f, 0.07f, 0.15f));//mic-off
+	static_cast<IngameUI*>(m_UIPlay.back())->SetUIname("Mic-off");
+	m_UIPlay.emplace_back(new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/ChatBox.dds", -0.1f, -0.7f, 0.6f, 0.6f));//chatBox
+	m_UIPlay.emplace_back(new MinimapUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Minimap2.dds", 0.0f, 0.0f, 1.0f, 1.0f));//Minimap
+	m_UIPlay.emplace_back(new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SpectatorMode.dds", 0.0f, -0.9f, 0.4f, 0.4f));//관전표시
+	m_UIPlay.emplace_back(new IngameUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/Command.dds", 0.0f, 0.0f, 1.5f, 1.5f));//조작법
+	static_cast<IngameUI*>(m_UIPlay.back())->SetUIname("Command");
 
 	m_nPlayPlayer = 1 + 5 + 1;
 	m_UIPlayer = new GameObject * [m_nPlayPlayer];

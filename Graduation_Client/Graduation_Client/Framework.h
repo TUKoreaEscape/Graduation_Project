@@ -120,6 +120,8 @@ private:
 
 	int								m_nDebugOptions = 10; // U
 
+	const int						MAX_TEXT_SIZE = 5;
+
 	std::thread buildThread;
 public:
 	Framework();

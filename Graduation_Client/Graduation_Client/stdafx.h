@@ -54,6 +54,7 @@ using Microsoft::WRL::ComPtr;
 
 #include <list>
 #include <queue>
+#include <vector>
 #include <deque>
 #include <algorithm>
 #include <iostream>

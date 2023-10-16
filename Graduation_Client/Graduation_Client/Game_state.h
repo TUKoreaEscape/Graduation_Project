@@ -11,7 +11,7 @@ enum GAME_STATE {
 	PLAYING_GAME, //게임중
 	ENDING_GAME, //게임이 끝난 후 (모든 플레이어 탈출 성공 or 술래 승)
 	INTERACTION_POWER, // 전력장치 수리
-	GAME_LOADING,
+	GAME_LOADING, //게임 로딩
 	SPECTATOR_GAME, // Player가 탈출 성공했을 때
 };
 
