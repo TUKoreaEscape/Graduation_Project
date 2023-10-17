@@ -39,6 +39,7 @@ enum class PVSROOM
 	CUBE_ROOM
 };
 
+class UIobject;
 class InteractionUI;
 class InteractionObject;
 class ItemBox;

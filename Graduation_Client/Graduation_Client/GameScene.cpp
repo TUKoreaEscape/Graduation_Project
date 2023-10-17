@@ -51,17 +51,17 @@ void GameScene::UIrender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	switch (GameState::GetInstance()->GetGameState()) {
 	case LOGIN:
-		(*std::find_if(m_UILogin.begin(), m_UILogin.end(), [](GameObject* ui) { return static_cast<UIObject*>(ui)->GetUIname() == "Login"; }))->render(pd3dCommandList);
-		(*std::find_if(m_UILogin.begin(), m_UILogin.end(), [](GameObject* ui) { return static_cast<UIObject*>(ui)->GetUIname() == "LoginButton"; }))->render(pd3dCommandList);
-		(*std::find_if(m_UILogin.begin(), m_UILogin.end(), [](GameObject* ui) { return static_cast<UIObject*>(ui)->GetUIname() == "CreateID"; }))->render(pd3dCommandList);
+		(*std::lower_bound(m_UILogin.begin(), m_UILogin.end(), "Login", [](GameObject*& ui, const std::string& s) { return static_cast<UIObject*>(ui)->GetUIname() < s; }))->render(pd3dCommandList);
+		(*std::lower_bound(m_UILogin.begin(), m_UILogin.end(), "LoginButton", [](GameObject*& ui, const std::string& s) { return static_cast<UIObject*>(ui)->GetUIname() < s; }))->render(pd3dCommandList);
+		(*std::lower_bound(m_UILogin.begin(), m_UILogin.end(), "CreateID", [](GameObject*& ui, const std::string& s) { return static_cast<UIObject*>(ui)->GetUIname() < s; }))->render(pd3dCommandList);
 
 		if (Input::GetInstance()->m_errorState != None)
 		{
-			if (Input::GetInstance()->m_errorState == Loginfail) (*std::find_if(m_UILogin.begin(), m_UILogin.end(), [](GameObject* ui) { return static_cast<UIObject*>(ui)->GetUIname() == "Loginfail"; }))->render(pd3dCommandList);
-			else if (Input::GetInstance()->m_errorState == IDfail) (*std::find_if(m_UILogin.begin(), m_UILogin.end(), [](GameObject* ui) { return static_cast<UIObject*>(ui)->GetUIname() == "SameID"; }))->render(pd3dCommandList);
+			if (Input::GetInstance()->m_errorState == Loginfail) (*std::lower_bound(m_UILogin.begin(), m_UILogin.end(), "Loginfail", [](GameObject*& ui, const std::string& s) { return static_cast<UIObject*>(ui)->GetUIname() < s; }))->render(pd3dCommandList);
+			else if (Input::GetInstance()->m_errorState == IDfail) (*std::lower_bound(m_UILogin.begin(), m_UILogin.end(), "SameID", [](GameObject*& ui, const std::string& s) { return static_cast<UIObject*>(ui)->GetUIname() < s; }))->render(pd3dCommandList);
 
 		}
-		if (Input::GetInstance()->m_SuccessState) (*std::find_if(m_UILogin.begin(), m_UILogin.end(), [](GameObject* ui) { return static_cast<UIObject*>(ui)->GetUIname() == "SuccessfullycreatedID"; }))->render(pd3dCommandList);
+		if (Input::GetInstance()->m_SuccessState) (*std::lower_bound(m_UILogin.begin(), m_UILogin.end(), "SuccessfullycreatedID", [](GameObject*& ui, const std::string& s) { return static_cast<UIObject*>(ui)->GetUIname() < s; }))->render(pd3dCommandList);
 		break;
 	case ROOM_SELECT:
 		for (GameObject*& ui : m_UIRoomSelect) {
@@ -1853,6 +1853,10 @@ void GameScene::BuildObjectsThread(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	static_cast<UIObject*>(m_UILogin.back())->SetUIname("SameID");
 	m_UILogin.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/SuccessfullycreatedID.dds", 0.0f, -0.2f, 0.8f, 0.35f));
 	static_cast<UIObject*>(m_UILogin.back())->SetUIname("SuccessfullycreatedID");
+
+	std::sort(m_UILogin.begin(), m_UILogin.end(), [](GameObject*& a, GameObject*& b) {
+		return static_cast<UIObject*>(a)->GetUIname() < static_cast<UIObject*>(a)->GetUIname(); });
+
 
 	
 	m_UIRoomSelect.emplace_back(new UIObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, L"Texture/RoomSelect.dds", 0.0f, 0.0f, 2.0f, 2.0f));
