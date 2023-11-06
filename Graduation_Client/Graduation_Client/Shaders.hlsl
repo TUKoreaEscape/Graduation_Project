@@ -1122,7 +1122,7 @@ float4 Outline(VS_SCREEN_RECT_TEXTURED_OUTPUT input)
 
 	float3 result = float3(0, 0, 0);
 	float totalWeight = 0;
-    float blurRadius = gtxtInputTextures[Depth_INDEX].Sample(gssWrap, input.uv).r * 0.0003;
+    float blurRadius = gtxtInputTextures[Depth_INDEX].Sample(gssWrap, input.uv).r * 0.0002;
 	
 	int blurSize = 5;
 	
